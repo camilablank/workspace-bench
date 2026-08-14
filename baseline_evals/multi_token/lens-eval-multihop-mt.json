@@ -1,0 +1,2587 @@
+{
+ "family": "multihop-mt",
+ "gate": "Qwen3.6-27B behavioral: chat-templated fill-in question, >=8/10 correct at temp 0.7. EVAL RENDER: feed `prompt` verbatim as plain text, NO chat template; readout at the final prompt token. Multi-intermediate items follow the all-units rule.",
+ "items": [
+  {
+   "name": "mt-007-author",
+   "prompt": "Fact: The author who created the secret agent with code number 007 is",
+   "target": "Ian Fleming",
+   "intermediates": [
+    "James Bond"
+   ],
+   "target_alts": [
+    "Fleming"
+   ],
+   "source": "staging_mt",
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "mt-100m-country",
+   "prompt": "Fact: The home country of the sprinter who holds the men's 100-meter world record is",
+   "target": "Jamaica",
+   "intermediates": [
+    "Usain Bolt"
+   ],
+   "source": "staging_mt",
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     3
+    ],
+    "target": 1
+   }
+  },
+  {
+   "name": "mt-1912-director",
+   "prompt": "Fact: The director of the 1997 romance film set aboard the ocean liner that sank in 1912 is",
+   "target": "James Cameron",
+   "intermediates": [
+    "Titanic"
+   ],
+   "source": "staging_mt",
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     1
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "mt-3hop-bigapple-ocean",
+   "prompt": "Fact: The ocean that the river along the west side of the city nicknamed the Big Apple flows into is the",
+   "target": "Atlantic",
+   "intermediates": [
+    "New York City",
+    "Hudson River"
+   ],
+   "prompt_allowed": [
+    "city",
+    "river"
+   ],
+   "source": "staging_mt",
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     3,
+     2
+    ],
+    "target": 1
+   }
+  },
+  {
+   "name": "mt-3hop-sevensamurai-currency",
+   "prompt": "Fact: The currency of the birth country of the director of Seven Samurai is the",
+   "target": "yen",
+   "intermediates": [
+    "Akira Kurosawa",
+    "Japan"
+   ],
+   "source": "staging_mt",
+   "consistency": 1.0,
+   "consistency_strict": 0.9,
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     5,
+     1
+    ],
+    "target": 1
+   }
+  },
+  {
+   "name": "mt-ad79-volcano",
+   "prompt": "Fact: The volcano whose eruption in AD 79 buried the Roman city rediscovered near modern Naples is Mount",
+   "target": "Vesuvius",
+   "intermediates": [
+    "Pompeii"
+   ],
+   "source": "staging_mt",
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 3
+   }
+  },
+  {
+   "name": "mt-agra-emperor",
+   "prompt": "Fact: The Mughal emperor who built the white marble mausoleum in Agra was",
+   "target": "Shah Jahan",
+   "intermediates": [
+    "Taj Mahal"
+   ],
+   "source": "staging_mt",
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     3
+    ],
+    "target": 3
+   }
+  },
+  {
+   "name": "mt-amharic-capital",
+   "prompt": "Fact: The capital of the country whose working language is Amharic is",
+   "target": "Addis Ababa",
+   "intermediates": [
+    "Ethiopia"
+   ],
+   "source": "staging_mt",
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     1
+    ],
+    "target": 4
+   }
+  },
+  {
+   "name": "mt-angkor-capital",
+   "prompt": "Fact: The capital of the country home to the temple complex of Angkor Wat is",
+   "target": "Phnom Penh",
+   "intermediates": [
+    "Cambodia"
+   ],
+   "source": "staging_mt",
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     1
+    ],
+    "target": 4
+   }
+  },
+  {
+   "name": "mt-arctic-bear-prey",
+   "prompt": "Fact: The marine mammals that the great white bear of the Arctic mainly hunts are",
+   "target": "seals",
+   "intermediates": [
+    "polar bear"
+   ],
+   "prompt_allowed": [
+    "bear"
+   ],
+   "source": "staging_mt",
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 1
+   }
+  },
+  {
+   "name": "mt-arith-add-div",
+   "prompt": "(31 + 49) / 4 = ",
+   "target": "20",
+   "intermediates": [
+    "80"
+   ],
+   "source": "staging_mt",
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     3
+    ],
+    "target": 3
+   }
+  },
+  {
+   "name": "mt-arith-div-add",
+   "prompt": "96 / 4 + 17 = ",
+   "target": "41",
+   "intermediates": [
+    "24"
+   ],
+   "source": "staging_mt",
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     3
+    ],
+    "target": 3
+   }
+  },
+  {
+   "name": "mt-arith-mul-add-1",
+   "prompt": "13 * 4 + 5 = ",
+   "target": "57",
+   "intermediates": [
+    "52"
+   ],
+   "source": "staging_mt",
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     3
+    ],
+    "target": 3
+   }
+  },
+  {
+   "name": "mt-arith-mul-add-2",
+   "prompt": "18 * 6 + 10 = ",
+   "target": "118",
+   "intermediates": [
+    "108"
+   ],
+   "source": "staging_mt",
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     4
+    ],
+    "target": 4
+   }
+  },
+  {
+   "name": "mt-arith-mul-mul",
+   "prompt": "7 * 8 * 2 = ",
+   "target": "112",
+   "intermediates": [
+    "56"
+   ],
+   "source": "staging_mt",
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     3
+    ],
+    "target": 4
+   }
+  },
+  {
+   "name": "mt-arith-mul-sub-1",
+   "prompt": "25 * 3 - 7 = ",
+   "target": "68",
+   "intermediates": [
+    "75"
+   ],
+   "source": "staging_mt",
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     3
+    ],
+    "target": 3
+   }
+  },
+  {
+   "name": "mt-arith-sq-sub",
+   "prompt": "12^2 - 20 = ",
+   "target": "124",
+   "intermediates": [
+    "144"
+   ],
+   "source": "staging_mt",
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     4
+    ],
+    "target": 4
+   }
+  },
+  {
+   "name": "mt-auckland-capital",
+   "prompt": "Fact: The capital of the country whose largest city is Auckland is",
+   "target": "Wellington",
+   "intermediates": [
+    "New Zealand"
+   ],
+   "source": "staging_mt",
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 1
+   }
+  },
+  {
+   "name": "mt-bakerstreet-instrument",
+   "prompt": "Fact: The instrument played by the detective who lives at 221B Baker Street is the",
+   "target": "violin",
+   "intermediates": [
+    "Sherlock Holmes"
+   ],
+   "source": "staging_mt",
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 1
+   }
+  },
+  {
+   "name": "mt-bloodsugar-organ",
+   "prompt": "Fact: The organ that produces the hormone which lowers blood sugar is the",
+   "target": "pancreas",
+   "intermediates": [
+    "insulin"
+   ],
+   "source": "staging_mt",
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     1
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "mt-briefhistory-university",
+   "prompt": "Fact: The university where the author of A Brief History of Time spent most of his career is",
+   "target": "Cambridge",
+   "intermediates": [
+    "Stephen Hawking"
+   ],
+   "source": "staging_mt",
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     3
+    ],
+    "target": 1
+   }
+  },
+  {
+   "name": "mt-cake-device",
+   "prompt": "Fact: The device used to execute the French queen who supposedly said 'Let them eat cake' was the",
+   "target": "guillotine",
+   "intermediates": [
+    "Marie Antoinette"
+   ],
+   "source": "staging_mt",
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     4
+    ],
+    "target": 3
+   }
+  },
+  {
+   "name": "mt-carbattery-formula",
+   "prompt": "Fact: The chemical formula of the acid used in car batteries is",
+   "target": "H2SO4",
+   "intermediates": [
+    "sulfuric acid"
+   ],
+   "prompt_allowed": [
+    "acid"
+   ],
+   "target_alts": [
+    "H₂SO₄"
+   ],
+   "source": "staging_mt",
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     3
+    ],
+    "target": 4
+   }
+  },
+  {
+   "name": "mt-cassius-sport",
+   "prompt": "Fact: The sport of the champion athlete born Cassius Clay was",
+   "target": "boxing",
+   "intermediates": [
+    "Muhammad Ali"
+   ],
+   "source": "staging_mt",
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 1
+   }
+  },
+  {
+   "name": "mt-ceylon-ocean",
+   "prompt": "Fact: The ocean surrounding the island nation formerly known as Ceylon is the",
+   "target": "Indian Ocean",
+   "intermediates": [
+    "Sri Lanka"
+   ],
+   "prompt_allowed": [
+    "ocean"
+   ],
+   "source": "staging_mt",
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "mt-claws-metal",
+   "prompt": "Fact: The fictional metal bonded to the skeleton of the clawed mutant hero played by Hugh Jackman is",
+   "target": "adamantium",
+   "intermediates": [
+    "Wolverine"
+   ],
+   "source": "staging_mt",
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     1
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "mt-clemens-river",
+   "prompt": "Fact: The river that features in the famous boyhood novels of the author born Samuel Clemens is the",
+   "target": "Mississippi",
+   "intermediates": [
+    "Mark Twain"
+   ],
+   "source": "staging_mt",
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     3
+    ],
+    "target": 1
+   }
+  },
+  {
+   "name": "mt-clownfish-studio",
+   "prompt": "Fact: The animation studio behind the 2003 film about a clownfish father searching the ocean for his son is",
+   "target": "Pixar",
+   "intermediates": [
+    "Finding Nemo"
+   ],
+   "source": "staging_mt",
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     3
+    ],
+    "target": 1
+   }
+  },
+  {
+   "name": "mt-coatofarms-baby",
+   "prompt": "Fact: The name for the baby of the large hopping marsupial on Australia's coat of arms is a",
+   "target": "joey",
+   "intermediates": [
+    "kangaroo"
+   ],
+   "source": "staging_mt",
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "mt-colorado-state",
+   "prompt": "Fact: The U.S. state containing the vast canyon carved by the Colorado River is",
+   "target": "Arizona",
+   "intermediates": [
+    "Grand Canyon"
+   ],
+   "prompt_allowed": [
+    "canyon"
+   ],
+   "source": "staging_mt",
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 1
+   }
+  },
+  {
+   "name": "mt-crescent-country",
+   "prompt": "Fact: The country most associated with the flaky crescent-shaped breakfast pastry is",
+   "target": "France",
+   "intermediates": [
+    "croissant"
+   ],
+   "source": "staging_mt",
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 1
+   }
+  },
+  {
+   "name": "mt-darkknight-city",
+   "prompt": "Fact: The city protected by the superhero known as the Dark Knight is",
+   "target": "Gotham City",
+   "intermediates": [
+    "Batman"
+   ],
+   "prompt_allowed": [
+    "city"
+   ],
+   "target_alts": [
+    "Gotham"
+   ],
+   "source": "staging_mt",
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     1
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "mt-dividedcapital-year",
+   "prompt": "Fact: The year the concrete wall dividing Germany's capital city fell was",
+   "target": "1989",
+   "intermediates": [
+    "Berlin Wall"
+   ],
+   "prompt_allowed": [
+    "wall"
+   ],
+   "source": "staging_mt",
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 5
+   }
+  },
+  {
+   "name": "mt-ear-country",
+   "prompt": "Fact: The country of birth of the painter who famously cut off part of his own ear is the",
+   "target": "Netherlands",
+   "intermediates": [
+    "Vincent van Gogh"
+   ],
+   "source": "staging_mt",
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     4
+    ],
+    "target": 1
+   }
+  },
+  {
+   "name": "mt-emancipation-theatre",
+   "prompt": "Fact: The theatre where the president who issued the Emancipation Proclamation was shot is",
+   "target": "Ford's",
+   "intermediates": [
+    "Abraham Lincoln"
+   ],
+   "source": "staging_mt",
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "mt-erie-ontario-falls",
+   "prompt": "Fact: The two countries that share the famous waterfall between Lake Erie and Lake Ontario are the United States and",
+   "target": "Canada",
+   "intermediates": [
+    "Niagara Falls"
+   ],
+   "source": "staging_mt",
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 1
+   }
+  },
+  {
+   "name": "mt-finches-islands",
+   "prompt": "Fact: The island group whose finches inspired the author of On the Origin of Species is the",
+   "target": "Galapagos",
+   "intermediates": [
+    "Charles Darwin"
+   ],
+   "source": "staging_mt",
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 3
+   }
+  },
+  {
+   "name": "mt-fma-country",
+   "prompt": "Fact: The country of birth of the scientist whose second law of motion is F = ma is",
+   "target": "England",
+   "intermediates": [
+    "Isaac Newton"
+   ],
+   "source": "staging_mt",
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 1
+   }
+  },
+  {
+   "name": "mt-fourseasons-nationality",
+   "prompt": "Fact: The nationality of the composer of The Four Seasons was",
+   "target": "Italian",
+   "intermediates": [
+    "Antonio Vivaldi"
+   ],
+   "source": "staging_mt",
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     4
+    ],
+    "target": 1
+   }
+  },
+  {
+   "name": "mt-glassslipper-time",
+   "prompt": "Fact: The hour at which the fairy-tale girl with the glass slippers had to leave the ball was",
+   "target": "midnight",
+   "intermediates": [
+    "Cinderella"
+   ],
+   "source": "staging_mt",
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 1
+   }
+  },
+  {
+   "name": "mt-greatone-sport",
+   "prompt": "Fact: The sport played by the athlete nicknamed The Great One is",
+   "target": "hockey",
+   "intermediates": [
+    "Wayne Gretzky"
+   ],
+   "source": "staging_mt",
+   "consistency": 1.0,
+   "consistency_strict": 0.0,
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     4
+    ],
+    "target": 1
+   }
+  },
+  {
+   "name": "mt-guernica-country",
+   "prompt": "Fact: The home country of the painter of Guernica is",
+   "target": "Spain",
+   "intermediates": [
+    "Pablo Picasso"
+   ],
+   "source": "staging_mt",
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 1
+   }
+  },
+  {
+   "name": "mt-huddle-continent",
+   "prompt": "Fact: The continent where the flightless black-and-white birds that huddle against blizzards live is",
+   "target": "Antarctica",
+   "intermediates": [
+    "penguins"
+   ],
+   "source": "staging_mt",
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 1
+   }
+  },
+  {
+   "name": "mt-inca-country",
+   "prompt": "Fact: The country containing the ancient Inca citadel perched high in the Andes is",
+   "target": "Peru",
+   "intermediates": [
+    "Machu Picchu"
+   ],
+   "source": "staging_mt",
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     4
+    ],
+    "target": 1
+   }
+  },
+  {
+   "name": "mt-janeeyre-nationality",
+   "prompt": "Fact: The nationality of the author of Jane Eyre was",
+   "target": "British",
+   "intermediates": [
+    "Charlotte Bronte"
+   ],
+   "target_alts": [
+    "English"
+   ],
+   "source": "staging_mt",
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     3
+    ],
+    "target": 1
+   }
+  },
+  {
+   "name": "mt-kingofpop-move",
+   "prompt": "Fact: The signature backward-gliding dance move of the King of Pop is the",
+   "target": "moonwalk",
+   "intermediates": [
+    "Michael Jackson"
+   ],
+   "source": "staging_mt",
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "mt-kite-invention",
+   "prompt": "Fact: The building-protection device invented by the founding father who flew a kite in a thunderstorm is the lightning",
+   "target": "rod",
+   "intermediates": [
+    "Benjamin Franklin"
+   ],
+   "source": "staging_mt",
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 1
+   }
+  },
+  {
+   "name": "mt-lamp-war",
+   "prompt": "Fact: The war in which the founder of modern nursing, known as the Lady with the Lamp, tended soldiers was the",
+   "target": "Crimean",
+   "intermediates": [
+    "Florence Nightingale"
+   ],
+   "source": "staging_mt",
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     4
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "mt-lapaz-lake",
+   "prompt": "Fact: The high-altitude lake shared by Peru and the country whose seat of government is La Paz is Lake",
+   "target": "Titicaca",
+   "intermediates": [
+    "Bolivia"
+   ],
+   "source": "staging_mt",
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     1
+    ],
+    "target": 3
+   }
+  },
+  {
+   "name": "mt-largest-animal-food",
+   "prompt": "Fact: The tiny shrimp-like creatures eaten by the largest animal ever to live are called",
+   "target": "krill",
+   "intermediates": [
+    "blue whale"
+   ],
+   "source": "staging_mt",
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "mt-lizard-country",
+   "prompt": "Fact: The country whose islands are home to the world's largest living lizard is",
+   "target": "Indonesia",
+   "intermediates": [
+    "Komodo dragon"
+   ],
+   "source": "staging_mt",
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     3
+    ],
+    "target": 1
+   }
+  },
+  {
+   "name": "mt-longnose-woodcarver",
+   "prompt": "Fact: The old woodcarver who created the puppet whose nose grows when he lies is named",
+   "target": "Geppetto",
+   "intermediates": [
+    "Pinocchio"
+   ],
+   "source": "staging_mt",
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 3
+   }
+  },
+  {
+   "name": "mt-lovegoddess-roman",
+   "prompt": "Fact: The Roman counterpart of the Greek goddess of love is",
+   "target": "Venus",
+   "intermediates": [
+    "Aphrodite"
+   ],
+   "source": "staging_mt",
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     3
+    ],
+    "target": 1
+   }
+  },
+  {
+   "name": "mt-male-ocean",
+   "prompt": "Fact: The ocean containing the low-lying island chain whose capital is Male is the",
+   "target": "Indian Ocean",
+   "intermediates": [
+    "Maldives"
+   ],
+   "prompt_allowed": [
+    "ocean"
+   ],
+   "source": "staging_mt",
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "mt-mendeleev-protons",
+   "prompt": "Fact: The atomic number of the element named after the chemist who created the periodic table is",
+   "target": "101",
+   "intermediates": [
+    "mendelevium"
+   ],
+   "source": "staging_mt",
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     4
+    ],
+    "target": 4
+   }
+  },
+  {
+   "name": "mt-monalisa-nationality",
+   "prompt": "Fact: The nationality of the artist who painted the Mona Lisa was",
+   "target": "Italian",
+   "intermediates": [
+    "Leonardo da Vinci"
+   ],
+   "source": "staging_mt",
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     3
+    ],
+    "target": 1
+   }
+  },
+  {
+   "name": "mt-moonlanding-month",
+   "prompt": "Fact: The month in 1969 when the mission that first landed humans on the Moon lifted off was",
+   "target": "July",
+   "intermediates": [
+    "Apollo 11"
+   ],
+   "source": "staging_mt",
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     4
+    ],
+    "target": 1
+   }
+  },
+  {
+   "name": "mt-moonlight-instrument",
+   "prompt": "Fact: The instrument for which the composer of the Moonlight Sonata wrote that piece is the",
+   "target": "piano",
+   "intermediates": [
+    "Beethoven"
+   ],
+   "source": "staging_mt",
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 1
+   }
+  },
+  {
+   "name": "mt-neongreen-city",
+   "prompt": "Fact: The U.S. city famous for topping its sausage in a bun with neon-green relish and celery salt, never ketchup, is",
+   "target": "Chicago",
+   "intermediates": [
+    "hot dog"
+   ],
+   "source": "staging_mt",
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 1
+   }
+  },
+  {
+   "name": "mt-neverland-fairy",
+   "prompt": "Fact: The fairy companion of the boy who never grows up is",
+   "target": "Tinker Bell",
+   "intermediates": [
+    "Peter Pan"
+   ],
+   "target_alts": [
+    "Tinkerbell"
+   ],
+   "source": "staging_mt",
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 3
+   }
+  },
+  {
+   "name": "mt-nowomannocry-country",
+   "prompt": "Fact: The home country of the reggae singer who made No Woman, No Cry famous is",
+   "target": "Jamaica",
+   "intermediates": [
+    "Bob Marley"
+   ],
+   "source": "staging_mt",
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     3
+    ],
+    "target": 1
+   }
+  },
+  {
+   "name": "mt-orei-country",
+   "prompt": "Fact: The home country of the soccer legend nicknamed O Rei is",
+   "target": "Brazil",
+   "intermediates": [
+    "Pele"
+   ],
+   "source": "staging_mt",
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 1
+   }
+  },
+  {
+   "name": "mt-pasteur-vaccine",
+   "prompt": "Fact: The disease targeted by the vaccine developed by the French scientist who invented pasteurization is",
+   "target": "rabies",
+   "intermediates": [
+    "Louis Pasteur"
+   ],
+   "source": "staging_mt",
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     3
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "mt-pharos-wonder",
+   "prompt": "Fact: The ancient wonder that guided ships into the harbor of Egypt's greatest port city was a",
+   "target": "lighthouse",
+   "intermediates": [
+    "Alexandria"
+   ],
+   "source": "staging_mt",
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     1
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "mt-queenpizza-country",
+   "prompt": "Fact: The country where the tomato, mozzarella, and basil pizza named after a queen was created is",
+   "target": "Italy",
+   "intermediates": [
+    "Margherita"
+   ],
+   "source": "staging_mt",
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     3
+    ],
+    "target": 1
+   }
+  },
+  {
+   "name": "mt-relativity-birthcountry",
+   "prompt": "Fact: The country of birth of the physicist who developed the theory of general relativity is",
+   "target": "Germany",
+   "intermediates": [
+    "Albert Einstein"
+   ],
+   "source": "staging_mt",
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 1
+   }
+  },
+  {
+   "name": "mt-ringquest-author",
+   "prompt": "Fact: The author of the fantasy epic in which a hobbit journeys to destroy a powerful ring is",
+   "target": "Tolkien",
+   "intermediates": [
+    "The Lord of the Rings"
+   ],
+   "source": "staging_mt",
+   "consistency": 1.0,
+   "consistency_strict": 0.0,
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     5
+    ],
+    "target": 1
+   }
+  },
+  {
+   "name": "mt-riyadh-continent",
+   "prompt": "Fact: The continent of the country whose capital is Riyadh is",
+   "target": "Asia",
+   "intermediates": [
+    "Saudi Arabia"
+   ],
+   "source": "staging_mt",
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 1
+   }
+  },
+  {
+   "name": "mt-sails-country",
+   "prompt": "Fact: The country home to the harborside opera house with white sail-shaped roofs is",
+   "target": "Australia",
+   "intermediates": [
+    "Sydney Opera House"
+   ],
+   "prompt_allowed": [
+    "opera",
+    "house"
+   ],
+   "source": "staging_mt",
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     3
+    ],
+    "target": 1
+   }
+  },
+  {
+   "name": "mt-satchmo-instrument",
+   "prompt": "Fact: The instrument played by the jazz musician nicknamed Satchmo was the",
+   "target": "trumpet",
+   "intermediates": [
+    "Louis Armstrong"
+   ],
+   "source": "staging_mt",
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 1
+   }
+  },
+  {
+   "name": "mt-scar-school",
+   "prompt": "Fact: The school attended by the boy wizard with a lightning-shaped scar is",
+   "target": "Hogwarts",
+   "intermediates": [
+    "Harry Potter"
+   ],
+   "source": "staging_mt",
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 1
+   }
+  },
+  {
+   "name": "mt-seoul-currency",
+   "prompt": "Fact: The currency of the country whose capital is Seoul is the",
+   "target": "won",
+   "intermediates": [
+    "South Korea"
+   ],
+   "source": "staging_mt",
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 1
+   }
+  },
+  {
+   "name": "mt-sfbay-state",
+   "prompt": "Fact: The U.S. state containing the orange suspension bridge at the entrance to San Francisco Bay is",
+   "target": "California",
+   "intermediates": [
+    "Golden Gate Bridge"
+   ],
+   "prompt_allowed": [
+    "bridge"
+   ],
+   "source": "staging_mt",
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     3
+    ],
+    "target": 1
+   }
+  },
+  {
+   "name": "mt-shark-composer",
+   "prompt": "Fact: The composer of the ominous two-note theme from Spielberg's 1975 shark film is",
+   "target": "John Williams",
+   "intermediates": [
+    "Jaws"
+   ],
+   "source": "staging_mt",
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "mt-shepherd-weapon",
+   "prompt": "Fact: The weapon the shepherd boy David used to defeat the Philistine giant was a",
+   "target": "sling",
+   "intermediates": [
+    "Goliath"
+   ],
+   "source": "staging_mt",
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     3
+    ],
+    "target": 1
+   }
+  },
+  {
+   "name": "mt-simulated-pill",
+   "prompt": "Fact: The color of the pill chosen by the hero of the 1999 film about escaping a simulated reality is",
+   "target": "red",
+   "intermediates": [
+    "The Matrix"
+   ],
+   "source": "staging_mt",
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 1
+   }
+  },
+  {
+   "name": "mt-sovietmissiles-president",
+   "prompt": "Fact: The U.S. president during the 1962 standoff over Soviet missiles on a Caribbean island was",
+   "target": "Kennedy",
+   "intermediates": [
+    "Cuban Missile Crisis"
+   ],
+   "source": "staging_mt",
+   "consistency": 1.0,
+   "consistency_strict": 0.0,
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     3
+    ],
+    "target": 1
+   }
+  },
+  {
+   "name": "mt-spacejam-sport",
+   "prompt": "Fact: The sport played by the athlete who starred in the 1996 film Space Jam is",
+   "target": "basketball",
+   "intermediates": [
+    "Michael Jordan"
+   ],
+   "source": "staging_mt",
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 1
+   }
+  },
+  {
+   "name": "mt-swordstone-king",
+   "prompt": "Fact: The legendary British king who proved his right to rule by pulling a sword from a stone is King",
+   "target": "Arthur",
+   "intermediates": [
+    "Excalibur"
+   ],
+   "source": "staging_mt",
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     3
+    ],
+    "target": 1
+   }
+  },
+  {
+   "name": "mt-tablesalt-formula",
+   "prompt": "Fact: The chemical formula of the main compound in table salt is",
+   "target": "NaCl",
+   "intermediates": [
+    "sodium chloride"
+   ],
+   "source": "staging_mt",
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "mt-tallest-animal-continent",
+   "prompt": "Fact: The native continent of the world's tallest land animal is",
+   "target": "Africa",
+   "intermediates": [
+    "giraffe"
+   ],
+   "source": "staging_mt",
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 1
+   }
+  },
+  {
+   "name": "mt-teachests-colony",
+   "prompt": "Fact: The colony where protesters dumped chests of British tea into the harbor in 1773 was",
+   "target": "Massachusetts",
+   "intermediates": [
+    "Boston Tea Party"
+   ],
+   "prompt_allowed": [
+    "tea"
+   ],
+   "source": "staging_mt",
+   "consistency": 1.0,
+   "consistency_strict": 0.9,
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     3
+    ],
+    "target": 1
+   }
+  },
+  {
+   "name": "mt-toyballet-composer",
+   "prompt": "Fact: The Russian composer of the Christmas ballet about a toy soldier that comes to life is",
+   "target": "Tchaikovsky",
+   "intermediates": [
+    "The Nutcracker"
+   ],
+   "source": "staging_mt",
+   "consistency": 1.0,
+   "consistency_strict": 0.8,
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     4
+    ],
+    "target": 4
+   }
+  },
+  {
+   "name": "mt-trident-roman",
+   "prompt": "Fact: The Roman name of the Greek god who carries a trident and rules the sea is",
+   "target": "Neptune",
+   "intermediates": [
+    "Poseidon"
+   ],
+   "source": "staging_mt",
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 1
+   }
+  },
+  {
+   "name": "mt-ulaanbaatar-desert",
+   "prompt": "Fact: The desert covering the southern third of the country whose capital is Ulaanbaatar is the",
+   "target": "Gobi",
+   "intermediates": [
+    "Mongolia"
+   ],
+   "source": "staging_mt",
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     1
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "mt-underworld-heads",
+   "prompt": "Fact: The number of heads of the hound that guards the Greek underworld is",
+   "target": "three",
+   "intermediates": [
+    "Cerberus"
+   ],
+   "source": "staging_mt",
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     3
+    ],
+    "target": 1
+   }
+  },
+  {
+   "name": "mt-unionwar-year",
+   "prompt": "Fact: The year the war between the Union and the Confederacy ended was",
+   "target": "1865",
+   "intermediates": [
+    "Civil War"
+   ],
+   "prompt_allowed": [
+    "war"
+   ],
+   "source": "staging_mt",
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 5
+   }
+  },
+  {
+   "name": "mt-warandpeace-country",
+   "prompt": "Fact: The home country of the author of War and Peace is",
+   "target": "Russia",
+   "intermediates": [
+    "Leo Tolstoy"
+   ],
+   "source": "staging_mt",
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     4
+    ],
+    "target": 1
+   }
+  },
+  {
+   "name": "mt-whitewhale-author",
+   "prompt": "Fact: The author of the novel about a captain obsessed with hunting a white whale is",
+   "target": "Herman Melville",
+   "intermediates": [
+    "Moby Dick"
+   ],
+   "target_alts": [
+    "Melville"
+   ],
+   "source": "staging_mt",
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     3
+    ],
+    "target": 3
+   }
+  },
+  {
+   "name": "mt-windmills-language",
+   "prompt": "Fact: The original language of the novel about a delusional knight who tilts at windmills is",
+   "target": "Spanish",
+   "intermediates": [
+    "Don Quixote"
+   ],
+   "source": "staging_mt",
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     4
+    ],
+    "target": 1
+   }
+  },
+  {
+   "name": "mt-yellowbrick-city",
+   "prompt": "Fact: The city at the end of the yellow brick road is the",
+   "target": "Emerald City",
+   "intermediates": [
+    "The Wizard of Oz"
+   ],
+   "prompt_allowed": [
+    "city"
+   ],
+   "source": "staging_mt",
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     4
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "mt-zeus-country",
+   "prompt": "Fact: The country where the ancient games held in honor of Zeus took place every four years is",
+   "target": "Greece",
+   "intermediates": [
+    "Olympic Games"
+   ],
+   "prompt_allowed": [
+    "games"
+   ],
+   "source": "staging_mt",
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 1
+   }
+  },
+  {
+   "name": "mt-3hop-guernica-capital",
+   "prompt": "Fact: The capital of the home country of the painter of Guernica is",
+   "target": "Madrid",
+   "intermediates": [
+    "Pablo Picasso",
+    "Spain"
+   ],
+   "source": "staging_mt",
+   "consistency": 0.9,
+   "consistency_strict": 0.9,
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2,
+     1
+    ],
+    "target": 1
+   }
+  },
+  {
+   "name": "mt-3hop-liberty-capital",
+   "prompt": "Fact: The capital of the country that gifted the torch-bearing copper statue in New York Harbor is",
+   "target": "Paris",
+   "intermediates": [
+    "Statue of Liberty",
+    "France"
+   ],
+   "prompt_allowed": [
+    "statue"
+   ],
+   "source": "staging_mt",
+   "consistency": 0.9,
+   "consistency_strict": 0.9,
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     3,
+     1
+    ],
+    "target": 1
+   }
+  },
+  {
+   "name": "mt-3hop-mockingbird-capital",
+   "prompt": "Fact: The capital of the U.S. state where the author of To Kill a Mockingbird was born is",
+   "target": "Montgomery",
+   "intermediates": [
+    "Harper Lee",
+    "Alabama"
+   ],
+   "source": "staging_mt",
+   "consistency": 0.9,
+   "consistency_strict": 0.9,
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2,
+     1
+    ],
+    "target": 1
+   }
+  },
+  {
+   "name": "mt-3hop-nabataeans-capital",
+   "prompt": "Fact: The capital of the modern country containing the rose-red city carved into rock by the Nabataeans is",
+   "target": "Amman",
+   "intermediates": [
+    "Petra",
+    "Jordan"
+   ],
+   "source": "staging_mt",
+   "consistency": 0.9,
+   "consistency_strict": 0.9,
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     1,
+     1
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "mt-3hop-sagarmatha-capital",
+   "prompt": "Fact: The capital of the country home to the mountain known locally as Sagarmatha is",
+   "target": "Kathmandu",
+   "intermediates": [
+    "Mount Everest",
+    "Nepal"
+   ],
+   "source": "staging_mt",
+   "consistency": 0.9,
+   "consistency_strict": 0.9,
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2,
+     1
+    ],
+    "target": 3
+   }
+  },
+  {
+   "name": "mt-3hop-windmills-currency",
+   "prompt": "Fact: The currency of the home country of the author of the novel about a knight who tilts at windmills is the",
+   "target": "euro",
+   "intermediates": [
+    "Miguel de Cervantes",
+    "Spain"
+   ],
+   "source": "staging_mt",
+   "consistency": 0.9,
+   "consistency_strict": 0.9,
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     4,
+     1
+    ],
+    "target": 1
+   }
+  },
+  {
+   "name": "mt-anangu-country",
+   "prompt": "Fact: The country containing the giant red sandstone monolith sacred to the Anangu people is",
+   "target": "Australia",
+   "intermediates": [
+    "Uluru"
+   ],
+   "source": "staging_mt",
+   "consistency": 0.9,
+   "consistency_strict": 0.9,
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 1
+   }
+  },
+  {
+   "name": "mt-arith-div-sub",
+   "prompt": "200 / 8 - 6 = ",
+   "target": "19",
+   "intermediates": [
+    "25"
+   ],
+   "source": "staging_mt",
+   "consistency": 0.9,
+   "consistency_strict": 0.9,
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     3
+    ],
+    "target": 3
+   }
+  }
+ ]
+}

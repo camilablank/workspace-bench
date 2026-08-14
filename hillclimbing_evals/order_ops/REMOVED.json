@@ -1,0 +1,3147 @@
+{
+ "negdec": {
+  "n_before": 35,
+  "n_after": 27,
+  "removed": [
+   {
+    "name": "negdec-004",
+    "expr": "((68 - 89) / 8) * 8",
+    "reason": "step a-b == answer (-21)"
+   },
+   {
+    "name": "negdec-012",
+    "expr": "((20 - 83) / 8) * 8",
+    "reason": "step a-b == answer (-63)"
+   },
+   {
+    "name": "negdec-015",
+    "expr": "((28 - 42) / 8) * 8",
+    "reason": "step a-b == answer (-14)"
+   },
+   {
+    "name": "negdec-016",
+    "expr": "((27 - 64) / 8) * 8",
+    "reason": "step a-b == answer (-37)"
+   },
+   {
+    "name": "negdec-018",
+    "expr": "((61 - 88) / 8) * 8",
+    "reason": "step a-b == answer (-27)"
+   },
+   {
+    "name": "negdec-023",
+    "expr": "((72 - 82) / 8) * 8",
+    "reason": "step a-b == answer (-10)"
+   },
+   {
+    "name": "negdec-036",
+    "expr": "((32 - 54) / 8) * 8",
+    "reason": "step a-b == answer (-22)"
+   },
+   {
+    "name": "negdec-037",
+    "expr": "((52 - 62) / 8) * 8",
+    "reason": "step a-b == answer (-10)"
+   }
+  ]
+ },
+ "dec16": {
+  "n_before": 54,
+  "n_after": 50,
+  "removed": [
+   {
+    "name": "dec16-004",
+    "expr": "(50 / 16) + 88",
+    "reason": "target 3.125 within tolerance of pi (3.14159) \u2014 reciting scores"
+   },
+   {
+    "name": "dec16-005",
+    "expr": "(23 / 16) + 71",
+    "reason": "target 1.4375 within tolerance of sqrt2 (1.41421) \u2014 reciting scores"
+   },
+   {
+    "name": "dec16-043",
+    "expr": "(51 / 16) + 63",
+    "reason": "target 3.1875 within tolerance of pi (3.14159) \u2014 reciting scores"
+   },
+   {
+    "name": "dec16-029",
+    "expr": "(196 / 16) + 79",
+    "reason": "k=10 gate: correct 0.6 < 0.8 at eval temperature (old k=1 greedy gate could not see reliability)"
+   }
+  ]
+ },
+ "absval": {
+  "n_before": 28,
+  "removed": [
+   {
+    "name": "absval-342",
+    "expr": "abs(166 - 511) * 7",
+    "reason": "k=10 gate: correct 0.5 < 0.8 at eval temperature (old k=1 greedy gate could not see reliability)"
+   },
+   {
+    "name": "absval-349",
+    "expr": "abs(116 - 963) * 9",
+    "reason": "k=10 gate: correct 0.3 < 0.8 at eval temperature (old k=1 greedy gate could not see reliability)"
+   },
+   {
+    "name": "absval-368",
+    "expr": "abs(448 - 989) * 8",
+    "reason": "k=10 gate: correct 0.5 < 0.8 at eval temperature (old k=1 greedy gate could not see reliability)"
+   }
+  ],
+  "n_after": 25
+ },
+ "floordiv": {
+  "n_before": 27,
+  "removed": [
+   {
+    "name": "floordiv-212",
+    "expr": "(4394 // 21) + 898",
+    "reason": "k=10 gate: correct 0.6 < 0.8 at eval temperature (old k=1 greedy gate could not see reliability)"
+   },
+   {
+    "name": "floordiv-220",
+    "expr": "(6564 // 25) + 605",
+    "reason": "k=10 gate: correct 0.6 < 0.8 at eval temperature (old k=1 greedy gate could not see reliability)"
+   },
+   {
+    "name": "floordiv-247",
+    "expr": "floor(5006 / 33) + 354",
+    "reason": "k=10 gate: correct 0.6 < 0.8 at eval temperature (old k=1 greedy gate could not see reliability)"
+   },
+   {
+    "name": "floordiv-418",
+    "expr": "floor(4171 / 23) + 478",
+    "reason": "k=10 gate: correct 0.1 < 0.8 at eval temperature (old k=1 greedy gate could not see reliability)"
+   },
+   {
+    "name": "floordiv-423",
+    "expr": "(5785 // 29) + 567",
+    "reason": "k=10 gate: correct 0.5 < 0.8 at eval temperature (old k=1 greedy gate could not see reliability)"
+   },
+   {
+    "name": "floordiv-424",
+    "expr": "(3456 // 31) + 295",
+    "reason": "k=10 gate: correct 0.7 < 0.8 at eval temperature (old k=1 greedy gate could not see reliability)"
+   }
+  ],
+  "n_after": 21
+ },
+ "maxsel": {
+  "n_before": 40,
+  "removed": [
+   {
+    "name": "maxsel-162",
+    "expr": "max(871, 574) - 482",
+    "reason": "k=10 gate: correct 0.6 < 0.8 at eval temperature (old k=1 greedy gate could not see reliability)"
+   }
+  ],
+  "n_after": 39
+ },
+ "muladd": {
+  "n_before": 39,
+  "removed": [
+   {
+    "name": "muladd-052",
+    "expr": "(29 * 43) + 130",
+    "reason": "k=10 gate: correct 0.5 < 0.8 at eval temperature (old k=1 greedy gate could not see reliability)"
+   },
+   {
+    "name": "muladd-067",
+    "expr": "(22 * 16) + 652",
+    "reason": "k=10 gate: correct 0.5 < 0.8 at eval temperature (old k=1 greedy gate could not see reliability)"
+   },
+   {
+    "name": "muladd-082",
+    "expr": "(32 * 24) + 324",
+    "reason": "k=10 gate: correct 0.5 < 0.8 at eval temperature (old k=1 greedy gate could not see reliability)"
+   },
+   {
+    "name": "muladd-093",
+    "expr": "(23 * 19) + 309",
+    "reason": "k=10 gate: correct 0.4 < 0.8 at eval temperature (old k=1 greedy gate could not see reliability)"
+   }
+  ],
+  "n_after": 35
+ },
+ "sign": {
+  "n_before": 26,
+  "removed": [
+   {
+    "name": "sign-061",
+    "expr": "(242 - 333) * 78",
+    "reason": "k=10 gate: correct 0.7 < 0.8 at eval temperature (old k=1 greedy gate could not see reliability)"
+   }
+  ],
+  "n_after": 25
+ },
+ "signpair": {
+  "n_before": 24,
+  "removed": [
+   {
+    "name": "signpair-143",
+    "expr": "(801 - 929) * 73",
+    "reason": "k=10 gate: correct 0.7 < 0.8 at eval temperature (old k=1 greedy gate could not see reliability)"
+   }
+  ],
+  "n_after": 23
+ },
+ "sqrt": {
+  "n_before": 31,
+  "removed": [
+   {
+    "name": "sqrt-160",
+    "expr": "sqrt(7569) * 7",
+    "reason": "k=10 gate: correct 0.7 < 0.8 at eval temperature (old k=1 greedy gate could not see reliability)"
+   },
+   {
+    "name": "sqrt-172",
+    "expr": "sqrt(9025) * 7",
+    "reason": "k=10 gate: correct 0.6 < 0.8 at eval temperature (old k=1 greedy gate could not see reliability)"
+   },
+   {
+    "name": "sqrt-196",
+    "expr": "sqrt(4489) * 6",
+    "reason": "k=10 gate: correct 0.5 < 0.8 at eval temperature (old k=1 greedy gate could not see reliability)"
+   },
+   {
+    "name": "sqrt-197",
+    "expr": "sqrt(9025) * 9",
+    "reason": "k=10 gate: correct 0.6 < 0.8 at eval temperature (old k=1 greedy gate could not see reliability)"
+   },
+   {
+    "name": "sqrt-200",
+    "expr": "sqrt(6724) * 9",
+    "reason": "k=10 gate: correct 0.5 < 0.8 at eval temperature (old k=1 greedy gate could not see reliability)"
+   }
+  ],
+  "n_after": 26
+ },
+ "mulmul": {
+  "n_before": 360,
+  "n_after": 103,
+  "removed": [
+   {
+    "name": "mulmul-000",
+    "expr": "(4 * 7) + (6 * 9)",
+    "reason": "gate 1/10 correct"
+   },
+   {
+    "name": "mulmul-001",
+    "expr": "(22 * 5) + (56 * 3)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "mulmul-004",
+    "expr": "(11 * 4) + (4 * 9)",
+    "reason": "gate 1/10 correct"
+   },
+   {
+    "name": "mulmul-005",
+    "expr": "(25 * 9) + (31 * 5)",
+    "reason": "gate 5/10 correct"
+   },
+   {
+    "name": "mulmul-007",
+    "expr": "(42 * 3) + (39 * 6)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "mulmul-009",
+    "expr": "(32 * 6) + (47 * 3)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "mulmul-010",
+    "expr": "(4 * 4) + (7 * 4)",
+    "reason": "gate 5/10 correct"
+   },
+   {
+    "name": "mulmul-011",
+    "expr": "(41 * 3) + (21 * 9)",
+    "reason": "gate 1/10 correct"
+   },
+   {
+    "name": "mulmul-012",
+    "expr": "(5 * 6) + (7 * 7)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "mulmul-013",
+    "expr": "(37 * 3) + (27 * 9)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "mulmul-015",
+    "expr": "(28 * 7) + (45 * 3)",
+    "reason": "gate 5/10 correct"
+   },
+   {
+    "name": "mulmul-017",
+    "expr": "(41 * 5) + (37 * 4)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "mulmul-019",
+    "expr": "(38 * 5) + (26 * 6)",
+    "reason": "gate 1/10 correct"
+   },
+   {
+    "name": "mulmul-021",
+    "expr": "(38 * 3) + (47 * 5)",
+    "reason": "gate 4/10 correct"
+   },
+   {
+    "name": "mulmul-023",
+    "expr": "(59 * 3) + (35 * 6)",
+    "reason": "gate 3/10 correct"
+   },
+   {
+    "name": "mulmul-026",
+    "expr": "(5 * 6) + (7 * 6)",
+    "reason": "gate 2/10 correct"
+   },
+   {
+    "name": "mulmul-029",
+    "expr": "(41 * 4) + (31 * 7)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "mulmul-031",
+    "expr": "(28 * 6) + (26 * 5)",
+    "reason": "gate 2/10 correct"
+   },
+   {
+    "name": "mulmul-032",
+    "expr": "(10 * 4) + (7 * 3)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "mulmul-033",
+    "expr": "(35 * 3) + (31 * 8)",
+    "reason": "gate 3/10 correct"
+   },
+   {
+    "name": "mulmul-035",
+    "expr": "(26 * 4) + (24 * 5)",
+    "reason": "gate 1/10 correct"
+   },
+   {
+    "name": "mulmul-038",
+    "expr": "(4 * 6) + (3 * 9)",
+    "reason": "gate 1/10 correct"
+   },
+   {
+    "name": "mulmul-039",
+    "expr": "(46 * 4) + (22 * 6)",
+    "reason": "gate 1/10 correct"
+   },
+   {
+    "name": "mulmul-040",
+    "expr": "(7 * 8) + (4 * 6)",
+    "reason": "gate 2/10 correct"
+   },
+   {
+    "name": "mulmul-041",
+    "expr": "(31 * 6) + (44 * 5)",
+    "reason": "gate 7/10 correct"
+   },
+   {
+    "name": "mulmul-042",
+    "expr": "(12 * 4) + (4 * 9)",
+    "reason": "gate 7/10 correct"
+   },
+   {
+    "name": "mulmul-045",
+    "expr": "(52 * 4) + (57 * 3)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "mulmul-047",
+    "expr": "(50 * 3) + (59 * 4)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "mulmul-049",
+    "expr": "(32 * 5) + (47 * 3)",
+    "reason": "gate 5/10 correct"
+   },
+   {
+    "name": "mulmul-050",
+    "expr": "(6 * 4) + (7 * 8)",
+    "reason": "gate 1/10 correct"
+   },
+   {
+    "name": "mulmul-051",
+    "expr": "(26 * 8) + (50 * 3)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "mulmul-053",
+    "expr": "(50 * 5) + (28 * 6)",
+    "reason": "gate 6/10 correct"
+   },
+   {
+    "name": "mulmul-055",
+    "expr": "(30 * 7) + (31 * 6)",
+    "reason": "gate 4/10 correct"
+   },
+   {
+    "name": "mulmul-059",
+    "expr": "(23 * 9) + (44 * 4)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "mulmul-060",
+    "expr": "(8 * 5) + (5 * 7)",
+    "reason": "gate 6/10 correct"
+   },
+   {
+    "name": "mulmul-061",
+    "expr": "(39 * 5) + (54 * 3)",
+    "reason": "gate 4/10 correct"
+   },
+   {
+    "name": "mulmul-062",
+    "expr": "(9 * 4) + (8 * 6)",
+    "reason": "gate 5/10 correct"
+   },
+   {
+    "name": "mulmul-063",
+    "expr": "(59 * 4) + (28 * 5)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "mulmul-065",
+    "expr": "(24 * 9) + (23 * 8)",
+    "reason": "gate 1/10 correct"
+   },
+   {
+    "name": "mulmul-066",
+    "expr": "(10 * 4) + (3 * 8)",
+    "reason": "gate 7/10 correct"
+   },
+   {
+    "name": "mulmul-067",
+    "expr": "(55 * 3) + (47 * 5)",
+    "reason": "gate 4/10 correct"
+   },
+   {
+    "name": "mulmul-068",
+    "expr": "(4 * 8) + (7 * 6)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "mulmul-069",
+    "expr": "(45 * 5) + (28 * 4)",
+    "reason": "gate 1/10 correct"
+   },
+   {
+    "name": "mulmul-070",
+    "expr": "(12 * 5) + (7 * 5)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "mulmul-071",
+    "expr": "(46 * 5) + (48 * 4)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "mulmul-073",
+    "expr": "(27 * 6) + (37 * 5)",
+    "reason": "gate 2/10 correct"
+   },
+   {
+    "name": "mulmul-074",
+    "expr": "(6 * 8) + (7 * 8)",
+    "reason": "gate 6/10 correct"
+   },
+   {
+    "name": "mulmul-077",
+    "expr": "(32 * 6) + (51 * 3)",
+    "reason": "gate 2/10 correct"
+   },
+   {
+    "name": "mulmul-079",
+    "expr": "(28 * 6) + (28 * 8)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "mulmul-080",
+    "expr": "(9 * 4) + (8 * 5)",
+    "reason": "gate 7/10 correct"
+   },
+   {
+    "name": "mulmul-081",
+    "expr": "(38 * 5) + (25 * 6)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "mulmul-084",
+    "expr": "(6 * 4) + (11 * 5)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "mulmul-085",
+    "expr": "(56 * 3) + (46 * 3)",
+    "reason": "gate 1/10 correct"
+   },
+   {
+    "name": "mulmul-087",
+    "expr": "(39 * 4) + (35 * 7)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "mulmul-089",
+    "expr": "(27 * 5) + (35 * 5)",
+    "reason": "gate 1/10 correct"
+   },
+   {
+    "name": "mulmul-090",
+    "expr": "(9 * 6) + (6 * 7)",
+    "reason": "gate 1/10 correct"
+   },
+   {
+    "name": "mulmul-091",
+    "expr": "(43 * 4) + (35 * 3)",
+    "reason": "gate 5/10 correct"
+   },
+   {
+    "name": "mulmul-092",
+    "expr": "(7 * 6) + (4 * 9)",
+    "reason": "gate 4/10 correct"
+   },
+   {
+    "name": "mulmul-093",
+    "expr": "(27 * 7) + (56 * 3)",
+    "reason": "gate 7/10 correct"
+   },
+   {
+    "name": "mulmul-095",
+    "expr": "(32 * 6) + (35 * 3)",
+    "reason": "gate 3/10 correct"
+   },
+   {
+    "name": "mulmul-097",
+    "expr": "(41 * 6) + (54 * 4)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "mulmul-099",
+    "expr": "(44 * 4) + (32 * 7)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "mulmul-101",
+    "expr": "(28 * 5) + (55 * 4)",
+    "reason": "gate 1/10 correct"
+   },
+   {
+    "name": "mulmul-103",
+    "expr": "(45 * 5) + (26 * 7)",
+    "reason": "gate 6/10 correct"
+   },
+   {
+    "name": "mulmul-105",
+    "expr": "(41 * 5) + (26 * 9)",
+    "reason": "gate 3/10 correct"
+   },
+   {
+    "name": "mulmul-107",
+    "expr": "(46 * 3) + (55 * 4)",
+    "reason": "gate 5/10 correct"
+   },
+   {
+    "name": "mulmul-109",
+    "expr": "(27 * 9) + (24 * 7)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "mulmul-110",
+    "expr": "(12 * 4) + (11 * 5)",
+    "reason": "gate 5/10 correct"
+   },
+   {
+    "name": "mulmul-113",
+    "expr": "(55 * 4) + (27 * 5)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "mulmul-114",
+    "expr": "(3 * 7) + (6 * 4)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "mulmul-115",
+    "expr": "(61 * 3) + (43 * 3)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "mulmul-117",
+    "expr": "(40 * 3) + (59 * 4)",
+    "reason": "gate 5/10 correct"
+   },
+   {
+    "name": "mulmul-118",
+    "expr": "(6 * 3) + (5 * 5)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "mulmul-119",
+    "expr": "(23 * 7) + (43 * 5)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "mulmul-120",
+    "expr": "(9 * 4) + (7 * 7)",
+    "reason": "gate 5/10 correct"
+   },
+   {
+    "name": "mulmul-121",
+    "expr": "(37 * 4) + (55 * 4)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "mulmul-122",
+    "expr": "(9 * 5) + (7 * 8)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "mulmul-123",
+    "expr": "(58 * 4) + (20 * 6)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "mulmul-125",
+    "expr": "(32 * 6) + (61 * 4)",
+    "reason": "gate 1/10 correct"
+   },
+   {
+    "name": "mulmul-127",
+    "expr": "(47 * 4) + (44 * 3)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "mulmul-128",
+    "expr": "(6 * 9) + (6 * 7)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "mulmul-129",
+    "expr": "(35 * 7) + (38 * 3)",
+    "reason": "gate 2/10 correct"
+   },
+   {
+    "name": "mulmul-130",
+    "expr": "(6 * 6) + (8 * 7)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "mulmul-132",
+    "expr": "(5 * 8) + (6 * 3)",
+    "reason": "gate 2/10 correct"
+   },
+   {
+    "name": "mulmul-133",
+    "expr": "(35 * 4) + (23 * 5)",
+    "reason": "gate 2/10 correct"
+   },
+   {
+    "name": "mulmul-135",
+    "expr": "(27 * 6) + (24 * 8)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "mulmul-137",
+    "expr": "(47 * 4) + (46 * 5)",
+    "reason": "gate 1/10 correct"
+   },
+   {
+    "name": "mulmul-139",
+    "expr": "(23 * 7) + (33 * 6)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "mulmul-141",
+    "expr": "(55 * 4) + (32 * 5)",
+    "reason": "gate 5/10 correct"
+   },
+   {
+    "name": "mulmul-145",
+    "expr": "(42 * 3) + (52 * 3)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "mulmul-146",
+    "expr": "(6 * 3) + (8 * 6)",
+    "reason": "gate 6/10 correct"
+   },
+   {
+    "name": "mulmul-147",
+    "expr": "(32 * 5) + (26 * 4)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "mulmul-148",
+    "expr": "(7 * 5) + (6 * 4)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "mulmul-149",
+    "expr": "(28 * 6) + (22 * 9)",
+    "reason": "gate 1/10 correct"
+   },
+   {
+    "name": "mulmul-151",
+    "expr": "(24 * 8) + (35 * 3)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "mulmul-153",
+    "expr": "(23 * 8) + (21 * 5)",
+    "reason": "gate 3/10 correct"
+   },
+   {
+    "name": "mulmul-155",
+    "expr": "(28 * 5) + (46 * 4)",
+    "reason": "gate 2/10 correct"
+   },
+   {
+    "name": "mulmul-157",
+    "expr": "(49 * 5) + (21 * 6)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "mulmul-159",
+    "expr": "(43 * 4) + (41 * 6)",
+    "reason": "gate 2/10 correct"
+   },
+   {
+    "name": "mulmul-161",
+    "expr": "(40 * 5) + (56 * 3)",
+    "reason": "gate 1/10 correct"
+   },
+   {
+    "name": "mulmul-165",
+    "expr": "(20 * 6) + (24 * 8)",
+    "reason": "gate 2/10 correct"
+   },
+   {
+    "name": "mulmul-167",
+    "expr": "(27 * 8) + (21 * 7)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "mulmul-169",
+    "expr": "(39 * 4) + (31 * 8)",
+    "reason": "gate 2/10 correct"
+   },
+   {
+    "name": "mulmul-170",
+    "expr": "(5 * 8) + (11 * 5)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "mulmul-171",
+    "expr": "(35 * 5) + (30 * 7)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "mulmul-172",
+    "expr": "(3 * 7) + (3 * 6)",
+    "reason": "gate 7/10 correct"
+   },
+   {
+    "name": "mulmul-175",
+    "expr": "(41 * 5) + (31 * 5)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "mulmul-178",
+    "expr": "(7 * 5) + (4 * 6)",
+    "reason": "gate 3/10 correct"
+   },
+   {
+    "name": "mulmul-179",
+    "expr": "(46 * 4) + (22 * 5)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "mulmul-180",
+    "expr": "(40 * 6) + (40 * 5)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "mulmul-181",
+    "expr": "(30 * 5) + (37 * 3)",
+    "reason": "gate 5/10 correct"
+   },
+   {
+    "name": "mulmul-182",
+    "expr": "(26 * 9) + (22 * 7)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "mulmul-183",
+    "expr": "(20 * 6) + (34 * 4)",
+    "reason": "gate 3/10 correct"
+   },
+   {
+    "name": "mulmul-184",
+    "expr": "(39 * 3) + (46 * 4)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "mulmul-187",
+    "expr": "(47 * 5) + (25 * 7)",
+    "reason": "gate 5/10 correct"
+   },
+   {
+    "name": "mulmul-188",
+    "expr": "(37 * 4) + (44 * 5)",
+    "reason": "gate 1/10 correct"
+   },
+   {
+    "name": "mulmul-189",
+    "expr": "(52 * 4) + (59 * 3)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "mulmul-191",
+    "expr": "(50 * 5) + (43 * 4)",
+    "reason": "gate 1/10 correct"
+   },
+   {
+    "name": "mulmul-193",
+    "expr": "(58 * 4) + (33 * 6)",
+    "reason": "gate 1/10 correct"
+   },
+   {
+    "name": "mulmul-194",
+    "expr": "(23 * 6) + (28 * 6)",
+    "reason": "gate 1/10 correct"
+   },
+   {
+    "name": "mulmul-195",
+    "expr": "(31 * 4) + (32 * 7)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "mulmul-196",
+    "expr": "(37 * 3) + (41 * 3)",
+    "reason": "gate 1/10 correct"
+   },
+   {
+    "name": "mulmul-197",
+    "expr": "(28 * 7) + (22 * 8)",
+    "reason": "gate 3/10 correct"
+   },
+   {
+    "name": "mulmul-198",
+    "expr": "(32 * 6) + (22 * 8)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "mulmul-199",
+    "expr": "(24 * 7) + (47 * 4)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "mulmul-200",
+    "expr": "(33 * 5) + (34 * 6)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "mulmul-201",
+    "expr": "(39 * 3) + (48 * 3)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "mulmul-202",
+    "expr": "(47 * 4) + (35 * 6)",
+    "reason": "gate 3/10 correct"
+   },
+   {
+    "name": "mulmul-203",
+    "expr": "(40 * 6) + (43 * 3)",
+    "reason": "gate 5/10 correct"
+   },
+   {
+    "name": "mulmul-204",
+    "expr": "(59 * 3) + (54 * 3)",
+    "reason": "gate 3/10 correct"
+   },
+   {
+    "name": "mulmul-205",
+    "expr": "(39 * 5) + (27 * 4)",
+    "reason": "gate 6/10 correct"
+   },
+   {
+    "name": "mulmul-206",
+    "expr": "(41 * 3) + (20 * 7)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "mulmul-209",
+    "expr": "(28 * 5) + (34 * 6)",
+    "reason": "gate 1/10 correct"
+   },
+   {
+    "name": "mulmul-210",
+    "expr": "(21 * 6) + (25 * 7)",
+    "reason": "gate 2/10 correct"
+   },
+   {
+    "name": "mulmul-211",
+    "expr": "(41 * 5) + (25 * 9)",
+    "reason": "gate 6/10 correct"
+   },
+   {
+    "name": "mulmul-212",
+    "expr": "(60 * 3) + (53 * 4)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "mulmul-213",
+    "expr": "(34 * 5) + (22 * 6)",
+    "reason": "gate 3/10 correct"
+   },
+   {
+    "name": "mulmul-214",
+    "expr": "(31 * 8) + (26 * 6)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "mulmul-215",
+    "expr": "(27 * 5) + (61 * 3)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "mulmul-216",
+    "expr": "(53 * 3) + (23 * 8)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "mulmul-217",
+    "expr": "(28 * 8) + (35 * 7)",
+    "reason": "gate 1/10 correct"
+   },
+   {
+    "name": "mulmul-218",
+    "expr": "(28 * 4) + (22 * 6)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "mulmul-219",
+    "expr": "(32 * 5) + (27 * 4)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "mulmul-220",
+    "expr": "(30 * 7) + (35 * 7)",
+    "reason": "gate 6/10 correct"
+   },
+   {
+    "name": "mulmul-221",
+    "expr": "(23 * 8) + (33 * 7)",
+    "reason": "gate 4/10 correct"
+   },
+   {
+    "name": "mulmul-222",
+    "expr": "(42 * 4) + (26 * 8)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "mulmul-223",
+    "expr": "(25 * 8) + (27 * 4)",
+    "reason": "gate 1/10 correct"
+   },
+   {
+    "name": "mulmul-224",
+    "expr": "(28 * 5) + (57 * 4)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "mulmul-225",
+    "expr": "(22 * 7) + (39 * 5)",
+    "reason": "gate 1/10 correct"
+   },
+   {
+    "name": "mulmul-227",
+    "expr": "(49 * 3) + (22 * 5)",
+    "reason": "gate 2/10 correct"
+   },
+   {
+    "name": "mulmul-228",
+    "expr": "(50 * 4) + (22 * 7)",
+    "reason": "gate 7/10 correct"
+   },
+   {
+    "name": "mulmul-229",
+    "expr": "(53 * 4) + (26 * 7)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "mulmul-231",
+    "expr": "(62 * 4) + (29 * 6)",
+    "reason": "gate 2/10 correct"
+   },
+   {
+    "name": "mulmul-232",
+    "expr": "(23 * 7) + (20 * 5)",
+    "reason": "gate 1/10 correct"
+   },
+   {
+    "name": "mulmul-233",
+    "expr": "(43 * 5) + (32 * 4)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "mulmul-234",
+    "expr": "(22 * 9) + (31 * 7)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "mulmul-235",
+    "expr": "(34 * 7) + (29 * 4)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "mulmul-236",
+    "expr": "(34 * 5) + (30 * 8)",
+    "reason": "gate 4/10 correct"
+   },
+   {
+    "name": "mulmul-237",
+    "expr": "(50 * 3) + (27 * 5)",
+    "reason": "gate 7/10 correct"
+   },
+   {
+    "name": "mulmul-239",
+    "expr": "(38 * 6) + (31 * 6)",
+    "reason": "gate 5/10 correct"
+   },
+   {
+    "name": "mulmul-240",
+    "expr": "(34 * 6) + (38 * 4)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "mulmul-241",
+    "expr": "(31 * 5) + (46 * 3)",
+    "reason": "gate 1/10 correct"
+   },
+   {
+    "name": "mulmul-242",
+    "expr": "(57 * 4) + (35 * 3)",
+    "reason": "gate 1/10 correct"
+   },
+   {
+    "name": "mulmul-245",
+    "expr": "(36 * 3) + (62 * 3)",
+    "reason": "gate 2/10 correct"
+   },
+   {
+    "name": "mulmul-247",
+    "expr": "(22 * 8) + (23 * 6)",
+    "reason": "gate 1/10 correct"
+   },
+   {
+    "name": "mulmul-248",
+    "expr": "(59 * 3) + (36 * 6)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "mulmul-249",
+    "expr": "(41 * 3) + (39 * 4)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "mulmul-251",
+    "expr": "(40 * 5) + (38 * 3)",
+    "reason": "gate 3/10 correct"
+   },
+   {
+    "name": "mulmul-252",
+    "expr": "(44 * 3) + (33 * 7)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "mulmul-253",
+    "expr": "(37 * 6) + (24 * 6)",
+    "reason": "gate 1/10 correct"
+   },
+   {
+    "name": "mulmul-254",
+    "expr": "(28 * 8) + (58 * 3)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "mulmul-255",
+    "expr": "(54 * 4) + (37 * 4)",
+    "reason": "gate 5/10 correct"
+   },
+   {
+    "name": "mulmul-257",
+    "expr": "(35 * 4) + (27 * 4)",
+    "reason": "gate 1/10 correct"
+   },
+   {
+    "name": "mulmul-258",
+    "expr": "(34 * 7) + (54 * 3)",
+    "reason": "gate 1/10 correct"
+   },
+   {
+    "name": "mulmul-259",
+    "expr": "(22 * 7) + (23 * 6)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "mulmul-260",
+    "expr": "(35 * 4) + (27 * 8)",
+    "reason": "gate 1/10 correct"
+   },
+   {
+    "name": "mulmul-262",
+    "expr": "(39 * 6) + (51 * 4)",
+    "reason": "gate 1/10 correct"
+   },
+   {
+    "name": "mulmul-263",
+    "expr": "(21 * 5) + (43 * 4)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "mulmul-264",
+    "expr": "(21 * 7) + (61 * 3)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "mulmul-265",
+    "expr": "(28 * 6) + (27 * 9)",
+    "reason": "gate 2/10 correct"
+   },
+   {
+    "name": "mulmul-266",
+    "expr": "(24 * 9) + (61 * 3)",
+    "reason": "gate 2/10 correct"
+   },
+   {
+    "name": "mulmul-268",
+    "expr": "(32 * 6) + (53 * 3)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "mulmul-269",
+    "expr": "(38 * 6) + (25 * 5)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "mulmul-270",
+    "expr": "(33 * 5) + (29 * 8)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "mulmul-271",
+    "expr": "(51 * 4) + (22 * 6)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "mulmul-272",
+    "expr": "(28 * 6) + (38 * 5)",
+    "reason": "gate 6/10 correct"
+   },
+   {
+    "name": "mulmul-273",
+    "expr": "(46 * 5) + (24 * 5)",
+    "reason": "gate 7/10 correct"
+   },
+   {
+    "name": "mulmul-274",
+    "expr": "(28 * 6) + (43 * 3)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "mulmul-275",
+    "expr": "(35 * 4) + (51 * 4)",
+    "reason": "gate 2/10 correct"
+   },
+   {
+    "name": "mulmul-277",
+    "expr": "(20 * 6) + (26 * 6)",
+    "reason": "gate 3/10 correct"
+   },
+   {
+    "name": "mulmul-278",
+    "expr": "(32 * 5) + (46 * 3)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "mulmul-279",
+    "expr": "(27 * 6) + (41 * 3)",
+    "reason": "gate 1/10 correct"
+   },
+   {
+    "name": "mulmul-281",
+    "expr": "(31 * 8) + (30 * 5)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "mulmul-282",
+    "expr": "(62 * 4) + (48 * 3)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "mulmul-283",
+    "expr": "(23 * 7) + (28 * 7)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "mulmul-285",
+    "expr": "(44 * 5) + (48 * 3)",
+    "reason": "gate 1/10 correct"
+   },
+   {
+    "name": "mulmul-286",
+    "expr": "(58 * 4) + (24 * 5)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "mulmul-287",
+    "expr": "(56 * 3) + (45 * 3)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "mulmul-288",
+    "expr": "(46 * 3) + (31 * 8)",
+    "reason": "gate 3/10 correct"
+   },
+   {
+    "name": "mulmul-289",
+    "expr": "(30 * 7) + (20 * 8)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "mulmul-290",
+    "expr": "(26 * 5) + (38 * 4)",
+    "reason": "gate 1/10 correct"
+   },
+   {
+    "name": "mulmul-291",
+    "expr": "(22 * 6) + (34 * 5)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "mulmul-292",
+    "expr": "(53 * 4) + (23 * 7)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "mulmul-293",
+    "expr": "(31 * 6) + (47 * 3)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "mulmul-294",
+    "expr": "(34 * 4) + (32 * 7)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "mulmul-296",
+    "expr": "(32 * 6) + (55 * 3)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "mulmul-297",
+    "expr": "(37 * 6) + (47 * 3)",
+    "reason": "gate 1/10 correct"
+   },
+   {
+    "name": "mulmul-298",
+    "expr": "(36 * 3) + (31 * 7)",
+    "reason": "gate 4/10 correct"
+   },
+   {
+    "name": "mulmul-299",
+    "expr": "(27 * 7) + (32 * 5)",
+    "reason": "gate 2/10 correct"
+   },
+   {
+    "name": "mulmul-300",
+    "expr": "(57 * 3) + (27 * 4)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "mulmul-301",
+    "expr": "(23 * 5) + (28 * 7)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "mulmul-303",
+    "expr": "(34 * 7) + (54 * 4)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "mulmul-304",
+    "expr": "(58 * 4) + (25 * 6)",
+    "reason": "gate 5/10 correct"
+   },
+   {
+    "name": "mulmul-305",
+    "expr": "(37 * 5) + (26 * 8)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "mulmul-306",
+    "expr": "(23 * 5) + (53 * 4)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "mulmul-307",
+    "expr": "(25 * 5) + (51 * 4)",
+    "reason": "gate 4/10 correct"
+   },
+   {
+    "name": "mulmul-308",
+    "expr": "(24 * 7) + (21 * 6)",
+    "reason": "gate 3/10 correct"
+   },
+   {
+    "name": "mulmul-310",
+    "expr": "(25 * 8) + (31 * 4)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "mulmul-311",
+    "expr": "(23 * 7) + (27 * 9)",
+    "reason": "gate 1/10 correct"
+   },
+   {
+    "name": "mulmul-312",
+    "expr": "(20 * 6) + (31 * 5)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "mulmul-313",
+    "expr": "(22 * 5) + (58 * 4)",
+    "reason": "gate 1/10 correct"
+   },
+   {
+    "name": "mulmul-315",
+    "expr": "(50 * 3) + (44 * 5)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "mulmul-316",
+    "expr": "(30 * 8) + (31 * 6)",
+    "reason": "gate 4/10 correct"
+   },
+   {
+    "name": "mulmul-317",
+    "expr": "(23 * 7) + (44 * 5)",
+    "reason": "gate 1/10 correct"
+   },
+   {
+    "name": "mulmul-318",
+    "expr": "(29 * 7) + (36 * 5)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "mulmul-320",
+    "expr": "(26 * 7) + (42 * 3)",
+    "reason": "gate 3/10 correct"
+   },
+   {
+    "name": "mulmul-321",
+    "expr": "(57 * 3) + (30 * 7)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "mulmul-324",
+    "expr": "(35 * 4) + (22 * 8)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "mulmul-325",
+    "expr": "(47 * 3) + (26 * 9)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "mulmul-326",
+    "expr": "(50 * 4) + (57 * 3)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "mulmul-327",
+    "expr": "(35 * 6) + (26 * 4)",
+    "reason": "gate 6/10 correct"
+   },
+   {
+    "name": "mulmul-329",
+    "expr": "(28 * 7) + (42 * 4)",
+    "reason": "gate 1/10 correct"
+   },
+   {
+    "name": "mulmul-330",
+    "expr": "(37 * 4) + (26 * 9)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "mulmul-331",
+    "expr": "(20 * 7) + (26 * 8)",
+    "reason": "gate 3/10 correct"
+   },
+   {
+    "name": "mulmul-332",
+    "expr": "(24 * 7) + (58 * 4)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "mulmul-333",
+    "expr": "(21 * 6) + (58 * 3)",
+    "reason": "gate 2/10 correct"
+   },
+   {
+    "name": "mulmul-334",
+    "expr": "(21 * 9) + (56 * 4)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "mulmul-335",
+    "expr": "(47 * 3) + (27 * 8)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "mulmul-336",
+    "expr": "(25 * 7) + (52 * 4)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "mulmul-338",
+    "expr": "(25 * 6) + (24 * 8)",
+    "reason": "gate 2/10 correct"
+   },
+   {
+    "name": "mulmul-340",
+    "expr": "(25 * 6) + (29 * 7)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "mulmul-341",
+    "expr": "(27 * 7) + (34 * 5)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "mulmul-343",
+    "expr": "(26 * 7) + (42 * 5)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "mulmul-344",
+    "expr": "(28 * 8) + (41 * 4)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "mulmul-345",
+    "expr": "(26 * 6) + (38 * 5)",
+    "reason": "gate 7/10 correct"
+   },
+   {
+    "name": "mulmul-346",
+    "expr": "(28 * 4) + (25 * 7)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "mulmul-348",
+    "expr": "(39 * 3) + (25 * 7)",
+    "reason": "gate 3/10 correct"
+   },
+   {
+    "name": "mulmul-349",
+    "expr": "(35 * 3) + (23 * 7)",
+    "reason": "gate 4/10 correct"
+   },
+   {
+    "name": "mulmul-350",
+    "expr": "(22 * 7) + (36 * 5)",
+    "reason": "gate 2/10 correct"
+   },
+   {
+    "name": "mulmul-351",
+    "expr": "(35 * 7) + (56 * 4)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "mulmul-352",
+    "expr": "(29 * 8) + (29 * 5)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "mulmul-354",
+    "expr": "(35 * 4) + (34 * 6)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "mulmul-355",
+    "expr": "(23 * 6) + (62 * 3)",
+    "reason": "gate 1/10 correct"
+   },
+   {
+    "name": "mulmul-356",
+    "expr": "(24 * 5) + (29 * 6)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "mulmul-357",
+    "expr": "(29 * 5) + (56 * 4)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "mulmul-358",
+    "expr": "(36 * 5) + (41 * 4)",
+    "reason": "gate 2/10 correct"
+   },
+   {
+    "name": "mulmul-359",
+    "expr": "(20 * 9) + (26 * 4)",
+    "reason": "gate 2/10 correct"
+   }
+  ]
+ },
+ "frac": {
+  "n_before": 132,
+  "n_after": 116,
+  "removed": [
+   {
+    "name": "frac-004",
+    "expr": "(17 / 19) * 646",
+    "reason": "twin frac-005 failed gate"
+   },
+   {
+    "name": "frac-005",
+    "expr": "(19 / 17) * 646",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "frac-012",
+    "expr": "(9 / 23) * 207",
+    "reason": "twin frac-013 failed gate"
+   },
+   {
+    "name": "frac-013",
+    "expr": "(23 / 9) * 207",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "frac-040",
+    "expr": "(7 / 17) * 119",
+    "reason": "twin frac-041 failed gate"
+   },
+   {
+    "name": "frac-041",
+    "expr": "(17 / 7) * 119",
+    "reason": "gate 7/10 correct"
+   },
+   {
+    "name": "frac-044",
+    "expr": "(19 / 23) * 437",
+    "reason": "twin frac-045 failed gate"
+   },
+   {
+    "name": "frac-045",
+    "expr": "(23 / 19) * 437",
+    "reason": "gate 3/10 correct"
+   },
+   {
+    "name": "frac-062",
+    "expr": "(17 / 23) * 391",
+    "reason": "gate 6/10 correct"
+   },
+   {
+    "name": "frac-063",
+    "expr": "(23 / 17) * 391",
+    "reason": "twin frac-062 failed gate"
+   },
+   {
+    "name": "frac-070",
+    "expr": "(7 / 17) * 357",
+    "reason": "twin frac-071 failed gate"
+   },
+   {
+    "name": "frac-071",
+    "expr": "(17 / 7) * 357",
+    "reason": "gate 1/10 correct"
+   },
+   {
+    "name": "frac-112",
+    "expr": "(7 / 13) * 273",
+    "reason": "twin frac-113 failed gate"
+   },
+   {
+    "name": "frac-113",
+    "expr": "(13 / 7) * 273",
+    "reason": "gate 3/10 correct"
+   },
+   {
+    "name": "frac-118",
+    "expr": "(3 / 13) * 195",
+    "reason": "twin frac-119 failed gate"
+   },
+   {
+    "name": "frac-119",
+    "expr": "(13 / 3) * 195",
+    "reason": "gate 0/10 correct"
+   }
+  ]
+ },
+ "fraccomp": {
+  "n_before": 140,
+  "n_after": 44,
+  "removed": [
+   {
+    "name": "fraccomp-000",
+    "expr": "((30 + 21) / 7) * 21",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "fraccomp-001",
+    "expr": "((22 + 31) / 3) * 15",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "fraccomp-002",
+    "expr": "((19 + 40) / 7) * 28",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "fraccomp-003",
+    "expr": "((20 + 17) / 7) * 28",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "fraccomp-004",
+    "expr": "((40 + 37) / 3) * 6",
+    "reason": "gate 6/10 correct"
+   },
+   {
+    "name": "fraccomp-005",
+    "expr": "((25 + 19) / 3) * 12",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "fraccomp-006",
+    "expr": "((31 + 27) / 7) * 35",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "fraccomp-007",
+    "expr": "((38 + 21) / 7) * 28",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "fraccomp-010",
+    "expr": "((31 + 40) / 3) * 6",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "fraccomp-011",
+    "expr": "((33 + 34) / 7) * 28",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "fraccomp-012",
+    "expr": "((33 + 13) / 3) * 9",
+    "reason": "gate 1/10 correct"
+   },
+   {
+    "name": "fraccomp-013",
+    "expr": "((17 + 24) / 7) * 21",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "fraccomp-014",
+    "expr": "((33 + 31) / 7) * 28",
+    "reason": "gate 2/10 correct"
+   },
+   {
+    "name": "fraccomp-015",
+    "expr": "((34 + 38) / 7) * 21",
+    "reason": "gate 3/10 correct"
+   },
+   {
+    "name": "fraccomp-016",
+    "expr": "((15 + 26) / 3) * 9",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "fraccomp-017",
+    "expr": "((24 + 40) / 7) * 21",
+    "reason": "gate 1/10 correct"
+   },
+   {
+    "name": "fraccomp-021",
+    "expr": "((25 + 32) / 7) * 35",
+    "reason": "gate 1/10 correct"
+   },
+   {
+    "name": "fraccomp-022",
+    "expr": "((11 + 26) / 3) * 9",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "fraccomp-023",
+    "expr": "((35 + 33) / 3) * 12",
+    "reason": "gate 7/10 correct"
+   },
+   {
+    "name": "fraccomp-024",
+    "expr": "((27 + 26) / 3) * 9",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "fraccomp-025",
+    "expr": "((33 + 10) / 3) * 12",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "fraccomp-028",
+    "expr": "((25 + 16) / 7) * 14",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "fraccomp-029",
+    "expr": "((18 + 25) / 7) * 28",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "fraccomp-030",
+    "expr": "((36 + 15) / 7) * 35",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "fraccomp-031",
+    "expr": "((27 + 10) / 3) * 6",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "fraccomp-033",
+    "expr": "((37 + 23) / 7) * 28",
+    "reason": "gate 5/10 correct"
+   },
+   {
+    "name": "fraccomp-034",
+    "expr": "((14 + 19) / 7) * 28",
+    "reason": "gate 1/10 correct"
+   },
+   {
+    "name": "fraccomp-035",
+    "expr": "((30 + 39) / 7) * 21",
+    "reason": "gate 2/10 correct"
+   },
+   {
+    "name": "fraccomp-036",
+    "expr": "((23 + 26) / 3) * 12",
+    "reason": "gate 1/10 correct"
+   },
+   {
+    "name": "fraccomp-038",
+    "expr": "((35 + 34) / 7) * 28",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "fraccomp-039",
+    "expr": "((14 + 24) / 3) * 6",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "fraccomp-040",
+    "expr": "((10 + 17) / 7) * 14",
+    "reason": "gate 3/10 correct"
+   },
+   {
+    "name": "fraccomp-041",
+    "expr": "((18 + 35) / 7) * 21",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "fraccomp-042",
+    "expr": "((29 + 32) / 3) * 9",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "fraccomp-043",
+    "expr": "((26 + 20) / 7) * 21",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "fraccomp-045",
+    "expr": "((17 + 34) / 7) * 35",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "fraccomp-047",
+    "expr": "((11 + 13) / 7) * 28",
+    "reason": "gate 3/10 correct"
+   },
+   {
+    "name": "fraccomp-048",
+    "expr": "((23 + 24) / 7) * 14",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "fraccomp-050",
+    "expr": "((30 + 18) / 7) * 28",
+    "reason": "gate 1/10 correct"
+   },
+   {
+    "name": "fraccomp-052",
+    "expr": "((23 + 13) / 7) * 35",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "fraccomp-054",
+    "expr": "((27 + 20) / 7) * 28",
+    "reason": "gate 1/10 correct"
+   },
+   {
+    "name": "fraccomp-056",
+    "expr": "((28 + 19) / 3) * 9",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "fraccomp-057",
+    "expr": "((35 + 29) / 3) * 12",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "fraccomp-059",
+    "expr": "((12 + 17) / 7) * 14",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "fraccomp-060",
+    "expr": "((31 + 15) / 3) * 15",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "fraccomp-061",
+    "expr": "((29 + 39) / 7) * 28",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "fraccomp-064",
+    "expr": "((13 + 13) / 7) * 28",
+    "reason": "gate 6/10 correct"
+   },
+   {
+    "name": "fraccomp-067",
+    "expr": "((38 + 28) / 7) * 21",
+    "reason": "gate 1/10 correct"
+   },
+   {
+    "name": "fraccomp-068",
+    "expr": "((37 + 21) / 3) * 15",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "fraccomp-070",
+    "expr": "((11 + 30) / 3) * 9",
+    "reason": "gate 4/10 correct"
+   },
+   {
+    "name": "fraccomp-071",
+    "expr": "((14 + 30) / 3) * 12",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "fraccomp-074",
+    "expr": "((32 + 22) / 7) * 28",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "fraccomp-075",
+    "expr": "((34 + 38) / 7) * 14",
+    "reason": "gate 1/10 correct"
+   },
+   {
+    "name": "fraccomp-077",
+    "expr": "((11 + 15) / 3) * 6",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "fraccomp-079",
+    "expr": "((31 + 17) / 7) * 14",
+    "reason": "gate 5/10 correct"
+   },
+   {
+    "name": "fraccomp-080",
+    "expr": "((15 + 32) / 7) * 35",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "fraccomp-081",
+    "expr": "((35 + 24) / 3) * 9",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "fraccomp-082",
+    "expr": "((27 + 28) / 7) * 35",
+    "reason": "gate 5/10 correct"
+   },
+   {
+    "name": "fraccomp-083",
+    "expr": "((30 + 38) / 7) * 21",
+    "reason": "gate 1/10 correct"
+   },
+   {
+    "name": "fraccomp-084",
+    "expr": "((11 + 15) / 3) * 9",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "fraccomp-085",
+    "expr": "((27 + 14) / 7) * 28",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "fraccomp-086",
+    "expr": "((39 + 19) / 3) * 12",
+    "reason": "gate 7/10 correct"
+   },
+   {
+    "name": "fraccomp-087",
+    "expr": "((26 + 23) / 3) * 6",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "fraccomp-090",
+    "expr": "((31 + 40) / 7) * 14",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "fraccomp-092",
+    "expr": "((13 + 25) / 3) * 9",
+    "reason": "gate 2/10 correct"
+   },
+   {
+    "name": "fraccomp-095",
+    "expr": "((28 + 18) / 3) * 15",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "fraccomp-097",
+    "expr": "((11 + 23) / 7) * 35",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "fraccomp-098",
+    "expr": "((21 + 20) / 7) * 14",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "fraccomp-099",
+    "expr": "((19 + 21) / 3) * 15",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "fraccomp-100",
+    "expr": "((38 + 10) / 7) * 21",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "fraccomp-103",
+    "expr": "((30 + 23) / 7) * 35",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "fraccomp-104",
+    "expr": "((26 + 35) / 3) * 6",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "fraccomp-108",
+    "expr": "((33 + 31) / 7) * 14",
+    "reason": "gate 5/10 correct"
+   },
+   {
+    "name": "fraccomp-109",
+    "expr": "((30 + 17) / 7) * 28",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "fraccomp-110",
+    "expr": "((21 + 15) / 7) * 28",
+    "reason": "gate 5/10 correct"
+   },
+   {
+    "name": "fraccomp-111",
+    "expr": "((28 + 10) / 7) * 28",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "fraccomp-112",
+    "expr": "((20 + 33) / 7) * 35",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "fraccomp-113",
+    "expr": "((22 + 27) / 3) * 9",
+    "reason": "gate 1/10 correct"
+   },
+   {
+    "name": "fraccomp-115",
+    "expr": "((40 + 24) / 3) * 12",
+    "reason": "gate 1/10 correct"
+   },
+   {
+    "name": "fraccomp-116",
+    "expr": "((12 + 19) / 3) * 12",
+    "reason": "gate 4/10 correct"
+   },
+   {
+    "name": "fraccomp-117",
+    "expr": "((26 + 15) / 7) * 14",
+    "reason": "gate 1/10 correct"
+   },
+   {
+    "name": "fraccomp-118",
+    "expr": "((27 + 26) / 3) * 15",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "fraccomp-120",
+    "expr": "((39 + 40) / 3) * 9",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "fraccomp-121",
+    "expr": "((38 + 14) / 7) * 14",
+    "reason": "gate 3/10 correct"
+   },
+   {
+    "name": "fraccomp-122",
+    "expr": "((13 + 25) / 3) * 12",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "fraccomp-123",
+    "expr": "((32 + 33) / 3) * 12",
+    "reason": "gate 1/10 correct"
+   },
+   {
+    "name": "fraccomp-125",
+    "expr": "((24 + 23) / 7) * 35",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "fraccomp-128",
+    "expr": "((25 + 21) / 7) * 28",
+    "reason": "gate 5/10 correct"
+   },
+   {
+    "name": "fraccomp-130",
+    "expr": "((32 + 23) / 7) * 21",
+    "reason": "gate 7/10 correct"
+   },
+   {
+    "name": "fraccomp-131",
+    "expr": "((40 + 14) / 7) * 21",
+    "reason": "gate 2/10 correct"
+   },
+   {
+    "name": "fraccomp-132",
+    "expr": "((16 + 30) / 7) * 14",
+    "reason": "gate 1/10 correct"
+   },
+   {
+    "name": "fraccomp-133",
+    "expr": "((13 + 10) / 3) * 6",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "fraccomp-135",
+    "expr": "((28 + 33) / 7) * 21",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "fraccomp-137",
+    "expr": "((26 + 13) / 7) * 35",
+    "reason": "gate 1/10 correct"
+   },
+   {
+    "name": "fraccomp-138",
+    "expr": "((22 + 16) / 7) * 14",
+    "reason": "gate 6/10 correct"
+   },
+   {
+    "name": "fraccomp-139",
+    "expr": "((35 + 11) / 7) * 21",
+    "reason": "gate 0/10 correct"
+   }
+  ]
+ },
+ "negdiv8": {
+  "n_before": 70,
+  "n_after": 45,
+  "removed": [
+   {
+    "name": "negdiv8-001",
+    "expr": "((23 - 63) / 8) * 6",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "negdiv8-006",
+    "expr": "((14 - 46) / 8) * 3",
+    "reason": "gate 3/10 correct"
+   },
+   {
+    "name": "negdiv8-008",
+    "expr": "((25 - 65) / 8) * 3",
+    "reason": "gate 3/10 correct"
+   },
+   {
+    "name": "negdiv8-009",
+    "expr": "((41 - 89) / 8) * 4",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "negdiv8-013",
+    "expr": "((52 - 84) / 8) * 3",
+    "reason": "twin negdiv8x-013 failed gate"
+   },
+   {
+    "name": "negdiv8-018",
+    "expr": "((57 - 97) / 8) * 5",
+    "reason": "twin negdiv8x-018 failed gate"
+   },
+   {
+    "name": "negdiv8-021",
+    "expr": "((13 - 61) / 8) * 4",
+    "reason": "gate 2/10 correct"
+   },
+   {
+    "name": "negdiv8-025",
+    "expr": "((38 - 78) / 8) * 2",
+    "reason": "twin negdiv8x-025 failed gate"
+   },
+   {
+    "name": "negdiv8-032",
+    "expr": "((30 - 78) / 8) * 6",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "negdiv8-033",
+    "expr": "((29 - 45) / 8) * 2",
+    "reason": "twin negdiv8x-033 failed gate"
+   },
+   {
+    "name": "negdiv8-035",
+    "expr": "((18 - 58) / 8) * 6",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "negdiv8-038",
+    "expr": "((44 - 92) / 8) * 4",
+    "reason": "twin negdiv8x-038 failed gate"
+   },
+   {
+    "name": "negdiv8-040",
+    "expr": "((49 - 89) / 8) * 6",
+    "reason": "twin negdiv8x-040 failed gate"
+   },
+   {
+    "name": "negdiv8-042",
+    "expr": "((31 - 63) / 8) * 3",
+    "reason": "twin negdiv8x-042 failed gate"
+   },
+   {
+    "name": "negdiv8-044",
+    "expr": "((31 - 71) / 8) * 5",
+    "reason": "twin negdiv8x-044 failed gate"
+   },
+   {
+    "name": "negdiv8-048",
+    "expr": "((46 - 94) / 8) * 3",
+    "reason": "gate 4/10 correct"
+   },
+   {
+    "name": "negdiv8-049",
+    "expr": "((33 - 73) / 8) * 6",
+    "reason": "twin negdiv8x-049 failed gate"
+   },
+   {
+    "name": "negdiv8-050",
+    "expr": "((50 - 90) / 8) * 5",
+    "reason": "twin negdiv8x-050 failed gate"
+   },
+   {
+    "name": "negdiv8-056",
+    "expr": "((16 - 56) / 8) * 3",
+    "reason": "twin negdiv8x-056 failed gate"
+   },
+   {
+    "name": "negdiv8-057",
+    "expr": "((52 - 92) / 8) * 4",
+    "reason": "twin negdiv8x-057 failed gate"
+   },
+   {
+    "name": "negdiv8-060",
+    "expr": "((46 - 94) / 8) * 4",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "negdiv8-061",
+    "expr": "((30 - 62) / 8) * 6",
+    "reason": "gate 1/10 correct"
+   },
+   {
+    "name": "negdiv8-062",
+    "expr": "((45 - 93) / 8) * 4",
+    "reason": "twin negdiv8x-062 failed gate"
+   },
+   {
+    "name": "negdiv8-067",
+    "expr": "((45 - 93) / 8) * 6",
+    "reason": "twin negdiv8x-067 failed gate"
+   },
+   {
+    "name": "negdiv8-069",
+    "expr": "((13 - 53) / 8) * 5",
+    "reason": "twin negdiv8x-069 failed gate"
+   }
+  ]
+ },
+ "negdiv8x": {
+  "n_before": 70,
+  "n_after": 45,
+  "removed": [
+   {
+    "name": "negdiv8x-001",
+    "expr": "((32 - 71) / 8) * 6",
+    "reason": "gate 4/10 correct"
+   },
+   {
+    "name": "negdiv8x-006",
+    "expr": "((65 - 96) / 8) * 3",
+    "reason": "twin negdiv8-006 failed gate"
+   },
+   {
+    "name": "negdiv8x-008",
+    "expr": "((44 - 83) / 8) * 3",
+    "reason": "twin negdiv8-008 failed gate"
+   },
+   {
+    "name": "negdiv8x-009",
+    "expr": "((52 - 99) / 8) * 4",
+    "reason": "gate 5/10 correct"
+   },
+   {
+    "name": "negdiv8x-013",
+    "expr": "((10 - 43) / 8) * 3",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "negdiv8x-018",
+    "expr": "((39 - 78) / 8) * 5",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "negdiv8x-021",
+    "expr": "((39 - 86) / 8) * 4",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "negdiv8x-025",
+    "expr": "((13 - 52) / 8) * 2",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "negdiv8x-032",
+    "expr": "((33 - 80) / 8) * 6",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "negdiv8x-033",
+    "expr": "((15 - 32) / 8) * 2",
+    "reason": "gate 4/10 correct"
+   },
+   {
+    "name": "negdiv8x-035",
+    "expr": "((42 - 83) / 8) * 6",
+    "reason": "gate 2/10 correct"
+   },
+   {
+    "name": "negdiv8x-038",
+    "expr": "((34 - 81) / 8) * 4",
+    "reason": "gate 2/10 correct"
+   },
+   {
+    "name": "negdiv8x-040",
+    "expr": "((41 - 82) / 8) * 6",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "negdiv8x-042",
+    "expr": "((15 - 46) / 8) * 3",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "negdiv8x-044",
+    "expr": "((11 - 50) / 8) * 5",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "negdiv8x-048",
+    "expr": "((23 - 70) / 8) * 3",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "negdiv8x-049",
+    "expr": "((13 - 52) / 8) * 6",
+    "reason": "leak 5/10"
+   },
+   {
+    "name": "negdiv8x-050",
+    "expr": "((30 - 71) / 8) * 5",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "negdiv8x-056",
+    "expr": "((27 - 68) / 8) * 3",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "negdiv8x-057",
+    "expr": "((29 - 68) / 8) * 4",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "negdiv8x-060",
+    "expr": "((24 - 73) / 8) * 4",
+    "reason": "gate 1/10 correct"
+   },
+   {
+    "name": "negdiv8x-061",
+    "expr": "((57 - 88) / 8) * 6",
+    "reason": "twin negdiv8-061 failed gate"
+   },
+   {
+    "name": "negdiv8x-062",
+    "expr": "((41 - 90) / 8) * 4",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "negdiv8x-067",
+    "expr": "((14 - 63) / 8) * 6",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "negdiv8x-069",
+    "expr": "((25 - 66) / 8) * 5",
+    "reason": "gate 0/10 correct"
+   }
+  ]
+ },
+ "halves": {
+  "n_before": 40,
+  "n_after": 38,
+  "removed": [
+   {
+    "name": "halves-023",
+    "expr": "(37 / 2) + 51",
+    "reason": "gate 7/10 correct"
+   },
+   {
+    "name": "halves-032",
+    "expr": "(63 / 2) + 28",
+    "reason": "gate 7/10 correct"
+   }
+  ]
+ },
+ "fracadd": {
+  "n_before": 80,
+  "n_after": 63,
+  "removed": [
+   {
+    "name": "fracadd-001",
+    "expr": "(82 / 7) + (72 / 7)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "fracadd-002",
+    "expr": "(84 / 11) + (70 / 11)",
+    "reason": "gate 5/10 correct"
+   },
+   {
+    "name": "fracadd-003",
+    "expr": "(94 / 11) + (93 / 11)",
+    "reason": "gate 3/10 correct"
+   },
+   {
+    "name": "fracadd-004",
+    "expr": "(57 / 7) + (41 / 7)",
+    "reason": "gate 2/10 correct"
+   },
+   {
+    "name": "fracadd-005",
+    "expr": "(16 / 7) + (82 / 7)",
+    "reason": "gate 3/10 correct"
+   },
+   {
+    "name": "fracadd-010",
+    "expr": "(86 / 3) + (28 / 3)",
+    "reason": "gate 6/10 correct"
+   },
+   {
+    "name": "fracadd-011",
+    "expr": "(20 / 9) + (61 / 9)",
+    "reason": "leak 1/10"
+   },
+   {
+    "name": "fracadd-022",
+    "expr": "(51 / 11) + (26 / 11)",
+    "reason": "gate 7/10 correct"
+   },
+   {
+    "name": "fracadd-023",
+    "expr": "(70 / 9) + (29 / 9)",
+    "reason": "gate 2/10 correct"
+   },
+   {
+    "name": "fracadd-024",
+    "expr": "(34 / 11) + (98 / 11)",
+    "reason": "gate 1/10 correct"
+   },
+   {
+    "name": "fracadd-025",
+    "expr": "(94 / 7) + (81 / 7)",
+    "reason": "gate 7/10 correct"
+   },
+   {
+    "name": "fracadd-035",
+    "expr": "(89 / 3) + (25 / 3)",
+    "reason": "gate 5/10 correct"
+   },
+   {
+    "name": "fracadd-041",
+    "expr": "(29 / 7) + (41 / 7)",
+    "reason": "gate 7/10 correct"
+   },
+   {
+    "name": "fracadd-045",
+    "expr": "(49 / 9) + (14 / 9)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "fracadd-056",
+    "expr": "(29 / 11) + (81 / 11)",
+    "reason": "gate 1/10 correct"
+   },
+   {
+    "name": "fracadd-066",
+    "expr": "(17 / 9) + (55 / 9)",
+    "reason": "leak 1/10"
+   },
+   {
+    "name": "fracadd-078",
+    "expr": "(56 / 11) + (87 / 11)",
+    "reason": "gate 6/10 correct"
+   }
+  ]
+ },
+ "subsub": {
+  "n_before": 60,
+  "n_after": 60,
+  "removed": []
+ },
+ "subsubx": {
+  "n_before": 60,
+  "n_after": 60,
+  "removed": []
+ },
+ "addmul": {
+  "n_before": 60,
+  "n_after": 43,
+  "removed": [
+   {
+    "name": "addmul-001",
+    "expr": "(35 + 27) * 6",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "addmul-005",
+    "expr": "(24 + 43) * 3",
+    "reason": "gate 1/10 correct"
+   },
+   {
+    "name": "addmul-010",
+    "expr": "(46 + 37) * 5",
+    "reason": "gate 5/10 correct"
+   },
+   {
+    "name": "addmul-021",
+    "expr": "(23 + 34) * 6",
+    "reason": "gate 3/10 correct"
+   },
+   {
+    "name": "addmul-022",
+    "expr": "(38 + 41) * 7",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "addmul-024",
+    "expr": "(29 + 44) * 7",
+    "reason": "gate 6/10 correct"
+   },
+   {
+    "name": "addmul-028",
+    "expr": "(36 + 41) * 6",
+    "reason": "gate 4/10 correct"
+   },
+   {
+    "name": "addmul-029",
+    "expr": "(19 + 29) * 4",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "addmul-037",
+    "expr": "(37 + 21) * 9",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "addmul-038",
+    "expr": "(45 + 34) * 5",
+    "reason": "twin addmulx-038 failed gate"
+   },
+   {
+    "name": "addmul-041",
+    "expr": "(22 + 14) * 8",
+    "reason": "gate 1/10 correct"
+   },
+   {
+    "name": "addmul-045",
+    "expr": "(23 + 47) * 3",
+    "reason": "gate 5/10 correct"
+   },
+   {
+    "name": "addmul-046",
+    "expr": "(17 + 22) * 7",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "addmul-047",
+    "expr": "(48 + 28) * 4",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "addmul-051",
+    "expr": "(44 + 37) * 3",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "addmul-053",
+    "expr": "(44 + 34) * 9",
+    "reason": "gate 4/10 correct"
+   },
+   {
+    "name": "addmul-058",
+    "expr": "(41 + 22) * 8",
+    "reason": "gate 0/10 correct"
+   }
+  ]
+ },
+ "addmulx": {
+  "n_before": 60,
+  "n_after": 43,
+  "removed": [
+   {
+    "name": "addmulx-001",
+    "expr": "35 + (27 * 6)",
+    "reason": "twin addmul-001 failed gate"
+   },
+   {
+    "name": "addmulx-005",
+    "expr": "24 + (43 * 3)",
+    "reason": "twin addmul-005 failed gate"
+   },
+   {
+    "name": "addmulx-010",
+    "expr": "46 + (37 * 5)",
+    "reason": "twin addmul-010 failed gate"
+   },
+   {
+    "name": "addmulx-021",
+    "expr": "23 + (34 * 6)",
+    "reason": "gate 2/10 correct"
+   },
+   {
+    "name": "addmulx-022",
+    "expr": "38 + (41 * 7)",
+    "reason": "twin addmul-022 failed gate"
+   },
+   {
+    "name": "addmulx-024",
+    "expr": "29 + (44 * 7)",
+    "reason": "twin addmul-024 failed gate"
+   },
+   {
+    "name": "addmulx-028",
+    "expr": "36 + (41 * 6)",
+    "reason": "twin addmul-028 failed gate"
+   },
+   {
+    "name": "addmulx-029",
+    "expr": "19 + (29 * 4)",
+    "reason": "twin addmul-029 failed gate"
+   },
+   {
+    "name": "addmulx-037",
+    "expr": "37 + (21 * 9)",
+    "reason": "twin addmul-037 failed gate"
+   },
+   {
+    "name": "addmulx-038",
+    "expr": "45 + (34 * 5)",
+    "reason": "gate 7/10 correct"
+   },
+   {
+    "name": "addmulx-041",
+    "expr": "22 + (14 * 8)",
+    "reason": "twin addmul-041 failed gate"
+   },
+   {
+    "name": "addmulx-045",
+    "expr": "23 + (47 * 3)",
+    "reason": "twin addmul-045 failed gate"
+   },
+   {
+    "name": "addmulx-046",
+    "expr": "17 + (22 * 7)",
+    "reason": "twin addmul-046 failed gate"
+   },
+   {
+    "name": "addmulx-047",
+    "expr": "48 + (28 * 4)",
+    "reason": "twin addmul-047 failed gate"
+   },
+   {
+    "name": "addmulx-051",
+    "expr": "44 + (37 * 3)",
+    "reason": "twin addmul-051 failed gate"
+   },
+   {
+    "name": "addmulx-053",
+    "expr": "44 + (34 * 9)",
+    "reason": "twin addmul-053 failed gate"
+   },
+   {
+    "name": "addmulx-058",
+    "expr": "41 + (22 * 8)",
+    "reason": "gate 5/10 correct"
+   }
+  ]
+ },
+ "fracint": {
+  "n_before": 70,
+  "n_after": 32,
+  "removed": [
+   {
+    "name": "fracint-000",
+    "expr": "(126 / 7) + (196 / 7)",
+    "reason": "gate 3/10 correct"
+   },
+   {
+    "name": "fracint-001",
+    "expr": "(182 / 7) + (147 / 7)",
+    "reason": "gate 4/10 correct"
+   },
+   {
+    "name": "fracint-002",
+    "expr": "(260 / 13) + (234 / 13)",
+    "reason": "gate 2/10 correct"
+   },
+   {
+    "name": "fracint-004",
+    "expr": "(91 / 7) + (140 / 7)",
+    "reason": "gate 5/10 correct"
+   },
+   {
+    "name": "fracint-006",
+    "expr": "(108 / 9) + (252 / 9)",
+    "reason": "gate 5/10 correct"
+   },
+   {
+    "name": "fracint-008",
+    "expr": "(189 / 7) + (119 / 7)",
+    "reason": "gate 1/10 correct"
+   },
+   {
+    "name": "fracint-012",
+    "expr": "(221 / 13) + (338 / 13)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "fracint-014",
+    "expr": "(253 / 11) + (198 / 11)",
+    "reason": "gate 4/10 correct"
+   },
+   {
+    "name": "fracint-015",
+    "expr": "(93 / 3) + (42 / 3)",
+    "reason": "gate 3/10 correct"
+   },
+   {
+    "name": "fracint-018",
+    "expr": "(143 / 11) + (341 / 11)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "fracint-019",
+    "expr": "(36 / 3) + (75 / 3)",
+    "reason": "gate 5/10 correct"
+   },
+   {
+    "name": "fracint-020",
+    "expr": "(153 / 9) + (270 / 9)",
+    "reason": "gate 1/10 correct"
+   },
+   {
+    "name": "fracint-023",
+    "expr": "(66 / 3) + (57 / 3)",
+    "reason": "gate 2/10 correct"
+   },
+   {
+    "name": "fracint-026",
+    "expr": "(154 / 7) + (231 / 7)",
+    "reason": "gate 1/10 correct"
+   },
+   {
+    "name": "fracint-027",
+    "expr": "(207 / 9) + (243 / 9)",
+    "reason": "gate 5/10 correct"
+   },
+   {
+    "name": "fracint-034",
+    "expr": "(165 / 11) + (363 / 11)",
+    "reason": "gate 1/10 correct"
+   },
+   {
+    "name": "fracint-035",
+    "expr": "(108 / 9) + (288 / 9)",
+    "reason": "gate 5/10 correct"
+   },
+   {
+    "name": "fracint-037",
+    "expr": "(119 / 7) + (210 / 7)",
+    "reason": "gate 2/10 correct"
+   },
+   {
+    "name": "fracint-038",
+    "expr": "(90 / 3) + (75 / 3)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "fracint-040",
+    "expr": "(182 / 7) + (112 / 7)",
+    "reason": "gate 5/10 correct"
+   },
+   {
+    "name": "fracint-041",
+    "expr": "(99 / 3) + (78 / 3)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "fracint-042",
+    "expr": "(182 / 7) + (217 / 7)",
+    "reason": "gate 3/10 correct"
+   },
+   {
+    "name": "fracint-044",
+    "expr": "(78 / 3) + (69 / 3)",
+    "reason": "gate 1/10 correct"
+   },
+   {
+    "name": "fracint-047",
+    "expr": "(143 / 11) + (352 / 11)",
+    "reason": "gate 1/10 correct"
+   },
+   {
+    "name": "fracint-048",
+    "expr": "(264 / 11) + (143 / 11)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "fracint-050",
+    "expr": "(243 / 9) + (216 / 9)",
+    "reason": "gate 1/10 correct"
+   },
+   {
+    "name": "fracint-052",
+    "expr": "(99 / 3) + (42 / 3)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "fracint-053",
+    "expr": "(180 / 9) + (207 / 9)",
+    "reason": "gate 7/10 correct"
+   },
+   {
+    "name": "fracint-055",
+    "expr": "(126 / 9) + (297 / 9)",
+    "reason": "gate 2/10 correct"
+   },
+   {
+    "name": "fracint-058",
+    "expr": "(154 / 11) + (187 / 11)",
+    "reason": "gate 7/10 correct"
+   },
+   {
+    "name": "fracint-059",
+    "expr": "(66 / 3) + (96 / 3)",
+    "reason": "gate 1/10 correct"
+   },
+   {
+    "name": "fracint-061",
+    "expr": "(162 / 9) + (261 / 9)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "fracint-063",
+    "expr": "(171 / 9) + (234 / 9)",
+    "reason": "gate 3/10 correct"
+   },
+   {
+    "name": "fracint-064",
+    "expr": "(154 / 7) + (203 / 7)",
+    "reason": "gate 2/10 correct"
+   },
+   {
+    "name": "fracint-065",
+    "expr": "(210 / 7) + (133 / 7)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "fracint-066",
+    "expr": "(209 / 11) + (297 / 11)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "fracint-068",
+    "expr": "(286 / 11) + (187 / 11)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "fracint-069",
+    "expr": "(260 / 13) + (351 / 13)",
+    "reason": "gate 2/10 correct"
+   }
+  ]
+ },
+ "mulmid": {
+  "n_before": 90,
+  "n_after": 33,
+  "removed": [
+   {
+    "name": "mulmid-001",
+    "expr": "(11 * 7) + (21 * 3)",
+    "reason": "gate 3/10 correct"
+   },
+   {
+    "name": "mulmid-002",
+    "expr": "(20 * 5) + (9 * 9)",
+    "reason": "gate 6/10 correct"
+   },
+   {
+    "name": "mulmid-004",
+    "expr": "(11 * 6) + (19 * 5)",
+    "reason": "gate 1/10 correct"
+   },
+   {
+    "name": "mulmid-005",
+    "expr": "(13 * 5) + (11 * 8)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "mulmid-007",
+    "expr": "(21 * 3) + (12 * 8)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "mulmid-009",
+    "expr": "(12 * 5) + (32 * 3)",
+    "reason": "gate 7/10 correct"
+   },
+   {
+    "name": "mulmid-010",
+    "expr": "(11 * 7) + (29 * 3)",
+    "reason": "gate 1/10 correct"
+   },
+   {
+    "name": "mulmid-012",
+    "expr": "(16 * 4) + (29 * 3)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "mulmid-013",
+    "expr": "(20 * 4) + (7 * 9)",
+    "reason": "gate 1/10 correct"
+   },
+   {
+    "name": "mulmid-014",
+    "expr": "(25 * 4) + (18 * 4)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "mulmid-015",
+    "expr": "(10 * 8) + (14 * 5)",
+    "reason": "gate 1/10 correct"
+   },
+   {
+    "name": "mulmid-016",
+    "expr": "(11 * 7) + (8 * 8)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "mulmid-017",
+    "expr": "(19 * 5) + (17 * 4)",
+    "reason": "gate 7/10 correct"
+   },
+   {
+    "name": "mulmid-018",
+    "expr": "(33 * 3) + (10 * 9)",
+    "reason": "gate 7/10 correct"
+   },
+   {
+    "name": "mulmid-024",
+    "expr": "(24 * 3) + (9 * 7)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "mulmid-025",
+    "expr": "(14 * 7) + (21 * 3)",
+    "reason": "gate 2/10 correct"
+   },
+   {
+    "name": "mulmid-026",
+    "expr": "(11 * 6) + (23 * 4)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "mulmid-027",
+    "expr": "(11 * 6) + (33 * 3)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "mulmid-029",
+    "expr": "(23 * 4) + (11 * 6)",
+    "reason": "gate 3/10 correct"
+   },
+   {
+    "name": "mulmid-030",
+    "expr": "(9 * 7) + (27 * 3)",
+    "reason": "gate 1/10 correct"
+   },
+   {
+    "name": "mulmid-031",
+    "expr": "(10 * 7) + (29 * 3)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "mulmid-032",
+    "expr": "(25 * 3) + (21 * 3)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "mulmid-034",
+    "expr": "(16 * 4) + (31 * 3)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "mulmid-035",
+    "expr": "(12 * 5) + (33 * 3)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "mulmid-037",
+    "expr": "(15 * 6) + (12 * 6)",
+    "reason": "gate 7/10 correct"
+   },
+   {
+    "name": "mulmid-038",
+    "expr": "(12 * 6) + (11 * 6)",
+    "reason": "gate 1/10 correct"
+   },
+   {
+    "name": "mulmid-039",
+    "expr": "(17 * 5) + (10 * 7)",
+    "reason": "gate 5/10 correct"
+   },
+   {
+    "name": "mulmid-040",
+    "expr": "(33 * 3) + (15 * 4)",
+    "reason": "gate 4/10 correct"
+   },
+   {
+    "name": "mulmid-041",
+    "expr": "(11 * 9) + (26 * 3)",
+    "reason": "gate 4/10 correct"
+   },
+   {
+    "name": "mulmid-042",
+    "expr": "(11 * 7) + (22 * 4)",
+    "reason": "gate 6/10 correct"
+   },
+   {
+    "name": "mulmid-045",
+    "expr": "(23 * 3) + (25 * 4)",
+    "reason": "gate 6/10 correct"
+   },
+   {
+    "name": "mulmid-046",
+    "expr": "(20 * 4) + (16 * 4)",
+    "reason": "gate 1/10 correct"
+   },
+   {
+    "name": "mulmid-047",
+    "expr": "(15 * 5) + (24 * 4)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "mulmid-049",
+    "expr": "(23 * 4) + (12 * 7)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "mulmid-050",
+    "expr": "(15 * 4) + (13 * 7)",
+    "reason": "gate 2/10 correct"
+   },
+   {
+    "name": "mulmid-053",
+    "expr": "(11 * 8) + (11 * 7)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "mulmid-054",
+    "expr": "(10 * 7) + (31 * 3)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "mulmid-057",
+    "expr": "(19 * 5) + (11 * 6)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "mulmid-058",
+    "expr": "(7 * 9) + (32 * 3)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "mulmid-059",
+    "expr": "(20 * 5) + (11 * 7)",
+    "reason": "gate 5/10 correct"
+   },
+   {
+    "name": "mulmid-060",
+    "expr": "(10 * 7) + (9 * 9)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "mulmid-061",
+    "expr": "(10 * 9) + (25 * 3)",
+    "reason": "gate 7/10 correct"
+   },
+   {
+    "name": "mulmid-062",
+    "expr": "(23 * 3) + (14 * 7)",
+    "reason": "gate 1/10 correct"
+   },
+   {
+    "name": "mulmid-063",
+    "expr": "(23 * 3) + (24 * 4)",
+    "reason": "gate 1/10 correct"
+   },
+   {
+    "name": "mulmid-065",
+    "expr": "(17 * 5) + (15 * 4)",
+    "reason": "gate 5/10 correct"
+   },
+   {
+    "name": "mulmid-066",
+    "expr": "(10 * 7) + (20 * 3)",
+    "reason": "gate 3/10 correct"
+   },
+   {
+    "name": "mulmid-067",
+    "expr": "(14 * 5) + (21 * 3)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "mulmid-068",
+    "expr": "(9 * 7) + (25 * 3)",
+    "reason": "gate 6/10 correct"
+   },
+   {
+    "name": "mulmid-069",
+    "expr": "(32 * 3) + (7 * 9)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "mulmid-070",
+    "expr": "(22 * 3) + (14 * 6)",
+    "reason": "gate 0/10 correct"
+   },
+   {
+    "name": "mulmid-073",
+    "expr": "(12 * 5) + (24 * 4)",
+    "reason": "gate 1/10 correct"
+   },
+   {
+    "name": "mulmid-074",
+    "expr": "(11 * 9) + (18 * 5)",
+    "reason": "gate 6/10 correct"
+   },
+   {
+    "name": "mulmid-077",
+    "expr": "(7 * 9) + (17 * 5)",
+    "reason": "gate 5/10 correct"
+   },
+   {
+    "name": "mulmid-080",
+    "expr": "(11 * 9) + (11 * 8)",
+    "reason": "gate 3/10 correct"
+   },
+   {
+    "name": "mulmid-084",
+    "expr": "(19 * 4) + (14 * 6)",
+    "reason": "gate 1/10 correct"
+   },
+   {
+    "name": "mulmid-086",
+    "expr": "(16 * 5) + (25 * 4)",
+    "reason": "gate 3/10 correct"
+   },
+   {
+    "name": "mulmid-088",
+    "expr": "(10 * 7) + (13 * 6)",
+    "reason": "gate 0/10 correct"
+   }
+  ]
+ },
+ "fracsmall": {
+  "n_before": 16,
+  "n_after": 16,
+  "removed": []
+ },
+ "halflead": {
+  "n_before": 45,
+  "n_after": 45,
+  "removed": []
+ },
+ "halftrail": {
+  "n_before": 45,
+  "n_after": 45,
+  "removed": []
+ }
+}

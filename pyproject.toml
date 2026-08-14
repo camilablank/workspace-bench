@@ -1,0 +1,57 @@
+[project]
+name = "workspace-bench"
+version = "0.1.0"
+description = "Standalone, self-contained runner for workspace-bench: score/judge an oracle lens (AO) vs the J-lens across all 12 eval families, exactly as implemented in the source research repo."
+requires-python = ">=3.12"
+# The default install is the CPU score/judge path: deterministic scorers (pydra CLIs) + the
+# LLM judges (Anthropic; openai only for the order_ops twin-judge's gpt-5.5 default). anthropic
+# and openai are imported lazily, so imports work even before they resolve — but the judges need
+# them at call time, so they are default deps here.
+dependencies = [
+    "pydra-config>=0.0.17",
+    "anthropic>=0.120.0",
+    "openai>=2.41.1",
+]
+
+[project.optional-dependencies]
+# Only needed to GENERATE fresh readouts (capture 27B activations + sample the lenses) — a GPU
+# step that also needs the model + lens checkpoints. Scoring/judging never imports these.
+gpu = [
+    "torch>=2.11",
+    "transformers>=5.11.0",
+    "peft>=0.19.1",
+    "safetensors>=0.8.0",
+    "huggingface-hub>=1.18.0",
+    "jaxtyping>=0.3",
+    "einops>=0.8",
+    "accelerate>=1.0",
+    "modal>=1.0",
+]
+# readout_coherence's summary judge lazily loads a tokenizer to render CJK readouts.
+coherence = ["transformers>=5.11.0", "safetensors>=0.8.0"]
+viz = ["huggingface-hub>=1.18.0"]  # push the static visualizer as an HF Space
+dev = ["pytest>=9.0", "ruff>=0.14", "mypy>=1.19"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/global_workspace", "src/jlens"]
+
+[tool.ruff]
+line-length = 100
+extend-exclude = ["src/jlens"]
+
+[tool.ruff.lint]
+select = ["E", "W", "F", "I", "N", "UP", "B", "SIM", "C4", "RUF"]
+# F722/F821/UP037 false-positive on jaxtyping string annotations (same rationale as the source repo).
+ignore = ["F722", "F821", "UP037"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["global_workspace", "jlens"]
+
+[tool.pytest.ini_options]
+markers = ["gpu: needs a GPU"]
+addopts = "-m 'not gpu'"
+pythonpath = ["src"]

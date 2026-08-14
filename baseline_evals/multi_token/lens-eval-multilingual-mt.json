@@ -1,0 +1,2672 @@
+{
+ "family": "multilingual-mt",
+ "gate": "Qwen3.6-27B behavioral: chat-templated capability question, >=8/10 @ temp 0.7 (poetry: committed multi-token rhyme). EVAL RENDER: feed `prompt` verbatim as plain text, NO chat template; readout at the final prompt token.",
+ "items": [
+  {
+   "name": "ml-de-fwd-ampel",
+   "lang": "de",
+   "prompt": "Die Anlage mit rotem, gelbem und grünem Licht an der Kreuzung ist die",
+   "target": "Ampel",
+   "intermediates": [
+    "traffic light"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "ml-de-fwd-staubsauger",
+   "lang": "de",
+   "prompt": "Das Gerät, mit dem man den Teppich reinigt, indem es Schmutz einsaugt, ist der",
+   "target": "Staubsauger",
+   "intermediates": [
+    "vacuum cleaner"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 3
+   }
+  },
+  {
+   "name": "ml-de-fwd-waschmaschine",
+   "lang": "de",
+   "prompt": "Das Gerät, das unsere Kleidung wäscht, ist die",
+   "target": "Waschmaschine",
+   "intermediates": [
+    "washing machine"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "ml-de-fwd-zahnbuerste",
+   "lang": "de",
+   "prompt": "Das kleine Gerät mit Borsten für die Mundhygiene morgens und abends ist die",
+   "target": "Zahnbürste",
+   "intermediates": [
+    "toothbrush"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 4
+   }
+  },
+  {
+   "name": "ml-de-rev-bibliothek",
+   "lang": "de",
+   "prompt": "In German, the word for library is \"",
+   "target": "Bibliothek",
+   "target_alts": [
+    "Bücherei"
+   ],
+   "intermediates": [
+    "Bibliothek"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 0.9,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "ml-de-rev-fernbedienung",
+   "lang": "de",
+   "prompt": "In German, the word for remote control is \"",
+   "target": "Fernbedienung",
+   "intermediates": [
+    "Fernbedienung"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 0.9,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "ml-de-rev-flugzeug",
+   "lang": "de",
+   "prompt": "In German, the word for airplane is \"",
+   "target": "Flugzeug",
+   "intermediates": [
+    "Flugzeug"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 0.7,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "ml-de-rev-guerteltier",
+   "lang": "de",
+   "prompt": "In German, the word for armadillo is \"",
+   "target": "Gürteltier",
+   "intermediates": [
+    "Gürteltier"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     4
+    ],
+    "target": 4
+   }
+  },
+  {
+   "name": "ml-de-rev-handschuh",
+   "lang": "de",
+   "prompt": "In German, the word for glove is \"",
+   "target": "Handschuh",
+   "intermediates": [
+    "Handschuh"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 0.5,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     3
+    ],
+    "target": 3
+   }
+  },
+  {
+   "name": "ml-de-rev-hubschrauber",
+   "lang": "de",
+   "prompt": "In German, the word for helicopter is \"",
+   "target": "Hubschrauber",
+   "intermediates": [
+    "Hubschrauber"
+   ],
+   "target_alts": [
+    "Helikopter"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     5
+    ],
+    "target": 5
+   }
+  },
+  {
+   "name": "ml-de-rev-meerschweinchen",
+   "lang": "de",
+   "prompt": "In German, the word for guinea pig is \"",
+   "target": "Meerschweinchen",
+   "intermediates": [
+    "Meerschweinchen"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     4
+    ],
+    "target": 4
+   }
+  },
+  {
+   "name": "ml-de-rev-rasenmaeher",
+   "lang": "de",
+   "prompt": "In German, the word for lawn mower is \"",
+   "target": "Rasenmäher",
+   "intermediates": [
+    "Rasenmäher"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     4
+    ],
+    "target": 4
+   }
+  },
+  {
+   "name": "ml-de-rev-rollstuhl",
+   "lang": "de",
+   "prompt": "In German, the word for wheelchair is \"",
+   "target": "Rollstuhl",
+   "intermediates": [
+    "Rollstuhl"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "ml-de-rev-schlafsack",
+   "lang": "de",
+   "prompt": "In German, the word for sleeping bag is \"",
+   "target": "Schlafsack",
+   "intermediates": [
+    "Schlafsack"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     3
+    ],
+    "target": 3
+   }
+  },
+  {
+   "name": "ml-de-rev-wolkenkratzer",
+   "lang": "de",
+   "prompt": "In German, the word for skyscraper is \"",
+   "target": "Wolkenkratzer",
+   "intermediates": [
+    "Wolkenkratzer"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     4
+    ],
+    "target": 4
+   }
+  },
+  {
+   "name": "ml-es-arith-35",
+   "lang": "es",
+   "prompt": "Veinte más quince son",
+   "target": "treinta y cinco",
+   "target_alts": [
+    "35"
+   ],
+   "intermediates": [
+    "35"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 0.9,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     3
+    ],
+    "target": 3
+   }
+  },
+  {
+   "name": "ml-es-arith-48",
+   "lang": "es",
+   "prompt": "Setenta y cuatro menos veintiséis son",
+   "target": "cuarenta y ocho",
+   "target_alts": [
+    "48"
+   ],
+   "intermediates": [
+    "48"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     3
+    ],
+    "target": 5
+   }
+  },
+  {
+   "name": "ml-es-arith-63",
+   "lang": "es",
+   "prompt": "Nueve por siete son",
+   "target": "sesenta y tres",
+   "target_alts": [
+    "63"
+   ],
+   "intermediates": [
+    "63"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     3
+    ],
+    "target": 4
+   }
+  },
+  {
+   "name": "ml-es-arith-72",
+   "lang": "es",
+   "prompt": "Cien menos veintiocho son",
+   "target": "setenta y dos",
+   "target_alts": [
+    "72"
+   ],
+   "intermediates": [
+    "72"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     3
+    ],
+    "target": 4
+   }
+  },
+  {
+   "name": "ml-es-fwd-aspiradora",
+   "lang": "es",
+   "prompt": "El aparato que limpia el suelo aspirando el polvo es la",
+   "target": "aspiradora",
+   "intermediates": [
+    "vacuum cleaner"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "ml-es-fwd-cucaracha",
+   "lang": "es",
+   "prompt": "El insecto marrón que corre por la cocina de noche es la",
+   "target": "cucaracha",
+   "intermediates": [
+    "cockroach"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 3
+   }
+  },
+  {
+   "name": "ml-es-fwd-erizo",
+   "lang": "es",
+   "prompt": "El pequeño animal cubierto de púas que se enrolla en una bola es el",
+   "target": "erizo",
+   "intermediates": [
+    "hedgehog"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "ml-es-fwd-medusa",
+   "lang": "es",
+   "prompt": "El animal marino transparente y gelatinoso que pica es la",
+   "target": "medusa",
+   "intermediates": [
+    "jellyfish"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "ml-es-fwd-montanarusa",
+   "lang": "es",
+   "prompt": "La atracción de feria con subidas y bajadas a gran velocidad es la",
+   "target": "montaña rusa",
+   "intermediates": [
+    "roller coaster"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 3
+   }
+  },
+  {
+   "name": "ml-es-fwd-osopolar",
+   "lang": "es",
+   "prompt": "El gran depredador blanco que caza focas en el Ártico es el",
+   "target": "oso polar",
+   "intermediates": [
+    "polar bear"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "ml-es-fwd-semaforo",
+   "lang": "es",
+   "prompt": "El aparato de tres luces que controla el tráfico en el cruce es el",
+   "target": "semáforo",
+   "intermediates": [
+    "traffic light"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 3
+   }
+  },
+  {
+   "name": "ml-es-rev-auriculares",
+   "lang": "es",
+   "prompt": "In Spanish, the word for headphones is \"",
+   "target": "auriculares",
+   "target_alts": [
+    "audífonos",
+    "cascos"
+   ],
+   "intermediates": [
+    "auriculares"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "ml-es-rev-cinturon",
+   "lang": "es",
+   "prompt": "In Spanish, the word for seat belt is \"",
+   "target": "cinturón de seguridad",
+   "intermediates": [
+    "cinturón de seguridad"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     4
+    ],
+    "target": 4
+   }
+  },
+  {
+   "name": "ml-es-rev-destornillador",
+   "lang": "es",
+   "prompt": "In Spanish, the word for screwdriver is \"",
+   "target": "destornillador",
+   "intermediates": [
+    "destornillador"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     4
+    ],
+    "target": 4
+   }
+  },
+  {
+   "name": "ml-es-rev-espantapajaros",
+   "lang": "es",
+   "prompt": "In Spanish, the word for scarecrow is \"",
+   "target": "espantapájaros",
+   "intermediates": [
+    "espantapájaros"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     6
+    ],
+    "target": 6
+   }
+  },
+  {
+   "name": "ml-es-rev-estrella",
+   "lang": "es",
+   "prompt": "In Spanish, the word for starfish is \"",
+   "target": "estrella de mar",
+   "intermediates": [
+    "estrella de mar"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     3
+    ],
+    "target": 3
+   }
+  },
+  {
+   "name": "ml-es-rev-gafas",
+   "lang": "es",
+   "prompt": "In Spanish, the word for sunglasses is \"",
+   "target": "gafas de sol",
+   "target_alts": [
+    "lentes de sol"
+   ],
+   "intermediates": [
+    "gafas de sol"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     4
+    ],
+    "target": 4
+   }
+  },
+  {
+   "name": "ml-es-rev-girasol",
+   "lang": "es",
+   "prompt": "In Spanish, the word for sunflower is \"",
+   "target": "girasol",
+   "intermediates": [
+    "girasol"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     3
+    ],
+    "target": 3
+   }
+  },
+  {
+   "name": "ml-es-rev-lavavajillas",
+   "lang": "es",
+   "prompt": "In Spanish, the word for dishwasher is \"",
+   "target": "lavavajillas",
+   "intermediates": [
+    "lavavajillas"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     4
+    ],
+    "target": 4
+   }
+  },
+  {
+   "name": "ml-es-rev-linterna",
+   "lang": "es",
+   "prompt": "In Spanish, the word for flashlight is \"",
+   "target": "linterna",
+   "intermediates": [
+    "linterna"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "ml-es-rev-sacapuntas",
+   "lang": "es",
+   "prompt": "In Spanish, the word for pencil sharpener is \"",
+   "target": "sacapuntas",
+   "intermediates": [
+    "sacapuntas"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     3
+    ],
+    "target": 3
+   }
+  },
+  {
+   "name": "ml-es-rev-silla",
+   "lang": "es",
+   "prompt": "In Spanish, the word for wheelchair is \"",
+   "target": "silla de ruedas",
+   "intermediates": [
+    "silla de ruedas"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     3
+    ],
+    "target": 3
+   }
+  },
+  {
+   "name": "ml-es-rev-tenedor",
+   "lang": "es",
+   "prompt": "In Spanish, the word for fork is \"",
+   "target": "tenedor",
+   "intermediates": [
+    "tenedor"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "ml-fr-arith-42",
+   "lang": "fr",
+   "prompt": "Quatre-vingt-quatre divisé par deux font",
+   "target": "quarante-deux",
+   "target_alts": [
+    "42"
+   ],
+   "intermediates": [
+    "42"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     3
+    ],
+    "target": 4
+   }
+  },
+  {
+   "name": "ml-fr-fwd-aspirateur",
+   "lang": "fr",
+   "prompt": "L'appareil qui nettoie les tapis en avalant la poussière est l'",
+   "target": "aspirateur",
+   "intermediates": [
+    "vacuum cleaner"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "ml-fr-fwd-herisson",
+   "lang": "fr",
+   "prompt": "Le petit animal couvert de piquants qui se roule en boule est le",
+   "target": "hérisson",
+   "intermediates": [
+    "hedgehog"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 3
+   }
+  },
+  {
+   "name": "ml-fr-fwd-meduse",
+   "lang": "fr",
+   "prompt": "L'animal marin transparent et gélatineux qui pique est la",
+   "target": "méduse",
+   "intermediates": [
+    "jellyfish"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "ml-fr-rev-ceinture",
+   "lang": "fr",
+   "prompt": "In French, the word for seat belt is \"",
+   "target": "ceinture de sécurité",
+   "intermediates": [
+    "ceinture de sécurité"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 0.5,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     5
+    ],
+    "target": 5
+   }
+  },
+  {
+   "name": "ml-fr-rev-cerfvolant",
+   "lang": "fr",
+   "prompt": "In French, the word for kite is \"",
+   "target": "cerf-volant",
+   "intermediates": [
+    "cerf-volant"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     5
+    ],
+    "target": 5
+   }
+  },
+  {
+   "name": "ml-fr-rev-cochondinde",
+   "lang": "fr",
+   "prompt": "In French, the word for guinea pig is \"",
+   "target": "cochon d'Inde",
+   "intermediates": [
+    "cochon d'Inde"
+   ],
+   "target_alts": [
+    "cobaye"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     6
+    ],
+    "target": 6
+   }
+  },
+  {
+   "name": "ml-fr-rev-couteau",
+   "lang": "fr",
+   "prompt": "In French, the word for knife is \"",
+   "target": "couteau",
+   "intermediates": [
+    "couteau"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     3
+    ],
+    "target": 3
+   }
+  },
+  {
+   "name": "ml-fr-rev-fauteuil",
+   "lang": "fr",
+   "prompt": "In French, the word for wheelchair is \"",
+   "target": "fauteuil roulant",
+   "intermediates": [
+    "fauteuil roulant"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     3
+    ],
+    "target": 3
+   }
+  },
+  {
+   "name": "ml-fr-rev-lampedepoche",
+   "lang": "fr",
+   "prompt": "In French, the word for flashlight is \"",
+   "target": "lampe de poche",
+   "target_alts": [
+    "torche"
+   ],
+   "intermediates": [
+    "lampe de poche"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 0.5,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     3
+    ],
+    "target": 3
+   }
+  },
+  {
+   "name": "ml-fr-rev-lavevaisselle",
+   "lang": "fr",
+   "prompt": "In French, the word for dishwasher is \"",
+   "target": "lave-vaisselle",
+   "intermediates": [
+    "lave-vaisselle"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 0.3,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     5
+    ],
+    "target": 5
+   }
+  },
+  {
+   "name": "ml-fr-rev-lunettes",
+   "lang": "fr",
+   "prompt": "In French, the word for sunglasses is \"",
+   "target": "lunettes de soleil",
+   "intermediates": [
+    "lunettes de soleil"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 0.7,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     3
+    ],
+    "target": 3
+   }
+  },
+  {
+   "name": "ml-fr-rev-marteau",
+   "lang": "fr",
+   "prompt": "In French, the word for hammer is \"",
+   "target": "marteau",
+   "intermediates": [
+    "marteau"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     3
+    ],
+    "target": 3
+   }
+  },
+  {
+   "name": "ml-fr-rev-pamplemousse",
+   "lang": "fr",
+   "prompt": "In French, the word for grapefruit is \"",
+   "target": "pamplemousse",
+   "intermediates": [
+    "pamplemousse"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     4
+    ],
+    "target": 4
+   }
+  },
+  {
+   "name": "ml-fr-rev-tirebouchon",
+   "lang": "fr",
+   "prompt": "In French, the word for corkscrew is \"",
+   "target": "tire-bouchon",
+   "intermediates": [
+    "tire-bouchon"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     4
+    ],
+    "target": 4
+   }
+  },
+  {
+   "name": "ml-fr-rev-tournesol",
+   "lang": "fr",
+   "prompt": "In French, the word for sunflower is \"",
+   "target": "tournesol",
+   "intermediates": [
+    "tournesol"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     3
+    ],
+    "target": 3
+   }
+  },
+  {
+   "name": "ml-fr-rev-tremblement",
+   "lang": "fr",
+   "prompt": "In French, the word for earthquake is \"",
+   "target": "tremblement de terre",
+   "target_alts": [
+    "séisme"
+   ],
+   "intermediates": [
+    "tremblement de terre"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     4
+    ],
+    "target": 4
+   }
+  },
+  {
+   "name": "ml-de-fwd-nilpferd",
+   "lang": "de",
+   "prompt": "Das riesige graue Tier, das den Tag im afrikanischen Fluss verbringt, ist das",
+   "target": "Nilpferd",
+   "target_alts": [
+    "Flusspferd"
+   ],
+   "intermediates": [
+    "hippopotamus",
+    "hippo"
+   ],
+   "consistency": 0.9,
+   "consistency_strict": 0.9,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     3,
+     2
+    ],
+    "target": 4
+   }
+  },
+  {
+   "name": "ml-de-fwd-streichholz",
+   "lang": "de",
+   "prompt": "Das kleine Stäbchen mit rotem Kopf, mit dem man Feuer macht, ist das",
+   "target": "Streichholz",
+   "intermediates": [
+    "matchstick",
+    "match"
+   ],
+   "target_alts": [
+    "Zündholz"
+   ],
+   "consistency": 0.9,
+   "consistency_strict": 0.9,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2,
+     1
+    ],
+    "target": 3
+   }
+  },
+  {
+   "name": "ml-de-rev-geldboerse",
+   "lang": "de",
+   "prompt": "In German, the word for wallet is \"",
+   "target": "Geldbörse",
+   "target_alts": [
+    "Portemonnaie",
+    "Brieftasche",
+    "Geldbeutel"
+   ],
+   "intermediates": [
+    "Geldbörse"
+   ],
+   "consistency": 0.9,
+   "consistency_strict": 0.9,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     4
+    ],
+    "target": 4
+   }
+  },
+  {
+   "name": "ml-de-rev-leuchtturm",
+   "lang": "de",
+   "prompt": "In German, the word for lighthouse is \"",
+   "target": "Leuchtturm",
+   "intermediates": [
+    "Leuchtturm"
+   ],
+   "consistency": 0.9,
+   "consistency_strict": 0.9,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     4
+    ],
+    "target": 4
+   }
+  },
+  {
+   "name": "ml-de-rev-wasserhahn",
+   "lang": "de",
+   "prompt": "In German, the word for faucet is \"",
+   "target": "Wasserhahn",
+   "intermediates": [
+    "Wasserhahn"
+   ],
+   "consistency": 0.9,
+   "consistency_strict": 0.9,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     3
+    ],
+    "target": 3
+   }
+  },
+  {
+   "name": "ml-es-fwd-lavadora",
+   "lang": "es",
+   "prompt": "El electrodoméstico que lava la ropa es la",
+   "target": "lavadora",
+   "intermediates": [
+    "washing machine"
+   ],
+   "consistency": 0.9,
+   "consistency_strict": 0.9,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "ml-es-rev-caballito",
+   "lang": "es",
+   "prompt": "In Spanish, the word for seahorse is \"",
+   "target": "caballito de mar",
+   "intermediates": [
+    "caballito de mar"
+   ],
+   "consistency": 0.9,
+   "consistency_strict": 0.9,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     4
+    ],
+    "target": 4
+   }
+  },
+  {
+   "name": "ml-es-rev-cepillo",
+   "lang": "es",
+   "prompt": "In Spanish, the word for toothbrush is \"",
+   "target": "cepillo de dientes",
+   "intermediates": [
+    "cepillo de dientes"
+   ],
+   "consistency": 0.9,
+   "consistency_strict": 0.9,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     4
+    ],
+    "target": 4
+   }
+  },
+  {
+   "name": "ml-es-rev-conejillo",
+   "lang": "es",
+   "prompt": "In Spanish, the word for guinea pig is \"",
+   "target": "conejillo de indias",
+   "target_alts": [
+    "cobaya",
+    "cuy"
+   ],
+   "intermediates": [
+    "conejillo de indias"
+   ],
+   "consistency": 0.9,
+   "consistency_strict": 0.9,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     6
+    ],
+    "target": 6
+   }
+  },
+  {
+   "name": "ml-fr-arith-35",
+   "lang": "fr",
+   "prompt": "Vingt plus quinze font",
+   "target": "trente-cinq",
+   "target_alts": [
+    "35"
+   ],
+   "intermediates": [
+    "35"
+   ],
+   "consistency": 0.9,
+   "consistency_strict": 0.9,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     3
+    ],
+    "target": 3
+   }
+  },
+  {
+   "name": "ml-fr-arith-52",
+   "lang": "fr",
+   "prompt": "Treize fois quatre font",
+   "target": "cinquante-deux",
+   "target_alts": [
+    "52"
+   ],
+   "intermediates": [
+    "52"
+   ],
+   "consistency": 0.9,
+   "consistency_strict": 0.9,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     3
+    ],
+    "target": 4
+   }
+  },
+  {
+   "name": "ml-fr-fwd-machinealaver",
+   "lang": "fr",
+   "prompt": "L'appareil ménager qui nettoie les vêtements est la",
+   "target": "machine à laver",
+   "intermediates": [
+    "washing machine"
+   ],
+   "consistency": 0.9,
+   "consistency_strict": 0.9,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 3
+   }
+  },
+  {
+   "name": "ml-fr-fwd-ourspolaire",
+   "lang": "fr",
+   "prompt": "Le grand prédateur blanc qui chasse les phoques sur la banquise est l'",
+   "target": "ours polaire",
+   "intermediates": [
+    "polar bear"
+   ],
+   "target_alts": [
+    "l'ours polaire",
+    "ours blanc"
+   ],
+   "consistency": 0.9,
+   "consistency_strict": 0.9,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 3
+   }
+  },
+  {
+   "name": "ml-fr-fwd-phare",
+   "lang": "fr",
+   "prompt": "La tour au bord de la mer qui guide les bateaux la nuit est le",
+   "target": "phare",
+   "intermediates": [
+    "lighthouse"
+   ],
+   "consistency": 0.9,
+   "consistency_strict": 0.9,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "ml-fr-rev-etoile",
+   "lang": "fr",
+   "prompt": "In French, the word for starfish is \"",
+   "target": "étoile de mer",
+   "intermediates": [
+    "étoile de mer"
+   ],
+   "consistency": 0.9,
+   "consistency_strict": 0.9,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     4
+    ],
+    "target": 4
+   }
+  },
+  {
+   "name": "ml-de-fwd-schubkarre",
+   "lang": "de",
+   "prompt": "Das Gefäß mit nur einem Rad und zwei Griffen, mit dem man im Garten Erde transportiert, ist die",
+   "target": "Schubkarre",
+   "intermediates": [
+    "wheelbarrow"
+   ],
+   "consistency": 0.8,
+   "consistency_strict": 0.8,
+   "source": "backfill-2026-07-29",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     3
+    ],
+    "target": 3
+   }
+  },
+  {
+   "name": "ml-de-fwd-schneemann",
+   "lang": "de",
+   "prompt": "Die Winterfigur aus drei weißen Kugeln mit einer Karotte als Nase ist der",
+   "target": "Schneemann",
+   "intermediates": [
+    "snowman"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "backfill-2026-07-29",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "ml-de-fwd-zugbruecke",
+   "lang": "de",
+   "prompt": "Die Brücke einer Burg, die man mit Ketten hochziehen kann, ist die",
+   "target": "Zugbrücke",
+   "intermediates": [
+    "drawbridge"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "backfill-2026-07-29",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 3
+   }
+  },
+  {
+   "name": "ml-de-fwd-wassermelone",
+   "lang": "de",
+   "prompt": "Die große Frucht, außen grün und innen rot mit schwarzen Kernen, ist die",
+   "target": "Wassermelone",
+   "intermediates": [
+    "watermelon"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "backfill-2026-07-29",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 4
+   }
+  },
+  {
+   "name": "ml-de-fwd-sicherheitsgurt",
+   "lang": "de",
+   "prompt": "Das Band im Auto, das man sich vor der Fahrt zum Schutz anlegt, ist der",
+   "target": "Sicherheitsgurt",
+   "intermediates": [
+    "seatbelt"
+   ],
+   "consistency": 0.8,
+   "consistency_strict": 0.8,
+   "source": "backfill-2026-07-29",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 3
+   }
+  },
+  {
+   "name": "ml-de-fwd-libelle",
+   "lang": "de",
+   "prompt": "Das Insekt mit vier durchsichtigen Flügeln, das über Teichen schwebt, ist die",
+   "target": "Libelle",
+   "intermediates": [
+    "dragonfly"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "backfill-2026-07-29",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "ml-de-fwd-sanduhr",
+   "lang": "de",
+   "prompt": "Das Gerät aus Glas, in dem feiner Sand von oben nach unten rieselt, um die Zeit zu messen, ist die",
+   "target": "Sanduhr",
+   "intermediates": [
+    "hourglass"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "backfill-2026-07-29",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "ml-de-fwd-marienkaefer",
+   "lang": "de",
+   "prompt": "Das kleine rote Insekt mit schwarzen Punkten, das Glück bringen soll, ist der",
+   "target": "Marienkäfer",
+   "intermediates": [
+    "ladybug"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "backfill-2026-07-29",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 4
+   }
+  },
+  {
+   "name": "ml-de-fwd-raupe",
+   "lang": "de",
+   "prompt": "Das kriechende Tier, das sich verpuppt und später zum Schmetterling wird, ist die",
+   "target": "Raupe",
+   "intermediates": [
+    "caterpillar"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "backfill-2026-07-29",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "ml-es-fwd-carretilla",
+   "lang": "es",
+   "prompt": "El recipiente con una sola rueda y dos mangos que sirve para transportar tierra es la",
+   "target": "carretilla",
+   "intermediates": [
+    "wheelbarrow"
+   ],
+   "consistency": 0.8,
+   "consistency_strict": 0.8,
+   "source": "backfill-2026-07-29",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     3
+    ],
+    "target": 3
+   }
+  },
+  {
+   "name": "ml-es-fwd-sandia",
+   "lang": "es",
+   "prompt": "La fruta grande, verde por fuera y roja por dentro con semillas negras, es la",
+   "target": "sandía",
+   "intermediates": [
+    "watermelon"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "backfill-2026-07-29",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "ml-es-fwd-libelula",
+   "lang": "es",
+   "prompt": "El insecto de cuatro alas transparentes que vuela sobre los estanques es la",
+   "target": "libélula",
+   "intermediates": [
+    "dragonfly"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "backfill-2026-07-29",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 3
+   }
+  },
+  {
+   "name": "ml-es-fwd-lombriz",
+   "lang": "es",
+   "prompt": "El animal alargado y blando que vive bajo la tierra húmeda del jardín es la",
+   "target": "lombriz",
+   "intermediates": [
+    "earthworm"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "backfill-2026-07-29",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 3
+   }
+  },
+  {
+   "name": "ml-fr-fwd-tondeuse",
+   "lang": "fr",
+   "prompt": "La machine qu'on pousse pour couper l'herbe du jardin est la",
+   "target": "tondeuse",
+   "intermediates": [
+    "lawnmower"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "backfill-2026-07-29",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     3
+    ],
+    "target": 3
+   }
+  },
+  {
+   "name": "ml-fr-fwd-brouette",
+   "lang": "fr",
+   "prompt": "Le récipient à une seule roue et deux poignées qui sert à transporter de la terre est la",
+   "target": "brouette",
+   "intermediates": [
+    "wheelbarrow"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "backfill-2026-07-29",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     3
+    ],
+    "target": 3
+   }
+  },
+  {
+   "name": "ml-fr-fwd-pasteque",
+   "lang": "fr",
+   "prompt": "Le gros fruit vert à l'extérieur, rouge à l'intérieur avec des pépins noirs, est la",
+   "target": "pastèque",
+   "intermediates": [
+    "watermelon"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "backfill-2026-07-29",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "ml-fr-fwd-hippocampe",
+   "lang": "fr",
+   "prompt": "Le petit animal marin dont la tête ressemble à celle d'un cheval est l'",
+   "target": "hippocampe",
+   "intermediates": [
+    "seahorse"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "backfill-2026-07-29",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     3
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "ml-fr-rev-citrouille",
+   "lang": "fr",
+   "prompt": "In French, the word for pumpkin is \"",
+   "target": "citrouille",
+   "intermediates": [
+    "citrouille"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "backfill-2026-07-29",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     3
+    ],
+    "target": 3
+   }
+  },
+  {
+   "name": "ml-fr-rev-grenouille",
+   "lang": "fr",
+   "prompt": "In French, the word for frog is \"",
+   "target": "grenouille",
+   "intermediates": [
+    "grenouille"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "backfill-2026-07-29",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     3
+    ],
+    "target": 3
+   }
+  },
+  {
+   "name": "ml-de-fwd-gewitter",
+   "lang": "de",
+   "prompt": "Das Unwetter mit Blitz und Donner nennt man",
+   "target": "Gewitter",
+   "intermediates": [
+    "thunderstorm"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "backfill-2026-07-29",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "ml-de-fwd-regenwurm",
+   "lang": "de",
+   "prompt": "Das lange, weiche Tier, das im feuchten Gartenboden lebt und Gänge gräbt, nennt man",
+   "target": "Regenwurm",
+   "intermediates": [
+    "earthworm"
+   ],
+   "consistency": 0.9,
+   "consistency_strict": 0.9,
+   "source": "backfill-2026-07-29",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 3
+   }
+  },
+  {
+   "name": "ml-de-fwd-vogelscheuche",
+   "lang": "de",
+   "prompt": "Die Figur aus Stroh und alten Kleidern, die auf dem Feld die Krähen vertreibt, nennt man",
+   "target": "Vogelscheuche",
+   "intermediates": [
+    "scarecrow"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "backfill-2026-07-29",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 4
+   }
+  },
+  {
+   "name": "ml-es-fwd-rascacielos",
+   "lang": "es",
+   "prompt": "El edificio altísimo de muchísimos pisos en el centro de una gran ciudad se llama",
+   "target": "rascacielos",
+   "intermediates": [
+    "skyscraper"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "backfill-2026-07-29",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 5
+   }
+  },
+  {
+   "name": "ml-es-fwd-mariquita",
+   "lang": "es",
+   "prompt": "El insecto pequeño y rojo con puntos negros que trae buena suerte se llama",
+   "target": "mariquita",
+   "intermediates": [
+    "ladybug"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "backfill-2026-07-29",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "ml-es-fwd-impermeable",
+   "lang": "es",
+   "prompt": "La prenda con capucha que nos ponemos encima para no mojarnos bajo la lluvia se llama",
+   "target": "impermeable",
+   "intermediates": [
+    "raincoat"
+   ],
+   "consistency": 0.8,
+   "consistency_strict": 0.8,
+   "source": "backfill-2026-07-29",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "ml-es-fwd-luciernaga",
+   "lang": "es",
+   "prompt": "El insecto que brilla con luz propia en las noches de verano se llama",
+   "target": "luciérnaga",
+   "intermediates": [
+    "firefly"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "backfill-2026-07-29",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 4
+   }
+  },
+  {
+   "name": "ml-fr-fwd-epouvantail",
+   "lang": "fr",
+   "prompt": "La silhouette de paille habillée de vieux vêtements qui fait fuir les oiseaux dans les champs s'appelle l'",
+   "target": "épouvantail",
+   "intermediates": [
+    "scarecrow"
+   ],
+   "consistency": 0.8,
+   "consistency_strict": 0.8,
+   "source": "backfill-2026-07-29",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 4
+   }
+  },
+  {
+   "name": "ml-fr-fwd-sablier",
+   "lang": "fr",
+   "prompt": "L'objet en verre où le sable fin s'écoule de haut en bas pour mesurer le temps s'appelle le",
+   "target": "sablier",
+   "intermediates": [
+    "hourglass"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "backfill-2026-07-29",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "ml-fr-fwd-coccinelle",
+   "lang": "fr",
+   "prompt": "Le petit insecte rouge à points noirs qui porte bonheur s'appelle la",
+   "target": "coccinelle",
+   "intermediates": [
+    "ladybug"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "backfill-2026-07-29",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 4
+   }
+  },
+  {
+   "name": "ml-es-fwd-trabalenguas",
+   "lang": "es",
+   "prompt": "La frase con sonidos repetidos que es muy difícil de pronunciar rápido se llama",
+   "target": "trabalenguas",
+   "intermediates": [
+    "tongue twister"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "backfill-2026-07-29",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     3
+    ],
+    "target": 3
+   }
+  }
+ ]
+}

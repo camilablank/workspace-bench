@@ -1,0 +1,538 @@
+[
+ {
+  "variant": "fracsmall",
+  "expr": "(8 / 3) + (7 / 3)",
+  "operands": [
+   "8",
+   "3",
+   "7"
+  ],
+  "name": "fracsmall-000",
+  "first_op": "add",
+  "answer": "5",
+  "first_value": "15",
+  "intermediates": [
+   "15"
+  ],
+  "prompt": "Compute (8 / 3) + (7 / 3). Reply with only the final number, nothing else.",
+  "tolerance": "rel2pct",
+  "null_set": [
+   "fracsmall-001",
+   "fracsmall-002",
+   "fracsmall-003",
+   "fracsmall-005",
+   "fracsmall-006",
+   "fracsmall-011",
+   "fracsmall-012",
+   "fracsmall-013",
+   "fracsmall-014",
+   "fracsmall-015"
+  ],
+  "gate_correct": 10,
+  "gate_greedy_ok": true
+ },
+ {
+  "variant": "fracsmall",
+  "expr": "(8 / 3) + (4 / 3)",
+  "operands": [
+   "8",
+   "3",
+   "4"
+  ],
+  "name": "fracsmall-001",
+  "first_op": "add",
+  "answer": "4",
+  "first_value": "12",
+  "intermediates": [
+   "12"
+  ],
+  "prompt": "Compute (8 / 3) + (4 / 3). Reply with only the final number, nothing else.",
+  "tolerance": "rel2pct",
+  "null_set": [
+   "fracsmall-000",
+   "fracsmall-004",
+   "fracsmall-005",
+   "fracsmall-007",
+   "fracsmall-008",
+   "fracsmall-009",
+   "fracsmall-010",
+   "fracsmall-011",
+   "fracsmall-012",
+   "fracsmall-013",
+   "fracsmall-014",
+   "fracsmall-015"
+  ],
+  "gate_correct": 10,
+  "gate_greedy_ok": true
+ },
+ {
+  "variant": "fracsmall",
+  "expr": "(5 / 3) + (7 / 3)",
+  "operands": [
+   "5",
+   "3",
+   "7"
+  ],
+  "name": "fracsmall-002",
+  "first_op": "add",
+  "answer": "4",
+  "first_value": "12",
+  "intermediates": [
+   "12"
+  ],
+  "prompt": "Compute (5 / 3) + (7 / 3). Reply with only the final number, nothing else.",
+  "tolerance": "rel2pct",
+  "null_set": [
+   "fracsmall-000",
+   "fracsmall-004",
+   "fracsmall-005",
+   "fracsmall-007",
+   "fracsmall-008",
+   "fracsmall-009",
+   "fracsmall-010",
+   "fracsmall-011",
+   "fracsmall-012",
+   "fracsmall-013",
+   "fracsmall-014",
+   "fracsmall-015"
+  ],
+  "gate_correct": 10,
+  "gate_greedy_ok": true
+ },
+ {
+  "variant": "fracsmall",
+  "expr": "(7 / 3) + (5 / 3)",
+  "operands": [
+   "7",
+   "3",
+   "5"
+  ],
+  "name": "fracsmall-003",
+  "first_op": "add",
+  "answer": "4",
+  "first_value": "12",
+  "intermediates": [
+   "12"
+  ],
+  "prompt": "Compute (7 / 3) + (5 / 3). Reply with only the final number, nothing else.",
+  "tolerance": "rel2pct",
+  "null_set": [
+   "fracsmall-000",
+   "fracsmall-004",
+   "fracsmall-005",
+   "fracsmall-007",
+   "fracsmall-008",
+   "fracsmall-009",
+   "fracsmall-010",
+   "fracsmall-011",
+   "fracsmall-012",
+   "fracsmall-013",
+   "fracsmall-014",
+   "fracsmall-015"
+  ],
+  "gate_correct": 10,
+  "gate_greedy_ok": true
+ },
+ {
+  "variant": "fracsmall",
+  "expr": "(9 / 7) + (5 / 7)",
+  "operands": [
+   "9",
+   "7",
+   "5"
+  ],
+  "name": "fracsmall-004",
+  "first_op": "add",
+  "answer": "2",
+  "first_value": "14",
+  "intermediates": [
+   "14"
+  ],
+  "prompt": "Compute (9 / 7) + (5 / 7). Reply with only the final number, nothing else.",
+  "tolerance": "rel2pct",
+  "null_set": [
+   "fracsmall-001",
+   "fracsmall-002",
+   "fracsmall-003",
+   "fracsmall-005",
+   "fracsmall-006",
+   "fracsmall-011",
+   "fracsmall-012",
+   "fracsmall-013",
+   "fracsmall-014",
+   "fracsmall-015"
+  ],
+  "gate_correct": 10,
+  "gate_greedy_ok": true
+ },
+ {
+  "variant": "fracsmall",
+  "expr": "(4 / 3) + (2 / 3)",
+  "operands": [
+   "4",
+   "3",
+   "2"
+  ],
+  "name": "fracsmall-005",
+  "first_op": "add",
+  "answer": "2",
+  "first_value": "6",
+  "intermediates": [
+   "6"
+  ],
+  "prompt": "Compute (4 / 3) + (2 / 3). Reply with only the final number, nothing else.",
+  "tolerance": "rel2pct",
+  "null_set": [
+   "fracsmall-000",
+   "fracsmall-001",
+   "fracsmall-002",
+   "fracsmall-003",
+   "fracsmall-004",
+   "fracsmall-006",
+   "fracsmall-007",
+   "fracsmall-008",
+   "fracsmall-009",
+   "fracsmall-010",
+   "fracsmall-011",
+   "fracsmall-013",
+   "fracsmall-014",
+   "fracsmall-015"
+  ],
+  "gate_correct": 10,
+  "gate_greedy_ok": true
+ },
+ {
+  "variant": "fracsmall",
+  "expr": "(4 / 3) + (8 / 3)",
+  "operands": [
+   "4",
+   "3",
+   "8"
+  ],
+  "name": "fracsmall-006",
+  "first_op": "add",
+  "answer": "4",
+  "first_value": "12",
+  "intermediates": [
+   "12"
+  ],
+  "prompt": "Compute (4 / 3) + (8 / 3). Reply with only the final number, nothing else.",
+  "tolerance": "rel2pct",
+  "null_set": [
+   "fracsmall-000",
+   "fracsmall-004",
+   "fracsmall-005",
+   "fracsmall-007",
+   "fracsmall-008",
+   "fracsmall-009",
+   "fracsmall-010",
+   "fracsmall-011",
+   "fracsmall-012",
+   "fracsmall-013",
+   "fracsmall-014",
+   "fracsmall-015"
+  ],
+  "gate_correct": 10,
+  "gate_greedy_ok": true
+ },
+ {
+  "variant": "fracsmall",
+  "expr": "(8 / 7) + (6 / 7)",
+  "operands": [
+   "8",
+   "7",
+   "6"
+  ],
+  "name": "fracsmall-007",
+  "first_op": "add",
+  "answer": "2",
+  "first_value": "14",
+  "intermediates": [
+   "14"
+  ],
+  "prompt": "Compute (8 / 7) + (6 / 7). Reply with only the final number, nothing else.",
+  "tolerance": "rel2pct",
+  "null_set": [
+   "fracsmall-001",
+   "fracsmall-002",
+   "fracsmall-003",
+   "fracsmall-005",
+   "fracsmall-006",
+   "fracsmall-011",
+   "fracsmall-012",
+   "fracsmall-013",
+   "fracsmall-014",
+   "fracsmall-015"
+  ],
+  "gate_correct": 10,
+  "gate_greedy_ok": true
+ },
+ {
+  "variant": "fracsmall",
+  "expr": "(6 / 7) + (8 / 7)",
+  "operands": [
+   "6",
+   "7",
+   "8"
+  ],
+  "name": "fracsmall-008",
+  "first_op": "add",
+  "answer": "2",
+  "first_value": "14",
+  "intermediates": [
+   "14"
+  ],
+  "prompt": "Compute (6 / 7) + (8 / 7). Reply with only the final number, nothing else.",
+  "tolerance": "rel2pct",
+  "null_set": [
+   "fracsmall-001",
+   "fracsmall-002",
+   "fracsmall-003",
+   "fracsmall-005",
+   "fracsmall-006",
+   "fracsmall-011",
+   "fracsmall-012",
+   "fracsmall-013",
+   "fracsmall-014",
+   "fracsmall-015"
+  ],
+  "gate_correct": 10,
+  "gate_greedy_ok": true
+ },
+ {
+  "variant": "fracsmall",
+  "expr": "(5 / 7) + (9 / 7)",
+  "operands": [
+   "5",
+   "7",
+   "9"
+  ],
+  "name": "fracsmall-009",
+  "first_op": "add",
+  "answer": "2",
+  "first_value": "14",
+  "intermediates": [
+   "14"
+  ],
+  "prompt": "Compute (5 / 7) + (9 / 7). Reply with only the final number, nothing else.",
+  "tolerance": "rel2pct",
+  "null_set": [
+   "fracsmall-001",
+   "fracsmall-002",
+   "fracsmall-003",
+   "fracsmall-005",
+   "fracsmall-006",
+   "fracsmall-011",
+   "fracsmall-012",
+   "fracsmall-013",
+   "fracsmall-014",
+   "fracsmall-015"
+  ],
+  "gate_correct": 10,
+  "gate_greedy_ok": true
+ },
+ {
+  "variant": "fracsmall",
+  "expr": "(7 / 3) + (8 / 3)",
+  "operands": [
+   "7",
+   "3",
+   "8"
+  ],
+  "name": "fracsmall-010",
+  "first_op": "add",
+  "answer": "5",
+  "first_value": "15",
+  "intermediates": [
+   "15"
+  ],
+  "prompt": "Compute (7 / 3) + (8 / 3). Reply with only the final number, nothing else.",
+  "tolerance": "rel2pct",
+  "null_set": [
+   "fracsmall-001",
+   "fracsmall-002",
+   "fracsmall-003",
+   "fracsmall-005",
+   "fracsmall-006",
+   "fracsmall-011",
+   "fracsmall-012",
+   "fracsmall-013",
+   "fracsmall-014",
+   "fracsmall-015"
+  ],
+  "gate_correct": 10,
+  "gate_greedy_ok": true
+ },
+ {
+  "variant": "fracsmall",
+  "expr": "(5 / 3) + (4 / 3)",
+  "operands": [
+   "5",
+   "3",
+   "4"
+  ],
+  "name": "fracsmall-011",
+  "first_op": "add",
+  "answer": "3",
+  "first_value": "9",
+  "intermediates": [
+   "9"
+  ],
+  "prompt": "Compute (5 / 3) + (4 / 3). Reply with only the final number, nothing else.",
+  "tolerance": "rel2pct",
+  "null_set": [
+   "fracsmall-000",
+   "fracsmall-001",
+   "fracsmall-002",
+   "fracsmall-003",
+   "fracsmall-004",
+   "fracsmall-005",
+   "fracsmall-006",
+   "fracsmall-007",
+   "fracsmall-008",
+   "fracsmall-009",
+   "fracsmall-010",
+   "fracsmall-012"
+  ],
+  "gate_correct": 10,
+  "gate_greedy_ok": true
+ },
+ {
+  "variant": "fracsmall",
+  "expr": "(2 / 3) + (4 / 3)",
+  "operands": [
+   "2",
+   "3",
+   "4"
+  ],
+  "name": "fracsmall-012",
+  "first_op": "add",
+  "answer": "2",
+  "first_value": "6",
+  "intermediates": [
+   "6"
+  ],
+  "prompt": "Compute (2 / 3) + (4 / 3). Reply with only the final number, nothing else.",
+  "tolerance": "rel2pct",
+  "null_set": [
+   "fracsmall-000",
+   "fracsmall-001",
+   "fracsmall-002",
+   "fracsmall-003",
+   "fracsmall-004",
+   "fracsmall-006",
+   "fracsmall-007",
+   "fracsmall-008",
+   "fracsmall-009",
+   "fracsmall-010",
+   "fracsmall-011",
+   "fracsmall-013",
+   "fracsmall-014",
+   "fracsmall-015"
+  ],
+  "gate_correct": 10,
+  "gate_greedy_ok": true
+ },
+ {
+  "variant": "fracsmall",
+  "expr": "(2 / 3) + (7 / 3)",
+  "operands": [
+   "2",
+   "3",
+   "7"
+  ],
+  "name": "fracsmall-013",
+  "first_op": "add",
+  "answer": "3",
+  "first_value": "9",
+  "intermediates": [
+   "9"
+  ],
+  "prompt": "Compute (2 / 3) + (7 / 3). Reply with only the final number, nothing else.",
+  "tolerance": "rel2pct",
+  "null_set": [
+   "fracsmall-000",
+   "fracsmall-001",
+   "fracsmall-002",
+   "fracsmall-003",
+   "fracsmall-004",
+   "fracsmall-005",
+   "fracsmall-006",
+   "fracsmall-007",
+   "fracsmall-008",
+   "fracsmall-009",
+   "fracsmall-010",
+   "fracsmall-012"
+  ],
+  "gate_correct": 10,
+  "gate_greedy_ok": true
+ },
+ {
+  "variant": "fracsmall",
+  "expr": "(4 / 3) + (5 / 3)",
+  "operands": [
+   "4",
+   "3",
+   "5"
+  ],
+  "name": "fracsmall-014",
+  "first_op": "add",
+  "answer": "3",
+  "first_value": "9",
+  "intermediates": [
+   "9"
+  ],
+  "prompt": "Compute (4 / 3) + (5 / 3). Reply with only the final number, nothing else.",
+  "tolerance": "rel2pct",
+  "null_set": [
+   "fracsmall-000",
+   "fracsmall-001",
+   "fracsmall-002",
+   "fracsmall-003",
+   "fracsmall-004",
+   "fracsmall-005",
+   "fracsmall-006",
+   "fracsmall-007",
+   "fracsmall-008",
+   "fracsmall-009",
+   "fracsmall-010",
+   "fracsmall-012"
+  ],
+  "gate_correct": 10,
+  "gate_greedy_ok": true
+ },
+ {
+  "variant": "fracsmall",
+  "expr": "(7 / 3) + (2 / 3)",
+  "operands": [
+   "7",
+   "3",
+   "2"
+  ],
+  "name": "fracsmall-015",
+  "first_op": "add",
+  "answer": "3",
+  "first_value": "9",
+  "intermediates": [
+   "9"
+  ],
+  "prompt": "Compute (7 / 3) + (2 / 3). Reply with only the final number, nothing else.",
+  "tolerance": "rel2pct",
+  "null_set": [
+   "fracsmall-000",
+   "fracsmall-001",
+   "fracsmall-002",
+   "fracsmall-003",
+   "fracsmall-004",
+   "fracsmall-005",
+   "fracsmall-006",
+   "fracsmall-007",
+   "fracsmall-008",
+   "fracsmall-009",
+   "fracsmall-010",
+   "fracsmall-012"
+  ],
+  "gate_correct": 10,
+  "gate_greedy_ok": true
+ }
+]

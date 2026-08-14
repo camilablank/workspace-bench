@@ -1,0 +1,3506 @@
+{
+ "family": "basic-readout-mt",
+ "gate": "Qwen3.6-27B capability >=8/10 (chat gate_prompt); every target multi-token (probe token count >=2). eval_render plain (entity/processing) / chat (implicit).",
+ "items": [
+  {
+   "name": "brmt-ent-cap-abu",
+   "subfamily": "entity",
+   "prompt": "The capital city of the United Arab Emirates is",
+   "target": "Abu Dhabi",
+   "intermediates": [
+    "Abu Dhabi"
+   ],
+   "units": [
+    {
+     "role": "readout",
+     "lang": "en",
+     "headline": true,
+     "match": [
+      "Abu Dhabi"
+     ]
+    }
+   ],
+   "consistency": 1.0,
+   "source": "brmt-v1",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "brmt-ent-cap-addis",
+   "subfamily": "entity",
+   "prompt": "The capital city of Ethiopia is",
+   "target": "Addis Ababa",
+   "intermediates": [
+    "Addis Ababa"
+   ],
+   "units": [
+    {
+     "role": "readout",
+     "lang": "en",
+     "headline": true,
+     "match": [
+      "Addis Ababa"
+     ]
+    }
+   ],
+   "consistency": 1.0,
+   "source": "brmt-v1",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     4
+    ],
+    "target": 4
+   }
+  },
+  {
+   "name": "brmt-ent-cap-buenos",
+   "subfamily": "entity",
+   "prompt": "The capital city of Argentina is",
+   "target": "Buenos Aires",
+   "intermediates": [
+    "Buenos Aires"
+   ],
+   "units": [
+    {
+     "role": "readout",
+     "lang": "en",
+     "headline": true,
+     "match": [
+      "Buenos Aires"
+     ]
+    }
+   ],
+   "consistency": 1.0,
+   "source": "brmt-v1",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "brmt-ent-cap-guatemala",
+   "subfamily": "entity",
+   "prompt": "The capital city of Guatemala is",
+   "target": "Guatemala City",
+   "intermediates": [
+    "Guatemala City"
+   ],
+   "units": [
+    {
+     "role": "readout",
+     "lang": "en",
+     "headline": true,
+     "match": [
+      "Guatemala City"
+     ]
+    }
+   ],
+   "consistency": 1.0,
+   "source": "brmt-v1",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "brmt-ent-cap-kuala",
+   "subfamily": "entity",
+   "prompt": "The capital city of Malaysia is",
+   "target": "Kuala Lumpur",
+   "intermediates": [
+    "Kuala Lumpur"
+   ],
+   "units": [
+    {
+     "role": "readout",
+     "lang": "en",
+     "headline": true,
+     "match": [
+      "Kuala Lumpur"
+     ]
+    }
+   ],
+   "consistency": 1.0,
+   "source": "brmt-v1",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "brmt-ent-cap-mexico",
+   "subfamily": "entity",
+   "prompt": "The capital city of Mexico is",
+   "target": "Mexico City",
+   "intermediates": [
+    "Mexico City"
+   ],
+   "units": [
+    {
+     "role": "readout",
+     "lang": "en",
+     "headline": true,
+     "match": [
+      "Mexico City"
+     ]
+    }
+   ],
+   "consistency": 1.0,
+   "source": "brmt-v1",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "brmt-ent-cap-new",
+   "subfamily": "entity",
+   "prompt": "The capital city of India is",
+   "target": "New Delhi",
+   "intermediates": [
+    "New Delhi"
+   ],
+   "units": [
+    {
+     "role": "readout",
+     "lang": "en",
+     "headline": true,
+     "match": [
+      "New Delhi"
+     ]
+    }
+   ],
+   "consistency": 1.0,
+   "source": "brmt-v1",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "brmt-ent-cap-panama",
+   "subfamily": "entity",
+   "prompt": "The capital city of Panama is",
+   "target": "Panama City",
+   "intermediates": [
+    "Panama City"
+   ],
+   "units": [
+    {
+     "role": "readout",
+     "lang": "en",
+     "headline": true,
+     "match": [
+      "Panama City"
+     ]
+    }
+   ],
+   "consistency": 1.0,
+   "source": "brmt-v1",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "brmt-ent-cap-phnom",
+   "subfamily": "entity",
+   "prompt": "The capital city of Cambodia is",
+   "target": "Phnom Penh",
+   "intermediates": [
+    "Phnom Penh"
+   ],
+   "units": [
+    {
+     "role": "readout",
+     "lang": "en",
+     "headline": true,
+     "match": [
+      "Phnom Penh"
+     ]
+    }
+   ],
+   "consistency": 1.0,
+   "source": "brmt-v1",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     4
+    ],
+    "target": 4
+   }
+  },
+  {
+   "name": "brmt-ent-cap-port",
+   "subfamily": "entity",
+   "prompt": "The capital city of Trinidad and Tobago is",
+   "target": "Port of Spain",
+   "intermediates": [
+    "Port of Spain"
+   ],
+   "units": [
+    {
+     "role": "readout",
+     "lang": "en",
+     "headline": true,
+     "match": [
+      "Port of Spain"
+     ]
+    }
+   ],
+   "consistency": 1.0,
+   "source": "brmt-v1",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     3
+    ],
+    "target": 3
+   }
+  },
+  {
+   "name": "brmt-ent-cap-san",
+   "subfamily": "entity",
+   "prompt": "The capital city of Puerto Rico is",
+   "target": "San Juan",
+   "intermediates": [
+    "San Juan"
+   ],
+   "units": [
+    {
+     "role": "readout",
+     "lang": "en",
+     "headline": true,
+     "match": [
+      "San Juan"
+     ]
+    }
+   ],
+   "consistency": 1.0,
+   "source": "brmt-v1",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "brmt-ent-cap-santo",
+   "subfamily": "entity",
+   "prompt": "The capital city of the Dominican Republic is",
+   "target": "Santo Domingo",
+   "intermediates": [
+    "Santo Domingo"
+   ],
+   "units": [
+    {
+     "role": "readout",
+     "lang": "en",
+     "headline": true,
+     "match": [
+      "Santo Domingo"
+     ]
+    }
+   ],
+   "consistency": 1.0,
+   "source": "brmt-v1",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "brmt-ent-cap-sarajevo",
+   "subfamily": "entity",
+   "prompt": "The capital city of Bosnia and Herzegovina is",
+   "target": "Sarajevo",
+   "intermediates": [
+    "Sarajevo"
+   ],
+   "units": [
+    {
+     "role": "readout",
+     "lang": "en",
+     "headline": true,
+     "match": [
+      "Sarajevo"
+     ]
+    }
+   ],
+   "consistency": 1.0,
+   "source": "brmt-v1",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     3
+    ],
+    "target": 3
+   }
+  },
+  {
+   "name": "brmt-ent-fld-berners-lee",
+   "subfamily": "entity",
+   "prompt": "The scholar Tim Berners-Lee is best known for work in the field of",
+   "target": "computer science",
+   "intermediates": [
+    "computer science"
+   ],
+   "units": [
+    {
+     "role": "readout",
+     "lang": "en",
+     "headline": true,
+     "match": [
+      "computer science"
+     ]
+    }
+   ],
+   "consistency": 1.0,
+   "source": "brmt-v1",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "brmt-ent-fld-franklin",
+   "subfamily": "entity",
+   "prompt": "The scholar Rosalind Franklin is best known for work in the field of",
+   "target": "molecular biology",
+   "intermediates": [
+    "molecular biology"
+   ],
+   "units": [
+    {
+     "role": "readout",
+     "lang": "en",
+     "headline": true,
+     "match": [
+      "molecular biology"
+     ]
+    }
+   ],
+   "consistency": 1.0,
+   "source": "brmt-v1",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "brmt-ent-fld-hawking",
+   "subfamily": "entity",
+   "prompt": "The scholar Stephen Hawking is best known for work in the field of",
+   "target": "theoretical physics",
+   "intermediates": [
+    "theoretical physics"
+   ],
+   "units": [
+    {
+     "role": "readout",
+     "lang": "en",
+     "headline": true,
+     "match": [
+      "theoretical physics"
+     ]
+    }
+   ],
+   "consistency": 1.0,
+   "source": "brmt-v1",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "brmt-ent-fld-turing",
+   "subfamily": "entity",
+   "prompt": "The scholar Alan Turing is best known for work in the field of",
+   "target": "computer science",
+   "intermediates": [
+    "computer science"
+   ],
+   "units": [
+    {
+     "role": "readout",
+     "lang": "en",
+     "headline": true,
+     "match": [
+      "computer science"
+     ]
+    }
+   ],
+   "consistency": 1.0,
+   "source": "brmt-v1",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "brmt-ent-lmk-alamo",
+   "subfamily": "entity",
+   "prompt": "The Alamo is located in the city of",
+   "target": "San Antonio",
+   "intermediates": [
+    "San Antonio"
+   ],
+   "units": [
+    {
+     "role": "readout",
+     "lang": "en",
+     "headline": true,
+     "match": [
+      "San Antonio"
+     ]
+    }
+   ],
+   "consistency": 1.0,
+   "source": "brmt-v1",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "brmt-ent-lmk-boardwalk",
+   "subfamily": "entity",
+   "prompt": "The Boardwalk is located in the city of",
+   "target": "Atlantic City",
+   "intermediates": [
+    "Atlantic City"
+   ],
+   "units": [
+    {
+     "role": "readout",
+     "lang": "en",
+     "headline": true,
+     "match": [
+      "Atlantic City"
+     ]
+    }
+   ],
+   "consistency": 1.0,
+   "source": "brmt-v1",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "brmt-ent-lmk-french",
+   "subfamily": "entity",
+   "prompt": "The French Quarter is located in the city of",
+   "target": "New Orleans",
+   "intermediates": [
+    "New Orleans"
+   ],
+   "units": [
+    {
+     "role": "readout",
+     "lang": "en",
+     "headline": true,
+     "match": [
+      "New Orleans"
+     ]
+    }
+   ],
+   "consistency": 1.0,
+   "source": "brmt-v1",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "brmt-ent-lmk-gateway",
+   "subfamily": "entity",
+   "prompt": "The Gateway Arch is located in the city of",
+   "target": "St. Louis",
+   "intermediates": [
+    "St. Louis"
+   ],
+   "units": [
+    {
+     "role": "readout",
+     "lang": "en",
+     "headline": true,
+     "match": [
+      "St. Louis"
+     ]
+    }
+   ],
+   "consistency": 1.0,
+   "source": "brmt-v1",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     3
+    ],
+    "target": 3
+   }
+  },
+  {
+   "name": "brmt-ent-lmk-golden",
+   "subfamily": "entity",
+   "prompt": "The Golden Gate Bridge is located in the city of",
+   "target": "San Francisco",
+   "intermediates": [
+    "San Francisco"
+   ],
+   "units": [
+    {
+     "role": "readout",
+     "lang": "en",
+     "headline": true,
+     "match": [
+      "San Francisco"
+     ]
+    }
+   ],
+   "consistency": 1.0,
+   "source": "brmt-v1",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "brmt-ent-lmk-hollywood",
+   "subfamily": "entity",
+   "prompt": "The Hollywood Sign is located in the city of",
+   "target": "Los Angeles",
+   "intermediates": [
+    "Los Angeles"
+   ],
+   "units": [
+    {
+     "role": "readout",
+     "lang": "en",
+     "headline": true,
+     "match": [
+      "Los Angeles"
+     ]
+    }
+   ],
+   "consistency": 1.0,
+   "source": "brmt-v1",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "brmt-ent-lmk-statue",
+   "subfamily": "entity",
+   "prompt": "The Statue of Liberty is located in the city of",
+   "target": "New York",
+   "intermediates": [
+    "New York"
+   ],
+   "units": [
+    {
+     "role": "readout",
+     "lang": "en",
+     "headline": true,
+     "match": [
+      "New York"
+     ]
+    }
+   ],
+   "consistency": 1.0,
+   "source": "brmt-v1",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "brmt-ent-lmk-temple",
+   "subfamily": "entity",
+   "prompt": "The Temple Square is located in the city of",
+   "target": "Salt Lake City",
+   "intermediates": [
+    "Salt Lake City"
+   ],
+   "units": [
+    {
+     "role": "readout",
+     "lang": "en",
+     "headline": true,
+     "match": [
+      "Salt Lake City"
+     ]
+    }
+   ],
+   "consistency": 1.0,
+   "source": "brmt-v1",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     3
+    ],
+    "target": 3
+   }
+  },
+  {
+   "name": "brmt-ent-spt-felix",
+   "subfamily": "entity",
+   "prompt": "The athlete Allyson Felix competed in the sport of",
+   "target": "track and field",
+   "intermediates": [
+    "track and field"
+   ],
+   "units": [
+    {
+     "role": "readout",
+     "lang": "en",
+     "headline": true,
+     "match": [
+      "track and field"
+     ]
+    }
+   ],
+   "consistency": 1.0,
+   "source": "brmt-v1",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     3
+    ],
+    "target": 3
+   }
+  },
+  {
+   "name": "brmt-ent-spt-gretzky",
+   "subfamily": "entity",
+   "prompt": "The athlete Wayne Gretzky competed in the sport of",
+   "target": "ice hockey",
+   "intermediates": [
+    "ice hockey"
+   ],
+   "units": [
+    {
+     "role": "readout",
+     "lang": "en",
+     "headline": true,
+     "match": [
+      "ice hockey"
+     ]
+    }
+   ],
+   "consistency": 1.0,
+   "source": "brmt-v1",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "brmt-ent-spt-kwan",
+   "subfamily": "entity",
+   "prompt": "The athlete Michelle Kwan competed in the sport of",
+   "target": "figure skating",
+   "intermediates": [
+    "figure skating"
+   ],
+   "units": [
+    {
+     "role": "readout",
+     "lang": "en",
+     "headline": true,
+     "match": [
+      "figure skating"
+     ]
+    }
+   ],
+   "consistency": 1.0,
+   "source": "brmt-v1",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "brmt-ent-spt-long",
+   "subfamily": "entity",
+   "prompt": "The athlete Ma Long competed in the sport of",
+   "target": "table tennis",
+   "intermediates": [
+    "table tennis"
+   ],
+   "units": [
+    {
+     "role": "readout",
+     "lang": "en",
+     "headline": true,
+     "match": [
+      "table tennis"
+     ]
+    }
+   ],
+   "consistency": 1.0,
+   "source": "brmt-v1",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "brmt-ent-spt-orr",
+   "subfamily": "entity",
+   "prompt": "The athlete Bobby Orr competed in the sport of",
+   "target": "ice hockey",
+   "intermediates": [
+    "ice hockey"
+   ],
+   "units": [
+    {
+     "role": "readout",
+     "lang": "en",
+     "headline": true,
+     "match": [
+      "ice hockey"
+     ]
+    }
+   ],
+   "consistency": 1.0,
+   "source": "brmt-v1",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "brmt-ent-spt-witt",
+   "subfamily": "entity",
+   "prompt": "The athlete Katarina Witt competed in the sport of",
+   "target": "figure skating",
+   "intermediates": [
+    "figure skating"
+   ],
+   "units": [
+    {
+     "role": "readout",
+     "lang": "en",
+     "headline": true,
+     "match": [
+      "figure skating"
+     ]
+    }
+   ],
+   "consistency": 1.0,
+   "source": "brmt-v1",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "brmt-ent-spt-yaping",
+   "subfamily": "entity",
+   "prompt": "The athlete Deng Yaping competed in the sport of",
+   "target": "table tennis",
+   "intermediates": [
+    "table tennis"
+   ],
+   "units": [
+    {
+     "role": "readout",
+     "lang": "en",
+     "headline": true,
+     "match": [
+      "table tennis"
+     ]
+    }
+   ],
+   "consistency": 1.0,
+   "source": "brmt-v1",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "brmt-ent-fld-hopper",
+   "subfamily": "entity",
+   "prompt": "The scholar Grace Hopper is best known for work in the field of",
+   "target": "computer science",
+   "intermediates": [
+    "computer science"
+   ],
+   "units": [
+    {
+     "role": "readout",
+     "lang": "en",
+     "headline": true,
+     "match": [
+      "computer science"
+     ]
+    }
+   ],
+   "consistency": 0.9,
+   "source": "brmt-v1",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "brmt-ent-spt-jennings",
+   "subfamily": "entity",
+   "prompt": "The athlete Kerri Walsh Jennings competed in the sport of",
+   "target": "beach volleyball",
+   "intermediates": [
+    "beach volleyball"
+   ],
+   "units": [
+    {
+     "role": "readout",
+     "lang": "en",
+     "headline": true,
+     "match": [
+      "beach volleyball"
+     ]
+    }
+   ],
+   "consistency": 0.9,
+   "source": "brmt-v1",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "brmt-ent-spt-miller",
+   "subfamily": "entity",
+   "prompt": "The athlete Bode Miller competed in the sport of",
+   "target": "alpine skiing",
+   "intermediates": [
+    "alpine skiing"
+   ],
+   "units": [
+    {
+     "role": "readout",
+     "lang": "en",
+     "headline": true,
+     "match": [
+      "alpine skiing"
+     ]
+    }
+   ],
+   "consistency": 0.9,
+   "source": "brmt-v1",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     3
+    ],
+    "target": 3
+   }
+  },
+  {
+   "name": "brmt-proc-numword-21",
+   "subfamily": "processing",
+   "prompt": "The number 21 written out in words is",
+   "target": "twenty-one",
+   "intermediates": [
+    "twenty-one"
+   ],
+   "units": [
+    {
+     "role": "readout",
+     "lang": "en",
+     "headline": true,
+     "match": [
+      "twenty-one"
+     ]
+    }
+   ],
+   "consistency": 1.0,
+   "source": "brmt-v1",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "brmt-proc-numword-22",
+   "subfamily": "processing",
+   "prompt": "The number 22 written out in words is",
+   "target": "twenty-two",
+   "intermediates": [
+    "twenty-two"
+   ],
+   "units": [
+    {
+     "role": "readout",
+     "lang": "en",
+     "headline": true,
+     "match": [
+      "twenty-two"
+     ]
+    }
+   ],
+   "consistency": 1.0,
+   "source": "brmt-v1",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "brmt-proc-numword-23",
+   "subfamily": "processing",
+   "prompt": "The number 23 written out in words is",
+   "target": "twenty-three",
+   "intermediates": [
+    "twenty-three"
+   ],
+   "units": [
+    {
+     "role": "readout",
+     "lang": "en",
+     "headline": true,
+     "match": [
+      "twenty-three"
+     ]
+    }
+   ],
+   "consistency": 1.0,
+   "source": "brmt-v1",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "brmt-proc-numword-24",
+   "subfamily": "processing",
+   "prompt": "The number 24 written out in words is",
+   "target": "twenty-four",
+   "intermediates": [
+    "twenty-four"
+   ],
+   "units": [
+    {
+     "role": "readout",
+     "lang": "en",
+     "headline": true,
+     "match": [
+      "twenty-four"
+     ]
+    }
+   ],
+   "consistency": 1.0,
+   "source": "brmt-v1",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "brmt-proc-numword-25",
+   "subfamily": "processing",
+   "prompt": "The number 25 written out in words is",
+   "target": "twenty-five",
+   "intermediates": [
+    "twenty-five"
+   ],
+   "units": [
+    {
+     "role": "readout",
+     "lang": "en",
+     "headline": true,
+     "match": [
+      "twenty-five"
+     ]
+    }
+   ],
+   "consistency": 1.0,
+   "source": "brmt-v1",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "brmt-proc-numword-26",
+   "subfamily": "processing",
+   "prompt": "The number 26 written out in words is",
+   "target": "twenty-six",
+   "intermediates": [
+    "twenty-six"
+   ],
+   "units": [
+    {
+     "role": "readout",
+     "lang": "en",
+     "headline": true,
+     "match": [
+      "twenty-six"
+     ]
+    }
+   ],
+   "consistency": 1.0,
+   "source": "brmt-v1",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "brmt-proc-numword-27",
+   "subfamily": "processing",
+   "prompt": "The number 27 written out in words is",
+   "target": "twenty-seven",
+   "intermediates": [
+    "twenty-seven"
+   ],
+   "units": [
+    {
+     "role": "readout",
+     "lang": "en",
+     "headline": true,
+     "match": [
+      "twenty-seven"
+     ]
+    }
+   ],
+   "consistency": 1.0,
+   "source": "brmt-v1",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "brmt-proc-numword-28",
+   "subfamily": "processing",
+   "prompt": "The number 28 written out in words is",
+   "target": "twenty-eight",
+   "intermediates": [
+    "twenty-eight"
+   ],
+   "units": [
+    {
+     "role": "readout",
+     "lang": "en",
+     "headline": true,
+     "match": [
+      "twenty-eight"
+     ]
+    }
+   ],
+   "consistency": 1.0,
+   "source": "brmt-v1",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "brmt-proc-numword-29",
+   "subfamily": "processing",
+   "prompt": "The number 29 written out in words is",
+   "target": "twenty-nine",
+   "intermediates": [
+    "twenty-nine"
+   ],
+   "units": [
+    {
+     "role": "readout",
+     "lang": "en",
+     "headline": true,
+     "match": [
+      "twenty-nine"
+     ]
+    }
+   ],
+   "consistency": 1.0,
+   "source": "brmt-v1",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "brmt-proc-numword-31",
+   "subfamily": "processing",
+   "prompt": "The number 31 written out in words is",
+   "target": "thirty-one",
+   "intermediates": [
+    "thirty-one"
+   ],
+   "units": [
+    {
+     "role": "readout",
+     "lang": "en",
+     "headline": true,
+     "match": [
+      "thirty-one"
+     ]
+    }
+   ],
+   "consistency": 1.0,
+   "source": "brmt-v1",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "brmt-proc-numword-32",
+   "subfamily": "processing",
+   "prompt": "The number 32 written out in words is",
+   "target": "thirty-two",
+   "intermediates": [
+    "thirty-two"
+   ],
+   "units": [
+    {
+     "role": "readout",
+     "lang": "en",
+     "headline": true,
+     "match": [
+      "thirty-two"
+     ]
+    }
+   ],
+   "consistency": 1.0,
+   "source": "brmt-v1",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "brmt-proc-numword-33",
+   "subfamily": "processing",
+   "prompt": "The number 33 written out in words is",
+   "target": "thirty-three",
+   "intermediates": [
+    "thirty-three"
+   ],
+   "units": [
+    {
+     "role": "readout",
+     "lang": "en",
+     "headline": true,
+     "match": [
+      "thirty-three"
+     ]
+    }
+   ],
+   "consistency": 1.0,
+   "source": "brmt-v1",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "brmt-proc-numword-34",
+   "subfamily": "processing",
+   "prompt": "The number 34 written out in words is",
+   "target": "thirty-four",
+   "intermediates": [
+    "thirty-four"
+   ],
+   "units": [
+    {
+     "role": "readout",
+     "lang": "en",
+     "headline": true,
+     "match": [
+      "thirty-four"
+     ]
+    }
+   ],
+   "consistency": 1.0,
+   "source": "brmt-v1",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "brmt-proc-numword-35",
+   "subfamily": "processing",
+   "prompt": "The number 35 written out in words is",
+   "target": "thirty-five",
+   "intermediates": [
+    "thirty-five"
+   ],
+   "units": [
+    {
+     "role": "readout",
+     "lang": "en",
+     "headline": true,
+     "match": [
+      "thirty-five"
+     ]
+    }
+   ],
+   "consistency": 1.0,
+   "source": "brmt-v1",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "brmt-proc-numword-36",
+   "subfamily": "processing",
+   "prompt": "The number 36 written out in words is",
+   "target": "thirty-six",
+   "intermediates": [
+    "thirty-six"
+   ],
+   "units": [
+    {
+     "role": "readout",
+     "lang": "en",
+     "headline": true,
+     "match": [
+      "thirty-six"
+     ]
+    }
+   ],
+   "consistency": 1.0,
+   "source": "brmt-v1",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "brmt-proc-numword-37",
+   "subfamily": "processing",
+   "prompt": "The number 37 written out in words is",
+   "target": "thirty-seven",
+   "intermediates": [
+    "thirty-seven"
+   ],
+   "units": [
+    {
+     "role": "readout",
+     "lang": "en",
+     "headline": true,
+     "match": [
+      "thirty-seven"
+     ]
+    }
+   ],
+   "consistency": 1.0,
+   "source": "brmt-v1",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "brmt-proc-numword-38",
+   "subfamily": "processing",
+   "prompt": "The number 38 written out in words is",
+   "target": "thirty-eight",
+   "intermediates": [
+    "thirty-eight"
+   ],
+   "units": [
+    {
+     "role": "readout",
+     "lang": "en",
+     "headline": true,
+     "match": [
+      "thirty-eight"
+     ]
+    }
+   ],
+   "consistency": 1.0,
+   "source": "brmt-v1",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "brmt-proc-numword-39",
+   "subfamily": "processing",
+   "prompt": "The number 39 written out in words is",
+   "target": "thirty-nine",
+   "intermediates": [
+    "thirty-nine"
+   ],
+   "units": [
+    {
+     "role": "readout",
+     "lang": "en",
+     "headline": true,
+     "match": [
+      "thirty-nine"
+     ]
+    }
+   ],
+   "consistency": 1.0,
+   "source": "brmt-v1",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "brmt-proc-numword-41",
+   "subfamily": "processing",
+   "prompt": "The number 41 written out in words is",
+   "target": "forty-one",
+   "intermediates": [
+    "forty-one"
+   ],
+   "units": [
+    {
+     "role": "readout",
+     "lang": "en",
+     "headline": true,
+     "match": [
+      "forty-one"
+     ]
+    }
+   ],
+   "consistency": 1.0,
+   "source": "brmt-v1",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "brmt-proc-numword-42",
+   "subfamily": "processing",
+   "prompt": "The number 42 written out in words is",
+   "target": "forty-two",
+   "intermediates": [
+    "forty-two"
+   ],
+   "units": [
+    {
+     "role": "readout",
+     "lang": "en",
+     "headline": true,
+     "match": [
+      "forty-two"
+     ]
+    }
+   ],
+   "consistency": 1.0,
+   "source": "brmt-v1",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "brmt-proc-numword-43",
+   "subfamily": "processing",
+   "prompt": "The number 43 written out in words is",
+   "target": "forty-three",
+   "intermediates": [
+    "forty-three"
+   ],
+   "units": [
+    {
+     "role": "readout",
+     "lang": "en",
+     "headline": true,
+     "match": [
+      "forty-three"
+     ]
+    }
+   ],
+   "consistency": 1.0,
+   "source": "brmt-v1",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "brmt-proc-numword-44",
+   "subfamily": "processing",
+   "prompt": "The number 44 written out in words is",
+   "target": "forty-four",
+   "intermediates": [
+    "forty-four"
+   ],
+   "units": [
+    {
+     "role": "readout",
+     "lang": "en",
+     "headline": true,
+     "match": [
+      "forty-four"
+     ]
+    }
+   ],
+   "consistency": 1.0,
+   "source": "brmt-v1",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "brmt-proc-numword-45",
+   "subfamily": "processing",
+   "prompt": "The number 45 written out in words is",
+   "target": "forty-five",
+   "intermediates": [
+    "forty-five"
+   ],
+   "units": [
+    {
+     "role": "readout",
+     "lang": "en",
+     "headline": true,
+     "match": [
+      "forty-five"
+     ]
+    }
+   ],
+   "consistency": 1.0,
+   "source": "brmt-v1",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "brmt-proc-numword-46",
+   "subfamily": "processing",
+   "prompt": "The number 46 written out in words is",
+   "target": "forty-six",
+   "intermediates": [
+    "forty-six"
+   ],
+   "units": [
+    {
+     "role": "readout",
+     "lang": "en",
+     "headline": true,
+     "match": [
+      "forty-six"
+     ]
+    }
+   ],
+   "consistency": 1.0,
+   "source": "brmt-v1",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "brmt-proc-numword-47",
+   "subfamily": "processing",
+   "prompt": "The number 47 written out in words is",
+   "target": "forty-seven",
+   "intermediates": [
+    "forty-seven"
+   ],
+   "units": [
+    {
+     "role": "readout",
+     "lang": "en",
+     "headline": true,
+     "match": [
+      "forty-seven"
+     ]
+    }
+   ],
+   "consistency": 1.0,
+   "source": "brmt-v1",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "brmt-proc-numword-48",
+   "subfamily": "processing",
+   "prompt": "The number 48 written out in words is",
+   "target": "forty-eight",
+   "intermediates": [
+    "forty-eight"
+   ],
+   "units": [
+    {
+     "role": "readout",
+     "lang": "en",
+     "headline": true,
+     "match": [
+      "forty-eight"
+     ]
+    }
+   ],
+   "consistency": 1.0,
+   "source": "brmt-v1",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "brmt-proc-numword-49",
+   "subfamily": "processing",
+   "prompt": "The number 49 written out in words is",
+   "target": "forty-nine",
+   "intermediates": [
+    "forty-nine"
+   ],
+   "units": [
+    {
+     "role": "readout",
+     "lang": "en",
+     "headline": true,
+     "match": [
+      "forty-nine"
+     ]
+    }
+   ],
+   "consistency": 1.0,
+   "source": "brmt-v1",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "brmt-proc-numword-51",
+   "subfamily": "processing",
+   "prompt": "The number 51 written out in words is",
+   "target": "fifty-one",
+   "intermediates": [
+    "fifty-one"
+   ],
+   "units": [
+    {
+     "role": "readout",
+     "lang": "en",
+     "headline": true,
+     "match": [
+      "fifty-one"
+     ]
+    }
+   ],
+   "consistency": 1.0,
+   "source": "brmt-v1",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "brmt-proc-numword-52",
+   "subfamily": "processing",
+   "prompt": "The number 52 written out in words is",
+   "target": "fifty-two",
+   "intermediates": [
+    "fifty-two"
+   ],
+   "units": [
+    {
+     "role": "readout",
+     "lang": "en",
+     "headline": true,
+     "match": [
+      "fifty-two"
+     ]
+    }
+   ],
+   "consistency": 1.0,
+   "source": "brmt-v1",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "brmt-proc-numword-53",
+   "subfamily": "processing",
+   "prompt": "The number 53 written out in words is",
+   "target": "fifty-three",
+   "intermediates": [
+    "fifty-three"
+   ],
+   "units": [
+    {
+     "role": "readout",
+     "lang": "en",
+     "headline": true,
+     "match": [
+      "fifty-three"
+     ]
+    }
+   ],
+   "consistency": 1.0,
+   "source": "brmt-v1",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "brmt-proc-numword-54",
+   "subfamily": "processing",
+   "prompt": "The number 54 written out in words is",
+   "target": "fifty-four",
+   "intermediates": [
+    "fifty-four"
+   ],
+   "units": [
+    {
+     "role": "readout",
+     "lang": "en",
+     "headline": true,
+     "match": [
+      "fifty-four"
+     ]
+    }
+   ],
+   "consistency": 1.0,
+   "source": "brmt-v1",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "brmt-proc-numword-55",
+   "subfamily": "processing",
+   "prompt": "The number 55 written out in words is",
+   "target": "fifty-five",
+   "intermediates": [
+    "fifty-five"
+   ],
+   "units": [
+    {
+     "role": "readout",
+     "lang": "en",
+     "headline": true,
+     "match": [
+      "fifty-five"
+     ]
+    }
+   ],
+   "consistency": 1.0,
+   "source": "brmt-v1",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "brmt-proc-ordinal-56",
+   "subfamily": "processing",
+   "prompt": "Written as an ordinal in words, 56 is",
+   "target": "fifty-sixth",
+   "intermediates": [
+    "fifty-sixth"
+   ],
+   "units": [
+    {
+     "role": "readout",
+     "lang": "en",
+     "headline": true,
+     "match": [
+      "fifty-sixth"
+     ]
+    }
+   ],
+   "consistency": 1.0,
+   "source": "brmt-v1",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     3
+    ],
+    "target": 3
+   }
+  },
+  {
+   "name": "brmt-proc-ordinal-57",
+   "subfamily": "processing",
+   "prompt": "Written as an ordinal in words, 57 is",
+   "target": "fifty-seventh",
+   "intermediates": [
+    "fifty-seventh"
+   ],
+   "units": [
+    {
+     "role": "readout",
+     "lang": "en",
+     "headline": true,
+     "match": [
+      "fifty-seventh"
+     ]
+    }
+   ],
+   "consistency": 1.0,
+   "source": "brmt-v1",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     3
+    ],
+    "target": 3
+   }
+  },
+  {
+   "name": "brmt-proc-ordinal-58",
+   "subfamily": "processing",
+   "prompt": "Written as an ordinal in words, 58 is",
+   "target": "fifty-eighth",
+   "intermediates": [
+    "fifty-eighth"
+   ],
+   "units": [
+    {
+     "role": "readout",
+     "lang": "en",
+     "headline": true,
+     "match": [
+      "fifty-eighth"
+     ]
+    }
+   ],
+   "consistency": 1.0,
+   "source": "brmt-v1",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     3
+    ],
+    "target": 3
+   }
+  },
+  {
+   "name": "brmt-proc-ordinal-59",
+   "subfamily": "processing",
+   "prompt": "Written as an ordinal in words, 59 is",
+   "target": "fifty-ninth",
+   "intermediates": [
+    "fifty-ninth"
+   ],
+   "units": [
+    {
+     "role": "readout",
+     "lang": "en",
+     "headline": true,
+     "match": [
+      "fifty-ninth"
+     ]
+    }
+   ],
+   "consistency": 1.0,
+   "source": "brmt-v1",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     3
+    ],
+    "target": 3
+   }
+  },
+  {
+   "name": "brmt-proc-ordinal-61",
+   "subfamily": "processing",
+   "prompt": "Written as an ordinal in words, 61 is",
+   "target": "sixty-first",
+   "intermediates": [
+    "sixty-first"
+   ],
+   "units": [
+    {
+     "role": "readout",
+     "lang": "en",
+     "headline": true,
+     "match": [
+      "sixty-first"
+     ]
+    }
+   ],
+   "consistency": 1.0,
+   "source": "brmt-v1",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "brmt-proc-ordinal-62",
+   "subfamily": "processing",
+   "prompt": "Written as an ordinal in words, 62 is",
+   "target": "sixty-second",
+   "intermediates": [
+    "sixty-second"
+   ],
+   "units": [
+    {
+     "role": "readout",
+     "lang": "en",
+     "headline": true,
+     "match": [
+      "sixty-second"
+     ]
+    }
+   ],
+   "consistency": 1.0,
+   "source": "brmt-v1",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "brmt-proc-ordinal-63",
+   "subfamily": "processing",
+   "prompt": "Written as an ordinal in words, 63 is",
+   "target": "sixty-third",
+   "intermediates": [
+    "sixty-third"
+   ],
+   "units": [
+    {
+     "role": "readout",
+     "lang": "en",
+     "headline": true,
+     "match": [
+      "sixty-third"
+     ]
+    }
+   ],
+   "consistency": 1.0,
+   "source": "brmt-v1",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "brmt-proc-ordinal-64",
+   "subfamily": "processing",
+   "prompt": "Written as an ordinal in words, 64 is",
+   "target": "sixty-fourth",
+   "intermediates": [
+    "sixty-fourth"
+   ],
+   "units": [
+    {
+     "role": "readout",
+     "lang": "en",
+     "headline": true,
+     "match": [
+      "sixty-fourth"
+     ]
+    }
+   ],
+   "consistency": 1.0,
+   "source": "brmt-v1",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     3
+    ],
+    "target": 3
+   }
+  },
+  {
+   "name": "brmt-proc-ordinal-65",
+   "subfamily": "processing",
+   "prompt": "Written as an ordinal in words, 65 is",
+   "target": "sixty-fifth",
+   "intermediates": [
+    "sixty-fifth"
+   ],
+   "units": [
+    {
+     "role": "readout",
+     "lang": "en",
+     "headline": true,
+     "match": [
+      "sixty-fifth"
+     ]
+    }
+   ],
+   "consistency": 1.0,
+   "source": "brmt-v1",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     3
+    ],
+    "target": 3
+   }
+  },
+  {
+   "name": "brmt-proc-ordinal-66",
+   "subfamily": "processing",
+   "prompt": "Written as an ordinal in words, 66 is",
+   "target": "sixty-sixth",
+   "intermediates": [
+    "sixty-sixth"
+   ],
+   "units": [
+    {
+     "role": "readout",
+     "lang": "en",
+     "headline": true,
+     "match": [
+      "sixty-sixth"
+     ]
+    }
+   ],
+   "consistency": 1.0,
+   "source": "brmt-v1",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     3
+    ],
+    "target": 3
+   }
+  },
+  {
+   "name": "brmt-proc-ordinal-67",
+   "subfamily": "processing",
+   "prompt": "Written as an ordinal in words, 67 is",
+   "target": "sixty-seventh",
+   "intermediates": [
+    "sixty-seventh"
+   ],
+   "units": [
+    {
+     "role": "readout",
+     "lang": "en",
+     "headline": true,
+     "match": [
+      "sixty-seventh"
+     ]
+    }
+   ],
+   "consistency": 1.0,
+   "source": "brmt-v1",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     3
+    ],
+    "target": 3
+   }
+  },
+  {
+   "name": "brmt-proc-ordinal-68",
+   "subfamily": "processing",
+   "prompt": "Written as an ordinal in words, 68 is",
+   "target": "sixty-eighth",
+   "intermediates": [
+    "sixty-eighth"
+   ],
+   "units": [
+    {
+     "role": "readout",
+     "lang": "en",
+     "headline": true,
+     "match": [
+      "sixty-eighth"
+     ]
+    }
+   ],
+   "consistency": 1.0,
+   "source": "brmt-v1",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     3
+    ],
+    "target": 3
+   }
+  },
+  {
+   "name": "brmt-proc-ordinal-69",
+   "subfamily": "processing",
+   "prompt": "Written as an ordinal in words, 69 is",
+   "target": "sixty-ninth",
+   "intermediates": [
+    "sixty-ninth"
+   ],
+   "units": [
+    {
+     "role": "readout",
+     "lang": "en",
+     "headline": true,
+     "match": [
+      "sixty-ninth"
+     ]
+    }
+   ],
+   "consistency": 1.0,
+   "source": "brmt-v1",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     3
+    ],
+    "target": 3
+   }
+  },
+  {
+   "name": "brmt-proc-ordinal-71",
+   "subfamily": "processing",
+   "prompt": "Written as an ordinal in words, 71 is",
+   "target": "seventy-first",
+   "intermediates": [
+    "seventy-first"
+   ],
+   "units": [
+    {
+     "role": "readout",
+     "lang": "en",
+     "headline": true,
+     "match": [
+      "seventy-first"
+     ]
+    }
+   ],
+   "consistency": 1.0,
+   "source": "brmt-v1",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "brmt-proc-ordinal-72",
+   "subfamily": "processing",
+   "prompt": "Written as an ordinal in words, 72 is",
+   "target": "seventy-second",
+   "intermediates": [
+    "seventy-second"
+   ],
+   "units": [
+    {
+     "role": "readout",
+     "lang": "en",
+     "headline": true,
+     "match": [
+      "seventy-second"
+     ]
+    }
+   ],
+   "consistency": 1.0,
+   "source": "brmt-v1",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "brmt-proc-ordinal-73",
+   "subfamily": "processing",
+   "prompt": "Written as an ordinal in words, 73 is",
+   "target": "seventy-third",
+   "intermediates": [
+    "seventy-third"
+   ],
+   "units": [
+    {
+     "role": "readout",
+     "lang": "en",
+     "headline": true,
+     "match": [
+      "seventy-third"
+     ]
+    }
+   ],
+   "consistency": 1.0,
+   "source": "brmt-v1",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "brmt-proc-ordinal-74",
+   "subfamily": "processing",
+   "prompt": "Written as an ordinal in words, 74 is",
+   "target": "seventy-fourth",
+   "intermediates": [
+    "seventy-fourth"
+   ],
+   "units": [
+    {
+     "role": "readout",
+     "lang": "en",
+     "headline": true,
+     "match": [
+      "seventy-fourth"
+     ]
+    }
+   ],
+   "consistency": 1.0,
+   "source": "brmt-v1",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     3
+    ],
+    "target": 3
+   }
+  },
+  {
+   "name": "brmt-proc-ordinal-75",
+   "subfamily": "processing",
+   "prompt": "Written as an ordinal in words, 75 is",
+   "target": "seventy-fifth",
+   "intermediates": [
+    "seventy-fifth"
+   ],
+   "units": [
+    {
+     "role": "readout",
+     "lang": "en",
+     "headline": true,
+     "match": [
+      "seventy-fifth"
+     ]
+    }
+   ],
+   "consistency": 1.0,
+   "source": "brmt-v1",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     3
+    ],
+    "target": 3
+   }
+  },
+  {
+   "name": "brmt-imp-animatedmovie",
+   "subfamily": "implicit",
+   "prompt": "What is your favorite animated movie? Answer with just the name.",
+   "target": "spirited away",
+   "intermediates": [
+    "spirited away"
+   ],
+   "units": [
+    {
+     "role": "readout",
+     "lang": "en",
+     "headline": true,
+     "match": [
+      "spirited away"
+     ]
+    }
+   ],
+   "consistency": 1.0,
+   "source": "brmt-v1",
+   "gate_variant": "chat",
+   "eval_render": "chat",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "brmt-imp-videogamefranchise",
+   "subfamily": "implicit",
+   "prompt": "What is your favorite video-game franchise? Answer with just the name.",
+   "target": "the legend of zelda",
+   "intermediates": [
+    "the legend of zelda"
+   ],
+   "units": [
+    {
+     "role": "readout",
+     "lang": "en",
+     "headline": true,
+     "match": [
+      "the legend of zelda"
+     ]
+    }
+   ],
+   "consistency": 1.0,
+   "source": "brmt-v1",
+   "gate_variant": "chat",
+   "eval_render": "chat",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     5
+    ],
+    "target": 5
+   }
+  },
+  {
+   "name": "brmt-imp-ancientcivilization",
+   "subfamily": "implicit",
+   "prompt": "What is your favorite ancient civilization? Answer with just the name.",
+   "target": "ancient egypt",
+   "intermediates": [
+    "ancient egypt"
+   ],
+   "units": [
+    {
+     "role": "readout",
+     "lang": "en",
+     "headline": true,
+     "match": [
+      "ancient egypt"
+     ]
+    }
+   ],
+   "consistency": 0.9,
+   "source": "brmt-v1",
+   "gate_variant": "chat",
+   "eval_render": "chat",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     3
+    ],
+    "target": 3
+   }
+  },
+  {
+   "name": "brmt-imp-boardgame",
+   "subfamily": "implicit",
+   "prompt": "What is your favorite board game? Answer with just the name.",
+   "target": "catan",
+   "intermediates": [
+    "catan"
+   ],
+   "units": [
+    {
+     "role": "readout",
+     "lang": "en",
+     "headline": true,
+     "match": [
+      "catan"
+     ]
+    }
+   ],
+   "consistency": 0.9,
+   "source": "brmt-v1",
+   "gate_variant": "chat",
+   "eval_render": "chat",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "brmt-imp-constellation",
+   "subfamily": "implicit",
+   "prompt": "What is your favorite constellation? Answer with just the name.",
+   "target": "orion",
+   "intermediates": [
+    "orion"
+   ],
+   "units": [
+    {
+     "role": "readout",
+     "lang": "en",
+     "headline": true,
+     "match": [
+      "orion"
+     ]
+    }
+   ],
+   "consistency": 0.9,
+   "source": "brmt-v1",
+   "gate_variant": "chat",
+   "eval_render": "chat",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "brmt-imp-dessert",
+   "subfamily": "implicit",
+   "prompt": "What is your favorite dessert? Answer with just the name.",
+   "target": "tiramisu",
+   "intermediates": [
+    "tiramisu"
+   ],
+   "units": [
+    {
+     "role": "readout",
+     "lang": "en",
+     "headline": true,
+     "match": [
+      "tiramisu"
+     ]
+    }
+   ],
+   "consistency": 0.9,
+   "source": "brmt-v1",
+   "gate_variant": "chat",
+   "eval_render": "chat",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     3
+    ],
+    "target": 3
+   }
+  },
+  {
+   "name": "brmt-imp-fictionalcharacter",
+   "subfamily": "implicit",
+   "prompt": "What is your favorite fictional character? Answer with just the name.",
+   "target": "sherlock holmes",
+   "intermediates": [
+    "sherlock holmes"
+   ],
+   "units": [
+    {
+     "role": "readout",
+     "lang": "en",
+     "headline": true,
+     "match": [
+      "sherlock holmes"
+     ]
+    }
+   ],
+   "consistency": 0.9,
+   "source": "brmt-v1",
+   "gate_variant": "chat",
+   "eval_render": "chat",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     4
+    ],
+    "target": 4
+   }
+  },
+  {
+   "name": "brmt-imp-movie",
+   "subfamily": "implicit",
+   "prompt": "What is your favorite movie? Answer with just the name.",
+   "target": "the shawshank redemption",
+   "intermediates": [
+    "the shawshank redemption"
+   ],
+   "units": [
+    {
+     "role": "readout",
+     "lang": "en",
+     "headline": true,
+     "match": [
+      "the shawshank redemption"
+     ]
+    }
+   ],
+   "consistency": 0.9,
+   "source": "brmt-v1",
+   "gate_variant": "chat",
+   "eval_render": "chat",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     6
+    ],
+    "target": 6
+   }
+  },
+  {
+   "name": "brmt-imp-musical",
+   "subfamily": "implicit",
+   "prompt": "What is your favorite musical? Answer with just the name.",
+   "target": "hamilton",
+   "intermediates": [
+    "hamilton"
+   ],
+   "units": [
+    {
+     "role": "readout",
+     "lang": "en",
+     "headline": true,
+     "match": [
+      "hamilton"
+     ]
+    }
+   ],
+   "consistency": 0.9,
+   "source": "brmt-v1",
+   "gate_variant": "chat",
+   "eval_render": "chat",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "brmt-imp-sitcom",
+   "subfamily": "implicit",
+   "prompt": "What is your favorite sitcom? Answer with just the name.",
+   "target": "the office",
+   "intermediates": [
+    "the office"
+   ],
+   "units": [
+    {
+     "role": "readout",
+     "lang": "en",
+     "headline": true,
+     "match": [
+      "the office"
+     ]
+    }
+   ],
+   "consistency": 0.9,
+   "source": "brmt-v1",
+   "gate_variant": "chat",
+   "eval_render": "chat",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "brmt-imp-song",
+   "subfamily": "implicit",
+   "prompt": "What is your favorite song? Answer with just the name.",
+   "target": "bohemian rhapsody",
+   "intermediates": [
+    "bohemian rhapsody"
+   ],
+   "units": [
+    {
+     "role": "readout",
+     "lang": "en",
+     "headline": true,
+     "match": [
+      "bohemian rhapsody"
+     ]
+    }
+   ],
+   "consistency": 0.9,
+   "source": "brmt-v1",
+   "gate_variant": "chat",
+   "eval_render": "chat",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     6
+    ],
+    "target": 6
+   }
+  },
+  {
+   "name": "brmt-imp-TVshow",
+   "subfamily": "implicit",
+   "prompt": "What is your favorite TV show? Answer with just the name.",
+   "target": "breaking bad",
+   "intermediates": [
+    "breaking bad"
+   ],
+   "units": [
+    {
+     "role": "readout",
+     "lang": "en",
+     "headline": true,
+     "match": [
+      "breaking bad"
+     ]
+    }
+   ],
+   "consistency": 0.8,
+   "source": "brmt-v1",
+   "gate_variant": "chat",
+   "eval_render": "chat",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "brmt-imp-citytovisit",
+   "subfamily": "implicit",
+   "prompt": "What is your favorite city you would most like to visit? Answer with just the name.",
+   "target": "kyoto",
+   "intermediates": [
+    "kyoto"
+   ],
+   "units": [
+    {
+     "role": "readout",
+     "lang": "en",
+     "headline": true,
+     "match": [
+      "kyoto"
+     ]
+    }
+   ],
+   "consistency": 0.8,
+   "source": "brmt-v1",
+   "gate_variant": "chat",
+   "eval_render": "chat",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "brmt-imp-mountain",
+   "subfamily": "implicit",
+   "prompt": "What is your favorite mountain? Answer with just the name.",
+   "target": "mount fuji",
+   "intermediates": [
+    "mount fuji"
+   ],
+   "units": [
+    {
+     "role": "readout",
+     "lang": "en",
+     "headline": true,
+     "match": [
+      "mount fuji"
+     ]
+    }
+   ],
+   "consistency": 0.8,
+   "source": "brmt-v1",
+   "gate_variant": "chat",
+   "eval_render": "chat",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     3
+    ],
+    "target": 3
+   }
+  },
+  {
+   "name": "brmt-imp-sci-fifranchise",
+   "subfamily": "implicit",
+   "prompt": "What is your favorite science-fiction franchise? Answer with just the name.",
+   "target": "star wars",
+   "intermediates": [
+    "star wars"
+   ],
+   "units": [
+    {
+     "role": "readout",
+     "lang": "en",
+     "headline": true,
+     "match": [
+      "star wars"
+     ]
+    }
+   ],
+   "consistency": 0.8,
+   "source": "brmt-v1",
+   "gate_variant": "chat",
+   "eval_render": "chat",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 2
+   }
+  }
+ ]
+}

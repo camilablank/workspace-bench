@@ -1,0 +1,98 @@
+[
+ {
+  "name": "b-ange-mix-ab",
+  "q": "Think about Adam being angry at Betty. Now write this sentence: \"The committee will meet on Thursday to review the annual budget.\"\n",
+  "phrase": "Adam being angry at Betty",
+  "stratum": "mix"
+ },
+ {
+  "name": "b-ange-mix-ba",
+  "q": "Think about Betty being angry at Adam. Now write this sentence: \"The committee will meet on Thursday to review the annual budget.\"\n",
+  "phrase": "Betty being angry at Adam",
+  "stratum": "mix"
+ },
+ {
+  "name": "b-jeal-mix-ab",
+  "q": "Think about Maria being jealous of Tom. Now write this sentence: \"The committee will meet on Thursday to review the annual budget.\"\n",
+  "phrase": "Maria being jealous of Tom",
+  "stratum": "mix"
+ },
+ {
+  "name": "b-jeal-mix-ba",
+  "q": "Think about Tom being jealous of Maria. Now write this sentence: \"The committee will meet on Thursday to review the annual budget.\"\n",
+  "phrase": "Tom being jealous of Maria",
+  "stratum": "mix"
+ },
+ {
+  "name": "b-fear-mix-ab",
+  "q": "Think about Susan being afraid of David. Now write this sentence: \"The committee will meet on Thursday to review the annual budget.\"\n",
+  "phrase": "Susan being afraid of David",
+  "stratum": "mix"
+ },
+ {
+  "name": "b-fear-mix-ba",
+  "q": "Think about David being afraid of Susan. Now write this sentence: \"The committee will meet on Thursday to review the annual budget.\"\n",
+  "phrase": "David being afraid of Susan",
+  "stratum": "mix"
+ },
+ {
+  "name": "b-prid-mix-ab",
+  "q": "Think about Emma being proud of James. Now write this sentence: \"The committee will meet on Thursday to review the annual budget.\"\n",
+  "phrase": "Emma being proud of James",
+  "stratum": "mix"
+ },
+ {
+  "name": "b-prid-mix-ba",
+  "q": "Think about James being proud of Emma. Now write this sentence: \"The committee will meet on Thursday to review the annual budget.\"\n",
+  "phrase": "James being proud of Emma",
+  "stratum": "mix"
+ },
+ {
+  "name": "b-ange-same-ab",
+  "q": "Think about Adam being angry at Brian. Now write this sentence: \"The committee will meet on Thursday to review the annual budget.\"\n",
+  "phrase": "Adam being angry at Brian",
+  "stratum": "same"
+ },
+ {
+  "name": "b-ange-same-ba",
+  "q": "Think about Brian being angry at Adam. Now write this sentence: \"The committee will meet on Thursday to review the annual budget.\"\n",
+  "phrase": "Brian being angry at Adam",
+  "stratum": "same"
+ },
+ {
+  "name": "b-jeal-same-ab",
+  "q": "Think about Alice being jealous of Karen. Now write this sentence: \"The committee will meet on Thursday to review the annual budget.\"\n",
+  "phrase": "Alice being jealous of Karen",
+  "stratum": "same"
+ },
+ {
+  "name": "b-jeal-same-ba",
+  "q": "Think about Karen being jealous of Alice. Now write this sentence: \"The committee will meet on Thursday to review the annual budget.\"\n",
+  "phrase": "Karen being jealous of Alice",
+  "stratum": "same"
+ },
+ {
+  "name": "b-debt-same-ab",
+  "q": "Think about Carlos owing money to Miguel. Now write this sentence: \"The committee will meet on Thursday to review the annual budget.\"\n",
+  "phrase": "Carlos owing money to Miguel",
+  "stratum": "same"
+ },
+ {
+  "name": "b-debt-same-ba",
+  "q": "Think about Miguel owing money to Carlos. Now write this sentence: \"The committee will meet on Thursday to review the annual budget.\"\n",
+  "phrase": "Miguel owing money to Carlos",
+  "stratum": "same"
+ },
+ {
+  "name": "b-trus-same-ab",
+  "q": "Think about Nina trusting Petra completely. Now write this sentence: \"The committee will meet on Thursday to review the annual budget.\"\n",
+  "phrase": "Nina trusting Petra completely",
+  "stratum": "same"
+ },
+ {
+  "name": "b-trus-same-ba",
+  "q": "Think about Petra trusting Nina completely. Now write this sentence: \"The committee will meet on Thursday to review the annual budget.\"\n",
+  "phrase": "Petra trusting Nina completely",
+  "stratum": "same"
+ }
+]

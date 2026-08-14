@@ -1,0 +1,390 @@
+{
+ "meta": {
+  "model": "Qwen/Qwen3.6-27B (enable_thinking=False)",
+  "render": "full conversation through the chat template, no generation prompt; readouts at ALL rendered positions",
+  "layers": [
+   36,
+   40,
+   44,
+   48,
+   52,
+   60
+  ],
+  "sources": {
+   "wildchat": "allenai/WildChat-1M",
+   "dailydialog": "ConvLab/dailydialog (detokenized mirror; agu18dec/dailydialog rejected for PTB tokenization spacing)"
+  },
+  "selection": "heuristic filters (English, non-toxic, non-redacted, no code/URLs, 120-360 rendered tokens) -> claude-sonnet-5 screen (junk/nsfw/naturalness) -> top-5/source by quality, distinct topics preferred",
+  "screen_model": "claude-sonnet-5"
+ },
+ "items": [
+  {
+   "id": "rc-wildchat-000",
+   "source": "wildchat",
+   "source_id": "73db8547e4bcbba6c536c694232a9317",
+   "messages": [
+    {
+     "role": "user",
+     "content": "Hi"
+    },
+    {
+     "role": "assistant",
+     "content": "Hello! How can I assist you today?"
+    },
+    {
+     "role": "user",
+     "content": "What usually happens if I'm still on a mobile provider's service and it merges with another, what is there to expect. Would my contract expire?"
+    },
+    {
+     "role": "assistant",
+     "content": "If your mobile provider merges with another company, there are a few potential outcomes that could happen. Here are a few possibilities:\n\n1. Your contract may continue as-is: In some cases, your contract may continue without any changes. This is more likely if the two companies have similar policies and pricing structures.\n\n2. You may be able to opt-out of your contract: Depending on the terms of your agreement, you may be able to cancel your contract without penalty if the company you originally signed up with is acquired or merges with another company.\n\n3. Your contract may be terminated: It is possible that your contract may be terminated as a result of the merger. If this happens, you may be able to switch to a new provider without penalty.\n\nIt is important to read the terms and conditions of your contract carefully to understand what your options are in the event of a merger. Additionally, you can contact your mobile provider to ask for more information about what you can expect in the event of a merger."
+    }
+   ],
+   "screen": {
+    "quality": 5,
+    "topic": "mobile provider merger contract"
+   },
+   "n_tokens_rendered": 268
+  },
+  {
+   "id": "rc-wildchat-001",
+   "source": "wildchat",
+   "source_id": "6a34cd527d9c72f76d4f7b6ca9ffbe4d",
+   "messages": [
+    {
+     "role": "user",
+     "content": "Who is sadovnichiy?"
+    },
+    {
+     "role": "assistant",
+     "content": "Sadovnichiy may refer to Viktor Sadovnichiy, a Russian mathematician and academician who is currently the rector of Lomonosov Moscow State University."
+    },
+    {
+     "role": "user",
+     "content": "What is he known for?"
+    },
+    {
+     "role": "assistant",
+     "content": "Viktor Sadovnichiy is known for his contributions to the field of mathematics, particularly in the areas of probability theory and statistics. He has authored over 300 research works and has received numerous awards and honors for his work, including the Russian Academy of Sciences Prize in Mathematics and Mechanics and the Order of Merit for the Fatherland. As the rector of Lomonosov Moscow State University, he has played a significant role in promoting research and academic excellence in Russia."
+    },
+    {
+     "role": "user",
+     "content": "What is lomonosov moscow state university?"
+    },
+    {
+     "role": "assistant",
+     "content": "Lomonosov Moscow State University (MSU) is a large, state-funded research university located in Moscow, Russia. It was founded in 1755 by Mikhail Lomonosov, a prominent Russian scientist and writer, and is considered one of the oldest and most prestigious universities in Russia. MSU offers a wide range of undergraduate and graduate programs in various fields, including mathematics, physics, chemistry, biology, medicine, social sciences, humanities, law, economics, and international relations. The university has a large and diverse student body, with over 40,000 undergraduate and graduate students, and a faculty of over 4,000 professors and researchers. It has a strong reputation for academic excellence and research achievements, and has produced many notable alumni, including several Nobel laureates."
+    }
+   ],
+   "screen": {
+    "quality": 5,
+    "topic": "Moscow State University rector"
+   },
+   "n_tokens_rendered": 357
+  },
+  {
+   "id": "rc-wildchat-002",
+   "source": "wildchat",
+   "source_id": "92a2acd9a426808e1bf476b6b01d480d",
+   "messages": [
+    {
+     "role": "user",
+     "content": "can you explain the calculation N*6.25"
+    },
+    {
+     "role": "assistant",
+     "content": "The calculation N * 6.25 simply means multiplying a number (represented by the variable N) by 6.25. For example, if N is equal to 4, then N * 6.25 would be 4 * 6.25 which equals 25. This calculation can be useful in various mathematical problems, such as determining the cost of an item with a 6.25% sales tax, or calculating the amount of medication to administer based on a patient's weight."
+    },
+    {
+     "role": "user",
+     "content": "Can you explain N*6.25 in relation to protein and nitrogen"
+    },
+    {
+     "role": "assistant",
+     "content": "In the context of protein and nitrogen, the calculation N * 6.25 is used to estimate the protein content of a food or biological sample based on its nitrogen content. Nitrogen is an essential component of protein molecules. The calculation is based on the fact that protein contains approximately 16% nitrogen by weight.\n\nTo convert the nitrogen content of a sample to protein content, the nitrogen content is multiplied by 6.25. For example, if a food or biological sample contains 1 gram of nitrogen, then the estimated protein content would be 1 * 6.25, which is 6.25 grams of protein.\n\nThis calculation is commonly used in nutritional science and food analysis to estimate the protein content of various foods and biological samples. However, it's important to note that this calculation provides only an estimate of protein content and should be confirmed using other methods, such as amino acid analysis or Kjeldahl analysis, for greater accuracy."
+    }
+   ],
+   "screen": {
+    "quality": 5,
+    "topic": "nitrogen to protein calculation"
+   },
+   "n_tokens_rendered": 354
+  },
+  {
+   "id": "rc-wildchat-003",
+   "source": "wildchat",
+   "source_id": "576e59afd66835b3797517cd1cd8a08b",
+   "messages": [
+    {
+     "role": "user",
+     "content": "how long does it take to orbit the sun?"
+    },
+    {
+     "role": "assistant",
+     "content": "The time it takes for an object to orbit the sun depends on its distance from the sun and its orbital speed. For Earth, it takes approximately 365.25 days (1 year) to orbit the sun. Other planets in our solar system have different orbital periods due to their varying distances from the sun and orbital speeds."
+    },
+    {
+     "role": "user",
+     "content": "how long does it take to run in a circle"
+    },
+    {
+     "role": "assistant",
+     "content": "The time it takes to run in a circle depends on several factors, including the size of the circle (circumference), the runner's speed, and the runner's physical fitness level. \n\nTo estimate the time, first determine the circumference of the circle using the formula: circumference = 2 x \u03c0 x radius (where \u03c0 (pi) is approximately 3.14159).\n\nNext, determine your running speed in the same unit as the circumference (mph, km/h, etc.). You can typically find your average running speed for a given distance (such as a mile or kilometer) and use that as a reference.\n\nFinally, divide the circumference by your running speed to find the time it takes to run in the circle:\n\ntime = circumference / running speed\n\nKeep in mind that other factors, such as fatigue or uneven terrain, can affect the time it takes to complete a circular run."
+    },
+    {
+     "role": "user",
+     "content": "hello how are you"
+    },
+    {
+     "role": "assistant",
+     "content": "As an AI, I do not have feelings or emotions, but I'm here to help you with any questions or information you need. How can I assist you today?"
+    }
+   ],
+   "screen": {
+    "quality": 4,
+    "topic": "orbital time and running speed"
+   },
+   "n_tokens_rendered": 345
+  },
+  {
+   "id": "rc-wildchat-004",
+   "source": "wildchat",
+   "source_id": "a50e6266c22523aadd9dec553512fbd6",
+   "messages": [
+    {
+     "role": "user",
+     "content": "How long do houses last before they become too decayed and are in need of demolishment and redevelopment"
+    },
+    {
+     "role": "assistant",
+     "content": "The lifespan of a house can vary widely depending on a variety of factors such as the quality of the construction, maintenance over the years, and the climate in which it is located. Generally, a well-built and well-maintained house can last for several decades or even centuries. However, houses that are poorly constructed or poorly maintained can begin to show signs of decay within just a few years. In some cases, houses may need to be demolished and redeveloped after just a few decades in order to avoid safety hazards or structural issues. Ultimately, the lifespan of a house depends on a number of factors and can vary widely from house to house."
+    },
+    {
+     "role": "user",
+     "content": "For example, if a house was built in the 60s, how long would it last without any renovations and significant maintenance"
+    },
+    {
+     "role": "assistant",
+     "content": "The lifespan of a house built in the 60s without proper maintenance and renovations can vary depending on a number of factors such as the quality of materials and construction at the time of building, the location and climate of the house, and the level of wear and tear over the years. Generally, most homes built in the 60s were constructed using durable materials and methods that could last several decades. However, if the house has not been properly maintained or renovated for many years, it may begin to show signs of decay much sooner. In some cases, houses that are over 50 years old may require significant renovations or even demolition and redevelopment to bring them up to modern standards and meet current building codes."
+    }
+   ],
+   "screen": {
+    "quality": 4,
+    "topic": "house lifespan and decay"
+   },
+   "n_tokens_rendered": 344
+  },
+  {
+   "id": "rc-dailydialog-000",
+   "source": "dailydialog",
+   "source_id": "dailydialog-train-5",
+   "messages": [
+    {
+     "role": "user",
+     "content": "Hey Lydia, what are you reading?"
+    },
+    {
+     "role": "assistant",
+     "content": "I'm looking at my horoscope for this month! My outlook is very positive. It says that I should take a vacation to someplace exotic, and that I will have a passionate summer fling!"
+    },
+    {
+     "role": "user",
+     "content": "What are you talking about? Let me see that... What are horoscopes?"
+    },
+    {
+     "role": "assistant",
+     "content": "It's a prediction of your month, based on your zodiac sign. You have a different sign for the month and date you were born in. I was born on April 15th, so I'm an Aries. When were you born?"
+    },
+    {
+     "role": "user",
+     "content": "January 5th."
+    },
+    {
+     "role": "assistant",
+     "content": "Let's see. . . you're a Capricorn. It says that you will be feeling stress at work, but you could see new, exciting developments in your love life. Looks like we'll both have interesting summers!"
+    },
+    {
+     "role": "user",
+     "content": "That's bogus. I don't feel any stress at work, and my love life is practically nonexistent. This zodiac stuff is all a bunch of nonsense."
+    },
+    {
+     "role": "assistant",
+     "content": "No, it's not, your astrology sign can tell you a lot about your personality. See? It says that an Aries is energetic and loves to socialize."
+    },
+    {
+     "role": "user",
+     "content": "Well, you certainly match those criteria, but they're so broad they could apply to anyone. What does it say about me?"
+    },
+    {
+     "role": "assistant",
+     "content": "A Capricorn is serious-minded and practical. She likes to do things in conventional ways. That sounds just like you!"
+    }
+   ],
+   "screen": {
+    "quality": 5,
+    "topic": "horoscopes and zodiac signs"
+   },
+   "n_tokens_rendered": 340
+  },
+  {
+   "id": "rc-dailydialog-001",
+   "source": "dailydialog",
+   "source_id": "dailydialog-train-49",
+   "messages": [
+    {
+     "role": "user",
+     "content": "Isn't this lovely weather? Will you help me water the flowers, Jack?"
+    },
+    {
+     "role": "assistant",
+     "content": "Well, do you think I have to?"
+    },
+    {
+     "role": "user",
+     "content": "I do. We haven't watered them for quite a few days."
+    },
+    {
+     "role": "assistant",
+     "content": "Please look at the sky. Don' t you see the dark clouds? It's going to rain soon."
+    },
+    {
+     "role": "user",
+     "content": "Good. So we don't have to work. How nice!"
+    },
+    {
+     "role": "assistant",
+     "content": "But I don't think it's so nice."
+    },
+    {
+     "role": "user",
+     "content": "Why?"
+    },
+    {
+     "role": "assistant",
+     "content": "The weather report says it's going to rain for a whole week."
+    }
+   ],
+   "screen": {
+    "quality": 4,
+    "topic": "weather and watering flowers"
+   },
+   "n_tokens_rendered": 145
+  },
+  {
+   "id": "rc-dailydialog-002",
+   "source": "dailydialog",
+   "source_id": "dailydialog-train-58",
+   "messages": [
+    {
+     "role": "user",
+     "content": "What do you do in your free time, Nancy?"
+    },
+    {
+     "role": "assistant",
+     "content": "Well, I like playing the violin."
+    },
+    {
+     "role": "user",
+     "content": "Really? How long have you been playing the violin?"
+    },
+    {
+     "role": "assistant",
+     "content": "About ten years so far. I started learning when I was in middle school."
+    },
+    {
+     "role": "user",
+     "content": "That's really interesting."
+    },
+    {
+     "role": "assistant",
+     "content": "Sure. So what about you? Do you have any hobbies?"
+    },
+    {
+     "role": "user",
+     "content": "Well, I like collecting matchbox! I'm not sure if that counts, though."
+    },
+    {
+     "role": "assistant",
+     "content": "Of course it does. Everybody has his own hobby."
+    }
+   ],
+   "screen": {
+    "quality": 4,
+    "topic": "hobbies and interests conversation"
+   },
+   "n_tokens_rendered": 137
+  },
+  {
+   "id": "rc-dailydialog-003",
+   "source": "dailydialog",
+   "source_id": "dailydialog-train-72",
+   "messages": [
+    {
+     "role": "user",
+     "content": "It smells like an ashtray in here!"
+    },
+    {
+     "role": "assistant",
+     "content": "Hi honey! What's wrong? Why do you have that look on your face?"
+    },
+    {
+     "role": "user",
+     "content": "What's wrong? I thought we agreed that you were gonna quit smoking."
+    },
+    {
+     "role": "assistant",
+     "content": "No! I said I was going to cut down which is very different. You can't just expect me to go cold turkey overnight!"
+    },
+    {
+     "role": "user",
+     "content": "Look, there are other ways to quit. You can try the nicotine patch, or nicotine chewing gum. We spend a fortune on cigarettes every month and now laws are cracking down and not allowing smoking in any public place. It's not like you can just light up like before."
+    },
+    {
+     "role": "assistant",
+     "content": "I know, I know. I am trying but, I don't have the willpower to just quit. I can't fight with the urge to reach for my pack of smokes in the morning with coffee or after lunch! Please understand?"
+    }
+   ],
+   "screen": {
+    "quality": 4,
+    "topic": "quitting smoking argument couple"
+   },
+   "n_tokens_rendered": 208
+  },
+  {
+   "id": "rc-dailydialog-004",
+   "source": "dailydialog",
+   "source_id": "dailydialog-train-76",
+   "messages": [
+    {
+     "role": "user",
+     "content": "Have you signed up to join the company's Christmas party?"
+    },
+    {
+     "role": "assistant",
+     "content": "Sure, I have. Will you join?"
+    },
+    {
+     "role": "user",
+     "content": "I will. You know, as a newcomer, I think it might be a good opportunity to get to know people from the other departments of our company in a more relaxed atmosphere."
+    },
+    {
+     "role": "assistant",
+     "content": "You are right. Our company's Christmas party has always been an amazing occasion for everybody to relax and get to know each other better. It is also a time to make new friends and do some networking."
+    },
+    {
+     "role": "user",
+     "content": "I hope that it is not a formal one when the boss is there."
+    },
+    {
+     "role": "assistant",
+     "content": "No, it will not be formal at all. It is a fun time. You will love the game show. Please dress casually. Usually there is an over abandon of drinks, so be careful with that."
+    }
+   ],
+   "screen": {
+    "quality": 4,
+    "topic": "company Christmas party"
+   },
+   "n_tokens_rendered": 189
+  }
+ ]
+}

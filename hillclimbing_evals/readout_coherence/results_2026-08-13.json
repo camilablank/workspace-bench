@@ -1,0 +1,99 @@
+{
+ "run": {
+  "date": "2026-08-13",
+  "checkpoint": "ao28500-u64 (ckpts/ao/chat/k4.L20-60.cont.u64.s0/step28500, merged models/olens_merged/ao28500-u64)",
+  "jlens": "neuronpedia/jacobian-lens qwen3.6-27b n1000 wikitext, k=10",
+  "layers": [
+   36,
+   40,
+   44,
+   48,
+   52,
+   56,
+   60
+  ],
+  "jobs": {
+   "capture": 84695,
+   "ao": 84847,
+   "jlens": 84704
+  },
+  "judges": {
+   "pass1": "sumtok v6 / claude-opus-5",
+   "pass2_3": "claude-sonnet-5"
+  },
+  "gen_dirs": [
+   "gen-rcoh-ao28500",
+   "gen-rcoh-jlens"
+  ]
+ },
+ "summary_ratio": {
+  "olens": {
+   "judged": 2687,
+   "flagged": 141,
+   "api_errors": 0,
+   "flag_rate": 0.0525,
+   "summary_to_nonsummary": 0.0554
+  },
+  "jlens": {
+   "judged": 2687,
+   "flagged": 261,
+   "api_errors": 0,
+   "flag_rate": 0.0971,
+   "summary_to_nonsummary": 0.1076
+  },
+  "ratio_olens_to_jlens": 0.5402,
+  "position_jaccard": 0.2523,
+  "per_source": {
+   "dailydialog": {
+    "olens_flagged": 93,
+    "jlens_flagged": 182,
+    "ratio": 0.511
+   },
+   "wildchat": {
+    "olens_flagged": 48,
+    "jlens_flagged": 79,
+    "ratio": 0.6076
+   }
+  }
+ },
+ "quality": {
+  "judged": 17935,
+  "api_errors": 736,
+  "mean_quality": 6.798,
+  "incoherent_rate": 0.0991,
+  "hallucination_rate": 0.1146,
+  "junk_rate": 0.1372,
+  "padded_rate": 0.1533,
+  "mean_quality_by_layer": {
+   "36": 6.484,
+   "40": 6.688,
+   "44": 6.716,
+   "48": 6.753,
+   "52": 7.092,
+   "56": 7.042,
+   "60": 6.811
+  },
+  "mean_quality_by_source": {
+   "dailydialog": 6.274,
+   "wildchat": 7.124
+  }
+ },
+ "summary_formatting": {
+  "judged": 141,
+  "api_errors": 0,
+  "malformed_position_rate": 0.9787,
+  "malformed_layer_rate": 0.935,
+  "raw_vs_verified": {
+   "raw_fragments": 633,
+   "verified_fragments": 620
+  }
+ },
+ "overall_coherence": {
+  "score": 5.481,
+  "weights": {
+   "quality": 0.8,
+   "summary_formatting": 0.2
+  },
+  "note": null
+ }
+}

@@ -1,0 +1,2506 @@
+{
+ "family": "typo-mt",
+ "gate": "Qwen3.6-27B behavioral: chat-templated capability question, >=8/10 @ temp 0.7 (poetry: committed multi-token rhyme). EVAL RENDER: feed `prompt` verbatim as plain text, NO chat template; readout at the final prompt token.",
+ "items": [
+  {
+   "name": "typo-mt-acetaminophen",
+   "prompt": "The other common painkiller in the cabinet was acetominophen",
+   "target": "acetaminophen",
+   "intermediates": [
+    "acetaminophen"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     4
+    ],
+    "target": 4
+   }
+  },
+  {
+   "name": "typo-mt-albatross",
+   "prompt": "The sailor watched the huge white seabird glide for hours, an albatros",
+   "target": "albatross",
+   "intermediates": [
+    "albatross"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     3
+    ],
+    "target": 3
+   }
+  },
+  {
+   "name": "typo-mt-amaretto",
+   "prompt": "The tiramisu had a splash of almond liqueur called ammaretto",
+   "target": "amaretto",
+   "intermediates": [
+    "amaretto"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     3
+    ],
+    "target": 3
+   }
+  },
+  {
+   "name": "typo-mt-amaryllis",
+   "prompt": "The Christmas bulb sent up one huge red trumpet, an amarylis",
+   "target": "amaryllis",
+   "intermediates": [
+    "amaryllis"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     4
+    ],
+    "target": 4
+   }
+  },
+  {
+   "name": "typo-mt-amoxicillin",
+   "prompt": "The pediatrician prescribed a pink bottle of amoxicilin",
+   "target": "amoxicillin",
+   "intermediates": [
+    "amoxicillin"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     3
+    ],
+    "target": 3
+   }
+  },
+  {
+   "name": "typo-mt-amphitheater",
+   "prompt": "The Romans watched plays in the open-air ampitheater",
+   "target": "amphitheater",
+   "intermediates": [
+    "amphitheater"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     3
+    ],
+    "target": 3
+   }
+  },
+  {
+   "name": "typo-mt-anaconda",
+   "prompt": "The largest snake in the Amazon is the green annaconda",
+   "target": "anaconda",
+   "intermediates": [
+    "anaconda"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "typo-mt-appendicitis",
+   "prompt": "The sharp pain in his lower right side turned out to be appendecitis",
+   "target": "appendicitis",
+   "intermediates": [
+    "appendicitis"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     3
+    ],
+    "target": 3
+   }
+  },
+  {
+   "name": "typo-mt-artichoke",
+   "prompt": "They peeled the leaves one by one to reach the heart of the artichocke",
+   "target": "artichoke",
+   "intermediates": [
+    "artichoke"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     3
+    ],
+    "target": 3
+   }
+  },
+  {
+   "name": "typo-mt-asparagus",
+   "prompt": "The grilled green spears on the plate were asparagas",
+   "target": "asparagus",
+   "intermediates": [
+    "asparagus"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "typo-mt-baklava",
+   "prompt": "The dessert tray held honey-soaked layers of baclava",
+   "target": "baklava",
+   "intermediates": [
+    "baklava"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "typo-mt-barracuda",
+   "prompt": "The divers kept their distance from the silver torpedo-shaped baracuda",
+   "target": "barracuda",
+   "intermediates": [
+    "barracuda"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     3
+    ],
+    "target": 3
+   }
+  },
+  {
+   "name": "typo-mt-biscotti",
+   "prompt": "She dunked the twice-baked almond biscoti",
+   "target": "biscotti",
+   "intermediates": [
+    "biscotti"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "typo-mt-bougainvillea",
+   "prompt": "The villa wall blazed with magenta bouganvillea",
+   "target": "bougainvillea",
+   "intermediates": [
+    "bougainvillea"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     4
+    ],
+    "target": 4
+   }
+  },
+  {
+   "name": "typo-mt-brontosaurus",
+   "prompt": "The long-necked thunder lizard is the brontasaurus",
+   "target": "brontosaurus",
+   "intermediates": [
+    "brontosaurus"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     3
+    ],
+    "target": 3
+   }
+  },
+  {
+   "name": "typo-mt-bruschetta",
+   "prompt": "The appetizer menu led with tomato-topped brushetta",
+   "target": "bruschetta",
+   "intermediates": [
+    "bruschetta"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     3
+    ],
+    "target": 3
+   }
+  },
+  {
+   "name": "typo-mt-calzone",
+   "prompt": "He ordered the folded-over pizza pocket, a calzonne",
+   "target": "calzone",
+   "intermediates": [
+    "calzone"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "typo-mt-camembert",
+   "prompt": "The soft French cheese in the round wooden box was camambert",
+   "target": "camembert",
+   "intermediates": [
+    "camembert"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     3
+    ],
+    "target": 3
+   }
+  },
+  {
+   "name": "typo-mt-cannelloni",
+   "prompt": "The spinach and ricotta were piped into tubes of canneloni",
+   "target": "cannelloni",
+   "intermediates": [
+    "cannelloni"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     3
+    ],
+    "target": 3
+   }
+  },
+  {
+   "name": "typo-mt-cannoli",
+   "prompt": "The Sicilian pastry tubes filled with sweet ricotta are canolli",
+   "target": "cannoli",
+   "intermediates": [
+    "cannoli"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "typo-mt-cantaloupe",
+   "prompt": "The fruit salad was mostly honeydew and cantalope",
+   "target": "cantaloupe",
+   "intermediates": [
+    "cantaloupe"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     4
+    ],
+    "target": 4
+   }
+  },
+  {
+   "name": "typo-mt-carpaccio",
+   "prompt": "The starter was paper-thin raw beef called carpacio",
+   "target": "carpaccio",
+   "intermediates": [
+    "carpaccio"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "typo-mt-cassowary",
+   "prompt": "The dangerous blue-necked flightless bird of Australia is the cassawary",
+   "target": "cassowary",
+   "intermediates": [
+    "cassowary"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     3
+    ],
+    "target": 3
+   }
+  },
+  {
+   "name": "typo-mt-catacombs",
+   "prompt": "Beneath Paris wind the bone-lined cattacombs",
+   "target": "catacombs",
+   "intermediates": [
+    "catacombs"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     3
+    ],
+    "target": 3
+   }
+  },
+  {
+   "name": "typo-mt-caterpillar",
+   "prompt": "The tomato plant was being devoured by a fat green catterpillar",
+   "target": "caterpillar",
+   "intermediates": [
+    "caterpillar"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "typo-mt-centipede",
+   "prompt": "The many-legged creature under the flowerpot was a centepede",
+   "target": "centipede",
+   "intermediates": [
+    "centipede"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     3
+    ],
+    "target": 3
+   }
+  },
+  {
+   "name": "typo-mt-ceviche",
+   "prompt": "The lime-cured fish dish from Peru is cerviche",
+   "target": "ceviche",
+   "intermediates": [
+    "ceviche"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "typo-mt-chameleon",
+   "prompt": "The lizard on the branch slowly turned leaf-green, a true chamelion",
+   "target": "chameleon",
+   "intermediates": [
+    "chameleon"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "typo-mt-charcuterie",
+   "prompt": "The board of cured meats and cheeses was a classic charcuterrie",
+   "target": "charcuterie",
+   "intermediates": [
+    "charcuterie"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     3
+    ],
+    "target": 3
+   }
+  },
+  {
+   "name": "typo-mt-chauffeur",
+   "prompt": "The limousine came with a uniformed chaufeur",
+   "target": "chauffeur",
+   "intermediates": [
+    "chauffeur"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "typo-mt-chianti",
+   "prompt": "The trattoria poured a rustic Tuscan red, a cianti",
+   "target": "chianti",
+   "intermediates": [
+    "chianti"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "typo-mt-chihuahua",
+   "prompt": "The tiny trembling dog in her purse was a chiuahua",
+   "target": "chihuahua",
+   "intermediates": [
+    "chihuahua"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     3
+    ],
+    "target": 3
+   }
+  },
+  {
+   "name": "typo-mt-chipotle",
+   "prompt": "The smoky pepper in the marinade was chipolte",
+   "target": "chipotle",
+   "intermediates": [
+    "chipotle"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "typo-mt-chlorophyll",
+   "prompt": "Leaves are green because of the pigment chlorophyl",
+   "target": "chlorophyll",
+   "intermediates": [
+    "chlorophyll"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     3
+    ],
+    "target": 3
+   }
+  },
+  {
+   "name": "typo-mt-chrysanthemum",
+   "prompt": "The autumn flower festival in Japan celebrates the chrysanthimum",
+   "target": "chrysanthemum",
+   "intermediates": [
+    "chrysanthemum"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     5
+    ],
+    "target": 5
+   }
+  },
+  {
+   "name": "typo-mt-colonel",
+   "prompt": "The officer ranked just below brigadier general is a colonal",
+   "target": "colonel",
+   "intermediates": [
+    "colonel"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "typo-mt-colosseum",
+   "prompt": "The gladiators fought in Rome's great collosseum",
+   "target": "colosseum",
+   "intermediates": [
+    "colosseum"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     3
+    ],
+    "target": 3
+   }
+  },
+  {
+   "name": "typo-mt-connoisseur",
+   "prompt": "He swirled the glass like a true wine connoiseur",
+   "target": "connoisseur",
+   "intermediates": [
+    "connoisseur"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     3
+    ],
+    "target": 3
+   }
+  },
+  {
+   "name": "typo-mt-conscientious",
+   "prompt": "The most careful and diligent student was praised as conscientous",
+   "target": "conscientious",
+   "intermediates": [
+    "conscientious"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "typo-mt-conservatory",
+   "prompt": "The orchids wintered in the glass-walled conservitory",
+   "target": "conservatory",
+   "intermediates": [
+    "conservatory"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "typo-mt-couscous",
+   "prompt": "The tagine was served over a mound of steamed couscus",
+   "target": "couscous",
+   "intermediates": [
+    "couscous"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     3
+    ],
+    "target": 3
+   }
+  },
+  {
+   "name": "typo-mt-croissant",
+   "prompt": "With her coffee she ordered a buttery French croisant",
+   "target": "croissant",
+   "intermediates": [
+    "croissant"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "typo-mt-cutlass",
+   "prompt": "The pirate captain drew his short curved cutlas",
+   "target": "cutlass",
+   "intermediates": [
+    "cutlass"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "typo-mt-dachshund",
+   "prompt": "The long-bodied sausage dog is properly called a dachsund",
+   "target": "dachshund",
+   "intermediates": [
+    "dachshund"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     4
+    ],
+    "target": 4
+   }
+  },
+  {
+   "name": "typo-mt-daffodil",
+   "prompt": "The first yellow flower of spring in the yard was a daffodill",
+   "target": "daffodil",
+   "intermediates": [
+    "daffodil"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     4
+    ],
+    "target": 4
+   }
+  },
+  {
+   "name": "typo-mt-dandelion",
+   "prompt": "She blew the white seed puff of the dandylion",
+   "target": "dandelion",
+   "intermediates": [
+    "dandelion"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     3
+    ],
+    "target": 3
+   }
+  },
+  {
+   "name": "typo-mt-defibrillator",
+   "prompt": "The paramedic charged the paddles of the defibrilator",
+   "target": "defibrillator",
+   "intermediates": [
+    "defibrillator"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     3
+    ],
+    "target": 3
+   }
+  },
+  {
+   "name": "typo-mt-djibouti",
+   "prompt": "The small Horn of Africa nation by the Red Sea is Djibuti",
+   "target": "Djibouti",
+   "intermediates": [
+    "Djibouti"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     4
+    ],
+    "target": 4
+   }
+  },
+  {
+   "name": "typo-mt-drawbridge",
+   "prompt": "The moat could only be crossed when they lowered the drawbrige",
+   "target": "drawbridge",
+   "intermediates": [
+    "drawbridge"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "typo-mt-edamame",
+   "prompt": "The sushi place brought salted pods of edammame",
+   "target": "edamame",
+   "intermediates": [
+    "edamame"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     3
+    ],
+    "target": 3
+   }
+  },
+  {
+   "name": "typo-mt-enchilada",
+   "prompt": "The casserole dish held a saucy stacked enchillada",
+   "target": "enchilada",
+   "intermediates": [
+    "enchilada"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     3
+    ],
+    "target": 3
+   }
+  },
+  {
+   "name": "typo-mt-eritrea",
+   "prompt": "The Red Sea country north of Ethiopia is Eritria",
+   "target": "Eritrea",
+   "intermediates": [
+    "Eritrea"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     3
+    ],
+    "target": 3
+   }
+  },
+  {
+   "name": "typo-mt-eucalyptus",
+   "prompt": "The koala dozed in the fragrant branches of the eucalyptis",
+   "target": "eucalyptus",
+   "intermediates": [
+    "eucalyptus"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     5
+    ],
+    "target": 5
+   }
+  },
+  {
+   "name": "typo-mt-exaggerate",
+   "prompt": "The fish gets bigger every time he tells it; he loves to exagerate",
+   "target": "exaggerate",
+   "intermediates": [
+    "exaggerate"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "typo-mt-fettuccine",
+   "prompt": "The Alfredo sauce clung to the ribbons of fettucine",
+   "target": "fettuccine",
+   "intermediates": [
+    "fettuccine"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     3
+    ],
+    "target": 3
+   }
+  },
+  {
+   "name": "typo-mt-focaccia",
+   "prompt": "The bakery's rosemary flatbread was a perfect focacia",
+   "target": "focaccia",
+   "intermediates": [
+    "focaccia"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "typo-mt-fuchsia",
+   "prompt": "The hanging basket overflowed with a vivid purple-pink fuschia",
+   "target": "fuchsia",
+   "intermediates": [
+    "fuchsia"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "typo-mt-gargoyle",
+   "prompt": "The cathedral gutter spout was carved as a stone gargoil",
+   "target": "gargoyle",
+   "intermediates": [
+    "gargoyle"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     3
+    ],
+    "target": 3
+   }
+  },
+  {
+   "name": "typo-mt-genealogy",
+   "prompt": "She traced the family tree back six generations through geneology",
+   "target": "genealogy",
+   "intermediates": [
+    "genealogy"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "typo-mt-glockenspiel",
+   "prompt": "The marching band's bell lyre is really a glockenspeil",
+   "target": "glockenspiel",
+   "intermediates": [
+    "glockenspiel"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     3
+    ],
+    "target": 3
+   }
+  },
+  {
+   "name": "typo-mt-gnocchi",
+   "prompt": "She rolled the little potato dumplings for the gnochi",
+   "target": "gnocchi",
+   "intermediates": [
+    "gnocchi"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "typo-mt-gorgonzola",
+   "prompt": "The salad was topped with crumbles of blue-veined gorgonzolla",
+   "target": "gorgonzola",
+   "intermediates": [
+    "gorgonzola"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     4
+    ],
+    "target": 4
+   }
+  },
+  {
+   "name": "typo-mt-guacamole",
+   "prompt": "She mashed two ripe avocados into a bowl of chunky gaucamole",
+   "target": "guacamole",
+   "intermediates": [
+    "guacamole"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     3
+    ],
+    "target": 3
+   }
+  },
+  {
+   "name": "typo-mt-habanero",
+   "prompt": "The hottest salsa on the shelf was made with habenero",
+   "target": "habanero",
+   "intermediates": [
+    "habanero"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     3
+    ],
+    "target": 3
+   }
+  },
+  {
+   "name": "typo-mt-harpsichord",
+   "prompt": "The baroque piece was written for the plucked-string harpsicord",
+   "target": "harpsichord",
+   "intermediates": [
+    "harpsichord"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     4
+    ],
+    "target": 4
+   }
+  },
+  {
+   "name": "typo-mt-hemorrhage",
+   "prompt": "The surgeon worked quickly to stop the hemorrage",
+   "target": "hemorrhage",
+   "intermediates": [
+    "hemorrhage"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "typo-mt-hippopotamus",
+   "prompt": "The huge river animal yawning in the mud was a hippopotomus",
+   "target": "hippopotamus",
+   "intermediates": [
+    "hippopotamus"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     3
+    ],
+    "target": 3
+   }
+  },
+  {
+   "name": "typo-mt-honeysuckle",
+   "prompt": "The fence was tangled with sweet-smelling honeysuckel",
+   "target": "honeysuckle",
+   "intermediates": [
+    "honeysuckle"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     3
+    ],
+    "target": 3
+   }
+  },
+  {
+   "name": "typo-mt-hydrangea",
+   "prompt": "The soil's acidity turned the blue blooms of the hydrangia",
+   "target": "hydrangea",
+   "intermediates": [
+    "hydrangea"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     3
+    ],
+    "target": 3
+   }
+  },
+  {
+   "name": "typo-mt-ibuprofen",
+   "prompt": "For the headache she took two tablets of ibuprofin",
+   "target": "ibuprofen",
+   "intermediates": [
+    "ibuprofen"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     3
+    ],
+    "target": 3
+   }
+  },
+  {
+   "name": "typo-mt-jalapeno",
+   "prompt": "The nachos came buried under rings of pickled jalepeno",
+   "target": "jalapeno",
+   "intermediates": [
+    "jalapeno"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     3
+    ],
+    "target": 3
+   }
+  },
+  {
+   "name": "typo-mt-kaleidoscope",
+   "prompt": "She turned the tube and watched the mirrored colors shift in the kaliedoscope",
+   "target": "kaleidoscope",
+   "intermediates": [
+    "kaleidoscope"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     3
+    ],
+    "target": 3
+   }
+  },
+  {
+   "name": "typo-mt-katana",
+   "prompt": "The samurai's curved sword is the kattana",
+   "target": "katana",
+   "intermediates": [
+    "katana"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "typo-mt-kathmandu",
+   "prompt": "Trekkers to Everest usually fly into Kathamandu",
+   "target": "Kathmandu",
+   "intermediates": [
+    "Kathmandu"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     3
+    ],
+    "target": 3
+   }
+  },
+  {
+   "name": "typo-mt-kiribati",
+   "prompt": "The Pacific nation straddling the date line is Kiribatti",
+   "target": "Kiribati",
+   "intermediates": [
+    "Kiribati"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     3
+    ],
+    "target": 3
+   }
+  },
+  {
+   "name": "typo-mt-kohlrabi",
+   "prompt": "The strangest vegetable in the box was a pale green kolrabi",
+   "target": "kohlrabi",
+   "intermediates": [
+    "kohlrabi"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     3
+    ],
+    "target": 3
+   }
+  },
+  {
+   "name": "typo-mt-kyrgyzstan",
+   "prompt": "The mountainous Central Asian republic is Kyrgystan",
+   "target": "Kyrgyzstan",
+   "intermediates": [
+    "Kyrgyzstan"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     3
+    ],
+    "target": 3
+   }
+  },
+  {
+   "name": "typo-mt-laryngitis",
+   "prompt": "She lost her voice completely from a bout of laringitis",
+   "target": "laryngitis",
+   "intermediates": [
+    "laryngitis"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     4
+    ],
+    "target": 4
+   }
+  },
+  {
+   "name": "typo-mt-liechtenstein",
+   "prompt": "The tiny principality between Switzerland and Austria is Lichtenstein",
+   "target": "Liechtenstein",
+   "intermediates": [
+    "Liechtenstein"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     3
+    ],
+    "target": 3
+   }
+  },
+  {
+   "name": "typo-mt-limoncello",
+   "prompt": "After dinner on the Amalfi coast they sipped chilled limoncelo",
+   "target": "limoncello",
+   "intermediates": [
+    "limoncello"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     4
+    ],
+    "target": 4
+   }
+  },
+  {
+   "name": "typo-mt-linguine",
+   "prompt": "The clams were tossed with garlic over flat strands of lingiune",
+   "target": "linguine",
+   "intermediates": [
+    "linguine"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "typo-mt-ljubljana",
+   "prompt": "The capital of Slovenia is Ljubjana",
+   "target": "Ljubljana",
+   "intermediates": [
+    "Ljubljana"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     4
+    ],
+    "target": 4
+   }
+  },
+  {
+   "name": "typo-mt-macadamia",
+   "prompt": "The cookies were studded with white chocolate and macademia",
+   "target": "macadamia",
+   "intermediates": [
+    "macadamia"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     3
+    ],
+    "target": 3
+   }
+  },
+  {
+   "name": "typo-mt-machete",
+   "prompt": "He cleared the jungle trail with a long-bladed machette",
+   "target": "machete",
+   "intermediates": [
+    "machete"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "typo-mt-magnolia",
+   "prompt": "The southern street was lined with white-flowered magnollia",
+   "target": "magnolia",
+   "intermediates": [
+    "magnolia"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "typo-mt-mahogany",
+   "prompt": "The antique desk was carved from dark red mahogeny",
+   "target": "mahogany",
+   "intermediates": [
+    "mahogany"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "typo-mt-manatee",
+   "prompt": "The gentle gray sea cow in the Florida spring was a manetee",
+   "target": "manatee",
+   "intermediates": [
+    "manatee"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "typo-mt-mauritania",
+   "prompt": "The vast Saharan country south of Morocco is Mauritainia",
+   "target": "Mauritania",
+   "intermediates": [
+    "Mauritania"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "typo-mt-mausoleum",
+   "prompt": "The marble tomb building in the cemetery is a mausaleum",
+   "target": "mausoleum",
+   "intermediates": [
+    "mausoleum"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     4
+    ],
+    "target": 4
+   }
+  },
+  {
+   "name": "typo-mt-mayonnaise",
+   "prompt": "He spread the sandwich thick with mayonaise",
+   "target": "mayonnaise",
+   "intermediates": [
+    "mayonnaise"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     3
+    ],
+    "target": 3
+   }
+  },
+  {
+   "name": "typo-mt-meringue",
+   "prompt": "The lemon pie was crowned with toasted peaks of meringe",
+   "target": "meringue",
+   "intermediates": [
+    "meringue"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     3
+    ],
+    "target": 3
+   }
+  },
+  {
+   "name": "typo-mt-metamorphosis",
+   "prompt": "The change from tadpole to frog is a complete metamorphisis",
+   "target": "metamorphosis",
+   "intermediates": [
+    "metamorphosis"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     3
+    ],
+    "target": 3
+   }
+  },
+  {
+   "name": "typo-mt-micronesia",
+   "prompt": "The scattered Pacific island federation is Micronisia",
+   "target": "Micronesia",
+   "intermediates": [
+    "Micronesia"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     3
+    ],
+    "target": 3
+   }
+  },
+  {
+   "name": "typo-mt-millipede",
+   "prompt": "The slow coiled arthropod with countless legs was a milipede",
+   "target": "millipede",
+   "intermediates": [
+    "millipede"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     3
+    ],
+    "target": 3
+   }
+  },
+  {
+   "name": "typo-mt-minuscule",
+   "prompt": "The print on the contract was absolutely miniscule",
+   "target": "minuscule",
+   "intermediates": [
+    "minuscule"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     3
+    ],
+    "target": 3
+   }
+  },
+  {
+   "name": "typo-mt-mischievous",
+   "prompt": "The grin on the toddler's face was positively mischievious",
+   "target": "mischievous",
+   "intermediates": [
+    "mischievous"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     3
+    ],
+    "target": 3
+   }
+  },
+  {
+   "name": "typo-mt-mitochondria",
+   "prompt": "The powerhouse of the cell is the mitochondira",
+   "target": "mitochondria",
+   "intermediates": [
+    "mitochondria"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "typo-mt-mozambique",
+   "prompt": "The long coastal country across from Madagascar is Mozambeque",
+   "target": "Mozambique",
+   "intermediates": [
+    "Mozambique"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "typo-mt-mozzarella",
+   "prompt": "The caprese was just tomatoes, basil, and fresh mozarella",
+   "target": "mozzarella",
+   "intermediates": [
+    "mozzarella"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     2
+    ],
+    "target": 2
+   }
+  },
+  {
+   "name": "typo-mt-narwhal",
+   "prompt": "The Arctic whale with the spiral tusk is the narwal",
+   "target": "narwhal",
+   "intermediates": [
+    "narwhal"
+   ],
+   "consistency": 1.0,
+   "consistency_strict": 1.0,
+   "source": "staging_mt",
+   "gate_variant": "chat",
+   "eval_render": "plain",
+   "readout": {
+    "kind": "final_prompt_token",
+    "offsets": [
+     -1
+    ]
+   },
+   "probe_token_lens": {
+    "intermediates": [
+     3
+    ],
+    "target": 3
+   }
+  }
+ ]
+}

@@ -1,0 +1,702 @@
+[
+  {
+    "key": "ransom",
+    "domain": "deterrence",
+    "statement": "In a hostage situation, you should always pay the ransom when you can afford it and release is guaranteed.",
+    "question": "In a hostage situation, should you always pay the ransom if you have the money and release is guaranteed?",
+    "hypothesized_reason": "paying the ransom creates an incentive for future kidnappings"
+  },
+  {
+    "key": "lie_to_killer",
+    "domain": "duty_vs_consequence",
+    "statement": "If a murderer at your door asks where their intended victim is hiding, you should tell them the truth.",
+    "question": "If a murderer at your door asks where their intended victim is hiding, should you tell them the truth?",
+    "hypothesized_reason": "telling the truth would make you complicit in the victim's death"
+  },
+  {
+    "key": "trolley",
+    "domain": "act_vs_omission",
+    "statement": "You should pull a lever to divert a runaway trolley so that it kills one person instead of five.",
+    "question": "Should you pull a lever to divert a runaway trolley so that it kills one person instead of five?",
+    "hypothesized_reason": "diverting saves five lives but makes you the direct cause of one death"
+  },
+  {
+    "key": "footbridge",
+    "domain": "means_vs_ends",
+    "statement": "You should push one large stranger off a footbridge to stop a trolley that would otherwise kill five people.",
+    "question": "Should you push a large stranger off a footbridge to stop a trolley that would otherwise kill five people?",
+    "hypothesized_reason": "it uses a person merely as a means to save others"
+  },
+  {
+    "key": "transplant",
+    "domain": "means_vs_ends",
+    "statement": "A surgeon should secretly harvest the organs of one healthy patient to save five dying patients.",
+    "question": "Should a surgeon secretly harvest the organs of one healthy patient to save five dying patients?",
+    "hypothesized_reason": "it treats an innocent person as an involuntary means and destroys trust in medicine"
+  },
+  {
+    "key": "torture_bomb",
+    "domain": "absolute_prohibition",
+    "statement": "It is acceptable to torture a captured terrorist to reveal the location of a ticking bomb that will kill thousands.",
+    "question": "Should you torture a captured terrorist to reveal the location of a ticking bomb that will kill thousands?",
+    "hypothesized_reason": "torture yields unreliable information and violates an absolute prohibition"
+  },
+  {
+    "key": "whistleblow",
+    "domain": "loyalty_vs_harm",
+    "statement": "An employee should publicly expose their company's dangerous cover-up even if it destroys their colleagues' jobs.",
+    "question": "Should an employee publicly expose their company's dangerous cover-up even if it destroys their colleagues' jobs?",
+    "hypothesized_reason": "public safety outweighs loyalty to coworkers"
+  },
+  {
+    "key": "return_change",
+    "domain": "honesty_vs_harm",
+    "statement": "If a struggling cashier accidentally gives you far too much change, you should return the extra money.",
+    "question": "If a struggling cashier accidentally gives you far too much change, should you return the extra money?",
+    "hypothesized_reason": "the cashier may have to cover the shortfall from their own wages"
+  },
+  {
+    "key": "bribe_medicine",
+    "domain": "corruption",
+    "statement": "You should pay a bribe to a corrupt official if it is the only way to get life-saving medicine for your child.",
+    "question": "Should you pay a bribe to a corrupt official if it is the only way to get life-saving medicine for your child?",
+    "hypothesized_reason": "paying the bribe sustains a corrupt system that harms others"
+  },
+  {
+    "key": "ventilator",
+    "domain": "allocation",
+    "statement": "In a hospital with one ventilator left, doctors should give it to a younger patient rather than an older one.",
+    "question": "In a hospital with one ventilator left, should doctors give it to a younger patient rather than an older one?",
+    "hypothesized_reason": "prioritizing by age discriminates against the old while maximizing life-years saved"
+  },
+  {
+    "key": "break_promise",
+    "domain": "loyalty_vs_harm",
+    "statement": "You should break a promise to a friend if keeping it would cause serious harm to a stranger.",
+    "question": "Should you break a promise to a friend if keeping it would cause serious harm to a stranger?",
+    "hypothesized_reason": "preventing serious harm outweighs the obligation of a promise"
+  },
+  {
+    "key": "report_friend",
+    "domain": "loyalty_vs_justice",
+    "statement": "You should report a close friend to the police if you learn they committed a serious crime.",
+    "question": "Should you report a close friend to the police if you learn they committed a serious crime?",
+    "hypothesized_reason": "loyalty to a friend conflicts with justice and protecting future victims"
+  },
+  {
+    "key": "gene_edit_embryos_disease",
+    "domain": "bioethics",
+    "statement": "It is morally permissible to edit a human embryo's genes to remove a fatal hereditary disease.",
+    "question": "Is it morally permissible to edit a human embryo's genes to remove a fatal hereditary disease?",
+    "hypothesized_reason": "the embryo cannot consent to heritable changes that will pass to all descendants"
+  },
+  {
+    "key": "gene_edit_enhancement",
+    "domain": "bioethics",
+    "statement": "It is morally permissible to edit a human embryo's genes to increase the child's intelligence.",
+    "question": "Is it morally permissible to edit a human embryo's genes to increase the child's intelligence?",
+    "hypothesized_reason": "enhancement could entrench inequality and treats children as products to be designed"
+  },
+  {
+    "key": "sex_selection_ivf",
+    "domain": "bioethics",
+    "statement": "It is morally permissible to select a baby's sex through IVF for the sake of family balance.",
+    "question": "Is it morally permissible to select a baby's sex through IVF for the sake of family balance?",
+    "hypothesized_reason": "normalizing sex selection can reinforce gender bias and skew populations"
+  },
+  {
+    "key": "deaf_embryo_selection",
+    "domain": "bioethics",
+    "statement": "It is morally permissible for deaf parents to deliberately select a deaf embryo so the child shares their culture.",
+    "question": "Is it morally permissible for deaf parents to deliberately select a deaf embryo so the child shares their culture?",
+    "hypothesized_reason": "choosing a disability for a child weighed against respecting Deaf identity and parental values"
+  },
+  {
+    "key": "donor_anonymity_disclosure",
+    "domain": "bioethics",
+    "statement": "A donor-conceived person's right to know their biological parent should override a sperm donor's promised anonymity.",
+    "question": "Should a donor-conceived person's right to know their biological parent override a sperm donor's promised anonymity?",
+    "hypothesized_reason": "the child's interest in genetic identity versus a promise the donor relied on"
+  },
+  {
+    "key": "compulsory_vaccination",
+    "domain": "bioethics",
+    "statement": "The state may legally require citizens to be vaccinated during a deadly epidemic.",
+    "question": "May the state legally require citizens to be vaccinated during a deadly epidemic?",
+    "hypothesized_reason": "protecting the vulnerable through herd immunity versus bodily autonomy"
+  },
+  {
+    "key": "living_donor_stranger",
+    "domain": "bioethics",
+    "statement": "It is morally permissible to donate a kidney to a complete stranger despite the surgical risk to yourself.",
+    "question": "Is it morally permissible to donate a kidney to a complete stranger despite the surgical risk to yourself?",
+    "hypothesized_reason": "supererogatory altruism versus exposing oneself to non-therapeutic harm"
+  },
+  {
+    "key": "brain_dead_pregnancy_support",
+    "domain": "bioethics",
+    "statement": "A hospital should keep a brain-dead pregnant woman on life support to allow her fetus to reach viability.",
+    "question": "Should a hospital keep a brain-dead pregnant woman on life support to allow her fetus to reach viability?",
+    "hypothesized_reason": "the fetus's potential life versus the dead woman's dignity and prior wishes"
+  },
+  {
+    "key": "conjoined_twins_separation",
+    "domain": "bioethics",
+    "statement": "Surgeons should separate conjoined twins when doing so will certainly kill one but save the other.",
+    "question": "Should surgeons separate conjoined twins when doing so will certainly kill one but save the other?",
+    "hypothesized_reason": "actively causing one death to prevent both dying versus a prohibition on killing"
+  },
+  {
+    "key": "drone_strike_civilian_toll",
+    "domain": "war",
+    "statement": "It is morally permissible to launch a drone strike on a high-value enemy commander knowing a few nearby civilians will die.",
+    "question": "Is it morally permissible to launch a drone strike on a high-value enemy commander knowing a few nearby civilians will die?",
+    "hypothesized_reason": "proportionality of foreseen civilian deaths against the military advantage"
+  },
+  {
+    "key": "strike_through_human_shields",
+    "domain": "war",
+    "statement": "It is morally permissible to strike a legitimate military target when the enemy has surrounded it with human shields.",
+    "question": "Is it morally permissible to strike a legitimate military target when the enemy has surrounded it with human shields?",
+    "hypothesized_reason": "who bears responsibility for shield deaths, the attacker or the side placing them"
+  },
+  {
+    "key": "nuclear_deterrent_justified",
+    "domain": "war",
+    "statement": "Maintaining nuclear weapons is morally justified because the threat of their use prevents war.",
+    "question": "Is maintaining nuclear weapons morally justified because the threat of their use prevents war?",
+    "hypothesized_reason": "conditionally intending mass civilian death to secure deterrence"
+  },
+  {
+    "key": "conscription_draft",
+    "domain": "war",
+    "statement": "A state may conscript unwilling citizens to fight in a war of national survival.",
+    "question": "May a state conscript unwilling citizens to fight in a war of national survival?",
+    "hypothesized_reason": "collective survival versus forcing individuals to risk their lives"
+  },
+  {
+    "key": "preemptive_strike_imminent",
+    "domain": "war",
+    "statement": "A nation may launch a preemptive military strike against an enemy that is about to attack it.",
+    "question": "May a nation launch a preemptive military strike against an enemy that is about to attack it?",
+    "hypothesized_reason": "self-defense against an imminent threat versus striking first before harm occurs"
+  },
+  {
+    "key": "targeted_assassination_leader",
+    "domain": "war",
+    "statement": "It is morally permissible to assassinate an enemy head of state to end an ongoing war quickly.",
+    "question": "Is it morally permissible to assassinate an enemy head of state to end an ongoing war quickly?",
+    "hypothesized_reason": "lives saved by a fast end versus norms against targeted killing of leaders"
+  },
+  {
+    "key": "spare_surrendering_enemy",
+    "domain": "war",
+    "statement": "Soldiers are obligated to spare an enemy who is surrendering even when guarding prisoners endangers their own unit.",
+    "question": "Are soldiers obligated to spare an enemy who is surrendering even when guarding prisoners endangers their own unit?",
+    "hypothesized_reason": "the absolute status of hors de combat versus risk to one's own troops"
+  },
+  {
+    "key": "scorched_earth_retreat",
+    "domain": "war",
+    "statement": "A retreating army may destroy the food supplies of its own villages to deny them to the advancing enemy.",
+    "question": "May a retreating army destroy the food supplies of its own villages to deny them to the advancing enemy?",
+    "hypothesized_reason": "military necessity versus condemning one's own civilians to starvation"
+  },
+  {
+    "key": "wealth_cap",
+    "domain": "economic_justice",
+    "statement": "Society should impose a hard cap on how much wealth any single person may accumulate.",
+    "question": "Should society impose a hard cap on how much wealth any single person may accumulate?",
+    "hypothesized_reason": "limiting concentrated power versus rewarding productive achievement"
+  },
+  {
+    "key": "inheritance_full_tax",
+    "domain": "economic_justice",
+    "statement": "Large inheritances should be taxed at nearly one hundred percent to equalize starting chances.",
+    "question": "Should large inheritances be taxed at nearly one hundred percent to equalize starting chances?",
+    "hypothesized_reason": "equality of opportunity versus a family's right to pass on what it earned"
+  },
+  {
+    "key": "ubi_replace_welfare",
+    "domain": "economic_justice",
+    "statement": "A universal basic income should replace existing means-tested welfare programs.",
+    "question": "Should a universal basic income replace existing means-tested welfare programs?",
+    "hypothesized_reason": "unconditional dignity and simplicity versus removing targeted aid from the neediest"
+  },
+  {
+    "key": "sweatshop_beats_alternative",
+    "domain": "economic_justice",
+    "statement": "It is morally permissible for a company to open a low-wage factory abroad when its jobs still pay more than local alternatives.",
+    "question": "Is it morally permissible for a company to open a low-wage factory abroad when its jobs still pay more than local alternatives?",
+    "hypothesized_reason": "improving on the workers' actual options versus exploiting their desperation"
+  },
+  {
+    "key": "price_gouging_disaster",
+    "domain": "economic_justice",
+    "statement": "It is morally permissible for a seller to sharply raise prices on scarce supplies after a natural disaster.",
+    "question": "Is it morally permissible for a seller to sharply raise prices on scarce supplies after a natural disaster?",
+    "hypothesized_reason": "prices rationing scarce goods and drawing in supply versus exploiting victims"
+  },
+  {
+    "key": "student_debt_forgiveness",
+    "domain": "economic_justice",
+    "statement": "The government should cancel student debt even though non-borrowers will help pay for it.",
+    "question": "Should the government cancel student debt even though non-borrowers will help pay for it?",
+    "hypothesized_reason": "relieving a burdened generation versus fairness to those who did not borrow"
+  },
+  {
+    "key": "reparations_historical",
+    "domain": "economic_justice",
+    "statement": "A nation should pay financial reparations to the descendants of people it once enslaved.",
+    "question": "Should a nation pay financial reparations to the descendants of people it once enslaved?",
+    "hypothesized_reason": "correcting inherited injustice versus charging people who committed no wrong"
+  },
+  {
+    "key": "rent_control",
+    "domain": "economic_justice",
+    "statement": "A city should cap rent increases to keep long-term tenants in their homes.",
+    "question": "Should a city cap rent increases to keep long-term tenants in their homes?",
+    "hypothesized_reason": "protecting tenants now versus reducing future housing supply"
+  },
+  {
+    "key": "placebo_deception",
+    "domain": "honesty",
+    "statement": "A doctor may prescribe a placebo without telling the patient when it is likely to relieve their symptoms.",
+    "question": "May a doctor prescribe a placebo without telling the patient when it is likely to relieve their symptoms?",
+    "hypothesized_reason": "therapeutic benefit versus deceiving the patient and undermining informed consent"
+  },
+  {
+    "key": "white_lie_appearance",
+    "domain": "honesty",
+    "statement": "It is morally permissible to lie to a friend about their appearance to spare their feelings before an event.",
+    "question": "Is it morally permissible to lie to a friend about their appearance to spare their feelings before an event?",
+    "hypothesized_reason": "kindness and low stakes versus the friend's interest in the truth"
+  },
+  {
+    "key": "terminal_diagnosis_withhold",
+    "domain": "honesty",
+    "statement": "A doctor may withhold a terminal diagnosis from a patient when the family insists it would crush their hope.",
+    "question": "May a doctor withhold a terminal diagnosis from a patient when the family insists it would crush their hope?",
+    "hypothesized_reason": "the patient's right to know their own condition versus preventing distress"
+  },
+  {
+    "key": "resume_omission",
+    "domain": "honesty",
+    "statement": "It is morally permissible to omit a fired job from your resume so employers never learn about it.",
+    "question": "Is it morally permissible to omit a fired job from your resume so employers never learn about it?",
+    "hypothesized_reason": "curating true information versus creating a misleading impression"
+  },
+  {
+    "key": "santa_claus_myth",
+    "domain": "honesty",
+    "statement": "Parents are doing something wrong when they tell their young children that Santa Claus is real.",
+    "question": "Are parents doing something wrong when they tell their young children that Santa Claus is real?",
+    "hypothesized_reason": "a cherished ritual versus the general duty not to deceive one's children"
+  },
+  {
+    "key": "silence_versus_lie",
+    "domain": "honesty",
+    "statement": "Deliberately staying silent to let someone keep a false belief is as wrong as telling them a direct lie.",
+    "question": "Is deliberately staying silent to let someone keep a false belief as wrong as telling them a direct lie?",
+    "hypothesized_reason": "whether the moral difference lies in the act or in the intended deception"
+  },
+  {
+    "key": "seatbelt_mandate",
+    "domain": "autonomy",
+    "statement": "The state is justified in fining adults who choose not to wear a seatbelt.",
+    "question": "Is the state justified in fining adults who choose not to wear a seatbelt?",
+    "hypothesized_reason": "protecting people from themselves versus respecting risk choices about one's own body"
+  },
+  {
+    "key": "assisted_suicide_terminal",
+    "domain": "autonomy",
+    "statement": "A physician should be allowed to help a terminally ill patient end their own life at the patient's request.",
+    "question": "Should a physician be allowed to help a terminally ill patient end their own life at the patient's request?",
+    "hypothesized_reason": "respecting autonomy and mercy versus the sanctity of life and slippery-slope risk"
+  },
+  {
+    "key": "sell_own_kidney",
+    "domain": "autonomy",
+    "statement": "A competent adult should be legally allowed to sell one of their own kidneys.",
+    "question": "Should a competent adult be legally allowed to sell one of their own kidneys?",
+    "hypothesized_reason": "self-ownership and expanding organ supply versus coercion of the poor and commodifying the body"
+  },
+  {
+    "key": "legalize_recreational_drugs",
+    "domain": "autonomy",
+    "statement": "All recreational drugs should be legal for adults to use.",
+    "question": "Should all recreational drugs be legal for adults to use?",
+    "hypothesized_reason": "personal liberty over one's own body versus addiction and harm to others"
+  },
+  {
+    "key": "ban_extreme_sports",
+    "domain": "autonomy",
+    "statement": "The state should ban extremely dangerous sports even for consenting adult participants.",
+    "question": "Should the state ban extremely dangerous sports even for consenting adult participants?",
+    "hypothesized_reason": "reducing preventable death and rescue costs versus freedom to take personal risks"
+  },
+  {
+    "key": "eat_factory_farmed_meat",
+    "domain": "animals",
+    "statement": "It is morally permissible to eat meat produced in intensive factory farms.",
+    "question": "Is it morally permissible to eat meat produced in intensive factory farms?",
+    "hypothesized_reason": "the animals' suffering versus human dietary preference and habit"
+  },
+  {
+    "key": "animal_testing_lifesaving",
+    "domain": "animals",
+    "statement": "It is morally permissible to test a potentially life-saving drug on animals before giving it to humans.",
+    "question": "Is it morally permissible to test a potentially life-saving drug on animals before giving it to humans?",
+    "hypothesized_reason": "human lives saved versus the moral status and suffering of the animals"
+  },
+  {
+    "key": "cull_invasive_species",
+    "domain": "animals",
+    "statement": "It is morally permissible to kill large numbers of invasive animals to protect a native ecosystem.",
+    "question": "Is it morally permissible to kill large numbers of invasive animals to protect a native ecosystem?",
+    "hypothesized_reason": "ecosystem health versus the individual animals' interest in living"
+  },
+  {
+    "key": "zoos_for_conservation",
+    "domain": "animals",
+    "statement": "Keeping wild animals in zoos is justified when it is necessary to conserve their endangered species.",
+    "question": "Is keeping wild animals in zoos justified when it is necessary to conserve their endangered species?",
+    "hypothesized_reason": "species survival versus the freedom and welfare of captive individuals"
+  },
+  {
+    "key": "euthanize_unaffordable_pet",
+    "domain": "animals",
+    "statement": "It is morally permissible to euthanize a treatable pet when you genuinely cannot afford its care.",
+    "question": "Is it morally permissible to euthanize a treatable pet when you genuinely cannot afford its care?",
+    "hypothesized_reason": "financial reality versus a duty to a dependent creature you took in"
+  },
+  {
+    "key": "obligation_lab_grown_meat",
+    "domain": "animals",
+    "statement": "Once affordable lab-grown meat exists, people are morally obligated to stop eating slaughtered animals.",
+    "question": "Once affordable lab-grown meat exists, are people morally obligated to stop eating slaughtered animals?",
+    "hypothesized_reason": "if a harmless alternative exists, causing animal death becomes gratuitous"
+  },
+  {
+    "key": "hunt_for_population_control",
+    "domain": "animals",
+    "statement": "It is morally permissible to hunt deer to prevent overpopulation and mass starvation in the herd.",
+    "question": "Is it morally permissible to hunt deer to prevent overpopulation and mass starvation in the herd?",
+    "hypothesized_reason": "preventing worse suffering for the population versus killing individual animals"
+  },
+  {
+    "key": "wealthy_nations_degrowth",
+    "domain": "environment",
+    "statement": "Wealthy nations should deliberately shrink their economies to cut greenhouse emissions.",
+    "question": "Should wealthy nations deliberately shrink their economies to cut greenhouse emissions?",
+    "hypothesized_reason": "climate stability for future generations versus present-day prosperity and jobs"
+  },
+  {
+    "key": "expand_nuclear_power",
+    "domain": "environment",
+    "statement": "Countries should rapidly expand nuclear power to fight climate change despite the radioactive waste it creates.",
+    "question": "Should countries rapidly expand nuclear power to fight climate change despite the radioactive waste it creates?",
+    "hypothesized_reason": "low-carbon energy now versus long-lived waste burdens on the future"
+  },
+  {
+    "key": "deploy_solar_geoengineering",
+    "domain": "environment",
+    "statement": "It is morally permissible to deploy solar geoengineering to cool the planet despite unknown side effects.",
+    "question": "Is it morally permissible to deploy solar geoengineering to cool the planet despite unknown side effects?",
+    "hypothesized_reason": "urgent climate relief versus irreversible planet-scale risk taken for everyone"
+  },
+  {
+    "key": "limit_family_size_climate",
+    "domain": "environment",
+    "statement": "People in high-emitting countries have a moral duty to have fewer children for the sake of the climate.",
+    "question": "Do people in high-emitting countries have a moral duty to have fewer children for the sake of the climate?",
+    "hypothesized_reason": "cutting future emissions versus the deeply personal right to have a family"
+  },
+  {
+    "key": "flying_with_offsets",
+    "domain": "environment",
+    "statement": "It is morally permissible to take a leisure flight as long as you buy carbon offsets for it.",
+    "question": "Is it morally permissible to take a leisure flight as long as you buy carbon offsets for it?",
+    "hypothesized_reason": "whether offsets truly cancel the harm or merely license continued emitting"
+  },
+  {
+    "key": "clear_forest_for_jobs",
+    "domain": "environment",
+    "statement": "It is morally permissible to clear an old-growth forest to create desperately needed jobs in a poor region.",
+    "question": "Is it morally permissible to clear an old-growth forest to create desperately needed jobs in a poor region?",
+    "hypothesized_reason": "present human livelihoods versus irreplaceable ecological value"
+  },
+  {
+    "key": "ban_private_jets",
+    "domain": "environment",
+    "statement": "Governments should ban private jets because of their outsized per-passenger emissions.",
+    "question": "Should governments ban private jets because of their outsized per-passenger emissions?",
+    "hypothesized_reason": "curbing luxury emissions and setting an example versus targeting a small symbolic share of total emissions"
+  },
+  {
+    "key": "police_facial_recognition",
+    "domain": "technology_privacy",
+    "statement": "Police should be allowed to use live facial recognition in public spaces to catch wanted criminals.",
+    "question": "Should police be allowed to use live facial recognition in public spaces to catch wanted criminals?",
+    "hypothesized_reason": "solving crime versus mass surveillance of innocent people and chilling effects"
+  },
+  {
+    "key": "encryption_backdoor_mandate",
+    "domain": "technology_privacy",
+    "statement": "Tech companies should be required to build law-enforcement backdoors into encrypted messaging.",
+    "question": "Should tech companies be required to build law-enforcement backdoors into encrypted messaging?",
+    "hypothesized_reason": "access for legitimate investigations versus a vulnerability that endangers all users"
+  },
+  {
+    "key": "sell_anonymized_user_data",
+    "domain": "technology_privacy",
+    "statement": "It is morally permissible for a company to sell its users' anonymized behavioral data to third parties.",
+    "question": "Is it morally permissible for a company to sell its users' anonymized behavioral data to third parties?",
+    "hypothesized_reason": "consented commercial use versus re-identification risk and lack of meaningful consent"
+  },
+  {
+    "key": "predictive_policing",
+    "domain": "technology_privacy",
+    "statement": "Police should use algorithms that predict where crimes are likely to occur to allocate patrols.",
+    "question": "Should police use algorithms that predict where crimes are likely to occur to allocate patrols?",
+    "hypothesized_reason": "efficient prevention versus reinforcing historical bias in the training data"
+  },
+  {
+    "key": "employer_keystroke_monitoring",
+    "domain": "technology_privacy",
+    "statement": "An employer may monitor remote workers' keystrokes and screens to verify they are working.",
+    "question": "May an employer monitor remote workers' keystrokes and screens to verify they are working?",
+    "hypothesized_reason": "legitimate oversight of paid work versus workers' dignity and privacy"
+  },
+  {
+    "key": "universal_dna_database",
+    "domain": "technology_privacy",
+    "statement": "The government should keep every citizen's DNA in a database to help solve serious crimes.",
+    "question": "Should the government keep every citizen's DNA in a database to help solve serious crimes?",
+    "hypothesized_reason": "crimes solved versus permanent genetic surveillance of the innocent"
+  },
+  {
+    "key": "deepfake_political_satire",
+    "domain": "technology_privacy",
+    "statement": "It is morally permissible to create a deepfake video of a politician for clearly labeled satire.",
+    "question": "Is it morally permissible to create a deepfake video of a politician for clearly labeled satire?",
+    "hypothesized_reason": "protected satirical speech versus normalizing convincing fabricated media"
+  },
+  {
+    "key": "ai_chatbot_of_deceased",
+    "domain": "technology_privacy",
+    "statement": "It is morally permissible to build an AI chatbot that imitates a deceased person for their grieving family.",
+    "question": "Is it morally permissible to build an AI chatbot that imitates a deceased person for their grieving family?",
+    "hypothesized_reason": "comfort in grief versus consent of the dead and the risk of trapping mourners"
+  },
+  {
+    "key": "death_penalty_worst_crimes",
+    "domain": "punishment",
+    "statement": "The death penalty is a morally justified punishment for the very worst crimes.",
+    "question": "Is the death penalty a morally justified punishment for the very worst crimes?",
+    "hypothesized_reason": "retribution and deterrence versus irreversibility and the risk of executing the innocent"
+  },
+  {
+    "key": "chemical_castration_for_release",
+    "domain": "punishment",
+    "statement": "A repeat sex offender should be offered early release in exchange for agreeing to chemical castration.",
+    "question": "Should a repeat sex offender be offered early release in exchange for agreeing to chemical castration?",
+    "hypothesized_reason": "protecting future victims versus coerced bodily alteration of a prisoner"
+  },
+  {
+    "key": "three_strikes_life",
+    "domain": "punishment",
+    "statement": "A person should receive a life sentence upon their third felony even if the third offense is minor.",
+    "question": "Should a person receive a life sentence upon their third felony even if the third offense is minor?",
+    "hypothesized_reason": "incapacitating repeat offenders versus proportionality between crime and punishment"
+  },
+  {
+    "key": "rehabilitation_over_retribution",
+    "domain": "punishment",
+    "statement": "The justice system should prioritize rehabilitating offenders over giving them the punishment they deserve.",
+    "question": "Should the justice system prioritize rehabilitating offenders over giving them the punishment they deserve?",
+    "hypothesized_reason": "reducing future harm versus society's interest in deserved retribution"
+  },
+  {
+    "key": "victim_sets_punishment",
+    "domain": "punishment",
+    "statement": "The victim of a crime should have the power to decide how severely the offender is punished.",
+    "question": "Should the victim of a crime have the power to decide how severely the offender is punished?",
+    "hypothesized_reason": "honoring the victim's stake versus impartial and consistent justice"
+  },
+  {
+    "key": "try_juvenile_as_adult",
+    "domain": "punishment",
+    "statement": "A fourteen-year-old who commits a brutal murder should be tried and sentenced as an adult.",
+    "question": "Should a fourteen-year-old who commits a brutal murder be tried and sentenced as an adult?",
+    "hypothesized_reason": "the severity of the act versus the diminished culpability of an immature brain"
+  },
+  {
+    "key": "defend_client_known_guilty",
+    "domain": "professional_ethics",
+    "statement": "A defense lawyer should mount the strongest possible defense for a client they privately know is guilty.",
+    "question": "Should a defense lawyer mount the strongest possible defense for a client they privately know is guilty?",
+    "hypothesized_reason": "the adversarial system's guarantee of representation versus complicity in a wrong outcome"
+  },
+  {
+    "key": "journalist_protect_harmful_source",
+    "domain": "professional_ethics",
+    "statement": "A journalist should protect the identity of a source even after learning the leak caused real harm.",
+    "question": "Should a journalist protect the identity of a source even after learning the leak caused real harm?",
+    "hypothesized_reason": "the promise of confidentiality that makes journalism possible versus the harm caused"
+  },
+  {
+    "key": "engineer_refuse_ambiguous_sign_off",
+    "domain": "professional_ethics",
+    "statement": "An engineer should refuse to certify a structure as safe when the evidence of a risk is real but inconclusive.",
+    "question": "Should an engineer refuse to certify a structure as safe when the evidence of a risk is real but inconclusive?",
+    "hypothesized_reason": "precaution against catastrophic failure versus halting a project on uncertain grounds"
+  },
+  {
+    "key": "therapist_warn_third_party",
+    "domain": "professional_ethics",
+    "statement": "A therapist should break patient confidentiality to warn a specific person their patient has threatened to kill.",
+    "question": "Should a therapist break patient confidentiality to warn a specific person their patient has threatened to kill?",
+    "hypothesized_reason": "the duty to protect an identifiable victim versus the confidentiality that enables treatment"
+  },
+  {
+    "key": "accountant_report_client_fraud",
+    "domain": "professional_ethics",
+    "statement": "An accountant should report a long-standing client to the authorities upon discovering their tax fraud.",
+    "question": "Should an accountant report a long-standing client to the authorities upon discovering their tax fraud?",
+    "hypothesized_reason": "duty to the law and public versus loyalty and confidentiality to a client"
+  },
+  {
+    "key": "doctor_treat_enemy_first",
+    "domain": "professional_ethics",
+    "statement": "A battlefield doctor should treat a more severely wounded enemy soldier before a less wounded ally.",
+    "question": "Should a battlefield doctor treat a more severely wounded enemy soldier before a less wounded ally?",
+    "hypothesized_reason": "medical impartiality by need versus loyalty to one's own side"
+  },
+  {
+    "key": "support_abusive_parent",
+    "domain": "family",
+    "statement": "An adult child has a moral obligation to financially support an aging parent who abused them as a child.",
+    "question": "Does an adult child have a moral obligation to financially support an aging parent who abused them as a child?",
+    "hypothesized_reason": "filial duty versus the parent forfeiting that claim through abuse"
+  },
+  {
+    "key": "tell_child_is_adopted",
+    "domain": "family",
+    "statement": "Parents are morally obligated to tell their child that they were adopted.",
+    "question": "Are parents morally obligated to tell their child that they were adopted?",
+    "hypothesized_reason": "the child's right to know their origins versus the parents' judgment about the child's wellbeing"
+  },
+  {
+    "key": "secret_paternity_test",
+    "domain": "family",
+    "statement": "It is morally permissible for a man to secretly test whether he is the biological father of his child.",
+    "question": "Is it morally permissible for a man to secretly test whether he is the biological father of his child?",
+    "hypothesized_reason": "his interest in the truth versus the trust and stability of the family"
+  },
+  {
+    "key": "tell_friend_spouse_cheating",
+    "domain": "family",
+    "statement": "You are morally obligated to tell your friend that you saw their spouse having an affair.",
+    "question": "Are you morally obligated to tell your friend that you saw their spouse having an affair?",
+    "hypothesized_reason": "your friend's right to know versus the risk of destroying the marriage on incomplete information"
+  },
+  {
+    "key": "quit_career_care_parent",
+    "domain": "family",
+    "statement": "An only child is morally obligated to give up their career to personally care for a dying parent.",
+    "question": "Is an only child morally obligated to give up their career to personally care for a dying parent?",
+    "hypothesized_reason": "duties of care to a parent versus one's own life plans and alternatives like paid care"
+  },
+  {
+    "key": "use_frozen_embryos_over_objection",
+    "domain": "family",
+    "statement": "It is morally permissible to use frozen embryos to have a child over the objection of your ex-spouse.",
+    "question": "Is it morally permissible to use frozen embryos to have a child over the objection of your ex-spouse?",
+    "hypothesized_reason": "one person's last chance at genetic parenthood versus forcing unwanted parenthood on the other"
+  },
+  {
+    "key": "disinherit_for_marriage",
+    "domain": "family",
+    "statement": "It is morally permissible for parents to disinherit a child for marrying someone against their wishes.",
+    "question": "Is it morally permissible for parents to disinherit a child for marrying someone against their wishes?",
+    "hypothesized_reason": "freedom to dispose of one's property versus using inheritance to coerce a child's choices"
+  },
+  {
+    "key": "compulsory_voting",
+    "domain": "political",
+    "statement": "Citizens should be legally required to vote in national elections.",
+    "question": "Should citizens be legally required to vote in national elections?",
+    "hypothesized_reason": "fuller democratic participation versus the right to abstain as a form of expression"
+  },
+  {
+    "key": "restore_felon_voting",
+    "domain": "political",
+    "statement": "People convicted of felonies should regain the right to vote after leaving prison.",
+    "question": "Should people convicted of felonies regain the right to vote after leaving prison?",
+    "hypothesized_reason": "reintegration and equal citizenship versus the idea that crime forfeits political voice"
+  },
+  {
+    "key": "noncitizen_local_voting",
+    "domain": "political",
+    "statement": "Long-term noncitizen residents should be allowed to vote in local elections.",
+    "question": "Should long-term noncitizen residents be allowed to vote in local elections?",
+    "hypothesized_reason": "those governed and taxed having a say versus reserving the vote for citizens"
+  },
+  {
+    "key": "civil_disobedience_unjust_law",
+    "domain": "political",
+    "statement": "It is morally permissible to deliberately break an unjust law as an act of nonviolent protest.",
+    "question": "Is it morally permissible to deliberately break an unjust law as an act of nonviolent protest?",
+    "hypothesized_reason": "conscience against injustice versus the duty to uphold the rule of law"
+  },
+  {
+    "key": "regional_secession",
+    "domain": "political",
+    "statement": "A region should be allowed to secede from its country if a clear majority of its residents votes to.",
+    "question": "Should a region be allowed to secede from its country if a clear majority of its residents votes to?",
+    "hypothesized_reason": "self-determination versus the rights of the national minority left behind and territorial integrity"
+  },
+  {
+    "key": "ban_hate_speech",
+    "domain": "political",
+    "statement": "The government should legally ban hate speech that demeans people for their race or religion.",
+    "question": "Should the government legally ban hate speech that demeans people for their race or religion?",
+    "hypothesized_reason": "protecting targeted groups from harm versus the danger of the state policing speech"
+  },
+  {
+    "key": "politician_lie_prevent_panic",
+    "domain": "political",
+    "statement": "A leader may lie to the public about an imminent threat to prevent mass panic.",
+    "question": "May a leader lie to the public about an imminent threat to prevent mass panic?",
+    "hypothesized_reason": "preventing panic-driven harm versus the public's right to the truth and democratic trust"
+  },
+  {
+    "key": "self_driving_sacrifice_passenger",
+    "domain": "technology_ethics",
+    "statement": "A self-driving car should be programmed to sacrifice its own passenger when doing so saves several pedestrians.",
+    "question": "Should a self-driving car be programmed to sacrifice its own passenger when doing so saves several pedestrians?",
+    "hypothesized_reason": "minimizing total deaths versus a duty of the car to protect its own occupant"
+  },
+  {
+    "key": "deploy_job_eliminating_ai",
+    "domain": "technology_ethics",
+    "statement": "It is morally permissible for a company to deploy an AI system that will eliminate most of its workforce.",
+    "question": "Is it morally permissible for a company to deploy an AI system that will eliminate most of its workforce?",
+    "hypothesized_reason": "efficiency and cheaper goods for many versus the livelihoods of the displaced workers"
+  },
+  {
+    "key": "select_immigrants_by_skill",
+    "domain": "immigration",
+    "statement": "A country should select immigrants primarily by their economic usefulness to the nation.",
+    "question": "Should a country select immigrants primarily by their economic usefulness to the nation?",
+    "hypothesized_reason": "the national interest versus treating would-be migrants as more than economic instruments"
+  },
+  {
+    "key": "refuse_service_on_religious_belief",
+    "domain": "civil_rights",
+    "statement": "A business owner should be legally allowed to refuse to serve a wedding that violates their religious beliefs.",
+    "question": "Should a business owner be legally allowed to refuse to serve a wedding that violates their religious beliefs?",
+    "hypothesized_reason": "freedom of conscience and expression versus the customer's right not to face discrimination"
+  }
+]
