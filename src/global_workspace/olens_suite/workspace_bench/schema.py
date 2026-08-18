@@ -44,7 +44,6 @@ CHANCE: dict[str, tuple[float, str]] = {
     "ordered_association": ((1.0 / 6.0) ** 3, "(1/6)³"),
     "entity_binding": ((1.0 / 6.0) ** 3, "(1/6)³"),
     "crossdom_2hop": (1.0 / 3.0, "1/3"),
-    "buggy_code": (0.5, "1/2"),
 }
 
 
@@ -176,6 +175,7 @@ class RunManifest:
     olens_k: int | None = None
     jlens_topk: int | None = None
     git_commit: str | None = None
+    run_config: dict[str, Any] | None = None  # gen dir run_config.json (injection + sampling)
     label: str = ""  # short display label; defaults to run_id
     notes: str = ""
 

@@ -121,11 +121,20 @@ def sample_equals_number(sample: str, target: str) -> bool:
 
 
 def hit_any(samples: list[str], targets: list[str]) -> bool:
-    """The headline pass criterion for one grid point: any target word-matches the joined,
-    lowercased samples — or, for numeric targets, any single sample IS the number."""
-    text = " \n ".join(samples).lower()
+    """The headline pass criterion for one grid point: any target word-matches ANY SINGLE
+    lowercased sample — or, for numeric targets, any single sample IS the number.
+
+    Per-sample on purpose: the old ``" \\n ".join(samples)`` let a multi-word target match
+    ACROSS the seam between two samples, because ``word_matcher`` joins target words with
+    ``[\\s\\-]+`` (which matches the seam's newline). Harmless for prose readouts, but a
+    J-lens grid point's samples are its top-k vocabulary TOKENS — adjacent ranks glued into
+    fake phrase hits (['Gotham','city'] passed target "Gotham City"; audit 2026-08-15: every
+    J-lens -mt "pass" was this artifact). A phrase spanning two different rollouts was never
+    a real readout either."""
+    lowered = [s.lower() for s in samples]
     for t in targets:
-        if word_matcher(t)(text):
+        matcher = word_matcher(t)
+        if any(matcher(s) for s in lowered):
             return True
         tl = t.lower()
         if re.fullmatch(r"\d+", tl) and any(sample_equals_number(s, tl) for s in samples):

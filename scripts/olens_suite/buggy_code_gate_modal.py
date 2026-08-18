@@ -1,5 +1,10 @@
 """Dual gate, one GPU pass, base model only.
 
+MIGRATION (2026-08-15): the gates are ported to the sglang stack (stock-model server) — see
+scripts/oracle_lens_evals/olens_sglang/suite_gates.py and
+docs/project/experiments/oracle_lens/sglang_suite_unification.md. This launcher stays the
+reference implementation until a GPU parity run confirms the port.
+
 Per item: verbalization-ban material (k=10 sampled + greedy RAW continuations) and
 consequence-gate material
 (k=5 sampled + greedy output-sim completions under the chat render). Raw text out; judging

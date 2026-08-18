@@ -10,7 +10,9 @@ The multi-token half of the frozen headline set: five **`-mt` mechanical banks**
 site as the single-token banks (final prompt token; directed-modulation-mt reads writing
 positions), same **word+exact pass@k** scorer, same **per-family permutation chance** null, same
 "never < 3× chance" rule — see `../single_token/README.md` for the full scoring protocol, which
-is shared. This README documents only what `-mt` changes.
+is shared (including the **audit 2026-08-15 change: the strict Opus bank judge is the headline
+pass criterion**, with `typo-mt` staying regex-scored). This README documents only what `-mt`
+changes.
 
 **What `-mt` makes harder.** The probed concept must be **multi-token** under the Qwen tokenizer,
 so a single lucky token cannot earn credit. In target derivation, the multi-token `target` **is**

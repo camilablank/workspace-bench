@@ -37,6 +37,27 @@ def load_base(model_id: str, device: str = "cuda") -> tuple[Any, Any]:
     return tok, base
 
 
+def _fetch_adapter(repo: str, run_name: str) -> Path:
+    """Adapter dir for ``<repo>:<run>`` — model or dataset repo, ``<run>/lora/`` or flat.
+
+    The AO program's checkpoints live in a DATASET repo (agu18dec/local-workspace) and the
+    RL arm keeps its adapter at the run root (no ``lora/``); the original model-repo +
+    ``lora/``-only contract 404s on both.
+    """
+    from huggingface_hub import snapshot_download
+    from huggingface_hub.errors import RepositoryNotFoundError
+
+    pats = [f"{run_name}/lora/*", f"{run_name}/adapter_*"]
+    try:
+        root = Path(snapshot_download(repo, allow_patterns=pats))
+    except RepositoryNotFoundError:
+        root = Path(snapshot_download(repo, repo_type="dataset", allow_patterns=pats))
+    for cand in (root / run_name / "lora", root / run_name):
+        if (cand / "adapter_model.safetensors").exists():
+            return cand
+    raise FileNotFoundError(f"no adapter under {repo}:{run_name} (tried lora/ and flat)")
+
+
 def load_lens(model_id: str, olens: str, device: str = "cuda") -> tuple[Any, Any, Any, Any, float]:
     """Base model + OLens LoRA (``<repo>:<run>``), guarded against the INERT-ADAPTER failure.
 
@@ -45,7 +66,6 @@ def load_lens(model_id: str, olens: str, device: str = "cuda") -> tuple[Any, Any
     """
     import torch
     import torch.nn as nn
-    from huggingface_hub import snapshot_download
     from peft import PeftModel
     from safetensors import safe_open
 
@@ -53,7 +73,7 @@ def load_lens(model_id: str, olens: str, device: str = "cuda") -> tuple[Any, Any
 
     # ---- OLens: compile-wrap iff the checkpoint needs it, then ASSERT it is live -----------
     repo, run_name = olens.split(":", 1)
-    lora = Path(snapshot_download(repo, allow_patterns=[f"{run_name}/lora/*"])) / run_name / "lora"
+    lora = _fetch_adapter(repo, run_name)
     with safe_open(str(lora / "adapter_model.safetensors"), framework="pt") as f:
         needs_compile = any("_orig_mod." in k for k in f.keys())  # noqa: SIM118
     if needs_compile:
@@ -108,7 +128,14 @@ def merge_lens(model: Any, probe_ids: Any, ref_logits: Any) -> tuple[Any, float]
 
 
 def make_sampler(
-    model: Any, tok: Any, wv_prompts: dict[int, Any], scale: float, device: str = "cuda"
+    model: Any,
+    tok: Any,
+    wv_prompts: dict[int, Any],
+    scale: float,
+    device: str = "cuda",
+    *,
+    transform: str = "scaled",
+    alpha: float = 0.0,
 ) -> Callable[..., list[list[str]]]:
     """The shared injection sampler over a MERGED model.
 
@@ -139,7 +166,16 @@ def make_sampler(
     ) -> list[list[str]]:
         p = wv_prompts[layer]
         pe0 = embed(torch.tensor([p.input_ids], device=device))[0]
-        rows = (scale * vecs_2d.to(device).float()).repeat_interleave(k, dim=0)
+        v = vecs_2d.to(device).float()
+        if transform == "unit":  # norm-matched alpha * h/||h|| — the distill/RL AO contract
+            if alpha <= 0:
+                raise ValueError("transform=unit needs alpha > 0")
+            v = alpha * v / v.norm(dim=-1, keepdim=True).clamp_min(1e-8)
+        elif transform == "scaled":
+            v = scale * v
+        else:
+            raise ValueError(f"unknown transform {transform!r} (scaled|unit)")
+        rows = v.repeat_interleave(k, dim=0)
         torch.manual_seed(seed)
         outs: list[str] = []
         for s in range(0, rows.shape[0], batch):

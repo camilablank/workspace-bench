@@ -17,6 +17,18 @@ from global_workspace.olens_suite.bank.verdicts import (
 # ------------------------------------------------------------------ matching (one source)
 
 
+def test_hit_any_no_cross_sample_gluing() -> None:
+    # word-boundary basics (mirrors the monorepo headline-metric test)
+    assert not hit_any(["she called him"], ["led"])
+    assert hit_any(["the led lights"], ["led"])
+    # cross-sample gluing (audit 2026-08-15): adjacent token-bank entries must NOT fuse
+    # into a phrase match; the intact phrase inside ONE sample must still hit.
+    assert not hit_any(["Ian", "Fleming"], ["Ian Fleming"])
+    assert not hit_any(["Fifty", "seventh"], ["fifty-seventh"])
+    assert hit_any(["the creator is Ian Fleming."], ["Ian Fleming"])
+    assert hit_any(["tug-of-war rules"], ["tug of war"])
+
+
 # (test_fve_hits_now_match_headline_metric: monorepo-only — needs the olens_sglang pipeline.)
 # (test_score_targets_reexports_matching: monorepo-only — needs the olens_sglang pipeline.)
 # --------------------------------------------------------------------------------- rollup

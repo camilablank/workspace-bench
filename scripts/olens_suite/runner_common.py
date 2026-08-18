@@ -29,11 +29,28 @@ sys.path.insert(0, str(REPO / "src"))
 
 HF_PATH = Path("/hf")
 
+
+def hf_secret() -> "modal.Secret":
+    """Client-env HF token for the containers — the AO program's checkpoints live in a
+    PRIVATE dataset repo (agu18dec/local-workspace); an unauthenticated container 401s on
+    snapshot_download. from_local_environ ships the launcher shell's HF_TOKEN."""
+    import modal
+
+    return modal.Secret.from_local_environ(["HF_TOKEN"])
+
+
 # The union of the three runners' needs; a shared image means one build, shared layer cache.
 PACKAGES = (
-    "torch>=2.11", "transformers>=5.11.0", "peft>=0.18", "safetensors>=0.8.0",
-    "jaxtyping>=0.3", "beartype>=0.22", "numpy>=2.3", "einops>=0.8",
-    "accelerate>=1.0", "hf_transfer",
+    "torch>=2.11",
+    "transformers>=5.11.0",
+    "peft>=0.18",
+    "safetensors>=0.8.0",
+    "jaxtyping>=0.3",
+    "beartype>=0.22",
+    "numpy>=2.3",
+    "einops>=0.8",
+    "accelerate>=1.0",
+    "hf_transfer",
 )
 
 
@@ -44,12 +61,18 @@ def suite_image(*, with_src: bool = True) -> "modal.Image":
     which import it at top level — also import cleanly inside the container.
     """
     import modal
+
     img = (
         modal.Image.debian_slim(python_version="3.12")
         .pip_install(*PACKAGES)
-        .env({"HF_HOME": str(HF_PATH), "HF_HUB_ENABLE_HF_TRANSFER": "1",
-              "PYTHONPATH": "/root/app/src",
-              "PYTORCH_CUDA_ALLOC_CONF": "expandable_segments:True"})
+        .env(
+            {
+                "HF_HOME": str(HF_PATH),
+                "HF_HUB_ENABLE_HF_TRANSFER": "1",
+                "PYTHONPATH": "/root/app/src",
+                "PYTORCH_CUDA_ALLOC_CONF": "expandable_segments:True",
+            }
+        )
     )
     if with_src:
         img = img.add_local_dir(str(REPO / "src"), "/root/app/src")
@@ -82,14 +105,19 @@ def fetch_suite_bank(domain: str) -> Any:
 
         from global_workspace.olens_suite.order_ops.spec import DATASET
 
-        root = Path(snapshot_download(DATASET, repo_type="dataset",
-                                      allow_patterns=["order-ops/banks/*"]))
+        root = Path(
+            snapshot_download(DATASET, repo_type="dataset", allow_patterns=["order-ops/banks/*"])
+        )
         return root / "order-ops" / "banks"
-    hf_files = {"buggy_code": "buggy-code/read_bank.json",
-                "superposed": "superposed/read_bank.json"}
+    hf_files = {
+        "buggy_code": "buggy-code/read_bank.json",
+        "superposed": "superposed/read_bank.json",
+    }
     if domain not in hf_files:
-        raise ValueError(f"unknown suite domain {domain!r}; expected one of "
-                         f"['order_ops', {', '.join(map(repr, hf_files))}]")
+        raise ValueError(
+            f"unknown suite domain {domain!r}; expected one of "
+            f"['order_ops', {', '.join(map(repr, hf_files))}]"
+        )
     if (local / "read_bank.json").exists():
         return json.loads((local / "read_bank.json").read_text())
     from huggingface_hub import hf_hub_download

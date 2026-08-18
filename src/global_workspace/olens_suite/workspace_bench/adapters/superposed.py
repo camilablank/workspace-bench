@@ -8,8 +8,10 @@ dictated sentence, then reads the activations at the write positions. Two lenses
   ``ao["<layer>"][i]`` the ``k`` free-text samples read at cell ``rels[i]`` (negative offsets,
   stored nearest-last-token-first; ``tokens[i]`` is the token at that cell).
 * **J-lens** (top-k tokens) — ``binding_jlens.json`` + ``dictation_jlens.json``. Each record is
-  ``{meta:{name,prompt,concepts,stratum}, tokens, jlens:{"<layer>":[per-pos [top-k tokens]]}}``
-  read over the *prompt* positions, so it carries no completion region structure.
+  ``{meta:{name,prompt,concepts,stratum}, tokens, jlens:{"<layer>":[per-pos [top-k tokens]]}}``.
+  Audit 2026-08-15: the capture was verified to be WRITE cells (negative rels indexing into the
+  last-20 generated dictation tokens), not prompt positions — but it carries no region labels,
+  so no IN_SENTENCE gate is applied.
 
 Pass semantics reuse the PACKAGED scorer :mod:`global_workspace.olens_suite.superposed.score`:
 :func:`~...score.load_reads` labels every oracle cell's region and
@@ -21,9 +23,8 @@ surfaced by that lens:
 * oracle: any concept word-matched by a sample of an IN_SENTENCE cell (identical to the scorer's
   ``per_item_union > 0``; off-task items such as ``d-petrichor`` have no IN_SENTENCE cell and so
   never pass);
-* J-lens: any concept word-matched by the top-k tokens at any (layer, position). The J-lens reads
-  the prompt (which itself names the concept), so it carries no region gate — the same
-  word-boundary rule, applied at every position.
+* J-lens: any concept word-matched by the top-k tokens at any (layer, position) — the same
+  word-boundary rule, applied at every captured write cell (no region gate available).
 
 Control items (``d-none`` / ``b-none``) dictate nothing, so their concept list is empty and both
 arms are ``pass=False`` by construction; they are kept as questions, not dropped.

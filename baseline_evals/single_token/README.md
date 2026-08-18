@@ -10,6 +10,18 @@ directed-modulation which reads the teacher-forced carrier's writing positions.
 Six of the seven are scored by a **deterministic matcher** (no LLM judge); **directed-modulation
 is LLM-judged** (its mechanical number is a proxy only — see its own section below).
 
+> ⚠️ **Audit 2026-08-15 — the headline pass criterion is now the STRICT Opus bank judge**
+> (`global_workspace.olens_suite.workspace_bench.bank_judge`), replacing regex substring
+> matching: per (item, layer), the judge sees every position's readout samples and decides
+> whether any target concept is **NAMED** — exact word / true synonym / faithful translation
+> only. Derived words (`blackout`≠`black`), fragments (`paragus`≠`asparagus`), and associative
+> imagery do NOT count, and every YES must carry a verbatim quote (unverifiable quotes void the
+> verdict). It judges AO free text and J-lens token bags identically (translation credit
+> survives; regex under-credited everywhere). **Exception: `typo` (and `typo-mt`) stay
+> regex-scored** — they are exact-word-recovery families, so exact matching is the correct
+> instrument. The mechanical word+exact metric below remains the deterministic secondary and
+> the per-position/per-layer drill-down.
+
 ## Scoring — the mechanical "word+exact pass@k" metric
 
 Scorer: `scripts/oracle_lens_evals/olens_sglang/score_targets.py`; hit semantics:
