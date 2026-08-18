@@ -1,7 +1,7 @@
 # workspace-bench (standalone) — how to run it
 
 You are an AI coding agent in a **self-contained checkout of workspace-bench**. This repo scores
-an **oracle lens (AO)** against the **J-lens** across all 12 eval families, using the *exact*
+an **oracle lens (AO)** against the **J-lens** across all 11 eval families, using the *exact*
 judge/scorer code from the source research repo (`global-workspace`, pinned below). The frozen
 eval items are the exact content of the HuggingFace dataset `camilablank/workspace-bench`.
 
@@ -28,7 +28,7 @@ uv venv && . .venv/bin/activate
 uv pip install -e .            # CPU score/judge path: pydra-config + anthropic + openai
 export ANTHROPIC_API_KEY=...   # required for every LLM-judged family
 # export OPENAI_API_KEY=...    # ONLY for the order_ops twin judge's default model (gpt-5.5); override with --model to skip
-uv pip install -e ".[dev]" && pytest    # 109 CPU tests (loader, deterministic scorers, judge summaries)
+uv pip install -e ".[dev]" && pytest    # 110 CPU tests (loader, deterministic scorers, judge summaries)
 ```
 
 `pyproject.toml` puts `src/` on the path (pytest) and `pip install -e .` makes `global_workspace`
@@ -77,12 +77,12 @@ protocol are in each family's README:
 | family | entrypoint (readouts → verdicts) |
 |---|---|
 | sandbagging / user-modeling / directed-modulation(-mt) | `scripts/oracle_lens_evals/olens_sglang/judge_readouts.py --family <name> <gen_dir> …` |
-| single/multi-token mechanical banks | `scripts/oracle_lens_evals/olens_sglang/score_targets.py <gen_dir> …` (deterministic matcher; no API) |
+| single/multi-token banks — **headline** | `python -m global_workspace.olens_suite.workspace_bench.bank_judge --acts <acts_dir> --gen <gen_dir> --kind <text\|tokens>` (strict Opus judge, audit 2026-08-15; verbatim-quote discipline). Exception: `typo`/`typo-mt` are regex-scored |
+| single/multi-token banks — deterministic secondary | `scripts/oracle_lens_evals/olens_sglang/score_targets.py <gen_dir> …` (word+exact matcher; no API) |
 | compositional_association | `scripts/oracle_lens/latent_eval/judge_mc.py <gen_dir> --tag <t> --out <out.json>` |
 | ethical_consequences | `scripts/oracle_lens_evals/ec_readout_judge.py <gen_dir> …` (+ `ec_two_axis_judge.py`) |
 | ordered_association | `scripts/oracle_lens_evals/oa_eb_readout_judge.py <gen_dir> --tag <t> --out <out.json>` |
-| relational | `scripts/oracle_lens_evals/judge_relational.py <gen_dir> --tag <t> --out <out.json>` |
-| maze_path | `scripts/oracle_lens_evals/maze_readout_judge.py <gen_dir> --tag <t> --out <out.json>` |
+| relational | `scripts/oracle_lens_evals/judge_relational.py <gen_dir> --tag <t> --out <out.json>` (default `--pos 20`, the blank; `--pos all` = deprecated bundled instrument, output tagged DO-NOT-QUOTE) |
 | safety_cases | `scripts/oracle_lens_evals/judge_safety_cases.py --items hillclimbing_evals/safety_cases/items.json --olens-dir <…> --jlens-dir <…> --out <…>` |
 | readout_coherence | `scripts/oracle_lens_evals/readout_coherence/judge.py …` then `readout_coherence/score.py` |
 
@@ -100,7 +100,7 @@ Concurrency defaults to 256 and the Anthropic key is assumed rate-unlimited — 
 `pip install -e ".[gpu]"`, then the vendored generators emit the gen-dir layout above:
 - behavioral banks + directed-modulation + readout_coherence: the sglang pipeline
   (`scripts/oracle_lens_evals/olens_sglang/{capture_acts,worker,jlens_eval}.py`).
-- ethical_consequences / ordered_association / relational / maze_path:
+- ethical_consequences / ordered_association / relational:
   `scripts/oracle_lens_evals/oa_eb_modal.py`.
 - order_ops / buggy_code / superposed: `scripts/olens_suite/*_modal.py`.
 These need GPUs (Modal or a cluster), the Qwen3.6-27B snapshot, and the AO + J-lens checkpoints;
@@ -116,8 +116,11 @@ they are documented, not runnable on a CPU-only box.
 
 ## Provenance
 
-Generated from `global-workspace` @ `82eacf5a` (see `PROVENANCE.md`). Banks + family READMEs
-mirror the HF dataset `camilablank/workspace-bench`. Judge code is pinned to the canonical merged
-(HEAD) versions — e.g. the loosened sandbagging `safety_strict` (PR #181) and `judge_mc`'s
-`--jlens-interp`; maze_path uses its hardened gold-leak-guard judge matching the frozen
-`items_final.json`. Do not hand-edit vendored code to diverge from the source; it defeats the point.
+Generated from `global-workspace` @ `76ec9581` (2026-08-16; see `PROVENANCE.md`). Banks + family
+READMEs mirror the HF dataset `camilablank/workspace-bench`. Judge code is pinned to the canonical
+merged (HEAD) versions — the 2026-08-15 eval-audit instruments: the strict Opus **bank judge**
+(`bank_judge.py`, headline on the mechanical banks; typo stays regex), `judge_relational`'s
+single-position p20 default, `judge_mc --char-cap` (frozen 24000), the `hit_any`
+cross-sample-gluing fix, plus the earlier loosened sandbagging `safety_strict` (PR #181) and
+`judge_mc --jlens-interp`. `maze_path` was retired by the audit and removed. Do not hand-edit
+vendored code to diverge from the source; it defeats the point.

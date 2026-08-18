@@ -109,6 +109,14 @@ def main() -> None:
         "--summarizer-model", default=CLAUDE_FAST, help="model for the --jlens-interp pass"
     )
     ap.add_argument("--resume", action="store_true", help="skip items already present in --out")
+    ap.add_argument(
+        "--char-cap",
+        type=int,
+        default=24000,
+        help="per-item blob cap fed to the judge. The FROZEN instrument is 24000, which sees "
+        "only ~2 of 6 layers on verbose (RL bullet) arms — pass a larger cap for the "
+        "full-blob variant and label the output as such.",
+    )
     args = ap.parse_args()
     items = json.loads(Path(args.items).read_text())
     by_id = {it["id"]: it for it in items}
@@ -131,7 +139,7 @@ def main() -> None:
         for iid, txt in by_layer[l].items():
             agg[iid] = agg.get(iid, "") + f"\n[L{l}] " + txt
     agg = {
-        k: "".join(ch for ch in v[:24000] if ch.isprintable() or ch in "\n\t ")
+        k: "".join(ch for ch in v[: args.char_cap] if ch.isprintable() or ch in "\n\t ")
         for k, v in agg.items()
         if all(k in by_layer[l] for l in layers)
     }

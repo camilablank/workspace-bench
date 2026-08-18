@@ -38,6 +38,9 @@ tolerance + role per family:
 | mulmid | 33 | L56 p−8 | rel2pct | comparison | yes (mid band) |
 | halves | 38 | L60 p−8 | rel2pct | structural | no |
 
+> ⚠️ **Audit 2026-08-15:** `frac` and `halves` are excluded from the benchmark summary/figure as
+> representability artifacts (their banks stay here for the per-variant drill-down).
+
 `role` bounds what a number may be quoted for: **structural** = target has no single-token
 route, can support a claim about *kind* of representation; **comparison** = target is a 1–2-digit
 integer reachable by one vocab token (`十八`/`eighteen`), so lens-vs-lens comparisons only;

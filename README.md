@@ -1,7 +1,7 @@
 # workspace-bench (standalone)
 
 A self-contained runner for **workspace-bench** — the eval suite that scores an **oracle lens
-(AO)** against the **J-lens** across 12 families, measuring whether a lens can surface *latent*
+(AO)** against the **J-lens** across 11 families, measuring whether a lens can surface *latent*
 content a language model (**Qwen3.6-27B**) computes but never writes. This repo bundles the exact
 judge/scorer code from the source research repo together with the frozen eval banks, so the evals
 can be run without the monorepo.
@@ -18,7 +18,7 @@ can be run without the monorepo.
 ```bash
 uv venv && . .venv/bin/activate
 uv pip install -e .            # CPU score/judge deps
-uv pip install -e ".[dev]" && pytest        # 109 CPU tests pass
+uv pip install -e ".[dev]" && pytest        # 110 CPU tests pass
 
 # deterministic smoke — runs immediately, no GPU, no API key (recovered readouts ship in-repo):
 python -m global_workspace.olens_suite.superposed.score \
@@ -42,13 +42,17 @@ For the LLM-judged families set `ANTHROPIC_API_KEY` and run the per-family entry
 `baseline_evals/single_token/` (multihop, multilingual, poetry, typo, association, basic-readout,
 directed-modulation) · `baseline_evals/multi_token/` (the `-mt` variants) ·
 `hillclimbing_evals/` (ethical_consequences, ordered_association, relational, readout_coherence,
-maze_path, sandbagging, user_modeling, compositional_association, order_ops, buggy_code,
-superposed, safety_cases). Deterministic scorers cover order_ops / superposed / the mechanical
-single-and-multi-token banks; the rest are LLM-judged (blind, apples-to-apples between AO free text
-and J-lens token bags summarized to prose).
+sandbagging, user_modeling, compositional_association, order_ops, buggy_code, superposed,
+safety_cases). Deterministic scorers cover order_ops / superposed / typo(-mt); the mechanical
+single-and-multi-token banks are headline-scored by the strict Opus bank judge (audit 2026-08-15;
+the word+exact matcher stays as the deterministic secondary); the rest are LLM-judged (blind,
+apples-to-apples between AO free text and J-lens token bags summarized to prose).
+`maze_path` was retired by the audit (doc-only null) and removed.
 
 ## Provenance
 
-Generated from the private `global-workspace` research repo @ `82eacf5a`; see `PROVENANCE.md`.
-This is a packaging of that code — change the source and re-derive rather than editing vendored
-files here.
+Generated from the private `global-workspace` research repo @ `76ec9581` (2026-08-16, includes
+the 2026-08-15 eval audit: strict Opus bank judge, relational single-position p20 instrument,
+`hit_any` cross-sample-gluing fix, `judge_mc --char-cap`, maze_path retired); see
+`PROVENANCE.md`. This is a packaging of that code — change the source and re-derive rather than
+editing vendored files here.

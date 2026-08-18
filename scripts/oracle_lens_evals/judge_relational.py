@@ -2,8 +2,8 @@
 """LLM judge for the `relational` two-hop eval — reconstruct the relation via TWO MC calls.
 
 The gold relation is "{hop1}'s {hop2}" (hop1 = outer/first, hop2 = inner/second). Per
-(item, layer) we bundle the readouts from the two probed positions (second name + "'s"), then
-ask the judge TWO forced-choice questions over that same readout:
+(item, layer) the judge sees the readout from ONE read position (default p20, the token at the
+blank — where the composed relation must be resolved) and answers TWO forced-choice questions:
 
     X-MC: "The relation is of the form X's Y. What is X (the outer relation word)?"
     Y-MC: "... What is Y (the inner relation word)?"
@@ -18,6 +18,12 @@ J-lens gen dirs MUST run with --interp: the blind-interpretation stage (summary 
 2026-08-05 protocol) sees only the tokens and its interpretation text is what the judge scores.
 
 Random baseline: per question 1/6 (5 content + cannot-tell); item both-correct = (1/6)^2 = 1/36.
+
+DO NOT judge bundled positions. The pre-2026-08 instrument concatenated ALL read positions into
+one judge call; readouts sitting ON the relation words echo them, so the pooled blob always
+contained both answers — 100/100 for every arm including raw J-lens token bags, zero
+discrimination. Position-by-position judging reads ~0 everywhere (position_sweep.json).
+`--pos all` remains only for reproducing the artifact and tags its output DO-NOT-QUOTE.
 
 Usage:
   uv run --no-sync python scripts/oracle_lens_evals/judge_relational.py \
@@ -137,6 +143,10 @@ def main() -> None:
     ap.add_argument("gen_dir", type=Path)
     ap.add_argument("--tag", required=True)
     ap.add_argument("--layers", default="", help="csv filter; empty = all layers present")
+    ap.add_argument("--pos", default="20",
+                    help="single read position to judge (default 20 = the blank). 'all' restores "
+                         "the DEPRECATED bundled instrument (cross-position fragment pooling; "
+                         "see module docstring) — never quote its numbers.")
     ap.add_argument("--interp", action="store_true",
                     help="REQUIRED for token-list (J-lens) gen dirs: summary-LM stage first")
     ap.add_argument("--model", default=CLAUDE_JUDGE)
@@ -149,8 +159,18 @@ def main() -> None:
     layers = {int(x) for x in args.layers.split(",") if x} or None
     cells = load_cells(args.gen_dir, layers)
     cells = {k: v for k, v in cells.items() if k[0] in items}
-    out_path = args.out or (REPO / "outputs/oracle_lens_evals/relational_eval" /
-                            f"verdicts_final_{args.tag}.json")
+    if args.pos == "all":
+        print("WARNING: --pos all = DEPRECATED bundled instrument (fragment-pooling artifact, "
+              "audit 2026-08). Output is tagged bundled_DO_NOT_QUOTE.")
+        stem = f"verdicts_bundled_DO_NOT_QUOTE_{args.tag}"
+    else:
+        want = int(args.pos)
+        cells = {k: [u for u in v if u["pos"] == want] for k, v in cells.items()}
+        cells = {k: v for k, v in cells.items() if v}
+        if not cells:
+            raise SystemExit(f"no readouts at pos {want} in {args.gen_dir}")
+        stem = f"verdicts_p{want}_{args.tag}"
+    out_path = args.out or (REPO / "outputs/oracle_lens_evals/relational_eval" / f"{stem}.json")
     out_path.parent.mkdir(parents=True, exist_ok=True)
     print(f"{len(cells)} (item, layer) cells from {args.gen_dir}; {n_scenes} scenes")
 
