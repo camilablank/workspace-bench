@@ -223,7 +223,7 @@ def _load_slop(
             continue  # judge-unavailable rows stay ungated
         key = (str(row["name"]), int(row["layer"]), int(row["pos"]), int(row["sample_idx"]))
         index[key] = float(row["slop"])
-    threshold = float(payload.get("config", {}).get("threshold", 5.0))
+    threshold = float(payload.get("config", {}).get("threshold", 9.0))
     return index, threshold
 
 

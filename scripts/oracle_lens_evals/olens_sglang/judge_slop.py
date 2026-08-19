@@ -14,8 +14,11 @@ mask + extract_phrase) and hits through the canonical matcher, so the "mechanica
 are bit-comparable with ``score_targets.py``. The judged context/target come from the bank item
 (clean prompt text), falling back to the manifest tokens for labels missing from the bank.
 
-The gate threshold is provisional until Camila fixes it qualitatively; every consumer reads it
-from this artifact's ``config.threshold``, never hardcodes it.
+The gate threshold is 9.0 (fixed by Camila 2026-08-19 after the threshold sweep): only
+invalidation-grade slop — outright contradictions or plausible competing answers beside the
+target — removes credit; mid-band junk (5-9) keeps credit but stays visible in the per-row
+scores. Every consumer reads the cut from this artifact's ``config.threshold``, never
+hardcodes it.
 
     source scripts/cluster/env.sh   # ANTHROPIC_API_KEY
     uv run --no-sync python scripts/oracle_lens_evals/olens_sglang/judge_slop.py \
@@ -105,9 +108,11 @@ def main() -> None:
     p.add_argument(
         "--threshold",
         type=float,
-        default=5.0,
-        help="PROVISIONAL headline gate: a hit counts only when slop < threshold. Consumers "
-        "read it from the artifact; re-run with a new value once Camila fixes the cut.",
+        default=9.0,
+        help="headline gate: a hit counts only when slop < threshold. 9.0 fixed by Camila "
+        "2026-08-19 — gate only invalidation-grade slop (contradictions / competing answers "
+        "beside the target); 5-9 junk keeps credit but stays visible in per-row scores. "
+        "Consumers read the cut from the artifact config, never hardcode it.",
     )
     p.add_argument("--out", default="", help="default: <gen-dir>/judge/slop.json")
     args = p.parse_args()
@@ -193,7 +198,7 @@ def main() -> None:
         "config": {
             "model": kwargs.get("model", "default"),
             "threshold": args.threshold,
-            "threshold_provisional": True,
+            "threshold_provisional": False,
             "layers": layers,
             "families": families,
         },
