@@ -39,6 +39,14 @@ generation prompt), so there is no retokenization divergence.
 - Pass 1 judge: the frozen sumtok judge v6 (`scripts/ola/sumtok_judge.py`), imported not
   copied, Opus-5 as it ships, `LAYERS` overridden to this band. Strict arm only.
 - Pass 2+3 judge: `claude-sonnet-5` (new instruments; prompts live in `judge.py`).
+- Pass 4+5 judge (added 2026-08-19, NOT part of the 2026-08-13 freeze): `claude-opus-5`
+  (`bullet_judges.py` — prompts live there; instrument distilled unchanged from the LOO-lane
+  `rcoh_loo_judges.py`, 2026-08-15). Restricted to pass 1's summary-flagged positions
+  (`effective_level >= 2`, union across the arms given); judges only samples that parse as
+  "- " bullet lists, so it targets bullet-format checkpoints (a `continuation_raw` arm is
+  skipped cell-by-cell and the skip count logged). Unit = (arm, label, pos, layer) cell,
+  all k samples in one call. When comparing checkpoints, pass every arm in ONE invocation
+  so the flagged-position union keeps them judged at the same positions.
 
 ## Metrics
 
@@ -55,8 +63,19 @@ generation prompt), so there is no retokenization divergence.
    must not start mid-sentence (", " / "'s" / dangling clause). Judge-reported fragments
    are quote-verified against the actual sample starts before counting.
 
+4. **Bullet relevance** (the *unrelatedness* judge; AO summary positions, bullet arms):
+   per bullet, `relation ∈ {continuation, context, tangential, unrelated}` w.r.t. the
+   conversation context AND the true next tokens, + `hallucinated` (asserts a wrong
+   specific — a generic phrase is not a hallucination). Headline = **unrelated-bullet
+   rate**; relation shares and hallucinated rate reported beside it.
+5. **Bullet diversity** (same positions): per sample, pairwise bullet-topic relations
+   (`same_topic` / `related_aspects` / `different_concepts`) + **n_distinct** (near
+   paraphrases count as ONE) + `diverse_aspects`. Headline = **mean n_distinct**.
+
 **Overall coherence = 0.8 × mean_quality + 0.2 × 10 × (1 − malformed_position_rate)** —
 weights frozen in `score.py`, quality dominates, formatting is the 2-point slice.
+Metrics 4+5 are reported BESIDE it (skip-if-missing in `score.py`), never inside it —
+the frozen combined score is unchanged.
 
 ## First frozen run (2026-08-13, ao28500-u64 — `results_2026-08-13.json`)
 
@@ -112,7 +131,13 @@ uv run --no-sync python scripts/oracle_lens_evals/readout_coherence/judge.py \
   --acts $G/acts-rcoh --gen-ao $G/gen-rcoh-ao28500 --gen-jlens $G/gen-rcoh-jlens \
   --out outputs/oracle_lens_evals/readout_coherence/verdicts --stage all
 
-# 5) score (commit the frozen numbers as results_<date>.json beside items.json,
+# 5) bullet judges (CPU, Opus; passes 4+5 — bullet-format arms only; repeat --arm
+#    per checkpoint under comparison so the flagged-position union is shared)
+uv run --no-sync python scripts/oracle_lens_evals/readout_coherence/bullet_judges.py \
+  --stage all --acts $G/acts-rcoh \
+  --arm ao28500:$G/gen-rcoh-ao28500:outputs/oracle_lens_evals/readout_coherence/verdicts
+
+# 6) score (commit the frozen numbers as results_<date>.json beside items.json,
 #    with the checkpoint recorded)
 uv run --no-sync python scripts/oracle_lens_evals/readout_coherence/score.py \
   --verdicts outputs/oracle_lens_evals/readout_coherence/verdicts \
@@ -121,9 +146,10 @@ uv run --no-sync python scripts/oracle_lens_evals/readout_coherence/score.py \
 
 ## Verbatim judge prompts
 
-Three passes. Pass 1 is the frozen sumtok judge v6 (`scripts/ola/sumtok_judge.py`, **claude-opus-5**,
+Five passes. Pass 1 is the frozen sumtok judge v6 (`scripts/ola/sumtok_judge.py`, **claude-opus-5**,
 imported not copied); passes 2–3 are `scripts/oracle_lens_evals/readout_coherence/judge.py`
-(**claude-sonnet-5**). All clean at git HEAD. `{...}` are placeholders.
+(**claude-sonnet-5**); passes 4–5 are `scripts/oracle_lens_evals/readout_coherence/bullet_judges.py`
+(**claude-opus-5**). All clean at git HEAD. `{...}` are placeholders.
 
 ### Pass 1 — summary-position judge (sumtok v6)
 
@@ -328,3 +354,66 @@ Return the JSON verdict.
 ```
 
 Reported malformed starts are quote-verified against the actual sample openings before counting.
+
+### Pass 4 — bullet-relevance judge (`RELEVANCE_SYSTEM`, claude-opus-5)
+
+One call per (item, position, layer) cell: all k samples' bullets judged together, one
+verdict per sample, bullets in order. The user message carries the CONTEXT window (last
+~1200 tokens, ending at the marked token «…»), the TRUE NEXT TOKENS (64), and each sample's
+bullets as 0-based numbered lines.
+
+```text
+You audit the output of an "oracle lens": a model that is given a hidden activation captured
+at a marked position inside a conversation and generates short "concept" bullets, each meant
+to read out something REAL about what the underlying model is processing at that position.
+You see the conversation up to the position (its last part), the TRUE next tokens that
+actually followed, and one or more independently sampled readouts (each a set of bullets).
+Bullets are lowercase mid-sentence fragments BY DESIGN — never penalize formatting, grammar,
+casing, truncation, or fragment starts; judge content only.
+
+Per bullet, `relation` (pick the strongest that applies):
+- continuation: overlaps, paraphrases, or plausibly extends the TRUE next tokens (or directly
+  continues the visible text at the marked position).
+- context: does not track the next tokens, but is clearly about THIS conversation — an earlier
+  point, the specific topic, a genuine aspect of what is being discussed.
+- tangential: only generically related (same broad domain or vague theme; would fit many
+  unrelated conversations equally well).
+- unrelated: no plausible connection to this conversation.
+Per bullet, `hallucinated`: true if it asserts specific content (names, numbers, facts,
+quotes) that does not appear in and cannot reasonably be inferred from the context or the
+true continuation. A generic phrase is not a hallucination; a wrong specific is.
+
+Return one verdict per SAMPLE, bullets in the order given. JSON only.
+```
+
+Schema per sample: `{bullets: [{relation, hallucinated}]}`.
+
+### Pass 5 — bullet-diversity judge (`DIVERSITY_SYSTEM`, claude-opus-5)
+
+Same cell unit and user-message shape as pass 4, minus the TRUE NEXT TOKENS block (diversity
+is judged against the context alone).
+
+```text
+You audit the DIVERSITY of an "oracle lens" readout: a set of short "concept" bullets
+generated from one hidden activation at a marked position in a conversation. The question is
+whether the bullets express different concepts or restate one thing. Bullets are lowercase
+mid-sentence fragments BY DESIGN — judge content only, never formatting.
+
+For every unordered PAIR of bullets (i < j, 0-based indices into the given list), classify:
+- same_topic: the two bullets say essentially the same thing — near paraphrases, shared-stem
+  variants ("can sound a bit" / "may sound a bit"), or the same claim reworded.
+- related_aspects: genuinely different facets, angles, or subtopics of one underlying
+  subject — distinct information, related theme.
+- different_concepts: different subjects altogether — each could stand alone as a separate
+  reading of the position.
+
+Per sample also report:
+- n_distinct: how many genuinely distinct concepts the bullets express (near paraphrases
+  count as ONE).
+- diverse_aspects: true only if the bullets relate to the position in different ways — not
+  restatements of one thing.
+
+Return one verdict per SAMPLE, pairs covering every i<j combination. JSON only.
+```
+
+Schema per sample: `{pairs: [{i, j, relation}], n_distinct, diverse_aspects}`.
