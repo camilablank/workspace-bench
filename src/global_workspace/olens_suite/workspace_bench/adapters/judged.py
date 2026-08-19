@@ -405,7 +405,7 @@ def overlay_judged(
         basis: dict[str, str] = {}
         # the slop gate (precision condition): only meaningful when the run carried it
         slop_run = bool((blob.get("config") or {}).get("slop"))
-        threshold = float((blob.get("config") or {}).get("slop_threshold", 5.0))
+        threshold = float((blob.get("config") or {}).get("slop_threshold", 9.0))
         gated: dict[str, bool] = {}
         for r in judged_rows(blob):
             hit = strict_hit(fam, r)

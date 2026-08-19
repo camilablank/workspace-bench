@@ -50,8 +50,9 @@ Two changes close that hole:
 - **Slop gate.** `global_workspace.judges.slop_judge` rates each mechanically-hitting free-text
   row 1.0–10.0 given the item's context + target (1 = only the precise target asserted; >5 =
   content not inferrable from the context; 10 = contradiction / plausible distractor answers —
-  invalidate). A hit counts toward the *gated* pass only when `slop < threshold` (provisional
-  5.0, read from the artifact config, never hardcoded). Run
+  invalidate). A hit counts toward the *gated* pass only when `slop < threshold` (**9.0**,
+  fixed by Camila 2026-08-19: only invalidation-grade slop — contradictions / competing answers —
+  removes credit; read from the artifact config, never hardcoded). Run
   `scripts/oracle_lens_evals/olens_sglang/judge_slop.py` to produce `<gen>/judge/slop.json`;
   the sglang adapter then reports `pass_rate_gated` beside the unchanged recall headline.
   Validation: `scripts/oracle_lens_evals/gate_slop_judge.py` (hallucinatory NLA hit-rows median

@@ -125,8 +125,9 @@ def main() -> None:
     p.add_argument(
         "--slop-threshold",
         type=float,
-        default=5.0,
-        help="PROVISIONAL gate recorded in the artifact config; consumers read it from there",
+        default=9.0,
+        help="gate recorded in the artifact config (9.0, Camila 2026-08-19: invalidation-grade "
+        "slop only); consumers read it from there",
     )
     p.add_argument("--concurrency", type=int, default=256)
     p.add_argument("--seed", type=int, default=0)
@@ -263,7 +264,7 @@ def main() -> None:
             "n_escalated": len(idx),
             "slop": not args.no_slop and args.readout_format == "text",
             "slop_threshold": args.slop_threshold,
-            "slop_threshold_provisional": True,
+            "slop_threshold_provisional": False,
         },
         "summary": summarize(judged + screen_kept),
         "summary_tiers": {"frontier_rows": len(judged), "screen_rows_folded": len(screen_kept)},
