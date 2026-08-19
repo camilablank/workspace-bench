@@ -55,8 +55,16 @@ plus gate fields: original 9 families carry `committed/raw/ok/ok_strict/leak/lea
 leak_substring/bare/bare_ok/bare_leak/pair_survived`; the 16 discrete-concept families carry
 `gate_correct` (0–10) and `gate_greedy_ok`.
 
-`excluded/round2.json` (14 items) and `pending/` hold pre-purge staging copies; `REMOVED.json`
-records per-item drop reasons — **but only for the 9 original families** (see caveats).
+`excluded/round2.json` (14 items) holds pre-purge staging copies; `REMOVED.json` records
+per-item drop reasons for all 25 families.
+
+> **Audit 2026-08-19 — bank self-consistency ledger.** The shipped banks' stale cross-references
+> were pruned: 728 `null_set` names and 6 `pair` names pointing at gate-removed items (see
+> `REMOVED.json`) were removed/nulled, and the per-item `tolerance` field — which had drifted to
+> values the scorer never accepted (e.g. `exact_int`) — was rewritten to the authoritative
+> `spec.FAMILIES` values. Item prompts, answers, and intermediates are UNCHANGED, and scoring was
+> never affected (`spec.py` was always authoritative) — this only makes the shipped data
+> self-consistent for fresh consumers.
 
 ## Admissibility gate (before freeze)
 
@@ -156,9 +164,10 @@ never subtracted silently.
   artifact (bare `/`/`-` matched any slash/hyphen) — metric deleted, claim withdrawn.
 - **`spec.py` is authoritative over the stale `scripts/olens_suite/README.md`** (which lists
   pre-purge n and wrong tolerances for signpair/absval).
-- **Discrete-family drop provenance is missing from `REMOVED.json`** — `finalize_order_ops.py`
-  wrote it to a now-nonexistent path (`evals/olens_suite/…`); only per-item `gate_correct`/
-  `gate_greedy_ok` survives for those 16 families.
+- **Discrete-family drop provenance was restored to `REMOVED.json` (2026-08-19 audit)** — it now
+  covers all 25 families with per-item reasons (`finalize_order_ops.py` had written the 16
+  discrete-concept families' entries to a now-nonexistent path; their per-item `gate_correct`/
+  `gate_greedy_ok` fields also survive on the items).
 - k=10/cell ⇒ ~±15% per-item error, 95% CIs ~±0.12; a 0.66-vs-0.68 gap may be noise. ~3.9% of
   samples are empty (folding empties into misses *understates* the lens). The read cell is a
   template token — this measures what's held at the moment of answering, not mid-computation.

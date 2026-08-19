@@ -33,7 +33,16 @@ score = pass at any layer.
 
 - **J-lens** gen dirs MUST run with `--interp`: the blind summary-LM stage turns the top-k token
   bag into prose first (item-blind), and the MC judge scores that — apples-to-apples with AO free
-  text (which goes to the judge directly).
+  text (which goes to the judge directly). In `--interp` mode, cells whose interpretation call
+  failed are **skipped**, never judged as empty text (interpretations are cached; failed calls are
+  retried on rerun).
+
+**Judge output (2026-08-19 additions).** The summary payload now carries `n_cells_judged` /
+`n_cells_api_failed` / `n_cells_interp_missing`: failed or uninterpreted cells are skipped and
+counted rather than scored, so when either count is nonzero the reported item rate is a **lower
+bound** — rerun to retry the dropped cells. `--pos all` output additionally embeds
+`"bundled_DO_NOT_QUOTE": true` in the summary payload itself, not just the filename, so the
+marker survives a copy-paste of the numbers.
 
 ## Random baseline
 
@@ -46,10 +55,13 @@ the 15.5% floor. The assumption-free per-cell rate (vs the 1/36 line) is the sec
 
 ## Files
 
-- `cloze_items_final.json` — 100 items (`rel-sNN-{a,b}`), built by `gen_relational.py` (deterministic).
-- Prompt rows: `outputs/oracle_lens_evals/relational_eval/prompts_final.json` (family `relational_final`).
+- `cloze_items_final.json` — 100 items (`rel-sNN-{a,b}`), built by `gen_relational.py`
+  (deterministic; generator script lives in the source repo, not shipped here).
+- Prompt rows: `outputs/oracle_lens_evals/relational_eval/prompts_final.json` (family
+  `relational_final`; source-repo output, not shipped).
 - Readouts: `oa_eb_modal.py --families relational_final --out_suffix relationalf`
-  → `gen-relationalf-{jlens,ao28500}`. Judge → `outputs/oracle_lens_evals/relational_eval/verdicts_p20_*.json`
+  → `gen-relationalf-{jlens,ao28500}` (source-repo outputs, not shipped). Judge →
+  `outputs/oracle_lens_evals/relational_eval/verdicts_p20_*.json`
   (`--pos all` writes `verdicts_bundled_DO_NOT_QUOTE_*.json`).
 
 ## Verbatim judge prompts

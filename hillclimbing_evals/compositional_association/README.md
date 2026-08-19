@@ -12,6 +12,13 @@ pilots) moved to `docs/project/experiments/ola/compositional_association_design.
 pipeline: readouts via the olens_sglang pipeline (see the design doc §1 for the exact
 commands; teacher readouts MUST use the embeds reference path), then judge as below.
 
+**Ledger note (2026-08-19 audit).** Three stimuli were reworded to honor the family's own
+word-boundary blocklist lint (regeneration-on-violation): `q09_c` "school-transfer paperwork" →
+"school-enrollment paperwork" and `q09_h` "school-transfer forms" → "school-enrollment forms"
+(the blocked-and-credited word "transfer" appeared in-stimulus), and `q09_a`
+"disappointed-sounding" → "glum-sounding" (blocked word "disappointed"). Axis concepts, credit
+lists, MC options, and all other items are unchanged; the bank now lints clean.
+
 ## Item schema
 
 Per item: `id`, `cluster`, `level` (L3/L4), `anchor`, `varied_axes`, `cell`, `stimulus` (the
@@ -26,7 +33,7 @@ Multiple-choice, one forced choice per item (`judge_mc.py`; the default instrume
 2026-08-13):
 
 ```bash
-uv run --no-sync python scripts/oracle_lens/latent_eval/judge_mc.py \
+python scripts/oracle_lens/latent_eval/judge_mc.py \
     <gen_dir> --tag teacher --out outputs/oracle_latent_eval/verdicts_teacher.json
 ```
 
@@ -48,12 +55,20 @@ writes per-item verdicts to `--out`. For J-lens gen dirs pass `--jlens-interp` (
 2026-08-13): the item-blind bag→prose summarizer runs on the top-k token readouts first and
 the MC judge scores the resulting prose — apples-to-apples with AO free text. This mirrors the ordered_association MC judge
 (`scripts/oracle_lens_evals/oa_eb_readout_judge.py`) — same seeded shuffle + "cannot tell"
-escape — here whole-item rather than per-axis (Camila's 2026-08-13 choice).
+escape — here whole-item rather than per-axis (design decision, 2026-08-13).
+
+**Robustness fixes (audit 2026-08-19, in `judge_mc.py` as shipped here):** `--resume` now
+re-judges rows recorded as `pick: "api_fail"` instead of freezing them as misses (a fresh,
+non-resumed file still counts them as misses and prints a warning to rerun with `--resume`);
+and items missing a readout at ANY judged layer are excluded from the denominator with a LOUD
+warning (previously they were dropped silently — arms with different layer coverage are not
+comparable).
 
 Reference MC results (recorded 2026-08-13, all-position × L{20,28,36,44,52,60} readouts):
 teacher **PASS 39/100** (cannot-tell 47, contrast 5, other 9); J-lens **PASS 38/100**
 (cannot-tell 40, contrast 5, other 17); chance ~9/100. Verdicts:
-`outputs/oracle_latent_eval/verdicts_mc_{teacher,jlens}.json`.
+`outputs/oracle_latent_eval/verdicts_mc_{teacher,jlens}.json` (source-repo output files — no
+`outputs/` are shipped in this export).
 
 ### Prior binary presence instrument (`judge_final.py`, retained)
 
@@ -64,13 +79,24 @@ all-gold-present, 73/100 flipped-absent, **PASS 10/100**; official J-lens 10/82/
 numbers measure a different thing (free naming of every component) and are NOT comparable to
 MC PASS above.
 
+**Robustness fixes (audit 2026-08-19).** In `judge_final.py` as shipped here, an API failure no
+longer counts as "flipped correctly absent" (which inflated `flip_clean`) — an item with any
+unjudged axis is excluded from the denominator and reported (`n_api_failed`,
+`n_excluded_incomplete`), and `--resume` re-judges incomplete items instead of freezing their
+gaps. Relatedly, the blind-interpretation J-lens path of that era
+(`jlens_interpret_score.py`) no longer caches failed interpretation calls as empty strings (a
+guaranteed judged miss forever after): failed calls are left out of the cache and retried on
+rerun, and cells with no interpretation are skipped and counted, never judged as misses.
+
 ## Caveats (repeat wherever numbers are published)
 
 - Generator (Claude) and judge (Opus 5) share a model family; subject model (Qwen3.6-27B)
   is a third family.
 - Teacher readouts must use the embeds reference path (design doc §1, ledger #15).
 - Presence inside a confabulated wrapper still counts if quote-verified (ledger #22).
-- Sparse API failures (~1–3 calls/run) count conservatively against readouts.
+- Sparse API failures (~1–3 calls/run) count conservatively against readouts in a single MC run
+  (rerun with `--resume` to retry them); the binary instrument excludes incomplete items instead
+  (see the 2026-08-19 fixes above).
 
 ## Verbatim judge prompt
 

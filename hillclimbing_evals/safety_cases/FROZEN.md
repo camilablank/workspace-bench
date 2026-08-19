@@ -4,6 +4,11 @@ The scenario prompt banks and the LLM-judge prompt below are **frozen** as of 20
 edit these files in place; if a scenario or the judge prompt must change, bump a version suffix
 (e.g. `_v4`) and re-freeze, so every scored run is attributable to an exact prompt set.
 
+> **Standalone-export note (2026-08-19).** Only `misalignment_exhaustive_bank.json` is mirrored
+> in this folder. The other four banks and the scripts named here (`generate_prompts.py`,
+> `build_working_set.py`, `scripts/diagnostic/judge_oracle_cells.py`) live in the source repo,
+> hash-pinned exactly as listed below.
+
 ## Frozen scenario prompt banks
 
 | bank | items | sha256[:16] | role |

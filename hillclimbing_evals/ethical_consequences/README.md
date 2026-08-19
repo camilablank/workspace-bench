@@ -1,4 +1,4 @@
-# Ethical-consequences eval (pilot, 2026-08-12)
+# Ethical-consequences eval (FROZEN 2026-08-12, 200-item bank)
 
 Hard ethical dilemmas with **no clean answer**, posed so the model commits to a single surface
 token — `yes`/`no` or `true`/`false`. The lens question: at the answer-decision token, does the
@@ -6,12 +6,13 @@ readout surface the **consideration the model is weighing** — the "incentive f
 kidnappings" behind a ransom yes/no — even though that reason never appears in the output?
 
 That reason is a **never-written latent intermediate**, the same shape as entity_binding's
-never-written capital or relational_multihop's composed relation. What makes this family distinct:
+never-written capital or relational_multihop's composed relation (both retired source-repo
+families). What makes this family distinct:
 the surface output is a *single decision token*, so a lens that only echoes the visible answer
 (`yes`) surfaces nothing, while a lens reading the global workspace should expose the weighed
 consideration behind it.
 
-## Gold reasons are sampled, not authored (Camila 2026-08-12)
+## Gold reasons are sampled, not authored (design decision, 2026-08-12)
 
 There is no single "correct" answer, so there is no hand-authored gold. Reasons are discovered
 empirically in two phases:
@@ -37,7 +38,7 @@ empirically in two phases:
 (`torture_bomb`, `bribe_medicine`, `report_friend`). Re-run the two scripts to refresh gold after
 editing `DILEMMAS`.
 
-## Committed vs deliberative — the both-sides metric (Camila 2026-08-12)
+## Committed vs deliberative — the both-sides metric (design decision, 2026-08-12)
 
 Two classes fall out of the sampling, and the deliberative class is the *more* interesting test:
 
@@ -53,7 +54,7 @@ Two classes fall out of the sampling, and the deliberative class is the *more* i
   surfacing *both* sides of a live deliberation is the strong evidence that the lens reads the
   latent workspace rather than the output token.
 
-## Phrasing variants (stress axis, not a fork — Camila 2026-08-12)
+## Phrasing variants (stress axis, not a fork — design decision, 2026-08-12)
 
 Each dilemma is emitted in three renders so we can see whether the surfaced reason is robust to how
 the question is asked, and whether the plain-completion vs chat-answer framings differ:
@@ -80,7 +81,7 @@ of a templated turn (`enable_thinking=False`).
 ## Sizes (FROZEN 2026-08-12)
 
 - `items.json` — the frozen bank: **100 dilemmas × 2 variants = 200 items** (83 committed +
-  17 deliberative), across 17 domains (bioethics, war, economic_justice, honesty, autonomy,
+  17 deliberative), across 25 domains (bioethics, war, economic_justice, honesty, autonomy,
   animals, environment, technology_privacy, punishment, professional_ethics, family, political, …).
   Source of truth: `dilemmas.json` (100). Every item carries model-derived gold + gate
   annotations; 177/200 pass the behavioral gate (23 flagged flips kept but `gate_pass=false`).
@@ -98,6 +99,10 @@ of a templated turn (`enable_thinking=False`).
    Default `--items` is now `items.json` (was `items_pilot.json`).
 7. `ec_two_axis_judge.py <gen_dir> --items <bank>` — two-axis (topic ∧ reason) judge, same CLI;
    protocol + results below.
+
+Steps 1–4's scripts (`gen_ethical_consequences.py`, `ec_elicit_gpu.py`, `ec_finalize.py`,
+`ec_gate_gpu.py`, `ec_gate_finalize.py`) live in the source repo, not vendored here; steps 5–7
+are vendored under `scripts/oracle_lens_evals/`.
 
 ## Judge protocol (multiple-choice reason-ID, 2026-08-13)
 
@@ -127,8 +132,15 @@ uses the same default.
 
 ### Random baselines (MC judge)
 
-- **committed MC chance = 1/6** (5 content options + the "cannot tell" line).
-- **deliberative chance = (1/6)² = 1/36** (two independent 6-line MCs, both required).
+- **committed MC chance = 1/6 per call** (5 content options + the "cannot tell" line).
+- **deliberative chance = (1/6)² = 1/36 per grid point** (two independent 6-line MCs, both
+  required).
+- **ANY-over-grid floor (2026-08-19 audit fix)** — the reported `pass_any` is ANY over the
+  (layer × tail-position) grid, so the judge output also reports `chance_any_of_grid_floor`:
+  the mean over items of 1−(5/6)^n_calls for committed, and the product of the two sides'
+  floors for deliberative. **Compare `pass_any` to that floor, not to 1/6**; the bundle adapter
+  draws the same floor. Failed judge calls are counted in `n_api_failed` and never persisted —
+  `--resume` retries them.
 
 ### What the judge is given
 
@@ -171,7 +183,8 @@ The topic gate barely dents AO (78 → 63) but halves J-lens (46 → 23): J-lens
 carry a plausible principle without identifying the scenario. Layer profile: AO passes peak at
 L36 (46 items) and decay in late layers; J-lens only ramps from L44 and never exceeds 10.
 Verdicts: `outputs/oracle_lens_evals/ethical_consequences_eval/verdicts_full_{ao28500,jlens}_v2.json`;
-figure: `scripts/figures/plot_ec_two_axis.py` → `plots/ec_judge_v2_comparison.png`.
+figure: `scripts/figures/plot_ec_two_axis.py` (source repo, not vendored) →
+`plots/ec_judge_v2_comparison.png`.
 
 ## Behavioral gate (DONE 2026-08-12) — two-condition consistency
 
@@ -211,10 +224,11 @@ discriminating result the deliberative subclass exposes.
   deliberative 1/36 chance). Blind interp stage for J-lens token lists (`--interp`) preserved. The
   cross-item distractor draw replaces the earlier "no foil for the pilot" note — the MC options are
   the built-in null. **NOTE: the AO 43% / J-lens 34% (committed) and 4/34 · 2/34 (deliberative)
-  numbers in the Results table below were measured with the OLD surfacing instrument and do NOT
+  numbers in the Results table above were measured with the OLD surfacing instrument and do NOT
   apply to the MC judge — re-measure against the MC baselines above on the next readout run.**
-- **Curate to 100**: after the full gate, drop incoherent dilemmas and trim `dilemmas.json` to
-  exactly 100 (prefer keeping deliberative + clean-committed; cut the borderline non-contested).
+- **Curated to 100** (done): after the full gate, incoherent dilemmas were dropped and
+  `dilemmas.json` trimmed to exactly 100 (deliberative + clean-committed kept preferentially;
+  the borderline non-contested cut).
 
 ## Caveats
 
@@ -222,13 +236,15 @@ discriminating result the deliberative subclass exposes.
   reasons; the lens is credited for matching them, not for matching a normative ground truth. If the
   model's stated reason and its true internal driver diverge (verbalized reason ≠ latent cause), the
   eval scores the lens against the verbalization — flag this wherever numbers are published.
-- **Answer-token fragmentation gotcha** (repo CLAUDE.md): if a downstream step reads the *generated*
-  answer token rather than `end_of_stimulus`, `True`/`Yes` at column zero fragment (`'T'+'rue'`);
+- **Answer-token fragmentation gotcha** (the source repo's CLAUDE.md): if a downstream step
+  reads the *generated* answer token rather than `end_of_stimulus`, `True`/`Yes` at column zero
+  fragment (`'T'+'rue'`);
   use `ANSWER_STEM` + `leading_space=True` so the answer's first token is a whole word. The read
   position here is the stimulus end, so the pilot is unaffected — but note it before moving the read.
 - Generator of the dilemmas is human-authored; the reason sampler and the judge share the subject /
   Anthropic model families respectively — the usual generator/judge/subject provenance caveat
-  applies (same as ordered_association / entity_binding). Repeat it wherever numbers are published.
+  applies (same as ordered_association / entity_binding, the latter a retired source-repo
+  family). Repeat it wherever numbers are published.
 
 ## Verbatim judge prompts
 

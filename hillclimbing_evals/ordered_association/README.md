@@ -5,7 +5,7 @@ edit.** Amendments go through a new version + a ledger entry in
 `docs/project/experiments/ola/ordered_association_entity_binding_evals.md`.
 50 scenario pairs (25/tier), 39 congruent / 39 incongruent / 22 neutral; 12 items carry
 `qa.continuation_sent1 = leak` (mask those positions in sweeps).
-(`items_pilot.json` is retained as build provenance.)
+(No `items_pilot.json` ships here — removed 2026-08-19; see Pilot / full sizes.)
 
 Does the lens state the DIRECTION of a relation ("the policeman chased the thief"), not just
 its concepts? Presence-only judges cannot see this: a readout listing "anger, a mother, a son"
@@ -19,7 +19,7 @@ flipped-sibling logic, applied to argument order).
 - **Tier A** — role labels blocked in the stimulus (conveyed by description: "badge and
   shoulder radio", never "police officer"); the action verb ALLOWED. Isolates pure
   argument-order binding.
-- **Tier B** — role labels AND the action word blocked (per Camila: action-blocking is a
+- **Tier B** — role labels AND the action word blocked (design decision: action-blocking is a
   stratum flag, not a hard rule — compare tiers). Full latent composition + direction.
 - **Stereotypicality**: where a scenario has a prior direction (police chase thieves), the
   reversed item is `incongruent` — the discriminative half: a lens decoding priors instead of
@@ -31,9 +31,12 @@ flipped-sibling logic, applied to argument order).
 
 ## Pilot / full sizes
 
-Pilot `items_pilot.json`: 10 scenarios × 2 directions = 40 (20 tier A, 20 tier B).
-Full bank (freeze as `items.json`): 25 scenarios × 2 directions = 100 — extend `GRID`, keep
-directions paired and the congruent/incongruent split roughly balanced within each tier.
+Pilot: 10 scenarios per tier × 2 tiers × 2 directions = 40 items (20 tier A, 20 tier B). The true
+pilot bank exists only in the source repo — the `items_pilot.json` formerly shipped here was a
+mislabeled byte-identical copy of the frozen `items.json` and was removed (2026-08-19 audit).
+Full bank (frozen as `items.json`): 25 scenarios per tier × 2 tiers × 2 directions = 100 —
+extend `GRID`, keep directions paired and the congruent/incongruent split roughly balanced
+within each tier.
 
 ## Gates before freeze (all green at freeze, 2026-08-12)
 
@@ -48,7 +51,7 @@ directions paired and the congruent/incongruent split roughly balanced within ea
 > This section documents the judge as of 2026-08-13 (it supersedes the pre-freeze plan of a
 > quote-verified presence probe in `oracle_lens_judge.py`).
 
-`scripts/oracle_lens_evals/oa_eb_readout_judge.py` (source repo), judge model
+`scripts/oracle_lens_evals/oa_eb_readout_judge.py` (vendored here), judge model
 **claude-opus-5** (`--model`, default `CLAUDE_JUDGE`), structured output, `--resume` supported.
 
 - **One judge call per (item, layer, position) readout** — the judge sees ONLY the readout
@@ -66,7 +69,7 @@ directions paired and the congruent/incongruent split roughly balanced within ea
 - Judge system prompt: answer based ONLY on what the readout states or clearly implies; no
   world knowledge or plausibility fill-in; garbled readouts OK; **partial name matches
   ("Marc", "Bangk") count** as mentions of the full name.
-- **PASS (per readout) = all three choices correct** (per Camila 2026-08-11) — this is what
+- **PASS (per readout) = all three choices correct** (design decision, 2026-08-11) — this is what
   makes the metric *directed*: Q1/Q3 swap under a direction flip, so a lens decoding priors
   or an undirected concept bag fails the incongruent half.
 - **J-lens**: token-bag readouts go through the blind interpretation stage first
@@ -74,9 +77,15 @@ directions paired and the congruent/incongruent split roughly balanced within ea
   interpreter sees ONLY the top-10 tokens — no stimulus, no options, no gold — and must commit
   to a specific reading; the MC judge then scores that prose. Co-occurring names+action force
   a ~50%-chance direction commitment which the counterbalanced pairs account for.
-- Sweep: `--layers 20,28,36,44,52,60` default, `--pos-stride` for position subsampling;
-  item-level aggregation in reports is best-over-grid unless stated otherwise. Mask the 12
-  items with `qa.continuation_sent1 = leak` in position sweeps (see above).
+- Sweep: `--layers` (default = all layers; e.g. `--layers 20,28,36,44,52,60`), `--pos-stride`
+  for position subsampling; item-level aggregation in reports is best-over-grid unless stated
+  otherwise. Mask the 12 items with `qa.continuation_sent1 = leak` in position sweeps (see above).
+- **Judge output (2026-08-19):** the judge reports `n_api_failed` (failed API calls are never
+  persisted; `--resume` retries them) and `chance.any_of_grid_floor` — the mean over items of
+  1−(1−(1/6)³)^n_sites, the honest baseline for the ANY-over-read-sites item pass
+  (`item_pass_any`); the per-site (1/6)³ understates it. entity_binding is retired from the
+  benchmark: when the retired EB bank is absent (as in this repo), the vendored judge runs the
+  ordered_association half alone.
 
 ### Random baseline
 

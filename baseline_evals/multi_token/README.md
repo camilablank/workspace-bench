@@ -11,8 +11,12 @@ site as the single-token banks (final prompt token; directed-modulation-mt reads
 positions), same **word+exact pass@k** scorer, same **per-family permutation chance** null, same
 "never < 3× chance" rule — see `../single_token/README.md` for the full scoring protocol, which
 is shared (including the **audit 2026-08-15 change: the strict Opus bank judge is the headline
-pass criterion**, with `typo-mt` staying regex-scored). This README documents only what `-mt`
-changes.
+pass criterion**, with `typo-mt` staying regex-scored). The bank judge's verbatim system prompt
+and its 2026-08-19 audit fixes (quote gate verified against readout samples only; API failures
+never persisted — counted in `summary.n_unavailable`, retried on `--resume`, all-failed runs
+abort; `summary.n_missing_readouts`; layer detection across all items) are reproduced in
+`../single_token/README.md` §"Verbatim system prompt — strict Opus bank judge" and apply to the
+`-mt` runs identically. This README documents only what `-mt` changes.
 
 **What `-mt` makes harder.** The probed concept must be **multi-token** under the Qwen tokenizer,
 so a single lucky token cannot earn credit. In target derivation, the multi-token `target` **is**

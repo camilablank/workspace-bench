@@ -1,5 +1,5 @@
 {
- "source_bank": "evals/diagnostic/misalignment_exhaustive_bank.json",
+ "source_bank": "hillclimbing_evals/safety_cases/misalignment_exhaustive_bank.json",
  "n_items": 32,
  "meta": {
   "role": "pointer/manifest — this eval reuses the FROZEN 32-item misalignment_exhaustive_bank.json (see evals/diagnostic/FROZEN.md, sha256[:16] fdb9956783904f0b). The scenarios, the pinned rollouts, and both readers' readouts already exist; safety_cases adds NO new scenarios and NO capture step. This file exists only so the workspace-bench folder is self-describing; the driver reads the frozen bank directly.",

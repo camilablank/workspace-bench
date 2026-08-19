@@ -82,12 +82,22 @@ its base rate** in items that did NOT dictate it (same template, same lens). Thi
 "blue ladder read back as RED" drift claim (`blue` base 13/1000 — "blue ladder" rests on `ladder`)
 and caveated `d-chain-key` (`key` is loaded at 25/1000 → rests on `unlock`).
 
-**workspace-bench bundle:** family `superposed`, `judge_type="deterministic"`, `metric="≥1 concept
-surfaced"`, chance None. Oracle arm: a cell hits iff `IN_SENTENCE` and any sample matches any
-concept; question passes iff any cell/layer hits (= `per_item_union > 0`; off-task items never
-pass). J-lens arm: same rule over top-k tokens at every (layer, position), **no region gate**
-(J-lens reads the prompt, which names the concept). Controls have empty `concepts` → both arms
-`pass=False` by construction.
+**workspace-bench bundle:** family `superposed`, `judge_type="deterministic"`, metric "≥1 concept
+surfaced (controls + write-non-compliant items excluded from the rate)", chance None. Oracle arm:
+a cell hits iff `IN_SENTENCE` and any sample matches any concept; question passes iff any
+cell/layer hits (= `per_item_union > 0`; off-task items never pass). J-lens arm: same rule over
+top-k tokens at every (layer, position), **no region gate** (J-lens reads the prompt, which names
+the concept).
+
+> **Audit 2026-08-19 — bundle denominators now match the packaged scorer.** The bundle adapter
+> (`adapters/superposed.py`) excludes from BOTH arms' pass rates: the two dictate-nothing
+> controls (`d-none`/`b-none` — empty concept list, neither arm can ever pass by construction)
+> and write-non-compliant items (no `IN_SENTENCE` oracle cell — i.e. `d-petrichor`, where the
+> model wrote its own sentence and every readout is self-echo). They remain browsable as
+> questions, marked `excluded_from_rate` in the question meta. Previously the controls counted
+> as failures in both arms and the write-compliance gate applied only to the oracle arm, scoring
+> the two arms on different gates. When no oracle arm is present, write compliance cannot be
+> determined and only the controls are excluded.
 
 ## Random baseline / null (no permutation null; layered)
 

@@ -31,9 +31,13 @@ language, verified, lang_group`.
 
 Example (the flagship `py-stock-below-zero`): `ship(10,[4,4,4])` subtracts without capping →
 `verified: "exec: exit 0; stdout = '-2'"`; its twin `py-clean-stock-capped` uses `min(qty,stock)`
-→ `stdout = '0'`. `verified` is parsed, never re-derived (`gates.parse_verified`), and handles
+→ `stdout = '0'`. `verified` is parsed, never re-derived (`gates.parse_verified`), and recognizes
 exactly two shapes: silent `exec: exit 0; stdout = '…'` and raising
-`exec: exit 1; stdout = ''; last = 'ValueError: …'`.
+`exec: exit 1; stdout = ''; last = 'ValueError: …'`. **Those two shapes hold for the python items
+only** (all 36 python entries are `exec:`-shaped); the 8 rust/go/c buggy items and 5 non-python
+clean twins instead carry prose `verified` strings ("by inspection: …", "gcc 9.4 …") that
+`parse_verified` reduces to an empty or garbled stdout — on non-python entries `verified` is
+**informational only**, not a machine-comparable truth string.
 
 **Item purity (lint-enforced):** no trouble vocabulary, no negative literals in code (a bare `-3`
 made J-lens emit "negative"), identifiers must not name the failure. Badness may exist only at
@@ -101,12 +105,17 @@ pass iff a matching verdict exists and its rung ∈ {S2,S3,S4} (no verdict → f
    `spec.py` names the judge as `gpt-5.5` and defines `RUNGS`/`HEADLINE`, and `pairwise.py` builds
    the payload and aggregates, but **no rung-judge module, no S0–S4 rubric text, no pick/ladder
    prompt exists anywhere** (`run_eval.py` returns `[]` for this stage with a "see the README"
-   comment; the README documents judging as a manual step). So the headline
-   `0.875 / 0.250 / 0.063` is reproducible **from stored verdicts, not from prompts**. (By
-   contrast order_ops' pairwise judge *is* committed.)
-2. **`correct_stdout` is absent from all 25 buggy items**, so re-running the output-leak gate
-   against the committed bank reports `-` for every item and `admissible` collapses to the
-   consequence gate alone. The doc's leak census (14 pass / 6 fail) is not reproducible here.
+   comment; the README documents judging as a manual step). And the stored verdicts are **NOT
+   included in this export** either (`results/` is gitignored; no verdict file is committed
+   anywhere in this repo) — so the headline `0.875 / 0.250 / 0.063` is documented here but not
+   re-derivable from this repo; re-aggregating it requires the source repo's `results/` outputs.
+   (By contrast order_ops' pairwise judge *is* committed.)
+2. **`correct_stdout` is absent from all 25 buggy items** (2026-08-19 audit finding, left
+   unfixed by design — the shipped bank is the frozen artifact), so `gates.verdicts()`'s
+   output-leak gate cannot run on it: every item gets `output_leak = None`, `admissible`
+   currently rests on the consequence gate alone, and the summary line prints
+   `(N without a twin stdout)`. The doc's leak census (14 pass / 6 fail) is not reproducible
+   here.
 3. **No item carries a `twin` field**, and there are 25 buggy vs 24 clean, so `pairwise.main`
    raises rather than guess the pairing. The buggy↔clean pairing behind the headline is not
    recorded in the repo.
@@ -141,5 +150,6 @@ ladder aggregator are in `src/global_workspace/olens_suite/buggy_code/pairwise.p
 names the judge as `gpt-5.5` and defines the `RUNGS`/`LEVELS`, but the two prompts that actually
 produce `correct_pick` and the S0–S4 `level` are **not in the repo** (`run_eval.py` returns `[]`
 for this stage; the README documents judging as a manual step). So there is nothing verbatim to
-reproduce — the headline is reproducible only from stored verdict files, not from prompts. This is
-the same reproducibility gap flagged above.
+reproduce — and since the stored verdict files are not shipped in this export either (`results/`
+is gitignored), the headline numbers are documented but not re-derivable here. This is the same
+reproducibility gap flagged above.

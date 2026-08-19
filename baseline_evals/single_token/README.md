@@ -22,6 +22,53 @@ is LLM-judged** (its mechanical number is a proxy only — see its own section b
 > instrument. The mechanical word+exact metric below remains the deterministic secondary and
 > the per-position/per-layer drill-down.
 
+### Verbatim system prompt — strict Opus bank judge
+
+Reproduced byte-exactly from the `SYSTEM` string in
+`src/global_workspace/olens_suite/workspace_bench/bank_judge.py`. One call per (item, layer): the
+user message carries the item's `targets` list, a note saying whether the samples are free text
+or top-10 vocabulary tokens, and every position's readout samples at that layer.
+
+```text
+You are judging readouts from an activation lens for an interpretability
+benchmark. You get one eval item: its TARGET concept(s) and the lens's readout samples at one
+layer (several token positions; for the J-lens the samples are top-10 vocabulary tokens, for
+the oracle lens they are free-text generations).
+
+Decide whether ANY target concept is EXPRESSED in the readout. STRICT rules:
+- Expressed means the target concept is NAMED: the exact target word/phrase as a standalone
+  word (case/inflection of the SAME word is fine: "cats" for "cat"), an established synonym or
+  alias that unambiguously denotes the SAME concept ("Mandarin" for "Chinese"), or a faithful
+  translation of the target into another language ("二月" for "February").
+- NOT expressed by a DIFFERENT or DERIVED word that merely contains the target string:
+  "blackout" does NOT express "black"; "childhood" does NOT express "child".
+- NOT expressed by word fragments or partial tokens, even distinctive ones: "paragus" does NOT
+  express "asparagus"; " acet" does NOT express "acetaminophen". Fragments of different tokens
+  sitting near each other in a token list NEVER combine.
+- NOT expressed by thematically associated imagery, descriptions, or scene content that evokes
+  the concept without naming it: "the wedding dress that never left the closet" does NOT
+  express "sadness". Hypernyms, hyponyms, and category neighbors do NOT count.
+- Judge only what is actually written. If uncertain, say not expressed.
+- Every YES must include a VERBATIM quote copied exactly from one sample (the smallest span
+  that names the target). No quote, no pass.
+Return JSON: {"expressed": bool, "target": "<which target, or empty>", "quote": "<verbatim>"}.
+```
+
+**Judge-protocol fixes (audit 2026-08-19, all in `bank_judge.py` as shipped here):**
+- a positive verdict's `quote` is verified against the readout **samples only** — never against
+  the full prompt, whose targets line and position headers contain the target verbatim — so a
+  hallucinated "quote" of the target word can no longer pass the quote gate (exact substring
+  first, then a whitespace/case-normalized fallback so legit verdicts aren't voided by
+  whitespace mangling);
+- API outages are **never persisted as verdicts**: failed cells are counted in
+  `summary.n_unavailable` and left out of the verdict file so `--resume` retries them (legacy
+  `judge="unavailable"` placeholder rows are likewise dropped and re-judged on resume), and a
+  run where every judge call fails aborts instead of writing a 0-pass score file;
+- `summary.n_missing_readouts` counts items with targets but no readout rows at any selected
+  layer, so a partial run can never masquerade as a clean 0/N;
+- available layers are detected across **all** items' gen files, not just item 0's (probing only
+  item 0 mis-selected layers for everyone whenever item 0's coverage was atypical).
+
 ## Scoring — the mechanical "word+exact pass@k" metric
 
 Scorer: `scripts/oracle_lens_evals/olens_sglang/score_targets.py`; hit semantics:
@@ -29,7 +76,9 @@ Scorer: `scripts/oracle_lens_evals/olens_sglang/score_targets.py`; hit semantics
 with `--exact` (both defaults). Matching is case-insensitive.
 
 **Grid & aggregation.** The grid is (item × targeted position × layer); the lens emits `k`
-samples per grid point (`--k 1` is the default — pass@1). A position hits if any of its k
+samples per grid point. `k` is fixed at **generation time** (the sampling worker's `--k` flag,
+source repo) — `score_targets.py` itself has no `k` flag and scores whatever k the gen dir
+carries; the published headline numbers are k=1 (pass@1). A position hits if any of its k
 samples matches any scored target; a layer hits if any of its positions hit; an **item passes if
 any scored layer hits** (best-over-grid / pass@k). Items with no scored targets or no rows are
 dropped from the denominator, not counted as misses.

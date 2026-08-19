@@ -14,8 +14,8 @@ but drops on the compositional families is producing prettier fiction.
 ## Bank — FROZEN (see items.json meta for selection provenance)
 
 10 held-out conversations: 5 `allenai/WildChat-1M` (English, non-toxic, non-redacted,
-2-3 turns) + 5 `ConvLab/dailydialog` (detokenized mirror — the in-house
-`agu18dec/dailydialog` carries PTB tokenization spacing, exactly the formatting noise this
+2-3 turns) + 5 `ConvLab/dailydialog` (detokenized mirror — an earlier in-house dailydialog
+re-export carries PTB tokenization spacing, exactly the formatting noise this
 eval scores, so it was rejected). Heuristic junk filters (no code blocks/URLs/placeholders,
 ≥98% ASCII, 120-360 rendered tokens) → `claude-sonnet-5` screen (junk/NSFW/naturalness) →
 top-5 per source by screen quality, distinct topics preferred. Regenerate only to re-freeze:
@@ -26,11 +26,15 @@ Qwen — the eval reads Qwen's workspace while it processes held-out text, teach
 `capture_rows.json` carries exact `input_ids` (chat template, `enable_thinking=False`, no
 generation prompt), so there is no retokenization divergence.
 
+**Ledger note (2026-08-19):** `items.json` `meta.layers` was corrected to include layer 56 —
+the frozen meta had gone stale; the actual runs always included 56 (see
+`results_2026-08-13.json` `run.layers`). The items themselves are untouched.
+
 ## Protocol — FROZEN 2026-08-13
 
 - Read sites: ALL positions of the rendered conversation × layers **36,40,44,48,52,56,60**
-  (the ≥36 band: early-layer readouts are expected junk; 36:61:4 = the sumtok ladder's
-  upper half. J-lens has no L63 artifact, so the band tops out at 60).
+  (the ≥36 band: early-layer readouts are expected junk; 36:61:4 = the sumtok (summary-token)
+  ladder's upper half. J-lens has no L63 artifact, so the band tops out at 60).
 - Oracle lens: bank injection, `continuation_raw`, **k=3, temp 0.8, top-p 0.95, top-k 64,
   max_new 64, no stop** — the exact sumtok contract, so pass 1 stays the same instrument.
   The CHECKPOINT is the run parameter (it's what this eval compares), not part of the
@@ -40,8 +44,8 @@ generation prompt), so there is no retokenization divergence.
   copied, Opus-5 as it ships, `LAYERS` overridden to this band. Strict arm only.
 - Pass 2+3 judge: `claude-sonnet-5` (new instruments; prompts live in `judge.py`).
 - Pass 4+5 judge (added 2026-08-19, NOT part of the 2026-08-13 freeze): `claude-opus-5`
-  (`bullet_judges.py` — prompts live there; instrument distilled unchanged from the LOO-lane
-  `rcoh_loo_judges.py`, 2026-08-15). Restricted to pass 1's summary-flagged positions
+  (`bullet_judges.py` — prompts live there; instrument distilled unchanged from an internal
+  predecessor judge, 2026-08-15, source repo). Restricted to pass 1's summary-flagged positions
   (`effective_level >= 2`, union across the arms given); judges only samples that parse as
   "- " bullet lists, so it targets bullet-format checkpoints (a `continuation_raw` arm is
   skipped cell-by-cell and the skip count logged). Unit = (arm, label, pos, layer) cell,
@@ -77,6 +81,21 @@ weights frozen in `score.py`, quality dominates, formatting is the 2-point slice
 Metrics 4+5 are reported BESIDE it (skip-if-missing in `score.py`), never inside it —
 the frozen combined score is unchanged.
 
+> **Audit 2026-08-19 (passes 4+5 robustness).** `bullet_judges.py` now judges ONLY samples that
+> parse to "- " bullet lists — a prose sample no longer draws a schema-forced verdict; each
+> verdict row records `n_samples_skipped`. `score.py`'s diversity fold aligns verdict samples
+> to the judged bullets: `n_distinct` is clamped to the sample's bullet count, pair indices are
+> validated (out-of-range / duplicate / reversed pairs from a malformed verdict are dropped),
+> and rows resumed into the same jsonl are deduped by key, last row wins. Both folds always
+> report `api_errors`, even when every call failed — a fully-failed judge pass is
+> distinguishable from a never-run one.
+
+## Random baseline
+
+None — deliberately. This family has no chance line: it is a checkpoint-comparison quality
+instrument (arms are scored against each other at the same positions), not a
+pass/fail-vs-chance eval.
+
 ## First frozen run (2026-08-13, ao28500-u64 — `results_2026-08-13.json`)
 
 | metric | value |
@@ -96,6 +115,15 @@ headroom for checkpoint hillclimbing. Junk concentrates at early template positi
 (isolated-punctuation samples).
 
 ## Run
+
+> ⚠️ **Steps 1–3 (GPU generation) are SOURCE-REPO cluster commands, kept verbatim for
+> provenance — they are NOT runnable from this export.** They use the source monorepo's Slurm
+> launcher (`scripts/cluster/submit.sh`), its cluster venvs
+> (`/workspace-vast/$USER/envs/sglang-olens`, `env.sh`), its `uv run --no-sync` convention, and
+> its bank path (`B=evals/workspace-bench/...`); the generators they call (`capture_acts.py`,
+> `worker.py`, `jlens_eval.py`) are not vendored here. This repo's copy of the bank is
+> `hillclimbing_evals/readout_coherence/{items.json,capture_rows.json}`. Steps 4–6 (judge +
+> score) run in this repo as-is, given the gen dirs.
 
 ```bash
 B=evals/workspace-bench/hillclimbing_evals/readout_coherence
@@ -125,21 +153,26 @@ scripts/cluster/submit.sh -J rcoh-jlens -g 1 -t 02:00:00 -q high -- \
   scripts/oracle_lens_evals/olens_sglang/jlens_eval.py \
   acts_dir=$G/acts-rcoh out_dir=$G/gen-rcoh-jlens layers=36:61:4 k=10
 
-# 4) judges (CPU, ANTHROPIC_API_KEY via env.sh; pass 1 Opus ~5k calls,
-#    pass 2 Sonnet ~17k calls, pass 3 Sonnet on the flagged subset)
-uv run --no-sync python scripts/oracle_lens_evals/readout_coherence/judge.py \
+# ─── Steps 4-6 run in THIS repo (CPU + ANTHROPIC_API_KEY), given the acts/gen dirs above.
+#     judge.py and bullet_judges.py additionally need `pip install -e ".[coherence]"`
+#     (transformers + safetensors, to render the tokenized context windows) on top of the
+#     default install; score.py needs only the default install.
+
+# 4) judges (pass 1 Opus ~5k calls, pass 2 Sonnet ~17k calls,
+#    pass 3 Sonnet on the flagged subset)
+python scripts/oracle_lens_evals/readout_coherence/judge.py \
   --acts $G/acts-rcoh --gen-ao $G/gen-rcoh-ao28500 --gen-jlens $G/gen-rcoh-jlens \
   --out outputs/oracle_lens_evals/readout_coherence/verdicts --stage all
 
-# 5) bullet judges (CPU, Opus; passes 4+5 — bullet-format arms only; repeat --arm
+# 5) bullet judges (Opus; passes 4+5 — bullet-format arms only; repeat --arm
 #    per checkpoint under comparison so the flagged-position union is shared)
-uv run --no-sync python scripts/oracle_lens_evals/readout_coherence/bullet_judges.py \
+python scripts/oracle_lens_evals/readout_coherence/bullet_judges.py \
   --stage all --acts $G/acts-rcoh \
   --arm ao28500:$G/gen-rcoh-ao28500:outputs/oracle_lens_evals/readout_coherence/verdicts
 
 # 6) score (commit the frozen numbers as results_<date>.json beside items.json,
 #    with the checkpoint recorded)
-uv run --no-sync python scripts/oracle_lens_evals/readout_coherence/score.py \
+python scripts/oracle_lens_evals/readout_coherence/score.py \
   --verdicts outputs/oracle_lens_evals/readout_coherence/verdicts \
   --out outputs/oracle_lens_evals/readout_coherence/results.json
 ```
@@ -252,8 +285,8 @@ text in the FORMAT of a continuation — reads as the next stretch of some
 ```
 
 AO addendum appended after the `_CORE` fill (the "what interesting SUMMARY content looks like"
-section with CORROBORATED/`jlens_support` guidance and the calibration examples — see
-`sumtok_judge.py::AO_SYSTEM`, reproduced in full in the source repo; it defines `jlens_support ∈
+section with CORROBORATED/`jlens_support` guidance and the calibration examples — see `AO_SYSTEM`
+in `scripts/ola/sumtok_judge.py`, vendored in this repo; it defines `jlens_support ∈
 {named, related, absent}` and worked examples for latent_inference / self_state / topic_gist /
 anticipated_content / hallucination / echo).
 
@@ -357,7 +390,7 @@ Reported malformed starts are quote-verified against the actual sample openings 
 
 ### Pass 4 — bullet-relevance judge (`RELEVANCE_SYSTEM`, claude-opus-5)
 
-One call per (item, position, layer) cell: all k samples' bullets judged together, one
+One call per (arm, label, pos, layer) cell: all k samples' bullets judged together, one
 verdict per sample, bullets in order. The user message carries the CONTEXT window (last
 ~1200 tokens, ending at the marked token «…»), the TRUE NEXT TOKENS (64), and each sample's
 bullets as 0-based numbered lines.
