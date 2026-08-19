@@ -19,7 +19,9 @@ every row, so the old number is always recomputable from the new artifact.
 judge re-judges (a) every row the screen scored positive on any probe and (b) a seeded random
 ``--audit-frac`` of the negatives — which is what makes the screen's own false-negative rate
 measurable rather than assumed. ``--screen-model none`` judges the whole grid with the frontier
-model.
+model. The headline ``summary`` always covers the FULL grid — frontier verdicts where they
+exist, screen verdicts for non-escalated grid points — so all-screen-negative items stay in
+the item-level denominators (``frontier_summary`` holds the escalated-subset-only numbers).
 
     # sandbagging, full grid, screened
     uv run --no-sync python scripts/oracle_lens_evals/olens_sglang/judge_readouts.py \
@@ -216,6 +218,12 @@ def main() -> None:
         "sandbagging": summarize_sandbagging,
         "user-modeling": summarize_user_modeling,
     }.get(args.family, summarize_directed_modulation)
+    # Headline summary covers the FULL grid, not just the escalated subset: frontier verdicts
+    # where they exist, screen verdicts for the grid points the screen did not escalate.
+    # Summarizing `judged` alone silently dropped all-screen-negative items from the item-level
+    # denominators (audit 2026-08-19), inflating the pass rate.
+    esc = set(idx)
+    screen_kept = [r for i, r in enumerate(screen_rows) if (i % len(keys)) not in esc]
     payload: dict[str, Any] = {
         "schema_version": 1,
         "family": args.family,
@@ -233,7 +241,9 @@ def main() -> None:
             "n_grid_points": len(pairs),
             "n_escalated": len(idx),
         },
-        "summary": summarize(judged),
+        "summary": summarize(judged + screen_kept),
+        "summary_tiers": {"frontier_rows": len(judged), "screen_rows_folded": len(screen_kept)},
+        "frontier_summary": summarize(judged) if screen_rows else None,
         "screen_summary": summarize(screen_rows) if screen_rows else None,
         "probe_counts": dict(Counter(str(r.get("probe")) for r in judged)),
         "verdicts": judged,

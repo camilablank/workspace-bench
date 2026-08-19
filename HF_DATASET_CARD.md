@@ -32,10 +32,24 @@ top-level card carries the cross-family summary tables.
 
 - Exported from the private `global-workspace` research repo (MATS project, Neel Nanda
   mentorship), `evals/workspace-bench/` at commit `2e6805c8` (2026-08-19). Git is canonical;
-  this mirror is generated.
+  this mirror is generated. The runnable standalone runner (judges, scorers, tests) lives at
+  [github.com/camilablank/workspace-bench](https://github.com/camilablank/workspace-bench) —
+  its data dirs mirror this dataset exactly.
+- **2026-08-19 (external-readiness audit)**: data-side fixes —
+  `ordered_association/items_pilot.json` removed (it was a mislabeled byte-identical copy of
+  the frozen `items.json`; the true pilot lives in the source repo);
+  `order_ops/*.json` stale cross-references pruned (728 `null_set` + 6 `pair` names pointing at
+  gate-removed items) and the per-item `tolerance` field rewritten to the authoritative spec
+  values (prompts/answers unchanged; scoring always used the spec);
+  `compositional_association/items.json` q09_a/q09_c/q09_h stimuli reworded to satisfy the
+  family's own blocklist lint ("disappointed", "transfer" ×2 — the bank now lints clean);
+  `safety_cases/items.json` meta note neutralized; `readout_coherence/items.json` `meta.layers`
+  corrected to include layer 56 (stale frozen-meta). Chance lines for the best-over-grid judged
+  families now state the ANY-over-grid floor (see the baselines table).
 - **2026-08-19**: readout_coherence gains passes 4+5 — the bullet-relevance (*unrelatedness*)
-  and bullet-diversity judges (promoted from the LOO-lane instrument); reported beside, never
-  inside, the frozen overall-coherence score. Verbatim prompts in the family README.
+  and bullet-diversity judges (promoted from an internal predecessor instrument); reported
+  beside, never inside, the frozen overall-coherence score. Verbatim prompts in the family
+  README.
 - **2026-08-15 eval audit** (source PR #188): the strict Opus **bank judge** replaces regex
   matching as the headline pass criterion on the mechanical banks (typo/typo-mt stay regex);
   `relational` is judged at a **single read position (p20, the blank)** — the old all-position
@@ -113,10 +127,10 @@ with olens/AO free text).
 | family | chance / null | basis |
 |---|---|---|
 | relational | per-cell **1/36 ≈ 2.8%**; headline (max-over-6-layers) floor **1−(35/36)⁶ ≈ 15.5%** | two 6-way MCs (5 options + "cannot tell"), cell = both correct; item = any layer |
-| ethical_consequences — committed | **1/6 ≈ 16.7%** | 5 reason options + "cannot tell" |
-| ethical_consequences — deliberative | **1/36 ≈ 2.8%** | two 6-way MCs (yes-side, no-side), both required |
-| compositional_association | **1/11 ≈ 9.1%** | 10 mc_options + "cannot tell" |
-| ordered_association | **1/216 ≈ 0.46%** | three 6-way MCs, all three correct |
+| ethical_consequences — committed | per call **1/6 ≈ 16.7%**; headline (`pass_any` over the layer×position grid) floor **1−(5/6)ⁿ** (reported as `chance_any_of_grid_floor`) | 5 reason options + "cannot tell"; item = any grid point |
+| ethical_consequences — deliberative | per grid point **1/36 ≈ 2.8%**; headline floor = yes-floor × no-floor (reported) | two 6-way MCs (yes-side, no-side), both required; sides ANY-aggregated independently |
+| compositional_association | **1/11 ≈ 9.1%** | 10 mc_options + "cannot tell" (one call per item — no grid inflation) |
+| ordered_association | per read site **1/216 ≈ 0.46%**; headline (any-site) floor **1−(1−(1/6)³)ⁿ** (reported) | three 6-way MCs, all three correct; item = any judged read site |
 | buggy_code | **0.5** | pairwise pick (buggy vs clean twin) |
 | sandbagging / user-modeling / directed-modulation | **empirical foil** | no uniform chance — headline = `strict − foil`; never quote strict alone |
 | order_ops / superposed | **permutation null** | deterministic; `net = value − cross` (donor-item false-alarm rate) |

@@ -25,7 +25,9 @@ are still flagged (``short_pool``).
 Aggregation is best-over-grid ANY over (layer, position): a committed item passes if ANY grid
 point's MC is correct; a deliberative item passes if its yes-side is EVER correct at some grid
 point AND its no-side is EVER correct at some grid point (sides aggregated independently — they
-need not land at the same grid point). Random baseline: committed 1/6, deliberative (1/6)^2 = 1/36.
+need not land at the same grid point). Random baseline: 1/6 PER CALL (deliberative (1/6)^2 per
+grid point); because pass_any is a max over the grid, the aggregate also reports the honest
+ANY-of-grid guessing floor 1-(5/6)^n_calls — compare pass_any to THAT, not to 1/6.
 
 Works on both gen dirs: AO rows carry free-text ``samples``; the J-lens baseline writes top-k
 tokens in the same schema — pass ``--interp`` for J-lens so a blind interpretation stage turns the
@@ -273,10 +275,13 @@ def main() -> None:
             [(INTERP_SYSTEM, f"TOKEN READOUTS:\n{txt}") for _k, txt in pending],
             schema=INTERP_SCHEMA, model=args.model, concurrency=256,
         )
+        n_interp_failed = sum(1 for r_ in ires if r_ is None)
         for (k, _txt), r_ in zip(pending, ires):
             if r_ is not None:
                 cache[k] = r_["interpretation"]
         cache_path.write_text(json.dumps(cache, ensure_ascii=False))
+        if n_interp_failed:
+            print(f"WARNING: {n_interp_failed} interp calls failed (not cached; rerun to retry)")
         todo = [(k, r, cache[k]) for k, r, _txt in todo if k in cache]
 
     prompts, meta = [], []
@@ -294,9 +299,11 @@ def main() -> None:
     res = async_json(prompts, schema=SCHEMA, model=args.model, concurrency=256)
 
     verdicts = list(done.values())
+    n_api_failed = 0
     for m, r_ in zip(meta, res):
         vkey, iid, layer, pos, klass, side, gold_pos, shown, ndist, short = m
         if r_ is None:
+            n_api_failed += 1  # not persisted -> --resume retries these cells
             continue
         choice = r_.get("choice")
         quote = (r_.get("quote") or "").strip()
@@ -349,12 +356,28 @@ def main() -> None:
             "earliest_no_layer": min((v["layer"] for v in no_hit), default=None),
         }
 
+    # pass_any is ANY over the judged (layer, pos) grid — the honest guessing floor is
+    # 1-(5/6)^n_calls per side, not the per-call 1/6 (with a 6x5 grid the naive floor is ~99%).
+    def comm_floor() -> float | None:
+        ns = [len(vs) for vs in committed.values()]
+        return round(sum(1 - (5 / 6) ** n for n in ns) / len(ns), 4) if ns else None
+
+    def delib_floor() -> float | None:
+        fs = []
+        for vs in delib.values():
+            ny = sum(1 for v in vs if v["side"] == "yes")
+            nn = sum(1 for v in vs if v["side"] == "no")
+            fs.append((1 - (5 / 6) ** ny) * (1 - (5 / 6) ** nn))
+        return round(sum(fs) / len(fs), 4) if fs else None
+
     agg = {
         "items_judged": len(by_item),
+        "n_api_failed": n_api_failed,  # cells dropped this run; rerun with --resume to retry
         "committed": {
             "total": len(committed),
             "pass_any": sum(1 for vs in committed.values() if any(v["correct"] for v in vs)),
-            "chance": "1/6",
+            "chance_per_call": "1/6",
+            "chance_any_of_grid_floor": comm_floor(),
         },
         "deliberative": {
             "total": len(delib),
@@ -363,7 +386,8 @@ def main() -> None:
             ),
             "yes_side_any": sum(1 for vs in delib.values() if side_correct(vs, "yes")),
             "no_side_any": sum(1 for vs in delib.values() if side_correct(vs, "no")),
-            "chance": "1/36",
+            "chance_per_call": "1/36",
+            "chance_any_of_grid_floor": delib_floor(),
         },
         "short_pool_items": sorted(
             i for i, vs in by_item.items() if any(v.get("short_pool") for v in vs)
@@ -376,6 +400,8 @@ def main() -> None:
         + "\n"
     )
     print(json.dumps({k: v for k, v in agg.items() if k != "per_item"}, indent=1))
+    if n_api_failed:
+        print(f"WARNING: {n_api_failed} judge calls failed — rerun with --resume to retry them")
     print(f"wrote {len(verdicts)} verdicts -> {args.out}")
 
 

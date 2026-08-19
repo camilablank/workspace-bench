@@ -138,6 +138,14 @@ def main() -> None:
     for l in layers:
         for iid, txt in by_layer[l].items():
             agg[iid] = agg.get(iid, "") + f"\n[L{l}] " + txt
+    all_ids = {iid for l in layers for iid in by_layer[l]}
+    incomplete = sorted(k for k in all_ids if not all(k in by_layer[l] for l in layers))
+    if incomplete:
+        print(
+            f"WARNING: {len(incomplete)} items missing at least one layer are EXCLUDED from "
+            f"the denominator (e.g. {incomplete[:3]}) — arms with different coverage are not "
+            "comparable."
+        )
     agg = {
         k: "".join(ch for ch in v[: args.char_cap] if ch.isprintable() or ch in "\n\t ")
         for k, v in agg.items()
@@ -146,7 +154,10 @@ def main() -> None:
 
     done: dict = {}
     if args.resume and args.out and args.out.exists():
-        done = json.loads(args.out.read_text()).get("per_item", {})
+        prior = json.loads(args.out.read_text()).get("per_item", {})
+        # api_fail rows are transient outages, not verdicts — drop them so resume RE-JUDGES
+        # those items instead of freezing them as misses
+        done = {k: v for k, v in prior.items() if v.get("pick") != "api_fail"}
 
     prompts, meta = [], []
     for it in items:
@@ -197,6 +208,11 @@ def main() -> None:
         breakdown[v.get("pick", "?")] += 1
     print(f"{args.tag}: PASS(pick=gold) {n_pass}/{n}   (chance ~1/11)")
     print("pick breakdown:", dict(sorted(breakdown.items())))
+    if breakdown.get("api_fail"):
+        print(
+            f"WARNING: {breakdown['api_fail']} judge calls failed and count as misses in this "
+            "file — rerun with --resume to retry them."
+        )
     if args.out:
         args.out.parent.mkdir(parents=True, exist_ok=True)
         args.out.write_text(

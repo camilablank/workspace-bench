@@ -73,9 +73,31 @@ def main() -> None:
 
     # flipped differing components: the contrast partner's concept on axes where it differs
     label_to_item = {it["gold_label"]: it for it in items}
+
+    def required_axes(it: dict) -> tuple[list[str], list[str]]:
+        partner = label_to_item.get(it["contrast_label"])
+        gold_axes = list(it["scored_axes"])
+        flip_axes = [
+            a for a in it["scored_axes"]
+            if partner and partner["axis_concepts"][a] != it["axis_concepts"][a]
+        ]
+        return gold_axes, flip_axes
+
+    def is_complete(it: dict, entry: dict) -> bool:
+        """Every required gold/flipped axis has a judged verdict (API failures leave gaps)."""
+        gold_axes, flip_axes = required_axes(it)
+        return all(a in entry.get("gold", {}) for a in gold_axes) and all(
+            a in entry.get("flipped", {}) for a in flip_axes
+        )
+
     done: dict = {}
     if args.resume and args.out and args.out.exists():
-        done = json.loads(args.out.read_text()).get("per_item", {})
+        prior = json.loads(args.out.read_text()).get("per_item", {})
+        # only complete entries are trusted on resume — items with axis gaps (an API outage
+        # mid-run) are re-judged rather than frozen with missing verdicts
+        done = {
+            iid: v for iid, v in prior.items() if iid in by_id and is_complete(by_id[iid], v)
+        }
     prompts, meta = [], []
     for it in items:
         r = agg.get(it["id"])
@@ -109,18 +131,28 @@ def main() -> None:
     for iid, sides in done.items():  # carry over resumed verdicts
         for side, axes in sides.items():
             verdict[iid][side].update(axes)
+    n_api_failed = 0
     for (iid, side, axis), r in zip(meta, res):
-        yes = bool(r and (r.get("answer") or "").strip().lower().startswith("y"))
+        if r is None:
+            # a failed call is NOT a verdict: on a gold axis it would deflate, on a flipped
+            # axis it would count as "contrast correctly absent" and INFLATE flip_clean. Leave
+            # the axis unjudged; the item is excluded below and re-judged on --resume.
+            n_api_failed += 1
+            continue
+        yes = (r.get("answer") or "").strip().lower().startswith("y")
         if yes:
             q = (r.get("quote") or "").strip()
             if not q or norm(q) not in norm(agg[iid]):
                 yes = False  # quote verification failed -> void
         verdict[iid][side][axis] = yes
 
-    n = n_pass = n_gold_all = n_flip_clean = 0
+    n = n_pass = n_gold_all = n_flip_clean = n_excluded = 0
     per_axis = defaultdict(lambda: [0, 0])
     for iid, v in verdict.items():
         it = by_id[iid]
+        if not is_complete(it, v):
+            n_excluded += 1  # axis gaps from API failures: excluded, not guessed
+            continue
         n += 1
         gold_ok = all(v["gold"].get(a, False) for a in it["scored_axes"])
         flip_clean = not any(v.get("flipped", {}).values())
@@ -135,6 +167,11 @@ def main() -> None:
         f"   PASS(both) {n_pass}/{n}"
     )
     print("per-axis present:", {a: f"{ok}/{tot}" for a, (ok, tot) in sorted(per_axis.items())})
+    if n_api_failed or n_excluded:
+        print(
+            f"WARNING: {n_api_failed} judge calls failed; {n_excluded} items excluded for "
+            "incomplete verdicts — rerun with --resume to retry them."
+        )
     if args.out:
         args.out.write_text(
             json.dumps(
@@ -144,6 +181,8 @@ def main() -> None:
                     "gold_all": n_gold_all,
                     "flip_clean": n_flip_clean,
                     "pass": n_pass,
+                    "n_api_failed": n_api_failed,
+                    "n_excluded_incomplete": n_excluded,
                     "per_axis": {a: v for a, v in per_axis.items()},
                     "per_item": {k: dict(v) for k, v in verdict.items()},
                 },

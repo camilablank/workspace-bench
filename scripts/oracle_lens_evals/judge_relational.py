@@ -175,6 +175,7 @@ def main() -> None:
     print(f"{len(cells)} (item, layer) cells from {args.gen_dir}; {n_scenes} scenes")
 
     keys = sorted(cells)
+    n_interp_missing = 0
     if args.interp:
         cache_path = out_path.with_suffix(".interp_cache.json")
         cache = json.loads(cache_path.read_text()) if cache_path.exists() else {}
@@ -186,7 +187,16 @@ def main() -> None:
                 if r:
                     cache[f"{k[0]}|L{k[1]}"] = r["interpretation"]
             cache_path.write_text(json.dumps(cache, indent=1, ensure_ascii=False))
-        readouts = {k: cache.get(f"{k[0]}|L{k[1]}", "") for k in keys}
+        # cells whose interp call failed are SKIPPED, not judged as empty text: an empty
+        # readout is a near-certain 'cannot tell', and only the J-lens arm runs this stage —
+        # judging it would skew the AO-vs-J-lens comparison itself. Rerun to retry them.
+        missing = [k for k in keys if f"{k[0]}|L{k[1]}" not in cache]
+        n_interp_missing = len(missing)
+        if missing:
+            print(f"WARNING: {n_interp_missing} cells have no interpretation — skipped; "
+                  "rerun to retry")
+            keys = [k for k in keys if f"{k[0]}|L{k[1]}" in cache]
+        readouts = {k: cache[f"{k[0]}|L{k[1]}"] for k in keys}
     else:
         readouts = {k: bundle(cells[k]) for k in keys}
 
@@ -203,8 +213,10 @@ def main() -> None:
     y_res = async_json(y_reqs, schema=MC_SCHEMA, model=args.model)
 
     verdicts = {}
+    n_api_failed = 0
     for (k, xg, yg), xr, yr in zip(meta, x_res, y_res):
         if xr is None or yr is None:
+            n_api_failed += 1  # cell dropped this run — reported below, rerun to retry
             continue
         x_ok = xr.get("choice") == xg
         y_ok = yr.get("choice") == yg
@@ -231,11 +243,23 @@ def main() -> None:
         "per_layer_pass": {f"L{L}": f"{sum(v)}/{len(v)}" for L, v in sorted(by_layer.items())},
         "items_pass_any_layer": f"{sum(item_pass.values())}/{len(items)}",
         "pair_consistency": f"{pair_ok}/{n_scenes}",
-        "random_baseline_item": "1/36 (two 6-way MCs, both correct)",
+        "random_baseline_item": "1/36 per cell (two 6-way MCs, both correct); the item-level "
+        "ANY-over-layers floor is 1-(35/36)^n_layers — compare items_pass_any_layer to that",
+        # denominators: per_layer_pass = judged cells at that layer; items_pass_any_layer =
+        # the FULL bank (unjudged items cannot pass). Non-zero failure counters below mean the
+        # item rate is a lower bound — rerun to retry the dropped cells.
+        "n_cells_judged": len(verdicts),
+        "n_cells_api_failed": n_api_failed,
+        "n_cells_interp_missing": n_interp_missing,
     }
+    if args.pos == "all":
+        summary["bundled_DO_NOT_QUOTE"] = True  # marker must survive copy-paste of the summary
     out_path.write_text(json.dumps({"summary": summary, "verdicts": verdicts},
                                    indent=1, ensure_ascii=False) + "\n")
     print(json.dumps(summary, indent=1))
+    if n_api_failed or n_interp_missing:
+        print(f"WARNING: {n_api_failed} judge + {n_interp_missing} interp failures — the item "
+              "rate is a lower bound; rerun to retry")
     print(f"-> {out_path}")
 
 

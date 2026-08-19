@@ -45,6 +45,20 @@ def read_jsonl(path: Path) -> list[dict[str, Any]]:
     return rows
 
 
+def dedupe_by_key(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Resume appends: keep the LAST row per key (a retry's success supersedes its error row,
+    and double-runs can't double-count in the denominators). Keyless rows pass through."""
+    by_key: dict[str, dict[str, Any]] = {}
+    passthrough: list[dict[str, Any]] = []
+    for r in rows:
+        key = r.get("key")
+        if key is None:
+            passthrough.append(r)
+        else:
+            by_key[key] = r
+    return passthrough + list(by_key.values())
+
+
 def source_of(label: str) -> str:
     return label.split("-")[1] if label.startswith("rc-") else "?"
 
@@ -82,7 +96,7 @@ def sumtok_metrics(ao: list[dict[str, Any]], jl: list[dict[str, Any]]) -> dict[s
 def quality_metrics(rows: list[dict[str, Any]]) -> dict[str, Any]:
     ok = [r for r in rows if not r.get("api_error")]
     if not ok:
-        return {"judged": 0}
+        return {"judged": 0, "api_errors": sum(1 for r in rows if r.get("api_error"))}
     by_layer: dict[int, list[int]] = defaultdict(list)
     by_source: dict[str, list[int]] = defaultdict(list)
     for r in ok:
@@ -112,7 +126,7 @@ def quality_metrics(rows: list[dict[str, Any]]) -> dict[str, Any]:
 def sumfmt_metrics(rows: list[dict[str, Any]]) -> dict[str, Any]:
     ok = [r for r in rows if not r.get("api_error")]
     if not ok:
-        return {"judged": 0}
+        return {"judged": 0, "api_errors": sum(1 for r in rows if r.get("api_error"))}
     n_malformed_pos = sum(1 for r in ok if r["n_malformed_layers"] > 0)
     total_layers = sum(r["n_layers"] for r in ok)
     return {
@@ -130,13 +144,17 @@ def sumfmt_metrics(rows: list[dict[str, Any]]) -> dict[str, Any]:
 
 def relevance_metrics(rows: list[dict[str, Any]]) -> dict[str, Any]:
     """Pass 4 (bullet_judges.py relevance.jsonl): per-bullet relation + hallucination."""
+    rows = dedupe_by_key(rows)
     ok = [r for r in rows if not r.get("api_error")]
+    n_err = sum(1 for r in rows if r.get("api_error"))
+    # api_errors is always reported: a fully-failed judge pass must be distinguishable from a
+    # pass that was never run (both used to return the same bare {"judged": 0}).
     if not ok:
-        return {"judged": 0}
+        return {"judged": 0, "api_errors": n_err}
     relations: dict[str, int] = defaultdict(int)
     n_bullets = 0
     n_halluc = 0
-    by_layer: dict[int, list[int]] = defaultdict(list)  # per-cell [unrelated, total] pairs
+    by_layer: dict[int, list[int]] = defaultdict(list)  # one 0/1 (unrelated?) per bullet
     for r in ok:
         # strict=False: a misbehaving judge may return more/fewer sample verdicts than
         # samples — score what aligns, same tolerance as the bullet truncation below.
@@ -149,10 +167,10 @@ def relevance_metrics(rows: list[dict[str, Any]]) -> dict[str, Any]:
                 n_halluc += bool(b["hallucinated"])
                 by_layer[r["layer"]].append(int(b["relation"] == "unrelated"))
     if not n_bullets:
-        return {"judged": len(ok), "n_bullets": 0}
+        return {"judged": len(ok), "api_errors": n_err, "n_bullets": 0}
     return {
         "judged": len(ok),
-        "api_errors": sum(1 for r in rows if r.get("api_error")),
+        "api_errors": n_err,
         "n_bullets": n_bullets,
         "relation_shares": {k: round(v / n_bullets, 4) for k, v in sorted(relations.items())},
         "unrelated_rate": round(relations.get("unrelated", 0) / n_bullets, 4),
@@ -165,26 +183,43 @@ def relevance_metrics(rows: list[dict[str, Any]]) -> dict[str, Any]:
 
 def diversity_metrics(rows: list[dict[str, Any]]) -> dict[str, Any]:
     """Pass 5 (bullet_judges.py diversity.jsonl): pairwise topic relations + n_distinct."""
+    rows = dedupe_by_key(rows)
     ok = [r for r in rows if not r.get("api_error")]
+    n_err = sum(1 for r in rows if r.get("api_error"))
     if not ok:
-        return {"judged": 0}
+        return {"judged": 0, "api_errors": n_err}
     pair_rel: dict[str, int] = defaultdict(int)
     n_distinct: list[int] = []
     n_diverse = 0
     n_samples = 0
     by_layer: dict[int, list[int]] = defaultdict(list)
     for r in ok:
-        for s in r["verdict"]["samples"]:
+        # align verdict samples to the judged bullets exactly as relevance_metrics does: a
+        # verdict for a sample with no bullets (or a surplus verdict from a misbehaving judge)
+        # must not enter the fold — an n_distinct=0 phantom sample would drag the headline.
+        for s, bullet_texts in zip(r["verdict"]["samples"], r["bullets"], strict=False):
+            if not bullet_texts:
+                continue
             n_samples += 1
-            n_distinct.append(int(s["n_distinct"]))
+            nd = max(0, min(int(s["n_distinct"]), len(bullet_texts)))  # clamp to bullet count
+            n_distinct.append(nd)
             n_diverse += bool(s["diverse_aspects"])
-            by_layer[r["layer"]].append(int(s["n_distinct"]))
+            by_layer[r["layer"]].append(nd)
+            seen_pairs: set[tuple[int, int]] = set()
             for pr in s["pairs"]:
+                i, j = pr.get("i"), pr.get("j")
+                valid = (
+                    isinstance(i, int) and isinstance(j, int)
+                    and 0 <= i < j < len(bullet_texts) and (i, j) not in seen_pairs
+                )
+                if not valid:  # out-of-range/duplicate/reversed pair from a malformed verdict
+                    continue
+                seen_pairs.add((i, j))
                 pair_rel[pr["relation"]] += 1
     n_pairs = sum(pair_rel.values())
     return {
         "judged": len(ok),
-        "api_errors": sum(1 for r in rows if r.get("api_error")),
+        "api_errors": n_err,
         "n_samples": n_samples,
         "mean_n_distinct": round(sum(n_distinct) / len(n_distinct), 3) if n_distinct else None,
         "diverse_aspects_rate": round(n_diverse / n_samples, 4) if n_samples else None,

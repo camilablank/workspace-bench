@@ -5,8 +5,12 @@ One call per (item, layer): the judge sees the item's targets and EVERY position
 samples at that layer, and decides whether any target concept is NAMED — strict mode
 (2026-08-15): exact word / true synonym / translation only; derived words, fragments, and
 associative imagery do NOT count; every positive must carry a verbatim quote (unverifiable quotes
-void the verdict). Works identically for oracle-lens free text and J-lens token bags (the
-prompt says which). Deterministic bundling order, resume-by-key, full verdicts persisted.
+void the verdict; quotes are verified against the READOUT SAMPLES only, never the prompt's
+target/position headers — audit 2026-08-19). Works identically for oracle-lens free text and
+J-lens token bags (the prompt says which). Deterministic bundling order, resume-by-key, full
+verdicts persisted. API outages are NEVER persisted as verdicts: failed cells are counted in
+``summary.n_unavailable``, left out of the file so ``--resume`` retries them, and a run where
+every call failed (e.g. no ANTHROPIC_API_KEY) aborts instead of writing a 0-pass score file.
 
     python -m global_workspace.olens_suite.workspace_bench.bank_judge \
         --acts outputs/oracle_lens_evals/olens_sglang/acts-final \
@@ -71,6 +75,21 @@ def load_rows(gen: Path, label: str, layer: int) -> list[dict[str, Any]]:
     return [json.loads(line) for line in f.read_text().splitlines() if line.strip()]
 
 
+def quote_verified(quote: str, samples_text: str) -> bool:
+    """A positive's quote must be a verbatim span of the readout SAMPLES themselves.
+
+    Verifying against the full prompt would let a hallucinated 'quote' of the target word pass
+    the quote gate (the targets line and position headers contain it verbatim). Exact substring
+    first; a whitespace/case-normalized fallback keeps legit verdicts from being voided by
+    whitespace mangling."""
+    if not quote:
+        return False
+    if quote in samples_text:
+        return True
+    norm_q = " ".join(quote.lower().split())
+    return bool(norm_q) and norm_q in " ".join(samples_text.lower().split())
+
+
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--acts", required=True, type=Path)
@@ -87,8 +106,14 @@ def main() -> None:
 
     manifest = json.loads((args.acts / "manifest.json").read_text())
     fams = set(args.families.split(",")) if args.families else None
-    probe = args.gen / manifest["prompts"][0]["label"]
-    layers = [ly for ly in manifest["layers"] if (probe / f"L{ly:03d}.jsonl").exists()]
+    # available layers = union over ALL items (probing only item 0 mis-selects layers for
+    # everyone whenever item 0's coverage is atypical)
+    labels = [p["label"] for p in manifest["prompts"]]
+    layers = [
+        ly
+        for ly in manifest["layers"]
+        if any((args.gen / lb / f"L{ly:03d}.jsonl").exists() for lb in labels)
+    ]
     layers = layers or manifest["layers"]
 
     by_family: dict[str, list[dict[str, Any]]] = defaultdict(list)
@@ -100,15 +125,21 @@ def main() -> None:
         out_path = out_dir / f"{family}.json"
         done: dict[str, Any] = {}
         if args.resume and out_path.exists():
-            done = json.loads(out_path.read_text()).get("verdicts", {})
-        cells: list[tuple[str, str]] = []  # (key, user_prompt)
+            prior = json.loads(out_path.read_text()).get("verdicts", {})
+            # legacy files may hold judge="unavailable" placeholders from an outage — drop
+            # them so the resume RE-JUDGES those cells instead of freezing them as misses
+            done = {k: v for k, v in prior.items() if v.get("judge") != "unavailable"}
+        cells: list[tuple[str, str, str]] = []  # (key, user_prompt, samples_text)
+        n_missing = 0  # items with targets but no readout rows at any selected layer
         for e in entries:
+            found_any = False
             for ly in layers:
                 key = f"{e['label']}|L{ly}"
-                if key in done:
-                    continue
                 rows = load_rows(args.gen, e["label"], int(ly))
                 if not rows:
+                    continue
+                found_any = True
+                if key in done:
                     continue
                 blocks = []
                 for r in rows:
@@ -122,18 +153,29 @@ def main() -> None:
                 user = (
                     f"targets: {json.dumps(e['targets'])}\n{kind_note}\n\n" + "\n\n".join(blocks)
                 )
-                cells.append((key, user))
+                samples_text = "\n".join(s for r in rows for s in r.get("samples", []))
+                cells.append((key, user, samples_text))
+            if not found_any:
+                n_missing += 1
+        n_unavailable = 0
         if cells:
-            prompts = [(SYSTEM, u) for _, u in cells]
+            prompts = [(SYSTEM, u) for _, u, _ in cells]
             results = async_json(
                 prompts, schema=SCHEMA, model=args.model, concurrency=args.concurrency
             )
-            for (key, user), r in zip(cells, results, strict=True):
+            if all(r is None for r in results):
+                raise SystemExit(
+                    f"[bank_judge] {family}: ALL {len(results)} judge calls failed "
+                    "(missing/invalid ANTHROPIC_API_KEY or a full outage) — refusing to write "
+                    "a 0-pass score file. Fix the key/outage and rerun (with --resume to keep "
+                    "any prior verdicts)."
+                )
+            for (key, _user, samples_text), r in zip(cells, results, strict=True):
                 if r is None:
-                    done[key] = {"expressed": False, "target": "", "quote": "", "quote_ok": False,
-                                 "judge": "unavailable"}
+                    # do NOT persist: the key stays absent so --resume retries it
+                    n_unavailable += 1
                     continue
-                quote_ok = bool(r.get("quote")) and r["quote"] in user
+                quote_ok = quote_verified(r.get("quote") or "", samples_text)
                 if r.get("expressed") and not quote_ok:
                     r["expressed"] = False  # unverifiable positive -> void (quote discipline)
                 done[key] = {"expressed": bool(r.get("expressed")), "target": r.get("target", ""),
@@ -147,13 +189,23 @@ def main() -> None:
         n_pass = sum(1 for e in entries if item_pass.get(e["label"]))
         payload = {
             "family": family, "kind": args.kind, "model": args.model,
-            "summary": {"n_items": n, "n_pass": n_pass, "pass_rate": n_pass / max(1, n)},
+            "summary": {
+                "n_items": n, "n_pass": n_pass, "pass_rate": n_pass / max(1, n),
+                # unjudged cells this run (retryable via --resume) + items with no readouts at
+                # all: surfaced so a partial run can never masquerade as a clean 0/N
+                "n_unavailable": n_unavailable, "n_missing_readouts": n_missing,
+            },
             "verdicts": done,
         }
         tmp = out_path.with_suffix(".tmp")
         tmp.write_text(json.dumps(payload, ensure_ascii=False, indent=1))
         tmp.replace(out_path)
-        print(f"[bank_judge] {family}: {n_pass}/{n} ({len(done)} cells) -> {out_path}", flush=True)
+        flag = f", {n_unavailable} UNJUDGED (rerun --resume)" if n_unavailable else ""
+        miss = f", {n_missing} items without readouts" if n_missing else ""
+        print(
+            f"[bank_judge] {family}: {n_pass}/{n} ({len(done)} cells{flag}{miss}) -> {out_path}",
+            flush=True,
+        )
 
 
 if __name__ == "__main__":

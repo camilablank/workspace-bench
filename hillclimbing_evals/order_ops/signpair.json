@@ -31,7 +31,6 @@
   "null_set": [
    "signpair-115",
    "signpair-134",
-   "signpair-143",
    "signpair-145",
    "signpair-148",
    "signpair-370",
@@ -52,7 +51,7 @@
    "signpair-403",
    "signpair-406"
   ],
-  "tolerance": "exact_int",
+  "tolerance": "rel2pct",
   "pair_survived": true
  },
  {
@@ -87,7 +86,6 @@
   "null_set": [
    "signpair-102",
    "signpair-134",
-   "signpair-143",
    "signpair-145",
    "signpair-148",
    "signpair-370",
@@ -107,7 +105,7 @@
    "signpair-403",
    "signpair-406"
   ],
-  "tolerance": "exact_int",
+  "tolerance": "rel2pct",
   "pair_survived": true
  },
  {
@@ -142,7 +140,6 @@
   "null_set": [
    "signpair-102",
    "signpair-115",
-   "signpair-143",
    "signpair-145",
    "signpair-148",
    "signpair-370",
@@ -162,7 +159,7 @@
    "signpair-403",
    "signpair-406"
   ],
-  "tolerance": "exact_int",
+  "tolerance": "rel2pct",
   "pair_survived": true
  },
  {
@@ -181,7 +178,7 @@
   ],
   "single_token_reachable": false,
   "name": "signpair-145",
-  "pair": "absval-095",
+  "pair": null,
   "prompt": "Compute (330 - 479) * 79. Reply with only the final number, nothing else.",
   "round": 1,
   "committed": "-11771",
@@ -198,7 +195,6 @@
    "signpair-102",
    "signpair-115",
    "signpair-134",
-   "signpair-143",
    "signpair-148",
    "signpair-370",
    "signpair-374",
@@ -217,7 +213,7 @@
    "signpair-403",
    "signpair-406"
   ],
-  "tolerance": "exact_int",
+  "tolerance": "rel2pct",
   "pair_survived": false
  },
  {
@@ -253,7 +249,6 @@
    "signpair-102",
    "signpair-115",
    "signpair-134",
-   "signpair-143",
    "signpair-145",
    "signpair-374",
    "signpair-376",
@@ -272,7 +267,7 @@
    "signpair-403",
    "signpair-406"
   ],
-  "tolerance": "exact_int",
+  "tolerance": "rel2pct",
   "pair_survived": true
  },
  {
@@ -308,7 +303,6 @@
    "signpair-102",
    "signpair-115",
    "signpair-134",
-   "signpair-143",
    "signpair-145",
    "signpair-374",
    "signpair-376",
@@ -327,7 +321,7 @@
    "signpair-403",
    "signpair-406"
   ],
-  "tolerance": "exact_int",
+  "tolerance": "rel2pct",
   "pair_survived": true
  },
  {
@@ -363,7 +357,6 @@
    "signpair-102",
    "signpair-115",
    "signpair-134",
-   "signpair-143",
    "signpair-145",
    "signpair-148",
    "signpair-370",
@@ -382,7 +375,7 @@
    "signpair-402",
    "signpair-403"
   ],
-  "tolerance": "exact_int",
+  "tolerance": "rel2pct",
   "pair_survived": true
  },
  {
@@ -418,7 +411,6 @@
    "signpair-102",
    "signpair-115",
    "signpair-134",
-   "signpair-143",
    "signpair-145",
    "signpair-148",
    "signpair-370",
@@ -439,7 +431,7 @@
    "signpair-403",
    "signpair-406"
   ],
-  "tolerance": "exact_int",
+  "tolerance": "rel2pct",
   "pair_survived": true
  },
  {
@@ -475,7 +467,6 @@
    "signpair-102",
    "signpair-115",
    "signpair-134",
-   "signpair-143",
    "signpair-145",
    "signpair-148",
    "signpair-370",
@@ -496,7 +487,7 @@
    "signpair-403",
    "signpair-406"
   ],
-  "tolerance": "exact_int",
+  "tolerance": "rel2pct",
   "pair_survived": true
  },
  {
@@ -532,7 +523,6 @@
    "signpair-102",
    "signpair-115",
    "signpair-134",
-   "signpair-143",
    "signpair-145",
    "signpair-148",
    "signpair-370",
@@ -552,7 +542,7 @@
    "signpair-403",
    "signpair-406"
   ],
-  "tolerance": "exact_int",
+  "tolerance": "rel2pct",
   "pair_survived": true
  },
  {
@@ -588,7 +578,6 @@
    "signpair-102",
    "signpair-115",
    "signpair-134",
-   "signpair-143",
    "signpair-148",
    "signpair-370",
    "signpair-374",
@@ -607,7 +596,7 @@
    "signpair-403",
    "signpair-406"
   ],
-  "tolerance": "exact_int",
+  "tolerance": "rel2pct",
   "pair_survived": true
  },
  {
@@ -643,7 +632,6 @@
    "signpair-102",
    "signpair-115",
    "signpair-134",
-   "signpair-143",
    "signpair-145",
    "signpair-148",
    "signpair-370",
@@ -662,7 +650,7 @@
    "signpair-402",
    "signpair-406"
   ],
-  "tolerance": "exact_int",
+  "tolerance": "rel2pct",
   "pair_survived": true
  },
  {
@@ -682,7 +670,7 @@
   "round": 2,
   "single_token_reachable": false,
   "name": "signpair-386",
-  "pair": "absval-346",
+  "pair": null,
   "prompt": "Compute (559 - 823) * 7. Reply with only the final number, nothing else.",
   "committed": "-1848",
   "raw": "-1848",
@@ -697,7 +685,6 @@
   "null_set": [
    "signpair-102",
    "signpair-115",
-   "signpair-143",
    "signpair-145",
    "signpair-148",
    "signpair-370",
@@ -718,7 +705,7 @@
    "signpair-403",
    "signpair-406"
   ],
-  "tolerance": "exact_int",
+  "tolerance": "rel2pct",
   "pair_survived": false
  },
  {
@@ -773,7 +760,7 @@
    "signpair-403",
    "signpair-406"
   ],
-  "tolerance": "exact_int",
+  "tolerance": "rel2pct",
   "pair_survived": true
  },
  {
@@ -809,7 +796,6 @@
    "signpair-102",
    "signpair-115",
    "signpair-134",
-   "signpair-143",
    "signpair-148",
    "signpair-370",
    "signpair-374",
@@ -828,7 +814,7 @@
    "signpair-403",
    "signpair-406"
   ],
-  "tolerance": "exact_int",
+  "tolerance": "rel2pct",
   "pair_survived": true
  },
  {
@@ -864,7 +850,6 @@
    "signpair-102",
    "signpair-115",
    "signpair-134",
-   "signpair-143",
    "signpair-145",
    "signpair-374",
    "signpair-376",
@@ -882,7 +867,7 @@
    "signpair-402",
    "signpair-406"
   ],
-  "tolerance": "exact_int",
+  "tolerance": "rel2pct",
   "pair_survived": true
  },
  {
@@ -917,7 +902,6 @@
   "null_set": [
    "signpair-102",
    "signpair-134",
-   "signpair-143",
    "signpair-145",
    "signpair-148",
    "signpair-370",
@@ -938,7 +922,7 @@
    "signpair-403",
    "signpair-406"
   ],
-  "tolerance": "exact_int",
+  "tolerance": "rel2pct",
   "pair_survived": true
  },
  {
@@ -973,7 +957,6 @@
   "null_set": [
    "signpair-115",
    "signpair-134",
-   "signpair-143",
    "signpair-145",
    "signpair-148",
    "signpair-370",
@@ -994,7 +977,7 @@
    "signpair-403",
    "signpair-406"
   ],
-  "tolerance": "exact_int",
+  "tolerance": "rel2pct",
   "pair_survived": true
  },
  {
@@ -1029,7 +1012,6 @@
   "null_set": [
    "signpair-102",
    "signpair-115",
-   "signpair-143",
    "signpair-145",
    "signpair-148",
    "signpair-370",
@@ -1049,7 +1031,7 @@
    "signpair-403",
    "signpair-406"
   ],
-  "tolerance": "exact_int",
+  "tolerance": "rel2pct",
   "pair_survived": true
  },
  {
@@ -1085,7 +1067,6 @@
    "signpair-102",
    "signpair-115",
    "signpair-134",
-   "signpair-143",
    "signpair-145",
    "signpair-148",
    "signpair-370",
@@ -1105,7 +1086,7 @@
    "signpair-403",
    "signpair-406"
   ],
-  "tolerance": "exact_int",
+  "tolerance": "rel2pct",
   "pair_survived": true
  },
  {
@@ -1140,7 +1121,6 @@
   "null_set": [
    "signpair-102",
    "signpair-134",
-   "signpair-143",
    "signpair-145",
    "signpair-148",
    "signpair-370",
@@ -1160,7 +1140,7 @@
    "signpair-401",
    "signpair-403"
   ],
-  "tolerance": "exact_int",
+  "tolerance": "rel2pct",
   "pair_survived": true
  },
  {
@@ -1196,7 +1176,6 @@
    "signpair-102",
    "signpair-115",
    "signpair-134",
-   "signpair-143",
    "signpair-145",
    "signpair-148",
    "signpair-370",
@@ -1215,7 +1194,7 @@
    "signpair-402",
    "signpair-406"
   ],
-  "tolerance": "exact_int",
+  "tolerance": "rel2pct",
   "pair_survived": true
  },
  {
@@ -1251,7 +1230,6 @@
    "signpair-102",
    "signpair-115",
    "signpair-134",
-   "signpair-143",
    "signpair-145",
    "signpair-148",
    "signpair-370",
@@ -1270,7 +1248,7 @@
    "signpair-401",
    "signpair-403"
   ],
-  "tolerance": "exact_int",
+  "tolerance": "rel2pct",
   "pair_survived": true
  }
 ]

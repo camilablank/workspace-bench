@@ -40,10 +40,8 @@
    "absval-338",
    "absval-339",
    "absval-340",
-   "absval-342",
    "absval-347",
    "absval-348",
-   "absval-349",
    "absval-353",
    "absval-354",
    "absval-356",
@@ -53,10 +51,9 @@
    "absval-361",
    "absval-362",
    "absval-363",
-   "absval-366",
-   "absval-368"
+   "absval-366"
   ],
-  "tolerance": "exact_int",
+  "tolerance": "rel2pct",
   "pair_survived": true
  },
  {
@@ -100,10 +97,8 @@
    "absval-338",
    "absval-339",
    "absval-340",
-   "absval-342",
    "absval-347",
    "absval-348",
-   "absval-349",
    "absval-353",
    "absval-354",
    "absval-356",
@@ -112,10 +107,9 @@
    "absval-360",
    "absval-361",
    "absval-363",
-   "absval-366",
-   "absval-368"
+   "absval-366"
   ],
-  "tolerance": "exact_int",
+  "tolerance": "rel2pct",
   "pair_survived": true
  },
  {
@@ -159,10 +153,8 @@
    "absval-338",
    "absval-339",
    "absval-340",
-   "absval-342",
    "absval-347",
    "absval-348",
-   "absval-349",
    "absval-353",
    "absval-354",
    "absval-356",
@@ -172,10 +164,9 @@
    "absval-361",
    "absval-362",
    "absval-363",
-   "absval-366",
-   "absval-368"
+   "absval-366"
   ],
-  "tolerance": "exact_int",
+  "tolerance": "rel2pct",
   "pair_survived": true
  },
  {
@@ -194,7 +185,7 @@
   ],
   "single_token_reachable": false,
   "name": "absval-093",
-  "pair": "signpair-143",
+  "pair": null,
   "prompt": "Compute abs(801 - 929) * 73. Reply with only the final number, nothing else.",
   "round": 1,
   "committed": "9344",
@@ -219,9 +210,7 @@
    "absval-338",
    "absval-339",
    "absval-340",
-   "absval-342",
    "absval-348",
-   "absval-349",
    "absval-353",
    "absval-354",
    "absval-356",
@@ -232,10 +221,9 @@
    "absval-361",
    "absval-362",
    "absval-363",
-   "absval-366",
-   "absval-368"
+   "absval-366"
   ],
-  "tolerance": "exact_int",
+  "tolerance": "rel2pct",
   "pair_survived": true
  },
  {
@@ -278,10 +266,8 @@
    "absval-338",
    "absval-339",
    "absval-340",
-   "absval-342",
    "absval-347",
    "absval-348",
-   "absval-349",
    "absval-353",
    "absval-354",
    "absval-356",
@@ -291,10 +277,9 @@
    "absval-361",
    "absval-362",
    "absval-363",
-   "absval-366",
-   "absval-368"
+   "absval-366"
   ],
-  "tolerance": "exact_int",
+  "tolerance": "rel2pct",
   "pair_survived": true
  },
  {
@@ -337,10 +322,8 @@
    "absval-338",
    "absval-339",
    "absval-340",
-   "absval-342",
    "absval-347",
    "absval-348",
-   "absval-349",
    "absval-353",
    "absval-354",
    "absval-356",
@@ -350,10 +333,9 @@
    "absval-361",
    "absval-362",
    "absval-363",
-   "absval-366",
-   "absval-368"
+   "absval-366"
   ],
-  "tolerance": "exact_int",
+  "tolerance": "rel2pct",
   "pair_survived": true
  },
  {
@@ -397,10 +379,8 @@
    "absval-338",
    "absval-339",
    "absval-340",
-   "absval-342",
    "absval-347",
    "absval-348",
-   "absval-349",
    "absval-353",
    "absval-354",
    "absval-356",
@@ -409,10 +389,9 @@
    "absval-359",
    "absval-360",
    "absval-362",
-   "absval-363",
-   "absval-368"
+   "absval-363"
   ],
-  "tolerance": "exact_int",
+  "tolerance": "rel2pct",
   "pair_survived": true
  },
  {
@@ -456,10 +435,8 @@
    "absval-338",
    "absval-339",
    "absval-340",
-   "absval-342",
    "absval-347",
    "absval-348",
-   "absval-349",
    "absval-353",
    "absval-354",
    "absval-357",
@@ -469,10 +446,9 @@
    "absval-361",
    "absval-362",
    "absval-363",
-   "absval-366",
-   "absval-368"
+   "absval-366"
   ],
-  "tolerance": "exact_int",
+  "tolerance": "rel2pct",
   "pair_survived": true
  },
  {
@@ -516,10 +492,8 @@
    "absval-338",
    "absval-339",
    "absval-340",
-   "absval-342",
    "absval-347",
    "absval-348",
-   "absval-349",
    "absval-353",
    "absval-354",
    "absval-356",
@@ -530,10 +504,9 @@
    "absval-361",
    "absval-362",
    "absval-363",
-   "absval-366",
-   "absval-368"
+   "absval-366"
   ],
-  "tolerance": "exact_int",
+  "tolerance": "rel2pct",
   "pair_survived": true
  },
  {
@@ -577,10 +550,8 @@
    "absval-337",
    "absval-339",
    "absval-340",
-   "absval-342",
    "absval-347",
    "absval-348",
-   "absval-349",
    "absval-353",
    "absval-354",
    "absval-356",
@@ -590,10 +561,9 @@
    "absval-361",
    "absval-362",
    "absval-363",
-   "absval-366",
-   "absval-368"
+   "absval-366"
   ],
-  "tolerance": "exact_int",
+  "tolerance": "rel2pct",
   "pair_survived": true
  },
  {
@@ -637,9 +607,7 @@
    "absval-337",
    "absval-338",
    "absval-340",
-   "absval-342",
    "absval-347",
-   "absval-349",
    "absval-353",
    "absval-354",
    "absval-356",
@@ -650,10 +618,9 @@
    "absval-361",
    "absval-362",
    "absval-363",
-   "absval-366",
-   "absval-368"
+   "absval-366"
   ],
-  "tolerance": "exact_int",
+  "tolerance": "rel2pct",
   "pair_survived": true
  },
  {
@@ -697,9 +664,7 @@
    "absval-337",
    "absval-338",
    "absval-339",
-   "absval-342",
    "absval-348",
-   "absval-349",
    "absval-353",
    "absval-354",
    "absval-356",
@@ -709,10 +674,9 @@
    "absval-360",
    "absval-361",
    "absval-362",
-   "absval-366",
-   "absval-368"
+   "absval-366"
   ],
-  "tolerance": "exact_int",
+  "tolerance": "rel2pct",
   "pair_survived": true
  },
  {
@@ -755,9 +719,7 @@
    "absval-337",
    "absval-338",
    "absval-339",
-   "absval-342",
    "absval-348",
-   "absval-349",
    "absval-353",
    "absval-354",
    "absval-356",
@@ -768,10 +730,9 @@
    "absval-361",
    "absval-362",
    "absval-363",
-   "absval-366",
-   "absval-368"
+   "absval-366"
   ],
-  "tolerance": "exact_int",
+  "tolerance": "rel2pct",
   "pair_survived": true
  },
  {
@@ -815,9 +776,7 @@
    "absval-337",
    "absval-338",
    "absval-340",
-   "absval-342",
    "absval-347",
-   "absval-349",
    "absval-353",
    "absval-354",
    "absval-356",
@@ -828,10 +787,9 @@
    "absval-361",
    "absval-362",
    "absval-363",
-   "absval-366",
-   "absval-368"
+   "absval-366"
   ],
-  "tolerance": "exact_int",
+  "tolerance": "rel2pct",
   "pair_survived": true
  },
  {
@@ -851,7 +809,7 @@
   "round": 2,
   "single_token_reachable": false,
   "name": "absval-353",
-  "pair": "signpair-393",
+  "pair": null,
   "prompt": "Compute abs(502 - 865) * 7. Reply with only the final number, nothing else.",
   "committed": "2541",
   "raw": "2541",
@@ -878,7 +836,6 @@
    "absval-340",
    "absval-347",
    "absval-348",
-   "absval-349",
    "absval-354",
    "absval-356",
    "absval-357",
@@ -888,10 +845,9 @@
    "absval-361",
    "absval-362",
    "absval-363",
-   "absval-366",
-   "absval-368"
+   "absval-366"
   ],
-  "tolerance": "exact_int",
+  "tolerance": "rel2pct",
   "pair_survived": false
  },
  {
@@ -911,7 +867,7 @@
   "round": 2,
   "single_token_reachable": false,
   "name": "absval-354",
-  "pair": "signpair-394",
+  "pair": null,
   "prompt": "Compute abs(409 - 737) * 9. Reply with only the final number, nothing else.",
   "committed": "2952",
   "raw": "2952",
@@ -938,7 +894,6 @@
    "absval-340",
    "absval-347",
    "absval-348",
-   "absval-349",
    "absval-353",
    "absval-356",
    "absval-357",
@@ -948,10 +903,9 @@
    "absval-361",
    "absval-362",
    "absval-363",
-   "absval-366",
-   "absval-368"
+   "absval-366"
   ],
-  "tolerance": "exact_int",
+  "tolerance": "rel2pct",
   "pair_survived": false
  },
  {
@@ -971,7 +925,7 @@
   "round": 2,
   "single_token_reachable": false,
   "name": "absval-356",
-  "pair": "signpair-396",
+  "pair": null,
   "prompt": "Compute abs(511 - 926) * 3. Reply with only the final number, nothing else.",
   "committed": "1245",
   "raw": "1245",
@@ -995,10 +949,8 @@
    "absval-338",
    "absval-339",
    "absval-340",
-   "absval-342",
    "absval-347",
    "absval-348",
-   "absval-349",
    "absval-353",
    "absval-354",
    "absval-357",
@@ -1008,10 +960,9 @@
    "absval-361",
    "absval-362",
    "absval-363",
-   "absval-366",
-   "absval-368"
+   "absval-366"
   ],
-  "tolerance": "exact_int",
+  "tolerance": "rel2pct",
   "pair_survived": false
  },
  {
@@ -1054,10 +1005,8 @@
    "absval-338",
    "absval-339",
    "absval-340",
-   "absval-342",
    "absval-347",
    "absval-348",
-   "absval-349",
    "absval-353",
    "absval-354",
    "absval-356",
@@ -1066,10 +1015,9 @@
    "absval-360",
    "absval-361",
    "absval-362",
-   "absval-366",
-   "absval-368"
+   "absval-366"
   ],
-  "tolerance": "exact_int",
+  "tolerance": "rel2pct",
   "pair_survived": true
  },
  {
@@ -1113,10 +1061,8 @@
    "absval-338",
    "absval-339",
    "absval-340",
-   "absval-342",
    "absval-347",
    "absval-348",
-   "absval-349",
    "absval-353",
    "absval-354",
    "absval-356",
@@ -1126,10 +1072,9 @@
    "absval-361",
    "absval-362",
    "absval-363",
-   "absval-366",
-   "absval-368"
+   "absval-366"
   ],
-  "tolerance": "exact_int",
+  "tolerance": "rel2pct",
   "pair_survived": true
  },
  {
@@ -1173,10 +1118,8 @@
    "absval-338",
    "absval-339",
    "absval-340",
-   "absval-342",
    "absval-347",
    "absval-348",
-   "absval-349",
    "absval-353",
    "absval-354",
    "absval-356",
@@ -1186,10 +1129,9 @@
    "absval-361",
    "absval-362",
    "absval-363",
-   "absval-366",
-   "absval-368"
+   "absval-366"
   ],
-  "tolerance": "exact_int",
+  "tolerance": "rel2pct",
   "pair_survived": true
  },
  {
@@ -1232,10 +1174,8 @@
    "absval-337",
    "absval-339",
    "absval-340",
-   "absval-342",
    "absval-347",
    "absval-348",
-   "absval-349",
    "absval-353",
    "absval-354",
    "absval-356",
@@ -1245,10 +1185,9 @@
    "absval-361",
    "absval-362",
    "absval-363",
-   "absval-366",
-   "absval-368"
+   "absval-366"
   ],
-  "tolerance": "exact_int",
+  "tolerance": "rel2pct",
   "pair_survived": true
  },
  {
@@ -1292,10 +1231,8 @@
    "absval-338",
    "absval-339",
    "absval-340",
-   "absval-342",
    "absval-347",
    "absval-348",
-   "absval-349",
    "absval-353",
    "absval-354",
    "absval-356",
@@ -1305,10 +1242,9 @@
    "absval-360",
    "absval-362",
    "absval-363",
-   "absval-366",
-   "absval-368"
+   "absval-366"
   ],
-  "tolerance": "exact_int",
+  "tolerance": "rel2pct",
   "pair_survived": true
  },
  {
@@ -1352,10 +1288,8 @@
    "absval-338",
    "absval-339",
    "absval-340",
-   "absval-342",
    "absval-347",
    "absval-348",
-   "absval-349",
    "absval-353",
    "absval-354",
    "absval-356",
@@ -1364,10 +1298,9 @@
    "absval-359",
    "absval-360",
    "absval-361",
-   "absval-363",
-   "absval-368"
+   "absval-363"
   ],
-  "tolerance": "exact_int",
+  "tolerance": "rel2pct",
   "pair_survived": true
  },
  {
@@ -1411,10 +1344,8 @@
    "absval-337",
    "absval-338",
    "absval-339",
-   "absval-342",
    "absval-347",
    "absval-348",
-   "absval-349",
    "absval-353",
    "absval-354",
    "absval-356",
@@ -1423,10 +1354,9 @@
    "absval-360",
    "absval-361",
    "absval-362",
-   "absval-366",
-   "absval-368"
+   "absval-366"
   ],
-  "tolerance": "exact_int",
+  "tolerance": "rel2pct",
   "pair_survived": true
  },
  {
@@ -1470,10 +1400,8 @@
    "absval-338",
    "absval-339",
    "absval-340",
-   "absval-342",
    "absval-347",
    "absval-348",
-   "absval-349",
    "absval-353",
    "absval-354",
    "absval-356",
@@ -1482,10 +1410,9 @@
    "absval-359",
    "absval-360",
    "absval-361",
-   "absval-363",
-   "absval-368"
+   "absval-363"
   ],
-  "tolerance": "exact_int",
+  "tolerance": "rel2pct",
   "pair_survived": true
  }
 ]

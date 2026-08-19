@@ -115,37 +115,47 @@ def test_relevance_metrics_truncates_overlong_verdicts() -> None:
 
 
 def test_relevance_metrics_empty() -> None:
-    assert sc.relevance_metrics([]) == {"judged": 0}
-    assert sc.relevance_metrics([{"api_error": True}]) == {"judged": 0}
+    # api_errors is always present: a fully-failed pass is distinguishable from a never-run one
+    assert sc.relevance_metrics([]) == {"judged": 0, "api_errors": 0}
+    assert sc.relevance_metrics([{"key": "e", "api_error": True}]) == {
+        "judged": 0,
+        "api_errors": 1,
+    }
+
+
+def _div_row(samples: list[dict[str, Any]], bullets: list[list[str]]) -> dict[str, Any]:
+    return {
+        "key": "k1",
+        "label": "rc-wildchat-0",
+        "layer": 44,
+        "pos": 3,
+        "bullets": bullets,
+        "api_error": False,
+        "verdict": {"samples": samples},
+    }
 
 
 def test_diversity_metrics_fold() -> None:
     rows = [
-        {
-            "key": "k1",
-            "label": "rc-wildchat-0",
-            "layer": 44,
-            "pos": 3,
-            "api_error": False,
-            "verdict": {
-                "samples": [
-                    {
-                        "pairs": [
-                            {"i": 0, "j": 1, "relation": "same_topic"},
-                            {"i": 0, "j": 2, "relation": "different_concepts"},
-                            {"i": 1, "j": 2, "relation": "related_aspects"},
-                        ],
-                        "n_distinct": 2,
-                        "diverse_aspects": True,
-                    },
-                    {
-                        "pairs": [{"i": 0, "j": 1, "relation": "same_topic"}],
-                        "n_distinct": 1,
-                        "diverse_aspects": False,
-                    },
-                ]
-            },
-        }
+        _div_row(
+            [
+                {
+                    "pairs": [
+                        {"i": 0, "j": 1, "relation": "same_topic"},
+                        {"i": 0, "j": 2, "relation": "different_concepts"},
+                        {"i": 1, "j": 2, "relation": "related_aspects"},
+                    ],
+                    "n_distinct": 2,
+                    "diverse_aspects": True,
+                },
+                {
+                    "pairs": [{"i": 0, "j": 1, "relation": "same_topic"}],
+                    "n_distinct": 1,
+                    "diverse_aspects": False,
+                },
+            ],
+            bullets=[["a", "b", "c"], ["a", "b"]],
+        )
     ]
     m = sc.diversity_metrics(rows)
     assert m["judged"] == 1 and m["n_samples"] == 2
@@ -155,5 +165,41 @@ def test_diversity_metrics_fold() -> None:
     assert m["mean_n_distinct_by_layer"] == {44: 1.5}
 
 
+def test_diversity_metrics_skips_empty_samples_and_bad_pairs() -> None:
+    # a verdict for a zero-bullet (prose) sample must not drag the fold to n_distinct=0, and
+    # out-of-range / duplicate / reversed pairs from a malformed verdict are dropped
+    rows = [
+        _div_row(
+            [
+                {
+                    "pairs": [
+                        {"i": 0, "j": 1, "relation": "different_concepts"},
+                        {"i": 0, "j": 1, "relation": "same_topic"},  # duplicate pair
+                        {"i": 1, "j": 0, "relation": "same_topic"},  # reversed
+                        {"i": 0, "j": 9, "relation": "same_topic"},  # out of range
+                    ],
+                    "n_distinct": 7,  # clamped to the 2 bullets that exist
+                    "diverse_aspects": True,
+                },
+                {"pairs": [], "n_distinct": 0, "diverse_aspects": False},  # phantom sample
+            ],
+            bullets=[["a", "b"], []],
+        )
+    ]
+    m = sc.diversity_metrics(rows)
+    assert m["n_samples"] == 1  # the empty-bullet sample is skipped
+    assert m["mean_n_distinct"] == 2.0  # 7 clamped to len(bullets)
+    assert m["pair_relation_shares"] == {"different_concepts": 1.0}
+
+
 def test_diversity_metrics_empty() -> None:
-    assert sc.diversity_metrics([]) == {"judged": 0}
+    assert sc.diversity_metrics([]) == {"judged": 0, "api_errors": 0}
+
+
+def test_folds_dedupe_resumed_rows() -> None:
+    # resume appends: an api_error row superseded by a retried success must count ONCE
+    err = {"key": "k1", "api_error": True}
+    good = _rel_row(36, ["context", "context"], [False, False])  # key "k36"
+    dup_err = {"key": good["key"], "api_error": True}  # earlier failure for the same key
+    m = sc.relevance_metrics([err, dup_err, good])
+    assert m["judged"] == 1 and m["api_errors"] == 1 and m["n_bullets"] == 2
