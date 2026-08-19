@@ -46,7 +46,7 @@ def run(
     transform: str = "scaled",
     alpha: float = 0.0,
     prompt_kind: str = "explain",
-    k: int = 10,
+    k: int = 1,
 ) -> dict[str, Any]:
     import torch
 
@@ -92,7 +92,7 @@ def run(
     wv = {e: renderer_for(prompt_kind)(tok, layer=e) for e in LAYERS}
     sample_rows = make_sampler(model, tok, wv, scale, dev, transform=transform, alpha=alpha)
 
-    def sample(layer: int, vec: Any, k: int = 10, seed: int = 0) -> list[str]:
+    def sample(layer: int, vec: Any, k: int = 1, seed: int = 0) -> list[str]:
         return sample_rows(layer, vec.unsqueeze(0), k, seed, 44, 0.8, 0.95)[0]
 
     rng = random.Random(41)
@@ -137,7 +137,7 @@ def main(
     transform: str = "scaled",
     alpha: float = 0.0,
     prompt_kind: str = "explain",
-    k: int = 10,
+    k: int = 1,
 ) -> None:
     """--olens <repo>:<run> evaluates a different OLens; --olens-scale is ITS injection scale
     (required with --olens unless the new lens really shares the default's 33.152)."""

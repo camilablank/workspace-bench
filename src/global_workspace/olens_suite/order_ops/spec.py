@@ -64,7 +64,11 @@ JLENS_ABSENT_LAYERS: tuple[int, ...] = (63,)
 SWEEP_LAYERS: tuple[int, ...] = (44, 52, 56, 60, 63)
 SWEEP_POSITIONS: tuple[int, ...] = tuple(range(-1, -15, -1))
 
-SAMPLING = {"k": 10, "max_new": 40, "temperature": 0.8, "top_p": 0.95}
+# k=1 is the cross-arm sample-parity contract (2026-08-19), matching the bank audit contract
+# and the external-lens workers. The value metric is a per-sample RATE (mean over samples), so
+# k only tightens variance, never shifts the expectation (RL: 0.53@k=10 vs 0.57@k=1) — pass a
+# higher --k for tighter CIs only when every compared arm gets the same k.
+SAMPLING = {"k": 1, "max_new": 40, "temperature": 0.8, "top_p": 0.95}
 SWEEP_SAMPLING = {"k": 5, "max_new": 40, "temperature": 0.8, "top_p": 0.95}
 
 # The `continue` reader (READERS below): the BASE model (adapter disabled) sampled from just
