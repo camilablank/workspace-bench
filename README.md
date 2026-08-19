@@ -41,6 +41,28 @@ bullet passes use opus).
 2. **Score / judge readouts** — CPU (deterministic families) or CPU + Anthropic API (LLM-judged).
    **Fully self-contained here.** Given readouts, every headline number is reproducible.
 
+## The precision condition (slop gate) and v2 MC judges — 2026-08-19
+
+Every headline matcher/judge is a RECALL instrument: a free-text readout that buries the
+correct answer under hallucinated detail scores identically to one that delivers it cleanly.
+Two changes close that hole:
+
+- **Slop gate.** `global_workspace.judges.slop_judge` rates each mechanically-hitting free-text
+  row 1.0–10.0 given the item's context + target (1 = only the precise target asserted; >5 =
+  content not inferrable from the context; 10 = contradiction / plausible distractor answers —
+  invalidate). A hit counts toward the *gated* pass only when `slop < threshold` (provisional
+  5.0, read from the artifact config, never hardcoded). Run
+  `scripts/oracle_lens_evals/olens_sglang/judge_slop.py` to produce `<gen>/judge/slop.json`;
+  the sglang adapter then reports `pass_rate_gated` beside the unchanged recall headline.
+  Validation: `scripts/oracle_lens_evals/gate_slop_judge.py` (hallucinatory NLA hit-rows median
+  7.3 vs clean AO 1.5 on the source-repo audit gen dirs). Token bags are never slop-rated —
+  rank is their precision instrument.
+- **v2 identification-MC judges** (judge artifacts `schema_version: 2`): the user-modeling and
+  directed-modulation judges no longer verify a disclosed target — they pick the gold out of 4
+  same-stratum distractors (other items' answers) + a "cannot tell" escape, with the `basis`
+  guards kept. All `*_foil` arms and `strict − foil` reporting were removed; the distractors
+  carry the null in-question. v1 judge artifacts remain readable everywhere.
+
 ## Families
 
 `baseline_evals/single_token/` (multihop, multilingual, poetry, typo, association, basic-readout,

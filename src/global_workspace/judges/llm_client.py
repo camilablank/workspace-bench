@@ -69,25 +69,51 @@ async def _one(
 async def _one_claude(
     client: Any, system: str, user: str, schema: dict[str, Any], model: str
 ) -> dict[str, Any] | None:
-    """One Anthropic structured completion; returns the parsed dict, or ``None`` on any error."""
-    try:
-        resp = await client.messages.create(
-            model=model,
-            max_tokens=16000,  # cap on thinking + text; Claude Opus 5 thinks by default — 8000
-            # truncated ~5% of candidate-heavy label rows (stop_reason=max_tokens, 2026-08-05)
-            system=system,
-            messages=[{"role": "user", "content": user}],
-            output_config={"format": {"type": "json_schema", "schema": schema["schema"]}},
-        )
-        if resp.stop_reason in ("refusal", "max_tokens"):  # fail open like any other error
-            print(f"  llm error: claude stop_reason={resp.stop_reason}")
+    """One Anthropic structured completion; returns the parsed dict, or ``None`` on any error.
+
+    Transient API errors (529 Overloaded / 429 / 5xx / connection) are retried with jittered
+    exponential backoff ON TOP of the SDK's own max_retries — a sustained overload window
+    outlives the SDK's 4 attempts, and a ``None`` here silently poisons the caller's verdicts
+    (observed 2026-08-18: a 529 storm turned a whole compositional interp pass into empty
+    summaries -> pass 0/100). Refusal/max_tokens/parse errors still fail open immediately.
+    """
+    import random
+
+    for attempt in range(7):
+        try:
+            resp = await client.messages.create(
+                model=model,
+                max_tokens=16000,  # cap on thinking + text; Claude Opus 5 thinks by default — 8000
+                # truncated ~5% of candidate-heavy label rows (stop_reason=max_tokens, 2026-08-05)
+                system=system,
+                messages=[{"role": "user", "content": user}],
+                output_config={"format": {"type": "json_schema", "schema": schema["schema"]}},
+            )
+            if resp.stop_reason in ("refusal", "max_tokens"):  # fail open like any other error
+                print(f"  llm error: claude stop_reason={resp.stop_reason}")
+                return None
+            text = next(b.text for b in resp.content if b.type == "text")
+            data: dict[str, Any] = json.loads(text)
+            return data
+        except Exception as e:
+            name = type(e).__name__
+            status = getattr(e, "status_code", None)
+            transient = (
+                status in (429, 500, 502, 503, 529)
+                or "Overloaded" in name
+                or "RateLimit" in name
+                or "Connection" in name
+                or "Timeout" in name
+                or "InternalServer" in name
+            )
+            if transient and attempt < 6:
+                wait = min(60.0, 2.0 * 2**attempt) * (0.5 + random.random())
+                print(f"  llm retry {attempt + 1}/6 in {wait:.0f}s: {name}")
+                await asyncio.sleep(wait)
+                continue
+            print(f"  llm error: {name}: {e}")  # non-transient/parse -> degrade to the proxy
             return None
-        text = next(b.text for b in resp.content if b.type == "text")
-        data: dict[str, Any] = json.loads(text)
-        return data
-    except Exception as e:  # any API/parse error degrades to the proxy
-        print(f"  llm error: {type(e).__name__}: {e}")
-        return None
+    return None
 
 
 CONCURRENCY = 32  # bound in-flight requests; firing all N at once exhausts the pool and stalls

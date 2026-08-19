@@ -53,12 +53,18 @@ class PosEntry:
 
     For the oracle lens ``samples`` are free-text generations; for the J-lens they are the
     top-k vocabulary tokens (``kind`` on the enclosing :class:`LensReadout` says which).
+
+    ``slop`` is the precision condition (Camila 2026-08-19): the minimum slop-judge score
+    (1.0-10.0) over this position's HITTING samples — the cleanest delivery of the answer is
+    what a threshold gate should judge survival by. ``None`` = no hit, or the slop pass was
+    not run (free-text arms only; token bags are never slop-judged).
     """
 
     pos: int
     token: str  # the decoded token string sitting at this position
     samples: list[str]
     hit: bool
+    slop: float | None = None
 
     def to_json(self) -> dict[str, Any]:
         return asdict(self)
@@ -77,13 +83,21 @@ class LayerCell:
 
 @dataclass
 class LensReadout:
-    """One lens's readout for one question: overall pass + per-layer cells + judge verdict."""
+    """One lens's readout for one question: overall pass + per-layer cells + judge verdict.
+
+    ``passed_gated`` layers the slop-gate precision condition over the recall headline: the
+    question still passes at ANY (layer, pos) hit, but a hit only counts when its slop score
+    is below the bundle's threshold. ``None`` = the slop pass was not run for this arm — the
+    gate can only remove credit it actually measured, so an ungated arm reports no gated
+    number rather than silently equating it with ``passed``.
+    """
 
     passed: bool
     kind: LensKind
     by_layer: dict[str, LayerCell] = field(default_factory=dict)
     earliest_layer: int | None = None
     verdict: dict[str, Any] = field(default_factory=dict)  # judge-specific extras
+    passed_gated: bool | None = None
 
     def to_json(self) -> dict[str, Any]:
         return {
@@ -92,6 +106,7 @@ class LensReadout:
             "earliest_layer": self.earliest_layer,
             "by_layer": {k: v.to_json() for k, v in self.by_layer.items()},
             "verdict": self.verdict,
+            "pass_gated": self.passed_gated,
         }
 
 
@@ -121,11 +136,18 @@ class Question:
 
 @dataclass
 class LensScore:
-    """A family-level pass rate for one lens arm."""
+    """A family-level pass rate for one lens arm.
+
+    ``pass_rate_gated`` is the slop-gated (precision) rate; ``None`` when the arm was never
+    slop-judged. The recall headline ``pass_rate`` never changes meaning — published numbers
+    stay comparable, the gated column reports beside them.
+    """
 
     pass_rate: float
     n_pass: int
     n_items: int
+    pass_rate_gated: float | None = None
+    n_pass_gated: int | None = None
 
     def to_json(self) -> dict[str, Any]:
         return asdict(self)
@@ -143,6 +165,7 @@ class FamilySummary:
     jlens: LensScore | None  # the baseline arm (may be None if no J-lens was run)
     chance: float | None = None  # analytic MC chance, else None
     chance_label: str | None = None
+    slop_threshold: float | None = None  # the gate cut the *_gated numbers used (provisional)
 
     def __post_init__(self) -> None:
         if self.chance is None and self.family in CHANCE:
@@ -158,6 +181,7 @@ class FamilySummary:
             "jlens": self.jlens.to_json() if self.jlens else None,
             "chance": self.chance,
             "chance_label": self.chance_label,
+            "slop_threshold": self.slop_threshold,
         }
 
 
