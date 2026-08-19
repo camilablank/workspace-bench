@@ -1,3 +1,14 @@
+> ⚠️ **Vendored provenance document (read this first).** This file is carried VERBATIM from the
+> source monorepo (`global-workspace`) as provenance for the three deterministic domains
+> (order_ops, buggy_code, superposed). Bank paths (`evals/olens_suite/...`,
+> `evals/workspace-bench/...`, `evals/oracle_lens/...`) and several referenced scripts/docs —
+> `gen_order_ops.py`, `finalize_order_ops.py`, `export_standalone_repo.py`, everything under
+> `docs/project/...` — use the SOURCE repo layout and are **not present in this export**. This
+> repo's runnable equivalents live in the root `CLAUDE.md` and each family's README (the banks
+> here sit at `hillclimbing_evals/<family>/`, e.g. `hillclimbing_evals/buggy_code/read_bank.json`).
+> The order-ops detail tables below are **STALE** — `hillclimbing_evals/order_ops/README.md` and
+> the packaged `spec.py` are authoritative wherever they disagree.
+
 # olens_suite — the run index
 
 Three eval domains, one shape: **gate → read → score → report**, every stage a command, every stage
@@ -16,12 +27,8 @@ the olens_sglang pipeline — see `evals/oracle_lens/README.md`.)
 
 ## The standalone repo
 
-A generated, evals-only mirror lives at **github.com/agu18dec/oracle-lens-evals** (private) —
-clone-and-run for anyone who doesn't need this monorepo. It is regenerated, never hand-edited:
-
-```bash
-uv run --no-sync python scripts/olens_suite/export_standalone_repo.py dest=/tmp/oracle-lens-evals push=True
-```
+THIS repo is the standalone export — see `PROVENANCE.md` at the repo root for the source pin and
+exactly what is vendored.
 
 ## The front door
 
@@ -35,8 +42,8 @@ uv run --no-sync python scripts/olens_suite/run_eval.py domain=superposed
 uv run --no-sync python scripts/olens_suite/run_eval.py domain=order_ops dry=True   # print only
 ```
 
-Item banks are COMMITTED at `evals/olens_suite/baseline_evals/multi_token/<domain>/` (canonical — all eval items live
-under `evals/`; the HF dataset `agu18dec/olens_eval_suite` is a mirror + report store) and
+Item banks are COMMITTED at `evals/olens_suite/baseline_evals/multi_token/<domain>/` (canonical —
+all eval items live under `evals/`) and
 resolved automatically; nothing is downloaded by hand. Every stage writes `results/<domain>/<stage>[_<family>].json`. Every CPU
 CLI is pydra-configured: `field=value` overrides, `--show` prints the resolved config, and each
 module's docstring documents its input JSON (a malformed file names the missing key instead of
@@ -129,7 +136,7 @@ python -m global_workspace.olens_suite.superposed.score \
     ao_out=results/superposed/read.json items=evals/olens_suite/baseline_evals/multi_token/superposed/read_bank.json
 # 3. one dictated word: its own rate against its base rate elsewhere
 python -m global_workspace.olens_suite.superposed.score \
-    ao_out=results/superposed/read.json items=evals/olens_suite/baseline_evals/multi_token/superposed/read_bank.json \\
+    ao_out=results/superposed/read.json items=evals/olens_suite/baseline_evals/multi_token/superposed/read_bank.json \
     specificity=ladder
 ```
 

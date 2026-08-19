@@ -41,6 +41,9 @@ from global_workspace.judges.llm_client import CLAUDE_JUDGE, async_json, schema_
 
 REPO = Path(__file__).resolve().parents[2]
 OA_ITEMS = REPO / "hillclimbing_evals/ordered_association/items.json"
+# entity_binding was RETIRED from the benchmark; its bank ships only in the source repo. The
+# EB half of this judge activates only when that bank is present (see main()) — this public
+# checkout runs the ordered_association half alone.
 EB_ITEMS = REPO / "_retired_entity_binding/items.json"
 DATASET_SEED = 20260810
 CANNOT = "cannot tell from the readout"
@@ -188,7 +191,10 @@ def main() -> None:
     args = ap.parse_args()
 
     oa_items = json.loads(OA_ITEMS.read_text())
-    eb_items = json.loads(EB_ITEMS.read_text())
+    # EB is retired and its bank is not shipped in the standalone export; run OA-only there.
+    eb_items = json.loads(EB_ITEMS.read_text()) if EB_ITEMS.exists() else []
+    if not eb_items:
+        print(f"note: {EB_ITEMS} absent (retired family) — judging ordered_association only")
     oa_by_id = {it["id"]: it for it in oa_items}
     eb_by_id = {it["id"]: it for it in eb_items}
 
@@ -226,10 +232,13 @@ def main() -> None:
             model=args.model,
             concurrency=256,
         )
+        n_interp_failed = sum(1 for r_ in ires if r_ is None)
         for (k, _txt), r_ in zip(pending, ires):
             if r_ is not None:
                 cache[k] = r_["interpretation"]
         cache_path.write_text(json.dumps(cache, ensure_ascii=False))
+        if n_interp_failed:
+            print(f"WARNING: {n_interp_failed} interp calls failed (not cached; rerun to retry)")
         todo = [(k, r, cache[k]) for k, r, _txt in todo if k in cache]
 
     prompts, meta = [], []
@@ -259,11 +268,17 @@ def main() -> None:
             res[i] = r_
 
     verdicts = list(done.values())
+    n_api_failed = 0
     for m, r_ in zip(meta, res):
         key, iid, layer, pos, fam, golds, foils = m
         if r_ is None:
+            n_api_failed += 1  # not persisted -> --resume retries these cells
             continue
-        correct = [r_["q1_choice"] == golds[0], r_["q2_choice"] == golds[1], r_["q3_choice"] == golds[2]]
+        correct = [
+            r_.get("q1_choice") == golds[0],
+            r_.get("q2_choice") == golds[1],
+            r_.get("q3_choice") == golds[2],
+        ]
         v = {
             "key": key,
             "id": iid,
@@ -285,15 +300,32 @@ def main() -> None:
         by_item[v["id"]].append(v)
     item_pass = {iid: any(v["pass"] for v in vs) for iid, vs in by_item.items()}
     fam_of = {iid: ("oa" if iid in oa_by_id else "eb") for iid in by_item}
+    # item_pass_any is ANY over the judged read sites; the honest guessing floor is therefore
+    # 1-(1-(1/6)^3)^n_sites per item, not the per-site (1/6)^3.
+    per_site = (1.0 / 6.0) ** 3
+
+    def any_floor(fam: str) -> float | None:
+        ns = [len(vs) for i, vs in by_item.items() if fam_of[i] == fam]
+        if not ns:
+            return None
+        return round(sum(1.0 - (1.0 - per_site) ** n for n in ns) / len(ns), 4)
+
     agg = {
         "items_judged": len(by_item),
+        "n_api_failed": n_api_failed,  # cells dropped this run; rerun with --resume to retry
         "item_pass_any": {
             "oa": sum(1 for i, p in item_pass.items() if p and fam_of[i] == "oa"),
             "oa_total": sum(1 for i in by_item if fam_of[i] == "oa"),
             "eb": sum(1 for i, p in item_pass.items() if p and fam_of[i] == "eb"),
             "eb_total": sum(1 for i in by_item if fam_of[i] == "eb"),
         },
+        "chance": {
+            "per_site": "(1/6)^3",
+            "any_of_grid_floor": {"oa": any_floor("oa"), "eb": any_floor("eb")},
+        },
     }
+    if n_api_failed:
+        print(f"WARNING: {n_api_failed} judge calls failed — rerun with --resume to retry them")
     args.out.parent.mkdir(parents=True, exist_ok=True)
     args.out.write_text(
         json.dumps({"tag": args.tag, "aggregate": agg, "verdicts": verdicts}, ensure_ascii=False)

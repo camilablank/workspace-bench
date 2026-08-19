@@ -68,13 +68,30 @@ def main() -> None:
     if pending:
         print(f"interpreting {len(pending)} grid points ...")
         res = async_json(pending, schema=SCHEMA, model=CLAUDE_JUDGE)
+        n_failed = 0
         for key, r in zip(keys, res):
-            cache[key] = (r or {}).get("interpretation", "")
+            interp = (r or {}).get("interpretation", "")
+            if not interp:
+                # a failed call must NOT be cached: an empty interpretation is a guaranteed
+                # judged miss forever after (and only the J-lens arm runs this stage, so the
+                # bias would be directional). Leave the key absent; the next run retries it.
+                n_failed += 1
+                continue
+            cache[key] = interp
         args.out.parent.mkdir(parents=True, exist_ok=True)
         args.out.write_text(json.dumps(cache, indent=1, ensure_ascii=False))
+        if n_failed:
+            print(f"WARNING: {n_failed} interpretation calls failed (not cached; rerun to retry)")
 
     for layer in layers:
-        readouts = {iid: cache.get(f"L{layer}:{iid}", "") for iid in by_layer[layer]}
+        readouts = {
+            iid: cache[f"L{layer}:{iid}"]
+            for iid in by_layer[layer]
+            if f"L{layer}:{iid}" in cache
+        }
+        n_missing = len(by_layer[layer]) - len(readouts)
+        if n_missing:
+            print(f"L{layer:02d}: {n_missing} items have no interpretation — SKIPPED, not failed")
         v = score_items(items, readouts, use_judge=True, verbose=False)
         n_comp = sum(all(x == "correct" for x in vv.values()) for vv in v.values())
         per_axis: dict[str, list[int]] = defaultdict(lambda: [0, 0])

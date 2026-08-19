@@ -15255,7 +15255,7 @@
         "state": "relief"
       }
     },
-    "stimulus": "The Denver posting fell through on a Tuesday, and Ana said all the right disappointed-sounding things at dinner, twice. But the anniversary dishes came back out of their boxes that same night to a tune she didn't seem to know she was humming, and Tomás stopped drafting his appeal to the regional office.",
+    "stimulus": "The Denver posting fell through on a Tuesday, and Ana said all the right glum-sounding things at dinner, twice. But the anniversary dishes came back out of their boxes that same night to a tune she didn't seem to know she was humming, and Tomás stopped drafting his appeal to the regional office.",
     "read_position": "end_of_stimulus",
     "inferable_from": 1,
     "gold_label": "his belief that his spouse privately feels relief that the move was canceled",
@@ -15659,7 +15659,7 @@
         "state": "relief"
       }
     },
-    "stimulus": "The posting fell through on a Tuesday. The backpack by the door stopped being packed in protest — though at dinner he still insisted Denver would have been fine — the goodbye list came down off the bedroom wall, and there was actual whistling from the bath, none of it lost on Tomás; he dropped the school-transfer paperwork into the bin without being asked twice.",
+    "stimulus": "The posting fell through on a Tuesday. The backpack by the door stopped being packed in protest — though at dinner he still insisted Denver would have been fine — the goodbye list came down off the bedroom wall, and there was actual whistling from the bath, none of it lost on Tomás; he dropped the school-enrollment paperwork into the bin without being asked twice.",
     "read_position": "end_of_stimulus",
     "inferable_from": 1,
     "gold_label": "his belief that his young child privately feels relief that the move was canceled",
@@ -16669,7 +16669,7 @@
         "state": "disappointment"
       }
     },
-    "stimulus": "The posting fell through on a Tuesday. The wall map with the route highlighted stayed up over his bed, the cowboy boots stayed by the door in size-four defiance, and Tomás found the school-transfer forms smoothed out and re-taped after he had binned them; he left the appeal folder open on his desk.",
+    "stimulus": "The posting fell through on a Tuesday. The wall map with the route highlighted stayed up over his bed, the cowboy boots stayed by the door in size-four defiance, and Tomás found the school-enrollment forms smoothed out and re-taped after he had binned them; he left the appeal folder open on his desk.",
     "read_position": "end_of_stimulus",
     "inferable_from": 1,
     "gold_label": "his belief that his young child privately feels disappointment that the move was canceled",

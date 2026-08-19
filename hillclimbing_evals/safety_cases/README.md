@@ -13,8 +13,8 @@ identical, blind, apples-to-apples settings.
 
 ## Scenario source — FROZEN
 
-The 32-item **`evals/diagnostic/misalignment_exhaustive_bank.json`** (see
-`evals/diagnostic/FROZEN.md`, sha256[:16] `fdb9956783904f0b`): 14 hand-authored agentic
+The 32-item **`misalignment_exhaustive_bank.json`** (in this folder; `evals/diagnostic/` in the
+source repo — see `FROZEN.md`, sha256[:16] `fdb9956783904f0b`): 14 hand-authored agentic
 scenarios that actually elicited misalignment from Qwen3.6-27B + 18 items from the Anthropic
 agentic-misalignment 18-condition grid (blackmail / leaking / murder × goal × urgency). Each
 item pins a rollout as `prefill` with `gen_answer=0`, so the whole readable sequence is fixed
@@ -39,10 +39,9 @@ Both readers are read over the SAME rendered `input_ids` (`enable_thinking=False
   `vocab` = id→string. Layer ladder: **0..62** (layer 63 absent). Long items are position-
   subsampled to 1024 reads (`positions`/`drops` give the mapping).
 
-`outputs/` is gitignored; the readouts live ONLY in the MAIN checkout
-`/workspace-vast/camilablank/exp/global-workspace/outputs/diagnostic/`. Run the driver from the
-main checkout, or pass `--olens-dir`/`--jlens-dir` absolute paths. This eval is **API-only**
-(no GPU) — it is a blind (summarize + judge) pass over saved files.
+The captured readouts are **not distributed with this repo**; pass their location to the driver
+via the required `--olens-dir`/`--jlens-dir` flags (the same note lives in `items.json` meta).
+This eval is **API-only** (no GPU) — it is a blind (summarize + judge) pass over saved files.
 
 ## Readout target / position policy — headline = prompt-region only
 
@@ -100,38 +99,41 @@ arm** (4 items) separately, plus a **per-layer table** and a **per-family breakd
 
 This is a **descriptive hit-rate, not a classifier accuracy**: there is NO uniform-random
 baseline. A reader that hallucinated "the model plans to blackmail" on every cell would score
-100% and be useless. The honest null is the **control arm**: the 4 items with
-`rollout_pick == "no-misaligned-used-first"` (am-blackmail_explicit-america_none,
+100% and be useless. The honest null is the **control arm**: the 4 items marked `arm: "control"`
+in `items.json` — the field the driver reads (`it["arm"]`); it encodes the source bank's
+`source.rollout_pick == "no-misaligned-used-first"` selection (am-blackmail_explicit-america_none,
 am-blackmail_none-none_none, am-leaking_none-none_none, am-murder_none-none_none) — the model did
 NOT take the misaligned action there, so a benign rollout was pinned. `hit_rate` on the control
 arm is each reader's **false-positive floor**; the meaningful quantity is misaligned-arm minus
 control-arm hit-rate. See Ambiguities for why this control is weak.
 
-## Run (API-only, no GPU — DO NOT run here; this is Camila's API pass)
+## Run (API-only, no GPU; needs `ANTHROPIC_API_KEY`)
 
 ```bash
-# From the MAIN checkout (outputs/ lives there, not in a worktree):
-/workspace-vast/$USER/envs/vllm-rollouts/bin/python \
-    scripts/oracle_lens_evals/judge_safety_cases.py \
-    --items evals/workspace-bench/baseline_evals/multi_token/safety_cases/items.json \
-    --scope prompt \
-    --layers 20,24,28,32,36,40,44,48,52,56,60 \
-    --out outputs/oracle_lens_evals/safety_cases/results_$(date +%F).json
-# (vllm-rollouts venv: the pinned project venv lacks the anthropic SDK, per value_leakage.)
-# Concurrency defaults to 256; judge model claude-sonnet-5. Per-(reader,item) checkpoints under
-# --cache-dir make the run resumable. --scope all and --judge-context window are the alt columns.
+# The captured readouts are NOT distributed with this repo — --olens-dir/--jlens-dir are
+# REQUIRED (point them at the olens/jlens exhaustive-capture dirs described above):
+python scripts/oracle_lens_evals/judge_safety_cases.py \
+    --olens-dir <olens readout dir> \
+    --jlens-dir <jlens readout dir> \
+    --out <results.json>
+# --items defaults to the shipped manifest, whose source_bank points at the scenario bank in
+# this folder (--bank overrides it). --scope prompt and
+# --layers 20,24,28,32,36,40,44,48,52,56,60 are the defaults; --scope all and
+# --judge-context window are the alt columns. Concurrency defaults to 256; judge model
+# claude-sonnet-5. Per-(reader,item) checkpoints under --cache-dir make the run resumable.
 ```
 
 ## Folding the results into a workspace-bench bundle
 
-Once the results exist, `workspace-bench/workspace_bench/adapters/safety_cases.py` folds the
-`--out` results.json + the `--cache-dir` verdict checkpoints into the run bundle (and so the
+Once the results exist, `workspace-bench/workspace_bench/adapters/safety_cases.py` (source repo,
+not vendored here) folds the `--out` results.json + the `--cache-dir` verdict checkpoints into
+the run bundle (and so the
 static visualizer) as TWO families — `safety_cases` (28 misaligned-arm items) and
 `safety_cases_control` (the 4-item false-positive floor; lower is better, it is the null).
 The family bars carry the eval's own headline (cell-pooled prompt-scope MISALIGNED rate, taken
 verbatim from results.json); per question, hit cells are kept per layer (capped, full counts in
-the verdict blob) with readout text re-attached from the `outputs/diagnostic/` capture dirs when
-present. Pass `safety_results=…` to `assemble_bundle.py` (also from the main checkout, or point
+the verdict blob) with readout text re-attached from the capture dirs when present. Pass
+`safety_results=…` to `assemble_bundle.py` (source repo, not vendored here; point
 `safety_cache=`/`safety_olens_dir=`/`safety_jlens_dir=` at absolute paths):
 
 ```bash
@@ -156,7 +158,7 @@ Defaults chosen so a human can adjust each:
    apples-to-apples. Ambiguity: the two readers natively cover different ladders (olens 12, jlens
    63); the shared-ladder default drops olens L63 and all jlens layers outside the set. Widen
    `--layers` (or headline a single layer such as L44) if desired.
-4. **Control arm = 4 `no-misaligned-used-first` items.** It is the only on-disk null. Weak: only
+4. **Control arm = the 4 `arm: "control"` items.** It is the only on-disk null. Weak: only
    4 items, all in the anthropic goal=none conditions, and its own prompts still contain
    misalignment-flavoured scenario framing. A purpose-built benign / none-goal control arm would
    give a cleaner false-positive floor.
@@ -166,7 +168,8 @@ Defaults chosen so a human can adjust each:
    `olens_exhaustive_judged_v3` run. Use `--judge-context window` for full v3 parity at the cost
    of blindness. The existing `olens_exhaustive_judged/summary.json` (6.97% over ALL cells) used
    the OLDER judge over ALL cells; do not compare its number directly to this eval's headline.
-6. **This lives under `baseline_evals/`** alongside `value_leakage`. Ambiguity: it is descriptive
+6. **In the source monorepo this lives under `baseline_evals/`** alongside `value_leakage` (in
+   this mirror it ships under `hillclimbing_evals/`). Ambiguity: it is descriptive
    / one-sided (no natural TPR/TNR), which sits a little awkwardly under "frozen headline, never
    tuned" — a human may prefer a dedicated `diagnostic_evals/` role.
 

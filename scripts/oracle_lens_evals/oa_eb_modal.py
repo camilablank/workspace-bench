@@ -436,7 +436,7 @@ def tomi_gate(prompts: str = "outputs/oracle_lens_evals/tomi_eval/prompts_pilot.
 
 @app.local_entrypoint()
 def regate(ids: str,
-           oa_items: str = "evals/workspace-bench/hillclimbing_evals/ordered_association/items_pilot.json",
+           oa_items: str = "hillclimbing_evals/ordered_association/items.json",
            out: str = "outputs/oracle_lens_evals/oa_eb_gates/gpu_gates_regen.json") -> None:
     """Gate GPU pass for a csv of ordered_association item ids (regen re-gating)."""
     want = {x for x in ids.split(",") if x}
@@ -478,10 +478,12 @@ def main(prompts: str = "outputs/oracle_lens_evals/oa_eb_eval/prompts_pilot.json
                                 layers=layer_list)
                for s in shard_lists if s]
     if gates:
-        oa_items = json.loads(Path(
-            "evals/olens_suite/hillclimbing_evals/ordered_association/items_pilot.json").read_text())
-        eb_items = json.loads(Path(
-            "evals/olens_suite/hillclimbing_evals/entity_binding/items_pilot.json").read_text())
+        oa_items = json.loads(
+            Path("hillclimbing_evals/ordered_association/items.json").read_text())
+        # entity_binding was retired from the benchmark; its bank ships only in the source
+        # repo. The gates pass runs EB only when that bank is present.
+        eb_path = Path("hillclimbing_evals/entity_binding/items.json")
+        eb_items = json.loads(eb_path.read_text()) if eb_path.exists() else []
         gates_handle = run_gates.spawn(oa_items, eb_items)
     for h in handles:
         res = h.get()

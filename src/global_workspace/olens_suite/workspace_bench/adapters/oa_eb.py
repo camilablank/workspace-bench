@@ -193,14 +193,33 @@ def _best_row(rows: list[dict[str, Any]], earliest: int | None) -> dict[str, Any
 
 
 def _family_summary(family: str, questions: list[Question]) -> FamilySummary:
+    # Item pass is ANY over the judged (layer, pos) read sites, so the drawn chance line is
+    # the multiple-comparisons floor 1-(1-(1/6)^3)^n_sites averaged over items — NOT the
+    # per-site (1/6)^3 from schema.CHANCE, which understates the floor by ~n_sites x
+    # (audit 2026-08-19; same correction the relational family applies).
+    per_site = (1.0 / 6.0) ** 3
+    sites = [
+        int((getattr(q, arm).verdict or {}).get("n_read_sites", 0))
+        for q in questions
+        for arm in ("olens", "jlens")
+        if getattr(q, arm) is not None
+    ]
+    sites = [n for n in sites if n > 0]
+    chance = chance_label = None
+    if sites:
+        mean_sites = sum(sites) / len(sites)
+        chance = sum(1.0 - (1.0 - per_site) ** n for n in sites) / len(sites)
+        chance_label = f"≈{chance:.2%} any-of-grid floor (per-site (1/6)³, ~{mean_sites:.0f} sites)"
     return FamilySummary(
         family=family,
         judge_type="mc",
         n_items=len(questions),
-        metric="all-3-MC-correct (best layer)",
+        metric="all-3-MC-correct (any judged read site)",
         olens=_score([q.olens for q in questions]),
         jlens=_score([q.jlens for q in questions]),
-        # chance auto-fills from schema.CHANCE for both families
+        # falls back to schema.CHANCE's per-site (1/6)³ only if no read-site counts exist
+        chance=chance,
+        chance_label=chance_label,
     )
 
 

@@ -18,9 +18,10 @@ can be run without the monorepo.
 ```bash
 uv venv && . .venv/bin/activate
 uv pip install -e .            # CPU score/judge deps
-uv pip install -e ".[dev]" && pytest        # 117 CPU tests pass
+uv pip install -e ".[dev]" && pytest        # 126 CPU tests pass
 
-# deterministic smoke — runs immediately, no GPU, no API key (recovered readouts ship in-repo):
+# deterministic smoke — runs immediately, no GPU, no API key (recovered readouts ship in-repo).
+# Run from the repo root (or make the two paths absolute):
 python -m global_workspace.olens_suite.superposed.score \
     ao_out=hillclimbing_evals/superposed/readouts/read.json \
     items=hillclimbing_evals/superposed/read_bank.json
@@ -28,12 +29,15 @@ python -m global_workspace.olens_suite.superposed.score \
 
 For the LLM-judged families set `ANTHROPIC_API_KEY` and run the per-family entrypoint (see
 `CLAUDE.md`). Judge models: claude-opus-5 (default), claude-haiku-4-5 (screen), claude-sonnet-5
-(safety_cases + readout_coherence).
+(safety_cases + the readout_coherence quality/formatting passes; readout_coherence's flag and
+bullet passes use opus).
 
 ## Two stages — what's self-contained
 
-1. **Generate readouts** — GPU + the 27B + the lens checkpoints (Modal / cluster). Not runnable on
-   a CPU box; generators are vendored under `scripts/` and gated behind `pip install -e ".[gpu]"`.
+1. **Generate readouts** — GPU + the 27B + the lens checkpoints (Modal / cluster). Not runnable
+   on a CPU box; the Modal launchers are vendored under `scripts/` behind `pip install -e
+   ".[gpu]"` (the sglang generation pipeline and the AO checkpoint are source-repo-only, so this
+   stage documents the pipeline rather than being turnkey).
 2. **Score / judge readouts** — CPU (deterministic families) or CPU + Anthropic API (LLM-judged).
    **Fully self-contained here.** Given readouts, every headline number is reproducible.
 
@@ -51,8 +55,11 @@ apples-to-apples between AO free text and J-lens token bags summarized to prose)
 
 ## Provenance
 
-Generated from the private `global-workspace` research repo @ `2e6805c8` (2026-08-19; previous pin `76ec9581`, 2026-08-16, includes
-the 2026-08-15 eval audit: strict Opus bank judge, relational single-position p20 instrument,
-`hit_any` cross-sample-gluing fix, `judge_mc --char-cap`, maze_path retired); see
-`PROVENANCE.md`. This is a packaging of that code — change the source and re-derive rather than
-editing vendored files here.
+Generated from the private `global-workspace` research repo @ `2e6805c8` (2026-08-19; the
+2026-08-15 eval audit brought the strict Opus bank judge, the relational single-position p20
+instrument, the `hit_any` cross-sample-gluing fix, `judge_mc --char-cap`, and retired
+maze_path). A follow-up external-readiness audit on 2026-08-19 hardened outage handling,
+corrected the bundle-overlay/chance-line semantics, and lint-fixed three data files — the full
+list is in `PROVENANCE.md` (those fixes are being backported to the source repo). Otherwise
+this is a packaging of the source code — change the source and re-derive rather than editing
+vendored files here.

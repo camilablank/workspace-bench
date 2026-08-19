@@ -406,12 +406,14 @@ async def run(args: argparse.Namespace) -> None:
 def main() -> None:
     p = argparse.ArgumentParser(description=__doc__,
                                 formatter_class=argparse.RawDescriptionHelpFormatter)
-    p.add_argument("--items", default=("evals/workspace-bench/baseline_evals/multi_token/"
-                                        "safety_cases/items.json"))
+    p.add_argument("--items", default="hillclimbing_evals/safety_cases/items.json",
+                   help="the shipped frozen bank (repo-relative or absolute)")
     p.add_argument("--bank", default=None,
                    help="override the frozen scenario bank (default: manifest source_bank)")
-    p.add_argument("--olens-dir", default="outputs/diagnostic/olens_exhaustive/items_iolens_chat")
-    p.add_argument("--jlens-dir", default="outputs/diagnostic/jlens_exhaustive/items")
+    p.add_argument("--olens-dir", required=True,
+                   help="oracle-lens readout dir (the captured readouts are not shipped here)")
+    p.add_argument("--jlens-dir", required=True,
+                   help="J-lens readout dir (the captured readouts are not shipped here)")
     p.add_argument("--scope", choices=["prompt", "all"], default="prompt",
                    help="prompt = cells before the pinned rollout (headline); all = every cell")
     p.add_argument("--layers", default=DEFAULT_LAYERS,

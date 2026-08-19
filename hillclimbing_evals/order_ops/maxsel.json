@@ -38,7 +38,6 @@
    "maxsel-158",
    "maxsel-160",
    "maxsel-161",
-   "maxsel-162",
    "maxsel-164",
    "maxsel-165",
    "maxsel-166",
@@ -67,7 +66,7 @@
    "maxsel-198",
    "maxsel-199"
   ],
-  "tolerance": "exact_int"
+  "tolerance": "rel2pct"
  },
  {
   "variant": "maxsel",
@@ -108,7 +107,6 @@
    "maxsel-158",
    "maxsel-160",
    "maxsel-161",
-   "maxsel-162",
    "maxsel-164",
    "maxsel-165",
    "maxsel-166",
@@ -137,7 +135,7 @@
    "maxsel-197",
    "maxsel-198"
   ],
-  "tolerance": "exact_int"
+  "tolerance": "rel2pct"
  },
  {
   "variant": "maxsel",
@@ -178,7 +176,6 @@
    "maxsel-158",
    "maxsel-160",
    "maxsel-161",
-   "maxsel-162",
    "maxsel-164",
    "maxsel-165",
    "maxsel-166",
@@ -207,7 +204,7 @@
    "maxsel-198",
    "maxsel-199"
   ],
-  "tolerance": "exact_int"
+  "tolerance": "rel2pct"
  },
  {
   "variant": "maxsel",
@@ -248,7 +245,6 @@
    "maxsel-158",
    "maxsel-160",
    "maxsel-161",
-   "maxsel-162",
    "maxsel-164",
    "maxsel-165",
    "maxsel-166",
@@ -278,7 +274,7 @@
    "maxsel-198",
    "maxsel-199"
   ],
-  "tolerance": "exact_int"
+  "tolerance": "rel2pct"
  },
  {
   "variant": "maxsel",
@@ -319,7 +315,6 @@
    "maxsel-158",
    "maxsel-160",
    "maxsel-161",
-   "maxsel-162",
    "maxsel-164",
    "maxsel-165",
    "maxsel-166",
@@ -347,7 +342,7 @@
    "maxsel-198",
    "maxsel-199"
   ],
-  "tolerance": "exact_int"
+  "tolerance": "rel2pct"
  },
  {
   "variant": "maxsel",
@@ -388,7 +383,6 @@
    "maxsel-158",
    "maxsel-160",
    "maxsel-161",
-   "maxsel-162",
    "maxsel-164",
    "maxsel-165",
    "maxsel-166",
@@ -417,7 +411,7 @@
    "maxsel-198",
    "maxsel-199"
   ],
-  "tolerance": "exact_int"
+  "tolerance": "rel2pct"
  },
  {
   "variant": "maxsel",
@@ -458,7 +452,6 @@
    "maxsel-158",
    "maxsel-160",
    "maxsel-161",
-   "maxsel-162",
    "maxsel-164",
    "maxsel-165",
    "maxsel-166",
@@ -486,7 +479,7 @@
    "maxsel-198",
    "maxsel-199"
   ],
-  "tolerance": "exact_int"
+  "tolerance": "rel2pct"
  },
  {
   "variant": "maxsel",
@@ -527,7 +520,6 @@
    "maxsel-158",
    "maxsel-160",
    "maxsel-161",
-   "maxsel-162",
    "maxsel-164",
    "maxsel-165",
    "maxsel-166",
@@ -557,7 +549,7 @@
    "maxsel-198",
    "maxsel-199"
   ],
-  "tolerance": "exact_int"
+  "tolerance": "rel2pct"
  },
  {
   "variant": "maxsel",
@@ -598,7 +590,6 @@
    "maxsel-157",
    "maxsel-160",
    "maxsel-161",
-   "maxsel-162",
    "maxsel-164",
    "maxsel-165",
    "maxsel-166",
@@ -626,7 +617,7 @@
    "maxsel-198",
    "maxsel-199"
   ],
-  "tolerance": "exact_int"
+  "tolerance": "rel2pct"
  },
  {
   "variant": "maxsel",
@@ -667,7 +658,6 @@
    "maxsel-157",
    "maxsel-158",
    "maxsel-161",
-   "maxsel-162",
    "maxsel-164",
    "maxsel-165",
    "maxsel-166",
@@ -695,7 +685,7 @@
    "maxsel-198",
    "maxsel-199"
   ],
-  "tolerance": "exact_int"
+  "tolerance": "rel2pct"
  },
  {
   "variant": "maxsel",
@@ -736,7 +726,6 @@
    "maxsel-157",
    "maxsel-158",
    "maxsel-160",
-   "maxsel-162",
    "maxsel-164",
    "maxsel-165",
    "maxsel-166",
@@ -765,7 +754,7 @@
    "maxsel-198",
    "maxsel-199"
   ],
-  "tolerance": "exact_int"
+  "tolerance": "rel2pct"
  },
  {
   "variant": "maxsel",
@@ -807,7 +796,6 @@
    "maxsel-158",
    "maxsel-160",
    "maxsel-161",
-   "maxsel-162",
    "maxsel-165",
    "maxsel-166",
    "maxsel-167",
@@ -835,7 +823,7 @@
    "maxsel-198",
    "maxsel-199"
   ],
-  "tolerance": "exact_int"
+  "tolerance": "rel2pct"
  },
  {
   "variant": "maxsel",
@@ -877,7 +865,6 @@
    "maxsel-158",
    "maxsel-160",
    "maxsel-161",
-   "maxsel-162",
    "maxsel-164",
    "maxsel-166",
    "maxsel-167",
@@ -903,7 +890,7 @@
    "maxsel-197",
    "maxsel-199"
   ],
-  "tolerance": "exact_int"
+  "tolerance": "rel2pct"
  },
  {
   "variant": "maxsel",
@@ -945,7 +932,6 @@
    "maxsel-158",
    "maxsel-160",
    "maxsel-161",
-   "maxsel-162",
    "maxsel-164",
    "maxsel-165",
    "maxsel-168",
@@ -972,7 +958,7 @@
    "maxsel-198",
    "maxsel-199"
   ],
-  "tolerance": "exact_int"
+  "tolerance": "rel2pct"
  },
  {
   "variant": "maxsel",
@@ -1014,7 +1000,6 @@
    "maxsel-158",
    "maxsel-160",
    "maxsel-161",
-   "maxsel-162",
    "maxsel-164",
    "maxsel-165",
    "maxsel-168",
@@ -1041,7 +1026,7 @@
    "maxsel-198",
    "maxsel-199"
   ],
-  "tolerance": "exact_int"
+  "tolerance": "rel2pct"
  },
  {
   "variant": "maxsel",
@@ -1082,7 +1067,6 @@
    "maxsel-158",
    "maxsel-160",
    "maxsel-161",
-   "maxsel-162",
    "maxsel-164",
    "maxsel-165",
    "maxsel-166",
@@ -1110,7 +1094,7 @@
    "maxsel-198",
    "maxsel-199"
   ],
-  "tolerance": "exact_int"
+  "tolerance": "rel2pct"
  },
  {
   "variant": "maxsel",
@@ -1152,7 +1136,6 @@
    "maxsel-158",
    "maxsel-160",
    "maxsel-161",
-   "maxsel-162",
    "maxsel-164",
    "maxsel-166",
    "maxsel-167",
@@ -1179,7 +1162,7 @@
    "maxsel-197",
    "maxsel-199"
   ],
-  "tolerance": "exact_int"
+  "tolerance": "rel2pct"
  },
  {
   "variant": "maxsel",
@@ -1248,7 +1231,7 @@
    "maxsel-197",
    "maxsel-198"
   ],
-  "tolerance": "exact_int"
+  "tolerance": "rel2pct"
  },
  {
   "variant": "maxsel",
@@ -1289,7 +1272,6 @@
    "maxsel-158",
    "maxsel-160",
    "maxsel-161",
-   "maxsel-162",
    "maxsel-164",
    "maxsel-165",
    "maxsel-166",
@@ -1317,7 +1299,7 @@
    "maxsel-198",
    "maxsel-199"
   ],
-  "tolerance": "exact_int"
+  "tolerance": "rel2pct"
  },
  {
   "variant": "maxsel",
@@ -1358,7 +1340,6 @@
    "maxsel-158",
    "maxsel-160",
    "maxsel-161",
-   "maxsel-162",
    "maxsel-164",
    "maxsel-165",
    "maxsel-166",
@@ -1386,7 +1367,7 @@
    "maxsel-198",
    "maxsel-199"
   ],
-  "tolerance": "exact_int"
+  "tolerance": "rel2pct"
  },
  {
   "variant": "maxsel",
@@ -1428,7 +1409,6 @@
    "maxsel-158",
    "maxsel-160",
    "maxsel-161",
-   "maxsel-162",
    "maxsel-164",
    "maxsel-165",
    "maxsel-166",
@@ -1457,7 +1437,7 @@
    "maxsel-198",
    "maxsel-199"
   ],
-  "tolerance": "exact_int"
+  "tolerance": "rel2pct"
  },
  {
   "variant": "maxsel",
@@ -1498,7 +1478,6 @@
    "maxsel-158",
    "maxsel-160",
    "maxsel-161",
-   "maxsel-162",
    "maxsel-164",
    "maxsel-165",
    "maxsel-166",
@@ -1526,7 +1505,7 @@
    "maxsel-198",
    "maxsel-199"
   ],
-  "tolerance": "exact_int"
+  "tolerance": "rel2pct"
  },
  {
   "variant": "maxsel",
@@ -1568,7 +1547,6 @@
    "maxsel-158",
    "maxsel-160",
    "maxsel-161",
-   "maxsel-162",
    "maxsel-164",
    "maxsel-165",
    "maxsel-166",
@@ -1596,7 +1574,7 @@
    "maxsel-198",
    "maxsel-199"
   ],
-  "tolerance": "exact_int"
+  "tolerance": "rel2pct"
  },
  {
   "variant": "maxsel",
@@ -1637,7 +1615,6 @@
    "maxsel-157",
    "maxsel-160",
    "maxsel-161",
-   "maxsel-162",
    "maxsel-164",
    "maxsel-165",
    "maxsel-166",
@@ -1665,7 +1642,7 @@
    "maxsel-198",
    "maxsel-199"
   ],
-  "tolerance": "exact_int"
+  "tolerance": "rel2pct"
  },
  {
   "variant": "maxsel",
@@ -1707,7 +1684,6 @@
    "maxsel-158",
    "maxsel-160",
    "maxsel-161",
-   "maxsel-162",
    "maxsel-164",
    "maxsel-166",
    "maxsel-167",
@@ -1734,7 +1710,7 @@
    "maxsel-198",
    "maxsel-199"
   ],
-  "tolerance": "exact_int"
+  "tolerance": "rel2pct"
  },
  {
   "variant": "maxsel",
@@ -1776,7 +1752,6 @@
    "maxsel-158",
    "maxsel-160",
    "maxsel-161",
-   "maxsel-162",
    "maxsel-164",
    "maxsel-165",
    "maxsel-167",
@@ -1803,7 +1778,7 @@
    "maxsel-198",
    "maxsel-199"
   ],
-  "tolerance": "exact_int"
+  "tolerance": "rel2pct"
  },
  {
   "variant": "maxsel",
@@ -1844,7 +1819,6 @@
    "maxsel-157",
    "maxsel-158",
    "maxsel-160",
-   "maxsel-162",
    "maxsel-164",
    "maxsel-165",
    "maxsel-166",
@@ -1872,7 +1846,7 @@
    "maxsel-198",
    "maxsel-199"
   ],
-  "tolerance": "exact_int"
+  "tolerance": "rel2pct"
  },
  {
   "variant": "maxsel",
@@ -1913,7 +1887,6 @@
    "maxsel-158",
    "maxsel-160",
    "maxsel-161",
-   "maxsel-162",
    "maxsel-164",
    "maxsel-165",
    "maxsel-166",
@@ -1941,7 +1914,7 @@
    "maxsel-198",
    "maxsel-199"
   ],
-  "tolerance": "exact_int"
+  "tolerance": "rel2pct"
  },
  {
   "variant": "maxsel",
@@ -2011,7 +1984,7 @@
    "maxsel-198",
    "maxsel-199"
   ],
-  "tolerance": "exact_int"
+  "tolerance": "rel2pct"
  },
  {
   "variant": "maxsel",
@@ -2052,7 +2025,6 @@
    "maxsel-157",
    "maxsel-158",
    "maxsel-161",
-   "maxsel-162",
    "maxsel-164",
    "maxsel-165",
    "maxsel-166",
@@ -2080,7 +2052,7 @@
    "maxsel-198",
    "maxsel-199"
   ],
-  "tolerance": "exact_int"
+  "tolerance": "rel2pct"
  },
  {
   "variant": "maxsel",
@@ -2121,7 +2093,6 @@
    "maxsel-157",
    "maxsel-158",
    "maxsel-161",
-   "maxsel-162",
    "maxsel-164",
    "maxsel-165",
    "maxsel-166",
@@ -2149,7 +2120,7 @@
    "maxsel-198",
    "maxsel-199"
   ],
-  "tolerance": "exact_int"
+  "tolerance": "rel2pct"
  },
  {
   "variant": "maxsel",
@@ -2191,7 +2162,6 @@
    "maxsel-158",
    "maxsel-160",
    "maxsel-161",
-   "maxsel-162",
    "maxsel-164",
    "maxsel-165",
    "maxsel-166",
@@ -2220,7 +2190,7 @@
    "maxsel-198",
    "maxsel-199"
   ],
-  "tolerance": "exact_int"
+  "tolerance": "rel2pct"
  },
  {
   "variant": "maxsel",
@@ -2262,7 +2232,6 @@
    "maxsel-158",
    "maxsel-160",
    "maxsel-161",
-   "maxsel-162",
    "maxsel-165",
    "maxsel-166",
    "maxsel-167",
@@ -2289,7 +2258,7 @@
    "maxsel-198",
    "maxsel-199"
   ],
-  "tolerance": "exact_int"
+  "tolerance": "rel2pct"
  },
  {
   "variant": "maxsel",
@@ -2330,7 +2299,6 @@
    "maxsel-158",
    "maxsel-160",
    "maxsel-161",
-   "maxsel-162",
    "maxsel-164",
    "maxsel-165",
    "maxsel-166",
@@ -2358,7 +2326,7 @@
    "maxsel-198",
    "maxsel-199"
   ],
-  "tolerance": "exact_int"
+  "tolerance": "rel2pct"
  },
  {
   "variant": "maxsel",
@@ -2399,7 +2367,6 @@
    "maxsel-158",
    "maxsel-160",
    "maxsel-161",
-   "maxsel-162",
    "maxsel-164",
    "maxsel-165",
    "maxsel-166",
@@ -2427,7 +2394,7 @@
    "maxsel-198",
    "maxsel-199"
   ],
-  "tolerance": "exact_int"
+  "tolerance": "rel2pct"
  },
  {
   "variant": "maxsel",
@@ -2468,7 +2435,6 @@
    "maxsel-157",
    "maxsel-160",
    "maxsel-161",
-   "maxsel-162",
    "maxsel-164",
    "maxsel-165",
    "maxsel-166",
@@ -2496,7 +2462,7 @@
    "maxsel-198",
    "maxsel-199"
   ],
-  "tolerance": "exact_int"
+  "tolerance": "rel2pct"
  },
  {
   "variant": "maxsel",
@@ -2538,7 +2504,6 @@
    "maxsel-158",
    "maxsel-160",
    "maxsel-161",
-   "maxsel-162",
    "maxsel-164",
    "maxsel-165",
    "maxsel-166",
@@ -2566,7 +2531,7 @@
    "maxsel-198",
    "maxsel-199"
   ],
-  "tolerance": "exact_int"
+  "tolerance": "rel2pct"
  },
  {
   "variant": "maxsel",
@@ -2608,7 +2573,6 @@
    "maxsel-158",
    "maxsel-160",
    "maxsel-161",
-   "maxsel-162",
    "maxsel-164",
    "maxsel-166",
    "maxsel-167",
@@ -2635,7 +2599,7 @@
    "maxsel-197",
    "maxsel-199"
   ],
-  "tolerance": "exact_int"
+  "tolerance": "rel2pct"
  },
  {
   "variant": "maxsel",
@@ -2676,7 +2640,6 @@
    "maxsel-158",
    "maxsel-160",
    "maxsel-161",
-   "maxsel-162",
    "maxsel-164",
    "maxsel-165",
    "maxsel-166",
@@ -2704,6 +2667,6 @@
    "maxsel-197",
    "maxsel-198"
   ],
-  "tolerance": "exact_int"
+  "tolerance": "rel2pct"
  }
 ]

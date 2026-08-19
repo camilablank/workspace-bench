@@ -11,6 +11,12 @@ free usage on the Anthropic key):
 - ``claude-*`` -> Anthropic Messages API with ``output_config.format`` structured outputs
   (needs ``ANTHROPIC_API_KEY``; the SDK auto-retries 429/5xx with backoff).
 - anything else -> the original OpenAI Chat Completions path (needs ``OPENAI_API_KEY``).
+
+Reproducibility: judge calls run at the model's DEFAULT sampling temperature — Claude judges
+think by default and extended thinking requires it, so no ``temperature=0`` is forced here.
+The seeded shuffles in the judge scripts freeze the *prompts*; the *verdicts* carry small
+rerun-to-rerun variance. Treat single-digit deltas between reruns of the same frozen
+instrument as noise.
 """
 
 import asyncio

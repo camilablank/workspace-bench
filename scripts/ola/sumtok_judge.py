@@ -538,7 +538,12 @@ async def run(args: argparse.Namespace) -> None:
             if fp.exists():
                 for line in fp.open():
                     try:
-                        done.add(json.loads(line)["key"])
+                        row = json.loads(line)
+                        # api_error rows are transient outages, not verdicts — leave them out
+                        # of `done` so a direct rerun RE-JUDGES them (readout_coherence's
+                        # judge.py wrapper already resumes this way; keep the two consistent).
+                        if not row.get("api_error"):
+                            done.add(row["key"])
                     except Exception:
                         continue  # truncated/malformed line — skip
             sinks[(lens, arm)] = fp.open("a")

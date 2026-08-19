@@ -237,7 +237,10 @@ def main() -> None:
 
     arms: list[tuple[str, Path, Path]] = []
     for spec in args.arm:
-        name, gd, vd = spec.split(":")
+        try:
+            name, gd, vd = spec.split(":")
+        except ValueError:
+            raise SystemExit(f"--arm must be name:gen_dir:verdict_dir, got {spec!r}") from None
         arms.append((name, Path(gd), Path(vd)))
 
     acts = Path(args.acts)
@@ -297,8 +300,14 @@ def main() -> None:
                     key = f"{name}|{label}|L{layer}|p{pos}"
                     if key in done:
                         continue
-                    bullets = [parse_bullets(s) for s in samples]
-                    if not any(bullets):
+                    all_bullets = [parse_bullets(s) for s in samples]
+                    # judge ONLY samples that parsed to bullets: an empty SAMPLE block still
+                    # draws a schema-required verdict, and score.py's per-sample folds would
+                    # count it (n_distinct=0 for a prose sample would drag the diversity
+                    # headline). The stored `bullets` list holds exactly the judged samples,
+                    # so verdict samples and bullets stay index-aligned.
+                    bullets = [bl for bl in all_bullets if bl]
+                    if not bullets:
                         n_skipped += 1  # non-bullet readout (e.g. continuation_raw arm)
                         continue
                     ids = conv_ids(label)
@@ -320,6 +329,7 @@ def main() -> None:
                             "layer": layer,
                             "pos": pos,
                             "bullets": bullets,
+                            "n_samples_skipped": len(all_bullets) - len(bullets),
                             "user": "\n\n".join(parts),
                         }
                     )
@@ -374,7 +384,10 @@ async def _run(
                     if not any(t in low for t in ("429", "529", "rate", "overload", "timeout")):
                         break
             await asyncio.sleep(2**attempt)
-        row = {k: job[k] for k in ("key", "arm", "label", "layer", "pos", "bullets")}
+        row = {
+            k: job[k]
+            for k in ("key", "arm", "label", "layer", "pos", "bullets", "n_samples_skipped")
+        }
         if verdict is None:
             row.update({"api_error": True, "error": err})
         else:

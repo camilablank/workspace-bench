@@ -21,13 +21,19 @@ is "surfaced" by :func:`~...score.concept_hits` (word-boundary match over its
 surfaced by that lens:
 
 * oracle: any concept word-matched by a sample of an IN_SENTENCE cell (identical to the scorer's
-  ``per_item_union > 0``; off-task items such as ``d-petrichor`` have no IN_SENTENCE cell and so
-  never pass);
+  ``per_item_union > 0``);
 * J-lens: any concept word-matched by the top-k tokens at any (layer, position) — the same
   word-boundary rule, applied at every captured write cell (no region gate available).
 
-Control items (``d-none`` / ``b-none``) dictate nothing, so their concept list is empty and both
-arms are ``pass=False`` by construction; they are kept as questions, not dropped.
+Rate denominators mirror the packaged scorer (audit 2026-08-19). Control items (``d-none`` /
+``b-none``) dictate nothing — their concept list is empty and neither arm can ever pass — so
+they are kept as browsable questions but EXCLUDED from both arms' pass rates. Likewise
+write-non-compliant items (no IN_SENTENCE oracle cell, e.g. ``d-petrichor``, where the model
+wrote its own sentence and every readout is self-echo): the packaged scorer excludes them, and
+counting them only in the region-gated oracle arm would score the two arms on different
+gates — they are excluded from BOTH arms' rates (marked ``excluded_from_rate`` in the question
+meta). When no oracle arm is present, write compliance cannot be determined and only the
+controls are excluded.
 
 The oracle metadata (prompt / concepts / stratum) lives on the ``read.json`` records only in the
 raw ``results/superposed/`` copy; the finalized readout copies (``read.json`` and the ``*_ao``
@@ -59,7 +65,9 @@ from global_workspace.olens_suite.workspace_bench.schema import (
 from global_workspace.readout_text import strip_scaffolding
 
 _FAMILY = "superposed"
-_METRIC = "≥1 concept surfaced"  # ">=1 concept surfaced"
+# ">=1 concept surfaced"; controls + write-non-compliant items sit outside the rate,
+# matching the packaged scorer's denominators.
+_METRIC = "≥1 concept surfaced (controls + write-non-compliant items excluded from the rate)"
 
 
 def build_superposed(
@@ -78,6 +86,16 @@ def build_superposed(
     meta = _resolve_metadata(olens_blob, jlens_recs)
     olens_reads = _load_reads(olens_blob, meta)
 
+    def excluded_reason(name: str) -> str:
+        """Why this item sits outside the pass-rate denominators ('' = scored normally)."""
+        _prompt, concepts, _stratum = meta[name]
+        if not concepts:
+            return "control (empty concept list; neither arm can pass by construction)"
+        read = olens_reads.get(name)
+        if read is not None and not any(reg is Region.IN_SENTENCE for reg in read.regions):
+            return "write-non-compliant (no IN_SENTENCE cell; excluded by the packaged scorer)"
+        return ""
+
     questions: list[Question] = []
     for name in meta:
         prompt, concepts, stratum = meta[name]
@@ -87,6 +105,10 @@ def build_superposed(
             if jlens_recs is not None and name in jlens_recs
             else None
         )
+        q_meta: dict[str, Any] = {"stratum": stratum, "concepts": list(concepts)}
+        reason = excluded_reason(name)
+        if reason:
+            q_meta["excluded_from_rate"] = reason
         questions.append(
             Question(
                 name=name,
@@ -95,17 +117,18 @@ def build_superposed(
                 targets=[str(c) for c in concepts],
                 olens=olens_ro,
                 jlens=jlens_ro,
-                meta={"stratum": stratum, "concepts": list(concepts)},
+                meta=q_meta,
             )
         )
 
+    rated = [q for q in questions if "excluded_from_rate" not in q.meta]
     summary = FamilySummary(
         family=_FAMILY,
         judge_type="deterministic",
         n_items=len(questions),
         metric=_METRIC,
-        olens=_score([q.olens for q in questions]),
-        jlens=_score([q.jlens for q in questions]),
+        olens=_score([q.olens for q in rated]),
+        jlens=_score([q.jlens for q in rated]),
         chance=None,
     )
     return [summary], {_FAMILY: questions}
