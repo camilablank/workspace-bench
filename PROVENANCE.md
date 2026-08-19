@@ -1,10 +1,12 @@
 # Provenance
 
-- **Source repo**: `global-workspace` (private, MATS project) @ commit `2e6805c8` (main,
-  2026-08-19 — includes source-repo PR #188, the 2026-08-15 eval audit + sglang unification,
-  and source-repo PR #189, the readout_coherence bullet-relevance + bullet-diversity judges).
-  Previous export pin: `76ec9581` (2026-08-16); the pin before that was
-  `82eacf5a103507ff18849a0b0d252e8fb069afd7`.
+- **Source repo**: `global-workspace` (private, MATS project) @ commit `b3a75b8c` (main,
+  2026-08-19 — includes source-repo PR #190, the gw backport of this repo's own 2026-08-19
+  audit fixes; PR #191, the v2 identification-MC judges for user-modeling/dm + removal of all
+  `*_foil` arms + the slop-gate precision condition; and PR #192, restoring PR-181
+  sandbagging-strict semantics. Source and export are back in lockstep — the earlier
+  "export intentionally ahead of pin 2e6805c8" note is retired). Previous export pins:
+  `2e6805c8` (2026-08-19), `76ec9581` (2026-08-16), `82eacf5a103507ff18849a0b0d252e8fb069afd7`.
 - **Eval items + family READMEs**: mirror the HuggingFace dataset `camilablank/workspace-bench`
   (baseline_evals/ + hillclimbing_evals/ at the repo root, HF restructured layout).
 - **Vendored code**: the `workspace_bench` bundle library, the deterministic scorers
@@ -35,11 +37,11 @@
   pending a GPU parity run). The AO checkpoint itself is not publicly distributed, so the GPU
   stage requires source-repo access; this export's contract is the score/judge stage.
 
-## 2026-08-19 audit fixes (applied in this export; source-repo backport pending)
+## 2026-08-19 audit fixes (applied in this export; backported to source as gw PR #190)
 
-A full external-readiness audit was run on 2026-08-19; its fixes were applied HERE first and are
-being backported to `global-workspace` — until that lands, this export is intentionally ahead of
-the pin on the files below.
+A full external-readiness audit was run on 2026-08-19; its fixes were applied HERE first and
+were backported to `global-workspace` the same day (source-repo PR #190). As of pin `b3a75b8c`
+source and export agree on every instrument below.
 
 Instrument fixes (scoring semantics — numbers produced after this date can differ from earlier
 runs where the old behavior was buggy):
