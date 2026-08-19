@@ -44,7 +44,10 @@ READ_CELLS: dict[str, dict[str, Any]] = {
 }
 SWEEP_LAYERS = (44, 48, 52, 56, 60, 63)
 SWEEP_ANCHORS = ("eof", "bugline", "innocent")
-SAMPLING = {"k": 10, "max_new": 44, "temperature": 0.8, "top_p": 0.95}
+# k=1 is the cross-arm sample-parity contract (2026-08-19); the rung classification
+# is judged from the continuations, so k>1 gives an arm more chances to surface
+# consequence evidence than a k=1 arm. Raise k only with every compared arm re-run.
+SAMPLING = {"k": 1, "max_new": 44, "temperature": 0.8, "top_p": 0.95}
 CONTROL_SEEDS = {"readout": 0, "repeat": 1, "noise": 101, "donor": 102}
 
 # Judge rubric (gpt-5.5; planted-case calibration 60/60 before any data; quote stored per

@@ -49,7 +49,11 @@ TARGET_SENTENCE = "The committee will meet on Thursday to review the annual budg
 RENDER = "bare"
 LAYERS: tuple[int, ...] = (44, 52, 56, 60)
 READ_CELLS_REL: tuple[int, ...] = tuple(range(-1, -21, -1))
-SAMPLING: dict[str, Any] = {"k": 6, "max_new": 44, "temperature": 0.8, "top_p": 0.95}
+# k=1 is the cross-arm sample-parity contract (2026-08-19): every text lens gets ONE sampled
+# readout per cell, matching the bank audit contract and the external-lens workers. The metric
+# is a per-item UNION over samples, so k>1 inflates scores vs k=1 arms (RL measured 1.58@k=6
+# vs 1.34@k=1). Raise k only if EVERY compared arm is re-run at the same k.
+SAMPLING: dict[str, Any] = {"k": 1, "max_new": 44, "temperature": 0.8, "top_p": 0.95}
 
 # ---- the concept-word rule ------------------------------------------------------------------
 # A dictated phrase is scored through its content words. Words of <=3 letters are dropped along
