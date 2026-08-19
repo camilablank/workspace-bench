@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""readout_coherence scoring — fold the three judge passes into the eval's metrics.
+"""readout_coherence scoring — fold the judge passes into the eval's metrics.
 
 Metric 1 (standalone): summary-position ratio. flag = effective_level >= 2 per the frozen
 sumtok gate; the headline is n_olens_flagged / n_jlens_flagged (ideally ~1: both lenses
@@ -11,6 +11,11 @@ summary-position rate). Quality (pass 2, per position x layer: 1-10 + hallucinat
 padded flags) dominates; summary-start formatting (pass 3) is the remaining 2-point slice
 because it only exists on the small flagged subset. Weights are constants below, frozen in
 the eval README — change them there or not at all.
+
+Metrics 4+5 (standalone, skip-if-missing): bullet relevance (per-bullet relation shares,
+headline = unrelated rate, + hallucinated rate) and bullet diversity (mean n_distinct,
+diverse_aspects rate, pairwise relation shares) from bullet_judges.py's relevance.jsonl /
+diversity.jsonl. Reported beside — never inside — the frozen overall-coherence score.
 
 Usage:
   uv run --no-sync python scripts/oracle_lens_evals/readout_coherence/score.py \
@@ -123,6 +128,75 @@ def sumfmt_metrics(rows: list[dict[str, Any]]) -> dict[str, Any]:
     }
 
 
+def relevance_metrics(rows: list[dict[str, Any]]) -> dict[str, Any]:
+    """Pass 4 (bullet_judges.py relevance.jsonl): per-bullet relation + hallucination."""
+    ok = [r for r in rows if not r.get("api_error")]
+    if not ok:
+        return {"judged": 0}
+    relations: dict[str, int] = defaultdict(int)
+    n_bullets = 0
+    n_halluc = 0
+    by_layer: dict[int, list[int]] = defaultdict(list)  # per-cell [unrelated, total] pairs
+    for r in ok:
+        # strict=False: a misbehaving judge may return more/fewer sample verdicts than
+        # samples — score what aligns, same tolerance as the bullet truncation below.
+        for verdict_sample, bullet_texts in zip(
+            r["verdict"]["samples"], r["bullets"], strict=False
+        ):
+            for b in verdict_sample["bullets"][: len(bullet_texts)]:
+                relations[b["relation"]] += 1
+                n_bullets += 1
+                n_halluc += bool(b["hallucinated"])
+                by_layer[r["layer"]].append(int(b["relation"] == "unrelated"))
+    if not n_bullets:
+        return {"judged": len(ok), "n_bullets": 0}
+    return {
+        "judged": len(ok),
+        "api_errors": sum(1 for r in rows if r.get("api_error")),
+        "n_bullets": n_bullets,
+        "relation_shares": {k: round(v / n_bullets, 4) for k, v in sorted(relations.items())},
+        "unrelated_rate": round(relations.get("unrelated", 0) / n_bullets, 4),
+        "hallucinated_rate": round(n_halluc / n_bullets, 4),
+        "unrelated_rate_by_layer": {
+            la: round(sum(v) / len(v), 4) for la, v in sorted(by_layer.items())
+        },
+    }
+
+
+def diversity_metrics(rows: list[dict[str, Any]]) -> dict[str, Any]:
+    """Pass 5 (bullet_judges.py diversity.jsonl): pairwise topic relations + n_distinct."""
+    ok = [r for r in rows if not r.get("api_error")]
+    if not ok:
+        return {"judged": 0}
+    pair_rel: dict[str, int] = defaultdict(int)
+    n_distinct: list[int] = []
+    n_diverse = 0
+    n_samples = 0
+    by_layer: dict[int, list[int]] = defaultdict(list)
+    for r in ok:
+        for s in r["verdict"]["samples"]:
+            n_samples += 1
+            n_distinct.append(int(s["n_distinct"]))
+            n_diverse += bool(s["diverse_aspects"])
+            by_layer[r["layer"]].append(int(s["n_distinct"]))
+            for pr in s["pairs"]:
+                pair_rel[pr["relation"]] += 1
+    n_pairs = sum(pair_rel.values())
+    return {
+        "judged": len(ok),
+        "api_errors": sum(1 for r in rows if r.get("api_error")),
+        "n_samples": n_samples,
+        "mean_n_distinct": round(sum(n_distinct) / len(n_distinct), 3) if n_distinct else None,
+        "diverse_aspects_rate": round(n_diverse / n_samples, 4) if n_samples else None,
+        "pair_relation_shares": {
+            k: round(v / n_pairs, 4) for k, v in sorted(pair_rel.items())
+        } if n_pairs else {},
+        "mean_n_distinct_by_layer": {
+            la: round(sum(v) / len(v), 3) for la, v in sorted(by_layer.items())
+        },
+    }
+
+
 def main() -> None:
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument("--verdicts", required=True, type=Path)
@@ -133,6 +207,8 @@ def main() -> None:
                         read_jsonl(args.verdicts / "sumtok_jlens.jsonl"))
     m2 = quality_metrics(read_jsonl(args.verdicts / "quality.jsonl"))
     m3 = sumfmt_metrics(read_jsonl(args.verdicts / "sumfmt.jsonl"))
+    m4 = relevance_metrics(read_jsonl(args.verdicts / "relevance.jsonl"))
+    m5 = diversity_metrics(read_jsonl(args.verdicts / "diversity.jsonl"))
 
     if m2.get("judged"):
         fmt_term = (1.0 - m3["malformed_position_rate"]) if m3.get("judged") else None
@@ -149,6 +225,8 @@ def main() -> None:
         "summary_ratio": m1,
         "quality": m2,
         "summary_formatting": m3,
+        "bullet_relevance": m4,
+        "bullet_diversity": m5,
         "overall_coherence": {"score": overall, "weights": {"quality": W_QUALITY,
                               "summary_formatting": W_SUMFMT}, "note": note},
     }
@@ -166,6 +244,14 @@ def main() -> None:
     if m3.get("judged"):
         print(f"metric 3  malformed summary-start: {m3['malformed_position_rate']} of"
               f" {m3['judged']} summary positions")
+    if m4.get("n_bullets"):
+        print(f"metric 4  bullet relevance: unrelated {m4['unrelated_rate']},"
+              f" halluc {m4['hallucinated_rate']},"
+              f" shares {m4['relation_shares']}  (n={m4['n_bullets']} bullets)")
+    if m5.get("n_samples"):
+        print(f"metric 5  bullet diversity: mean n_distinct {m5['mean_n_distinct']},"
+              f" diverse_aspects {m5['diverse_aspects_rate']},"
+              f" pairs {m5['pair_relation_shares']}  (n={m5['n_samples']} samples)")
     print(f"OVERALL coherence: {overall}/10" + (f"  [{note}]" if note else ""))
     print(f"-> {args.out}")
 

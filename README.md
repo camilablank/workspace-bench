@@ -18,7 +18,7 @@ can be run without the monorepo.
 ```bash
 uv venv && . .venv/bin/activate
 uv pip install -e .            # CPU score/judge deps
-uv pip install -e ".[dev]" && pytest        # 110 CPU tests pass
+uv pip install -e ".[dev]" && pytest        # 117 CPU tests pass
 
 # deterministic smoke — runs immediately, no GPU, no API key (recovered readouts ship in-repo):
 python -m global_workspace.olens_suite.superposed.score \
@@ -51,7 +51,7 @@ apples-to-apples between AO free text and J-lens token bags summarized to prose)
 
 ## Provenance
 
-Generated from the private `global-workspace` research repo @ `76ec9581` (2026-08-16, includes
+Generated from the private `global-workspace` research repo @ `2e6805c8` (2026-08-19; previous pin `76ec9581`, 2026-08-16, includes
 the 2026-08-15 eval audit: strict Opus bank judge, relational single-position p20 instrument,
 `hit_any` cross-sample-gluing fix, `judge_mc --char-cap`, maze_path retired); see
 `PROVENANCE.md`. This is a packaging of that code — change the source and re-derive rather than

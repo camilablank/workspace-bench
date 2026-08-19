@@ -1,7 +1,8 @@
 # Provenance
 
-- **Source repo**: `global-workspace` (private, MATS project) @ commit `76ec9581` (main,
-  2026-08-16 — includes PR #188, the 2026-08-15 eval audit + sglang suite unification).
+- **Source repo**: `global-workspace` (private, MATS project) @ commit `2e6805c8` (main,
+  2026-08-19 — includes PR #188, the 2026-08-15 eval audit + sglang unification, and PR #189,
+  the readout_coherence bullet-relevance + bullet-diversity judges).
   Previous export pin: `82eacf5a103507ff18849a0b0d252e8fb069afd7`.
 - **Eval items + family READMEs**: mirror the HuggingFace dataset `camilablank/workspace-bench`
   (baseline_evals/ + hillclimbing_evals/ at the repo root, HF restructured layout).

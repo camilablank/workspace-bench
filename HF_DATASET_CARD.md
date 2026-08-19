@@ -31,8 +31,11 @@ top-level card carries the cross-family summary tables.
 ## Provenance
 
 - Exported from the private `global-workspace` research repo (MATS project, Neel Nanda
-  mentorship), `evals/workspace-bench/` at commit `76ec9581` (2026-08-16). Git is canonical;
+  mentorship), `evals/workspace-bench/` at commit `2e6805c8` (2026-08-19). Git is canonical;
   this mirror is generated.
+- **2026-08-19**: readout_coherence gains passes 4+5 — the bullet-relevance (*unrelatedness*)
+  and bullet-diversity judges (promoted from the LOO-lane instrument); reported beside, never
+  inside, the frozen overall-coherence score. Verbatim prompts in the family README.
 - **2026-08-15 eval audit** (source PR #188): the strict Opus **bank judge** replaces regex
   matching as the headline pass criterion on the mechanical banks (typo/typo-mt stay regex);
   `relational` is judged at a **single read position (p20, the blank)** — the old all-position
@@ -103,7 +106,7 @@ with olens/AO free text).
 | value_leakage (paused, not mirrored) | one readout per (arm, item, layer); ≥2-sample evidence quorum | single position = user-turn `<\|im_end\|>` |
 | order_ops, superposed | **no LLM judge** — deterministic per-cell matchers | read cells |
 | single-token / mechanical -mt | **strict Opus bank judge** per (item, layer) — target must be NAMED (exact/synonym/translation; verbatim quote required); `typo`/`typo-mt` stay regex-scored; mechanical word+exact pass@k is the deterministic secondary | read positions |
-| readout_coherence | sumtok-flag judge + 1–10 surface-quality judge + summary-formatting judge, per (position, layer) | ALL positions × L36–60 |
+| readout_coherence | sumtok-flag judge + 1–10 surface-quality judge + summary-formatting judge, per (position, layer); + bullet-relevance (continuation/context/tangential/unrelated + hallucinated) and bullet-diversity (pairwise topics, n_distinct) judges per cell on summary-flagged positions of bullet-format arms (2026-08-19) | ALL positions × L36–60; passes 4–5 on the summary-flagged subset |
 
 ## Random baselines (state these on every report and visualizer)
 

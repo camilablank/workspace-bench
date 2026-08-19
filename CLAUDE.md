@@ -28,7 +28,7 @@ uv venv && . .venv/bin/activate
 uv pip install -e .            # CPU score/judge path: pydra-config + anthropic + openai
 export ANTHROPIC_API_KEY=...   # required for every LLM-judged family
 # export OPENAI_API_KEY=...    # ONLY for the order_ops twin judge's default model (gpt-5.5); override with --model to skip
-uv pip install -e ".[dev]" && pytest    # 110 CPU tests (loader, deterministic scorers, judge summaries)
+uv pip install -e ".[dev]" && pytest    # 117 CPU tests (loader, deterministic scorers, judge summaries)
 ```
 
 `pyproject.toml` puts `src/` on the path (pytest) and `pip install -e .` makes `global_workspace`
@@ -84,7 +84,7 @@ protocol are in each family's README:
 | ordered_association | `scripts/oracle_lens_evals/oa_eb_readout_judge.py <gen_dir> --tag <t> --out <out.json>` |
 | relational | `scripts/oracle_lens_evals/judge_relational.py <gen_dir> --tag <t> --out <out.json>` (default `--pos 20`, the blank; `--pos all` = deprecated bundled instrument, output tagged DO-NOT-QUOTE) |
 | safety_cases | `scripts/oracle_lens_evals/judge_safety_cases.py --items hillclimbing_evals/safety_cases/items.json --olens-dir <…> --jlens-dir <…> --out <…>` |
-| readout_coherence | `scripts/oracle_lens_evals/readout_coherence/judge.py …` then `readout_coherence/score.py` |
+| readout_coherence | `scripts/oracle_lens_evals/readout_coherence/judge.py …` then `readout_coherence/bullet_judges.py` (passes 4+5: bullet relevance/unrelatedness + diversity, Opus; bullet-format arms, summary-flagged positions) then `readout_coherence/score.py` |
 
 **J-lens is judged apples-to-apples with AO**: for the LLM-judged families, pass the J-lens
 gen dir with the family's interp/summarizer flag (`--interp` / `--jlens-interp` /
@@ -116,7 +116,7 @@ they are documented, not runnable on a CPU-only box.
 
 ## Provenance
 
-Generated from `global-workspace` @ `76ec9581` (2026-08-16; see `PROVENANCE.md`). Banks + family
+Generated from `global-workspace` @ `2e6805c8` (2026-08-19; see `PROVENANCE.md`). Banks + family
 READMEs mirror the HF dataset `camilablank/workspace-bench`. Judge code is pinned to the canonical
 merged (HEAD) versions — the 2026-08-15 eval-audit instruments: the strict Opus **bank judge**
 (`bank_judge.py`, headline on the mechanical banks; typo stays regex), `judge_relational`'s
