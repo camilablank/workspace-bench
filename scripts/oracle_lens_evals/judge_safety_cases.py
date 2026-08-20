@@ -155,8 +155,9 @@ class Judge:
         async with self.sem:
             for attempt in range(4):
                 try:
+                    # temperature omitted: the API now rejects it for this model
+                    # ("`temperature` is deprecated for this model", 2026-08-19)
                     kw: dict[str, Any] = {"model": model, "max_tokens": max_tokens,
-                                          "temperature": 0.0,
                                           "messages": [{"role": "user", "content": user}]}
                     if system is not None:
                         kw["system"] = system

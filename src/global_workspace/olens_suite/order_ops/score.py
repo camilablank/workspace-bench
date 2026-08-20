@@ -336,8 +336,12 @@ def main(config: Config) -> None:
             print(pre + f"{lbl:<12}"
                   + "".join(f"{s[k]:>8.3f}" if s.get(k) is not None else f"{'-':>8}"
                             for k, _ in cols)
-                  + (f"{r['noise']:>7.3f}{r['donor']:>7.3f}{r['donor_recovers_own']:>7.3f}"
-                     f"  {'YES' if r['single_token_reachable'] else 'no'}" if i == 0 else ""))
+                  + (((f"{r['noise']:>7.3f}" if r['noise'] is not None else f"{'-':>7}")
+                      + (f"{r['donor']:>7.3f}" if r['donor'] is not None else f"{'-':>7}")
+                      + (f"{r['donor_recovers_own']:>7.3f}"
+                         if r['donor_recovers_own'] is not None else f"{'-':>7}")
+                      + f"  {'YES' if r['single_token_reachable'] else 'no'}")
+                     if i == 0 else ""))
             if "anti" in s:
                 print(f"{'':<33}{'  sign:':<12}|v| {s['magnitude']:.3f}  commit {s['commit']:.3f}"
                       f"  anti {s['anti']:.3f}  both {s['both']:.3f}  "

@@ -118,6 +118,13 @@ def main() -> None:
         "full-blob variant and label the output as such.",
     )
     args = ap.parse_args()
+    if args.out and "fullblob" in args.out.name and args.char_cap < 100_000:
+        raise SystemExit(
+            f"--out {args.out.name} claims the FULL-BLOB variant but --char-cap is "
+            f"{args.char_cap} (the frozen 24000 default sees ~2 of 6 layers on verbose "
+            "bullet arms and fakes cannot_tell collapses — 2026-08-20). Pass "
+            "--char-cap 200000, or rename the output."
+        )
     items = json.loads(Path(args.items).read_text())
     by_id = {it["id"]: it for it in items}
 
@@ -221,6 +228,7 @@ def main() -> None:
                     "tag": args.tag,
                     "n": n,
                     "pass": n_pass,
+                    "char_cap": args.char_cap,
                     "jlens_interp": args.jlens_interp,
                     "breakdown": dict(breakdown),
                     "per_item": per_item,
