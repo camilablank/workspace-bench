@@ -303,7 +303,13 @@ async def run(args: argparse.Namespace) -> None:
     layerset = set(layers)
     olens_dir = REPO / args.olens_dir
     jlens_dir = REPO / args.jlens_dir
-    sig = _settings_sig(args.scope, layers, args.judge_context, args.judge_model)
+    # the reader-dir identity MUST be part of the cache key: the label filenames repeat
+    # across arms, and a shared cache dir otherwise serves arm A's verdicts to arm B
+    # (observed 2026-08-20: three arms "measured" identical safety rates). Per-arm cache
+    # dirs remain good practice; this makes even a shared dir safe.
+    sig = _settings_sig(args.scope, layers, args.judge_context, args.judge_model) + (
+        f"__{Path(args.olens_dir).name}_{Path(args.jlens_dir).name}"
+    )
     cache_dir = (REPO / args.cache_dir) if args.cache_dir else None
 
     judge = Judge(args.judge_model, args.summarizer_model, args.concurrency)
