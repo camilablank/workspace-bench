@@ -30,6 +30,21 @@ generation prompt), so there is no retokenization divergence.
 the frozen meta had gone stale; the actual runs always included 56 (see
 `results_2026-08-13.json` `run.layers`). The items themselves are untouched.
 
+### Pinned additions (2026-08-20) — `rc-sumtok-*`
+
+5 hand-pinned conversations where earlier internal lanes found notable readouts
+(minesweeper impossibility argument, C loop-interchange TLB/cache walkthrough,
+Machiavelli/AIM jailbreak refusal, the "David Peckham" typo, "you look fresh" smalltalk),
+appended by the source repo's `add_pinned.py` (bank-authoring script, not vendored here)
+with `input_ids` copied VERBATIM from the source repo's summary-token corpus so the read
+sites line up token-for-token with the earlier findings. They deliberately differ from the
+frozen group — the assistant turn is Qwen's OWN sampled response (self-generated, some
+with `<think>` blocks), far outside the length window, never screened — so they carry
+`source: "sumtok"` and report as their own `per_source` / `by_source` split in `score.py`;
+the frozen-10 numbers stay recoverable by excluding `rc-sumtok-*` labels. Bank is now 15
+conversations / 7,707 positions (was 10 / 2,687). `results_2026-08-13.json` predates this
+group.
+
 ## Protocol — FROZEN 2026-08-13
 
 - Read sites: ALL positions of the rendered conversation × layers **36,40,44,48,52,56,60**
@@ -129,23 +144,24 @@ headroom for checkpoint hillclimbing. Junk concentrates at early template positi
 B=evals/workspace-bench/hillclimbing_evals/readout_coherence
 G=outputs/oracle_lens_evals/olens_sglang
 
-# 1) capture (1 GPU, project venv, ~2.5k positions x 7 layers)
+# 1) capture (1 GPU, project venv, ~7.7k positions x 7 layers since the pinned additions)
 scripts/cluster/submit.sh -J rcoh-cap -g 1 -t 02:00:00 -q high -- \
   env PYTHONUNBUFFERED=1 uv run --no-sync python \
   scripts/oracle_lens_evals/olens_sglang/capture_acts.py \
   prompts_json=$B/capture_rows.json layers=36:61:4 out_dir=$G/acts-rcoh
 
-# 2) AO readouts (sglang venv, 2-shard array; ~51k pos-readouts, bank mode).
+# 2) AO readouts (sglang venv; ~146k pos-readouts since the pinned additions — bump the
+#    array to ~6 shards to keep per-shard time flat; bank mode).
 #    PATH must lead with the venv bin (server JIT shells out to ninja) and
 #    PYTHONPATH=src is required — same as launch_eval.sh.
 SGL=/workspace-vast/$USER/envs/sglang-olens
-scripts/cluster/submit.sh -J rcoh-ao -g 1 -t 04:00:00 -q high -a 0-1 -- \
+scripts/cluster/submit.sh -J rcoh-ao -g 1 -t 04:00:00 -q high -a 0-5 -- \
   env PYTHONUNBUFFERED=1 PYTHONPATH=$PWD/src PATH=$SGL/bin:$PATH $SGL/bin/python \
   scripts/oracle_lens_evals/olens_sglang/worker.py \
   --acts-dir $G/acts-rcoh --merged-dir /workspace-vast/$USER/exp/models/olens_merged/ao28500-u64 \
   --out-dir $G/gen-rcoh-ao28500 --injection bank --prompt-kind continuation_raw \
   --layers 36:61:4 --k 3 --temperature 0.8 --top-p 0.95 --top-k 64 --max-new 64 \
-  --num-shards 2
+  --num-shards 6
 
 # 3) J-lens readouts (1 GPU, project venv, minutes)
 scripts/cluster/submit.sh -J rcoh-jlens -g 1 -t 02:00:00 -q high -- \
@@ -158,8 +174,8 @@ scripts/cluster/submit.sh -J rcoh-jlens -g 1 -t 02:00:00 -q high -- \
 #     (transformers + safetensors, to render the tokenized context windows) on top of the
 #     default install; score.py needs only the default install.
 
-# 4) judges (pass 1 Opus ~5k calls, pass 2 Sonnet ~17k calls,
-#    pass 3 Sonnet on the flagged subset)
+# 4) judges (pass 1 Opus ~15k calls, pass 2 Sonnet ~54k calls since the pinned
+#    additions, pass 3 Sonnet on the flagged subset)
 python scripts/oracle_lens_evals/readout_coherence/judge.py \
   --acts $G/acts-rcoh --gen-ao $G/gen-rcoh-ao28500 --gen-jlens $G/gen-rcoh-jlens \
   --out outputs/oracle_lens_evals/readout_coherence/verdicts --stage all
