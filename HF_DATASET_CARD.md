@@ -1,5 +1,6 @@
 ---
 pretty_name: "workspace-bench — frozen eval item banks"
+license: mit
 tags:
   - interpretability
   - evaluation

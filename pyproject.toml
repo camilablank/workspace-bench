@@ -2,6 +2,7 @@
 name = "workspace-bench"
 version = "0.1.0"
 description = "Standalone, self-contained runner for workspace-bench: score/judge an oracle lens (AO) vs the J-lens across all 11 eval families, exactly as implemented in the source research repo."
+license = {text = "MIT"}
 requires-python = ">=3.12"
 # The default install is the CPU score/judge path: deterministic scorers (pydra CLIs) + the
 # LLM judges (Anthropic; openai only for the order_ops twin-judge's gpt-5.5 default). anthropic
