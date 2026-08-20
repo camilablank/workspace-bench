@@ -7,6 +7,8 @@ A *run bundle* is one directory per (olens, jlens) evaluation::
       manifest.json          RunManifest.to_json()
       summary.json           {"schema_version", "run", ...run, "families": [FamilySummary, ...]}
       families/<family>.json  {"family", "questions": [Question, ...]}
+      families/<family>.fve.json  OPTIONAL reconstructor-FVE sidecar (write_fve_sidecar);
+                             the visualizer overlays it when present and tolerates absence
 
 The split is deliberate: ``summary.json`` is small (per-family scalars) and always loaded by
 the visualizer; the per-family question files hold the bulky readouts and are fetched lazily.
@@ -251,3 +253,137 @@ def _write_json(path: Path, obj: Any) -> None:
     tmp = path.with_suffix(path.suffix + ".tmp")
     tmp.write_text(json.dumps(obj, ensure_ascii=False, indent=1))
     tmp.replace(path)
+
+
+# --------------------------------------------------------------------------------------
+# Reconstructor-FVE sidecar (families/<family>.fve.json) — OPTIONAL per-run augmentation.
+#
+# For each free-text oracle-lens readout sample the Modal precompute job embeds the
+# bullets, refits them against the captured residual activation y at that (pos, layer),
+# and stores: total FVE, per-bullet attribution (exact Shapley over the 2^k bullet
+# subsets — order-independent, sums to the total — plus the algebraic coefficient
+# decomposition c_i<a_i,y>/||y||^2 from the full refit, which also sums to the total but
+# splits credit between near-duplicate bullets arbitrarily), and the length-based
+# matching-pursuit result (NNOMP k=4 over token prefixes of every bullet).
+# `samples` lists are index-aligned with the corresponding PosEntry.samples; a None slot
+# means "not computed" (e.g. degenerate/empty readout). The visualizer overlays whatever
+# is present and renders normally when the sidecar or any slot is missing.
+# --------------------------------------------------------------------------------------
+
+FVE_VERSION = 1
+
+
+@dataclass
+class BulletFVE:
+    """One bullet's share of a readout's FVE (both attribution flavors)."""
+
+    text: str
+    shapley: float  # exact Shapley value of this bullet's FVE contribution
+    shapley_pct: float  # shapley / total FVE (0.0 when total <= 0)
+    coef: float  # refit coefficient of the bullet's atom
+    coef_share: float  # c_i * <a_i, y> / ||y||^2 — exact share from the full refit
+
+    def to_json(self) -> dict[str, Any]:
+        return asdict(self)
+
+
+@dataclass
+class PrefixPick:
+    """One atom the prefix matching pursuit selected: a bullet's first n_tokens tokens."""
+
+    bullet: int  # index into the sample's bullets
+    n_tokens: int  # prefix length in tokens
+    text: str
+    coef: float
+
+    def to_json(self) -> dict[str, Any]:
+        return {"bullet": self.bullet, "len": self.n_tokens, "text": self.text, "coef": self.coef}
+
+
+@dataclass
+class PrefixMP:
+    """Length-based matching pursuit over bullet prefixes: the best-4 atoms + their FVE."""
+
+    fve: float
+    selected: list[PrefixPick] = field(default_factory=list)
+
+    def to_json(self) -> dict[str, Any]:
+        return {"fve": self.fve, "selected": [p.to_json() for p in self.selected]}
+
+
+@dataclass
+class SampleFVE:
+    """FVE payload for ONE readout sample at one (pos, layer)."""
+
+    fve: float
+    bullets: list[BulletFVE] = field(default_factory=list)
+    prefix_mp: PrefixMP | None = None
+
+    def to_json(self) -> dict[str, Any]:
+        return {
+            "fve": self.fve,
+            "bullets": [b.to_json() for b in self.bullets],
+            "prefix_mp": self.prefix_mp.to_json() if self.prefix_mp else None,
+        }
+
+
+@dataclass
+class OverallFVE:
+    """The question's headline FVE: the canonical read site's sample-0 total."""
+
+    pos: int
+    layer: int
+    sample: int
+    fve: float
+
+    def to_json(self) -> dict[str, Any]:
+        return asdict(self)
+
+
+@dataclass
+class QuestionFVE:
+    """All FVE data for one question: headline + per-(pos, layer, sample) payloads."""
+
+    overall: OverallFVE
+    # pos (str) -> layer (str) -> {"samples": [SampleFVE | None, ...]} aligned with PosEntry.samples
+    by_pos: dict[str, dict[str, list[SampleFVE | None]]] = field(default_factory=dict)
+    tokens: list[str] | None = None  # full prompt token strip (index == pos), when available
+
+    def to_json(self) -> dict[str, Any]:
+        out: dict[str, Any] = {
+            "overall": self.overall.to_json(),
+            "by_pos": {
+                pos: {
+                    layer: {"samples": [s.to_json() if s else None for s in samples]}
+                    for layer, samples in by_layer.items()
+                }
+                for pos, by_layer in self.by_pos.items()
+            },
+        }
+        if self.tokens is not None:
+            out["tokens"] = self.tokens
+        return out
+
+
+def write_fve_sidecar(
+    run_dir: Path,
+    family: str,
+    meta: dict[str, Any],
+    questions: dict[str, QuestionFVE],
+) -> Path:
+    """Write ``<run_dir>/families/<family>.fve.json`` next to the family's question file.
+
+    ``meta`` records the compute conventions (embedder id, whitening, k, prefix grid,
+    contract) so a rendered number is always traceable to how it was produced.
+    """
+    path = run_dir / "families" / f"{family}.fve.json"
+    _write_json(
+        path,
+        {
+            "family": family,
+            "fve_version": FVE_VERSION,
+            "meta": meta,
+            "questions": {name: q.to_json() for name, q in questions.items()},
+        },
+    )
+    return path

@@ -1,12 +1,14 @@
 # Provenance
 
-- **Source repo**: `global-workspace` (private, MATS project) @ commit `b3a75b8c` (main,
-  2026-08-19 — includes source-repo PR #190, the gw backport of this repo's own 2026-08-19
-  audit fixes; PR #191, the v2 identification-MC judges for user-modeling/dm + removal of all
-  `*_foil` arms + the slop-gate precision condition; and PR #192, restoring PR-181
-  sandbagging-strict semantics. Source and export are back in lockstep — the earlier
-  "export intentionally ahead of pin 2e6805c8" note is retired). Previous export pins:
-  `2e6805c8` (2026-08-19), `76ec9581` (2026-08-16), `82eacf5a103507ff18849a0b0d252e8fb069afd7`.
+- **Source repo**: `global-workspace` (private, MATS project) @ commit `ac48b5d0` (main,
+  2026-08-20 — includes source-repo PR #193, the slop-gate threshold locked at 9.0; PR #194,
+  the judged-family slop gate; PR #195, suite-domain k=1 sampling defaults; PR #196, the
+  readout_coherence pinned sumtok conversations (bank now 15 convs / 7,707 positions);
+  PR #197, judge instrument guards (fullblob char-cap, safety-judge temperature, canonical
+  judge runner, order_ops None-guard); and PR #198, the lane-code landing whose vendored
+  surface here is the readout_coherence bundle adapter + schema detail-file additions.
+  Source and export in lockstep). Previous export pins: `b3a75b8c` (2026-08-19), `2e6805c8`
+  (2026-08-19), `76ec9581` (2026-08-16), `82eacf5a103507ff18849a0b0d252e8fb069afd7`.
 - **Eval items + family READMEs**: mirror the HuggingFace dataset `camilablank/workspace-bench`
   (baseline_evals/ + hillclimbing_evals/ at the repo root, HF restructured layout).
 - **Vendored code**: the `workspace_bench` bundle library, the deterministic scorers

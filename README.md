@@ -78,11 +78,17 @@ apples-to-apples between AO free text and J-lens token bags summarized to prose)
 
 ## Provenance
 
-Generated from the private `global-workspace` research repo @ `2e6805c8` (2026-08-19; the
-2026-08-15 eval audit brought the strict Opus bank judge, the relational single-position p20
-instrument, the `hit_any` cross-sample-gluing fix, `judge_mc --char-cap`, and retired
-maze_path). A follow-up external-readiness audit on 2026-08-19 hardened outage handling,
-corrected the bundle-overlay/chance-line semantics, and lint-fixed three data files — the full
-list is in `PROVENANCE.md` (those fixes are being backported to the source repo). Otherwise
-this is a packaging of the source code — change the source and re-derive rather than editing
-vendored files here.
+Generated from the private `global-workspace` research repo @ `ac48b5d0` (2026-08-20; see
+`PROVENANCE.md` for the current pin and the full sync ledger). The 2026-08-15 eval audit
+brought the strict Opus bank judge, the relational single-position p20 instrument, the
+`hit_any` cross-sample-gluing fix, `judge_mc --char-cap`, and retired maze_path; a follow-up
+external-readiness audit on 2026-08-19 hardened outage handling, corrected the
+bundle-overlay/chance-line semantics, and lint-fixed three data files (all backported to the
+source repo as its PR #190). Otherwise this is a packaging of the source code — change the
+source and re-derive rather than editing vendored files here.
+
+## License
+
+MIT — see [LICENSE](LICENSE). The eval item banks mirrored on the HuggingFace dataset
+[`camilablank/workspace-bench`](https://huggingface.co/datasets/camilablank/workspace-bench)
+carry the same license.
