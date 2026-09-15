@@ -33,7 +33,7 @@ Shared facts that shape the design:
 workspace-bench/
 ├── README.md                     # what the bench is + one entry per eval (what / example / how judged)
 ├── CLAUDE.md                     # agent runbook: contracts, invariants, how to add a family
-├── pyproject.toml                # package `wsbench`; deps: openai, anthropic (extra), orjson
+├── pyproject.toml                # package `wsbench`; deps: openai, anthropic (stdlib json)
 ├── uv.lock
 ├── .github/workflows/ci.yml      # ruff + pytest (offline), on every PR
 ├── evals/                        # frozen banks, one folder per family, each with its own README.md
@@ -68,11 +68,13 @@ One `JudgeConfig` per family, declared in the registry:
 ```python
 @dataclass(frozen=True)
 class JudgeConfig:
-    model: str                    # judge of record for this family
-    prompt_version: str           # bumps whenever a prompt/schema changes; cache keys on it
-    reasoning: dict | None        # {"effort": "minimal"} for Gemini; None for Claude
-    aux_models: dict[str, str]    # e.g. {"extract": "deepseek/deepseek-v4-flash"} for jlens_pr Stage A,
-                                  #      {"summarizer": DEFAULT} for J-lens token-bag → prose
+    model: str  # judge of record for this family
+    prompt_version: str  # bumps whenever a prompt/schema changes; cache keys on it
+    reasoning: dict | None  # {"effort": "minimal"} for Gemini; None for Claude
+    aux_models: dict[
+        str, str
+    ]  # e.g. {"extract": "deepseek/deepseek-v4-flash"} for jlens_pr Stage A,
+    #      {"summarizer": DEFAULT} for J-lens token-bag → prose
 ```
 
 - `DEFAULT_JUDGE = "google/gemini-3.8-flash"` (OpenRouter). Every family uses it unless its
@@ -83,7 +85,7 @@ class JudgeConfig:
   hallucination-bench does, so unpinned numbers can never be mistaken for numbers of record.
 - Routing by model id: `claude-*` → Anthropic SDK (structured outputs, `ANTHROPIC_API_KEY`);
   everything else → OpenRouter via the OpenAI SDK (`OPENROUTER_API_KEY`, must start `sk-or-`).
-  Both paths share: JSON-schema structured output, 8-attempt jittered backoff on 429/5xx/timeouts,
+  Both paths share: JSON-schema structured output, 12-attempt jittered backoff on 429/5xx/timeouts,
   process-wide RPM pacer (`--rpm`, default 240), preflight call that fails fast on a bad key or
   model, per-run spend tally, failures return `None` and leave the cell unjudged (never scored).
 - **Single-tier judging.** The haiku-screen → opus two-tier design existed to save Opus spend.
