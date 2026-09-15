@@ -98,13 +98,15 @@ def api_key(model: str) -> str                                   # ANTHROPIC_API
 def schema_block(name: str, properties: dict, required: list[str]) -> dict   # {"name", "strict": True, "schema": {type object, additionalProperties False, required, properties}}
 async def stream_json_async(prompts: list[tuple[str, str]], *, schema: dict, model: str, on_result: Callable[[int, dict | None], None],
                 reasoning: dict | None = None, concurrency: int = 64, rpm: float = 240.0,
-                max_tokens: int = 8000, timeout: float = 180.0, spend: Spend | None = None) -> Spend   # the primitive
+                max_tokens: int | None = None, timeout: float = 180.0, spend: Spend | None = None) -> Spend   # the primitive; max_tokens None → 8000 on OpenRouter, 16000 on Anthropic (thinking counts against it)
 def stream_json(...same signature...) -> Spend                   # = asyncio.run(stream_json_async(...)); for CLI/tests
 def preflight(model: str, reasoning: dict | None) -> None
 # test seams (module-level, monkeypatchable):
 def _make_client(route: str, key: str) -> Any                    # AsyncOpenAI / AsyncAnthropic construction lives ONLY here
 def _backoff(attempt: int, status: int | None) -> float          # min(90 if status == 429 else 30, 2 * 2**attempt) * (0.5 + random())
 async def _pace(rpm: float) -> None                              # see pacer below
+_PACER: _Pacer                                                   # module singleton; _Pacer.reset() clears the next-slot time (tests)
+async def preflight_async(model: str, reasoning: dict | None) -> None   # preflight = asyncio.run(preflight_async(...))
 ```
 
 Behaviour, both routes:
@@ -117,7 +119,7 @@ Behaviour, both routes:
   the nine families as coroutines in ONE loop under one pacer; `stream_json` only wraps it in
   `asyncio.run` and raises `JudgeConfigError` if called from inside a running loop.
 - Retry loop: 12 attempts; transient = status in (408, 409, 429, 500, 502, 503, 504, 529) or
-  exception name containing "Timeout" / "Connection" or a JSON decode failure or `ValueError`
+  exception name containing "Timeout" / "Connection" / "Deadline" or a JSON decode failure or `ValueError`
   (empty choices / non-object body). Backoff `min(cap, 2 * 2**attempt) * (0.5 + random())`,
   cap 90 s on 429 else 30 s (`_backoff`). Fatal = exception name in ("AuthenticationError",
   "PermissionDeniedError", "NotFoundError") or status in (401, 402, 403) → raise
@@ -128,7 +130,7 @@ Behaviour, both routes:
   building a client.
 
 OpenRouter route (`route == "openrouter"`): `AsyncOpenAI(api_key, base_url=OPENROUTER,
-max_retries=0)`; `chat.completions.create(model, max_tokens, messages=[system, user],
+max_retries=0)`; `chat.completions.create(timeout=timeout, model, max_tokens, messages=[system, user],
 response_format={"type": "json_schema", "json_schema": schema}, extra_body={"reasoning":
 reasoning, "usage": {"include": True}, "provider": {"require_parameters": True}})`. `reasoning`
 key is omitted from `extra_body` when `None`. Strip a ```` ```json ```` fence before
@@ -184,12 +186,12 @@ class Cache:
     def get(self, key: str, fp: str, *, include_failed: bool = False) -> dict | None
         # newest row with this key AND this fp whose payload["result"] is not None; with include_failed, the newest such row regardless
     def put(self, key: str, fp: str, payload: dict) -> None   # appends {"key", "fp", "ts", **payload}; flushes; raises ValueError if payload uses the reserved keys key/fp/ts
-    def __len__(self) -> int
+    def __len__(self) -> int                       # rows loaded at open + rows appended this session
     def close(self) -> None
 ```
 
 Rows are never rewritten; a changed fingerprint simply appends a new row, and older rows stay
-so switching back reuses them. A `payload` containing `"result": None` is a recorded failure;
+so switching back reuses them. A row is *failed* iff `row.get("result") is None` (a payload without a `result` key counts as failed);
 `get` skips it unless `include_failed=True`, so failed cells are retried on the next run.
 
 ## `readouts.py` — the one input contract + converter
@@ -234,7 +236,9 @@ Converter: reads `<gen_dir>/<label>/L<layer:03d>.jsonl` (rows `{"label", "layer"
 "samples", ...}`, optional `"scores"`), writes one contract row per source row with
 `id` = the directory name (not the row's `label`, which older dirs may lack); `kind="tokens"`
 maps `samples`→`tokens` and `scores`→`scores`. Layer files are discovered by glob
-`*/L*.jsonl`; `layers` restricts. Samples are written raw: no `extract_phrase` stripping
+`*/L*.jsonl`; the layer comes from the filename (a row's own `layer` field is ignored); rows
+missing `pos` or `samples` are skipped and counted in the returned report's
+`skipped["malformed"]`; `layers` restricts. Samples are written raw: no `extract_phrase` stripping
 (fresh gen dirs are already stripped at write time). Returns the LoadReport of the written file.
 
 ## `results.py` — one results schema
@@ -271,7 +275,7 @@ def read_results(out_dir: Path) -> FamilyResult
 def completeness(*, pinned: bool, subset: bool, n_expected: int, n_missing: int, n_unjudged: int, n_empty: int) -> bool
     # pinned and not subset and n_missing == 0 and n_unjudged == 0 and n_empty <= 0.05 * n_expected
 def macro(results: Sequence[FamilyResult]) -> dict
-    # {"value": mean of value over results with complete and metric == "pass_rate", "families": [...], "excluded": [{family, reason}]}
+    # {"value": mean of value over results with complete, metric == "pass_rate" and value is not None; "families": [...], "excluded": [{family, reason}]} — reasons: "incomplete", "metric", "no value"
 def markdown_table(results: Sequence[FamilyResult], macro_row: dict | None) -> str
     # columns: family | metric | value | 95% CI | n | chance | judge | pinned | complete
 ```
@@ -308,16 +312,21 @@ def load_all() -> None                    # imports every wsbench.evals.<pkg> so
 
 `main` calls `registry.load_all()` once before dispatching.
 
-- `list` — table: family, group, n items (from bank, `?` if the bank file is absent), judge
-  model, prompt version. Empty registry prints "no families registered yet".
+- `list` — table: family, group, n items, judge model, prompt version. n items =
+  `len(d)` if the bank JSON's top level is a list, else `len(d["items"])`; `?` if the file is
+  absent or any other shape. Empty registry prints "no families registered yet".
 - `judge <family> --readouts F --out DIR [--judge-model M] [--layers 20,36] [--items a,b]
   [--limit N] [--allow-missing] [--concurrency 64] [--rpm 240] [--dry-run]` — resolves the judge
   (`judge_config.resolve` with flag + `os.environ`), builds `JudgeArgs`, calls `spec.run`,
   prints `Spend.report()`-style summary and the `value`. Unknown family → message listing known
   families, exit 2. `JudgeConfigError` → message, exit 3. `--out` default
   `outputs/<readouts stem>/<family>/` (so several individually judged families share a
-  parent that `report` can read). `judge` prints `counts["spend_usd"]` and `numbers["value"]`
-  from the returned `FamilyResult`; no `Spend` object crosses the `spec.run` boundary.
+  parent that `report` can read). **`spec.run` returns a `FamilyResult` and writes nothing;
+  the CLI calls `write_results(out, result)` for both `judge` and `run`.** Families set
+  `pinned_instrument=args.judge.pinned` and `complete=completeness(pinned=args.judge.pinned,
+  subset=args.items is not None or args.limit > 0, ...)`; the test stub does the same.
+  `judge` prints `result.counts["spend_usd"]` and `result.value`; no `Spend` object crosses
+  the `spec.run` boundary.
 - `run (--all | --families a,b) --readouts-root DIR --out DIR [same judge flags]` — for each
   selected family expects `DIR/<family>.jsonl`; missing file → recorded as skipped, not fatal;
   runs families sequentially in phase 1 (concurrent scheduling is phase 6); writes
@@ -346,7 +355,11 @@ check`, keys `OPENROUTER_API_KEY` / `ANTHROPIC_API_KEY`, never committed).
 restores it after, so a stub family registered by one test never leaks into another (tests
 must not clear-and-reload; `load_all` is a no-op after first import). Tests that call
 `stream_json` pass `rpm=1e9` or monkeypatch `wsbench.llm._pace`, and monkeypatch
-`wsbench.llm._backoff` to return 0 and `wsbench.llm._make_client` to return a fake.
+`wsbench.llm._backoff` to return 0 and `wsbench.llm._make_client` to return a fake. No async
+test plugin: tests drive coroutines with `asyncio.run(...)` inside sync test functions. A second
+autouse fixture calls `wsbench.llm._PACER.reset()` before each test. The "pacer shared across
+two `Spend`s" test asserts on reserved slot times with `time.monotonic` / `asyncio.sleep`
+monkeypatched, never on wall-clock.
 
 - `test_llm.py`: `route` for `claude-sonnet-5` / `google/gemini-3.8-flash`; `api_key` errors on
   missing and malformed keys; `schema_block` shape; `stream_json` with a fake OpenRouter client
