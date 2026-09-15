@@ -64,5 +64,11 @@ class Cache:
     def __len__(self) -> int:
         return self._n
 
+    def __enter__(self) -> Cache:
+        return self
+
+    def __exit__(self, *exc: object) -> None:
+        self.close()
+
     def close(self) -> None:
         self._fh.close()

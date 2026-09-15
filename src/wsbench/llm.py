@@ -37,6 +37,9 @@ class JudgeConfigError(RuntimeError):
 
 @dataclass
 class Spend:
+    """Per-run tally. ``calls`` counts HTTP 200 responses (including garbled bodies that were
+    then retried); ``errors``/``refusals`` count cells left unjudged."""
+
     usd: float = 0.0
     calls: int = 0
     retries: int = 0
@@ -114,10 +117,13 @@ class _Pacer:
 _PACER = _Pacer()
 
 
+_sleep = asyncio.sleep  # seam: tests patch this instead of the global asyncio.sleep
+
+
 async def _pace(rpm: float) -> None:
     delay = _PACER.reserve(rpm)
     if delay > 0:
-        await asyncio.sleep(delay)
+        await _sleep(delay)
 
 
 def _backoff(attempt: int, status: int | None) -> float:
@@ -215,9 +221,9 @@ async def _anthropic_once(
         spend.refusals += 1
         print(f"  llm refusal: {model}")
         return None
-    if stop == "max_tokens":
+    if stop in ("max_tokens", "model_context_window_exceeded"):
         spend.errors += 1
-        print(f"  llm error: {model} stop_reason=max_tokens")
+        print(f"  llm error: {model} stop_reason={stop}")
         return None
     text = next((b.text for b in resp.content if getattr(b, "type", None) == "text"), None)
     if text is None:
@@ -281,7 +287,7 @@ async def _one(
             )
             if transient and attempt < _ATTEMPTS - 1:
                 spend.retries += 1
-                await asyncio.sleep(_backoff(attempt, status))
+                await _sleep(_backoff(attempt, status))
                 continue
             spend.errors += 1
             print(f"  llm error: {name}: {str(e)[:200]}")

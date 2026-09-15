@@ -11,6 +11,7 @@ from pathlib import Path
 from wsbench.judge_config import JudgeConfig, ResolvedJudge
 from wsbench.results import FamilyResult
 
+# src layout (uv-managed checkout); a wheel install would resolve to site-packages.
 REPO_ROOT = Path(__file__).resolve().parents[2]
 FAMILIES: dict[str, EvalSpec] = {}
 

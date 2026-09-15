@@ -111,7 +111,7 @@ def load_readouts(
     pos_sets = {k: set(v) for k, v in positions.items()} if positions is not None else None
     cells: list[Cell] = []
     seen: set[tuple[str, int, int]] = set()
-    for line in Path(path).read_text(encoding="utf-8").splitlines():
+    for line in Path(path).read_bytes().decode("utf-8", "replace").splitlines():
         if not line.strip():
             continue
         rep.n_rows += 1
@@ -193,7 +193,7 @@ def convert_gen_dir(
             if layer is None or (layer_set is not None and layer not in layer_set):
                 continue
             id_ = f.parent.name
-            for line in f.read_text(encoding="utf-8").splitlines():
+            for line in f.read_bytes().decode("utf-8", "replace").splitlines():
                 if not line.strip():
                     continue
                 try:

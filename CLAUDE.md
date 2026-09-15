@@ -43,7 +43,8 @@ cells, and empty cells <= 5% of expected. `report`'s macro averages only complet
 - Failures (`None` verdicts, refusals, missing cells) never score; they are counted.
 - Frozen banks under `evals/<family>/items.json` are never edited in place.
 - `spec.run` returns a `FamilyResult` and writes nothing; the CLI writes `results.json`.
-- No `Spend` crosses the family boundary; families report `counts["spend_usd"]`.
+- No `Spend` crosses the family boundary; families report `counts["spend_usd"]`. `counts` has a
+  fixed key set; any other tally goes in `extras`.
 - Cache rows are append-only (`cache.py`); a changed fingerprint appends, never rewrites.
 
 ## Adding a family

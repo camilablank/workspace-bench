@@ -183,3 +183,14 @@ def test_convert_tokens_and_layer_restrict(tmp_path):
     assert c.tokens == ("s1", "s2") and c.scores == (2.0, 1.0)
     c = next(c for c in cells if c.id == "item2" and c.pos == 4)
     assert c.tokens == ("s3",) and c.scores is None
+
+
+def test_invalid_utf8_line_is_malformed_not_fatal(tmp_path):
+    from wsbench.readouts import load_readouts
+
+    f = tmp_path / "r.jsonl"
+    good = b'{"id": "a", "layer": 1, "pos": 0, "samples": ["x"]}\n'
+    f.write_bytes(good + b'{"id": "b", "layer": 1, "pos": 0, "samples": ["\xff\xfe"]}\n')
+    cells, rep = load_readouts(f)
+    assert len(cells) == 2 and rep.skipped["malformed"] == 0
+    assert "\ufffd" in cells[1].samples[0]

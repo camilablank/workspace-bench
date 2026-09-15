@@ -275,7 +275,7 @@ def test_pacer_shared_across_spends(keys, monkeypatch):
     async def fake_sleep(d: float) -> None:
         sleeps.append(d)
 
-    monkeypatch.setattr(llm.asyncio, "sleep", fake_sleep)
+    monkeypatch.setattr(llm, "_sleep", fake_sleep)
     fake = FakeOpenRouter([_or_response('{"a": 1}'), _or_response('{"a": 1}')])
     _install(monkeypatch, fake)
     s1, s2 = Spend(), Spend()
@@ -376,3 +376,55 @@ def test_bad_concurrency_and_rpm(keys, monkeypatch):
         )
     with pytest.raises(JudgeConfigError):
         stream_json([("s", "u")], schema=SCHEMA, model=GEMINI, on_result=lambda i, r: None, rpm=0)
+
+
+def test_openrouter_fatal_cancels_inflight_task(keys, fast, monkeypatch):
+    """A 401 on one call must cancel a hung sibling call and close the client."""
+    cancelled: list[bool] = []
+
+    class Hanging(FakeOpenRouter):
+        async def _create(self, **kw: Any) -> Any:
+            self.calls.append(kw)
+            if kw["messages"][1]["content"] == "hang":
+                try:
+                    await asyncio.sleep(30)
+                except asyncio.CancelledError:
+                    cancelled.append(True)
+                    raise
+            raise AuthenticationError("bad key")
+
+    fake = Hanging([])
+    _install(monkeypatch, fake)
+    with pytest.raises(JudgeConfigError):
+        stream_json(
+            [("s", "hang"), ("s", "die")],
+            schema=SCHEMA,
+            model=GEMINI,
+            on_result=lambda i, r: None,
+        )
+    assert cancelled == [True]
+    assert fake.closed
+
+
+def test_anthropic_context_window_stop_is_error_not_retry(keys, fast, monkeypatch):
+    fake = FakeAnthropic([_claude_response("{", stop_reason="model_context_window_exceeded")])
+    got, spend = _collect([("s", "u")], CLAUDE, fake, monkeypatch)
+    assert got == {0: None}
+    assert spend.errors == 1 and spend.retries == 0 and len(fake.calls) == 1
+
+
+def test_real_clients_are_built_with_expected_kwargs(monkeypatch):
+    """Guards the SDK call shapes without any network: client construction + create() signatures."""
+    import inspect
+
+    from anthropic.resources.messages import AsyncMessages
+    from openai.resources.chat.completions import AsyncCompletions
+
+    orc = llm._make_client("openrouter", "sk-or-x")
+    assert str(orc.base_url).rstrip("/") == llm.OPENROUTER and orc.max_retries == 0
+    anc = llm._make_client("anthropic", "k")
+    assert anc.max_retries == 0
+    a = inspect.signature(AsyncMessages.create).parameters
+    assert {"output_config", "system", "timeout", "max_tokens"} <= set(a)
+    o = inspect.signature(AsyncCompletions.create).parameters
+    assert {"extra_body", "response_format", "max_tokens", "timeout"} <= set(o)

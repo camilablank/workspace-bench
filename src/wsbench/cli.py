@@ -190,7 +190,14 @@ def cmd_run(args: argparse.Namespace) -> int:
 
 
 def cmd_report(args: argparse.Namespace) -> int:
-    results = [read_results(p.parent) for p in sorted(args.dir.glob("*/results.json"))]
+    if not args.dir.is_dir():
+        print(f"not a directory: {args.dir}", file=sys.stderr)
+        return 2
+    try:
+        results = [read_results(p.parent) for p in sorted(args.dir.glob("*/results.json"))]
+    except ValueError as e:
+        print(f"unreadable results: {e}", file=sys.stderr)
+        return 2
     m = macro(results)
     table = markdown_table(results, m)
     print(table, end="")
