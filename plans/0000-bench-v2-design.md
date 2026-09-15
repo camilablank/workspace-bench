@@ -68,11 +68,13 @@ One `JudgeConfig` per family, declared in the registry:
 ```python
 @dataclass(frozen=True)
 class JudgeConfig:
-    model: str                    # judge of record for this family
-    prompt_version: str           # bumps whenever a prompt/schema changes; cache keys on it
-    reasoning: dict | None        # {"effort": "minimal"} for Gemini; None for Claude
-    aux_models: dict[str, str]    # e.g. {"extract": "deepseek/deepseek-v4-flash"} for jlens_pr Stage A,
-                                  #      {"summarizer": DEFAULT} for J-lens token-bag → prose
+    model: str  # judge of record for this family
+    prompt_version: str  # bumps whenever a prompt/schema changes; cache keys on it
+    reasoning: dict | None  # {"effort": "minimal"} for Gemini; None for Claude
+    aux_models: dict[
+        str, str
+    ]  # e.g. {"extract": "deepseek/deepseek-v4-flash"} for jlens_pr Stage A,
+    #      {"summarizer": DEFAULT} for J-lens token-bag → prose
 ```
 
 - `DEFAULT_JUDGE = "google/gemini-3.8-flash"` (OpenRouter). Every family uses it unless its
