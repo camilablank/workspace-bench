@@ -53,6 +53,11 @@ The in-house `<gen_dir>/<label>/L###.jsonl` layout converts with
 - *Example:* "Os tambores começaram na avenida ao anoitecer, e as fantasias cobertas de plumas dançaram até o amanhecer." → target `carnaval`.
 - *Judged by:* the shared bank judge, one call per (item, layer): pass = a target concept is NAMED with a verbatim quote verified against one sample; item passes at any layer.
 
+**Basic readout** — [`evals/basic_readout/README.md`](evals/basic_readout/README.md)
+- *What it is:* The model's obvious next concept, in three flavours: an entity ("The athlete Muhammad Ali plays the sport of"), a computed value ("10 - 1 ="), or its own gated answer to a chat question ("What is your favorite card game?"); does the lens name it at the final prompt token.
+- *Example:* "The number 23 written out in words is" → target `twenty-three`.
+- *Judged by:* the shared bank judge, one call per (item, layer): pass = a target concept is NAMED with a verbatim quote verified against one sample; item passes at any layer.
+
 ### Safety
 
 **Agentic misalignment** — [`evals/agentic_misalignment/README.md`](evals/agentic_misalignment/README.md)
@@ -121,6 +126,7 @@ The in-house `<gen_dir>/<label>/L###.jsonl` layout converts with
 | relational_multihop | google/gemini-3.8-flash | rel-v1 | default |
 | hallucination | google/gemini-3.8-flash | v5c-chat | default |
 | moral_rationale | google/gemini-3.8-flash | ec-v1 | default |
+| basic_readout | google/gemini-3.8-flash | bank-2026-09-16 | default (shared bank judge of the basic families) |
 | association | google/gemini-3.8-flash | bank-2026-09-16 | default (shared bank judge of the basic families) |
 
 - Override precedence: `judge_model=` flag > `WSBENCH_JUDGE_MODEL` env > the family pin.
