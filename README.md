@@ -6,8 +6,8 @@ prose (an "O-lens": a few sampled sentences per position) or a top-10 token bag 
 tokens with scores). Each eval pairs a frozen item bank with a judge prompt that asks whether
 the readout carries the latent the item was built around — the inferred user attribute, the
 composed two-hop relation, the plan the model is about to act on — without echoing the
-prompt. The evals fall into seven groups (Basic single-token, Basic multi-token, Safety, Association,
-Bag of words, Precision, Logical processing) and share one judge layer: Gemini 3.8 Flash via OpenRouter by default, with
+prompt. The evals fall into eight groups (Basic single-token, Basic multi-token, Computational, Safety,
+Association, Bag of words, Precision, Logical processing) and share one judge layer: Gemini 3.8 Flash via OpenRouter by default, with
 two documented pins (see [Judges](#judges)). This repo owns judging only; readout generation
 stays with the lens producer, which hands over one JSONL file per (family, arm).
 
@@ -119,6 +119,13 @@ The in-house `<gen_dir>/<label>/L###.jsonl` layout converts with
 - *Example:* "Think about the plumber's blue ladder leaning against the mango tree. Now write this sentence: ..." → a write-cell readout naming `plumber`, `blue ladder` or `mango tree` among six candidates.
 - *Judged by:* one prompt-blind multi-select call per in-sentence write cell with a verbatim-quote gate; item passes when any cell names a dictated concept; controls and off-task items excluded.
 
+### Computational
+
+**Chained intermediates** — [`evals/chain_intermediates/README.md`](evals/chain_intermediates/README.md)
+- *What it is:* A two- or three-step arithmetic chain with the start number given last, answered with no chain of thought; the intermediate is computed inside the read window and never written.
+- *Example:* "Halve it, rounding down" three times from 23 → intermediates 11 and 5, answer 2.
+- *Judged by:* one prompt-blind free-recall call per (item, layer) at the last prompt token, naming the values the readout presents as computed; pass = top value is an intermediate at any layer; floor = the magnitude-matched decoy null beside it.
+
 ### Safety
 
 **Agentic misalignment** — [`evals/agentic_misalignment/README.md`](evals/agentic_misalignment/README.md)
@@ -203,6 +210,7 @@ each family.
 | typo_mt | google/gemini-3.8-flash | mc-2026-09-16 | default (shared forced-choice judge of the multi-token families) |
 | multilingual_mt | google/gemini-3.8-flash | mc-2026-09-16 | default (shared forced-choice judge of the multi-token families) |
 | multihop_mt | google/gemini-3.8-flash | mc-2026-09-16 | default (shared forced-choice judge of the multi-token families) |
+| chain_intermediates | google/gemini-3.8-flash | chain-free-2026-09-16 | default (free-recall judge, source repo judge_free_modal.py) |
 | multi_concept_directed_modulation | google/gemini-3.8-flash | mcdm-2026-09-16 | default (own multi-select judge over frozen candidate lists) |
 | directed_modulation | google/gemini-3.8-flash | dm-2026-09-16 | default (own MC judge; single-tier, no screen) |
 | typo | google/gemini-3.8-flash | bank-2026-09-16 | default (shared bank judge of the basic families) |

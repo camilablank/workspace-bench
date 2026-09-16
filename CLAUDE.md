@@ -77,6 +77,11 @@ cell). `wsbench convert-gen-dir gen_dir=GEN out=F.jsonl kind=prose|tokens` conve
   family's judge on the stock model's prompt-only summaries, judged at one layer) into
   `evals/baselines/prompt_only.json`; `prompt_only.EXCLUDED` names families whose prompt states
   the answer (multi_concept_directed_modulation), never frozen or shown.
+- chain_intermediates (`group="computational"`, own judge): one free-recall call per (item,
+  layer) at the last prompt token (max-pos row; other rows ignored and counted); token lenses are
+  judged as their bag, no summarizer; a top value needs the digits in the readout or a verbatim
+  quote; pass = top value is an intermediate at any layer; `extras.null_top1_near` is the ±3
+  decoy null. No analytic floor.
 - Cell shapes: moral = tail-5 positions, 1-2 calls/cell; relational = max-pos row per (item,
   layer); role-bound = every row, 3 MCs/call; conjunctive = one call per item over the
   `[L<layer>]` blob (`opts=char_cap=N`); user_modeling = k samples -> k calls, item key `name`
@@ -123,7 +128,7 @@ macro averages only complete `pass_rate` families and lists every exclusion with
   in `extras`); no `Spend` crosses the family boundary. Cache rows are append-only.
 - README: each family entry is `**<spec.title>** — [link]` followed by exactly three lines
   `- *What it is:*` / `- *Example:*` / `- *Judged by:*`, grouped Basic (single token) · Basic
-  (multi-token) · Safety · Association · Bag of words · Precision · Logical processing. Credits live in README §Credits and NOTICE.md, one
+  (multi-token) · Computational · Safety · Association · Bag of words · Precision · Logical processing. Credits live in README §Credits and NOTICE.md, one
   bullet per external source; in-house families get no credit line.
 
 ## Adding a family
