@@ -1,15 +1,15 @@
-# multilingual_multihop
+# multihop_mt
 
-A non-English two-hop prompt; the judge must pick the bridge concept's English name and the passage's language, in one layer.
+A two- or three-hop factual prompt whose bridge concepts are multi-token names; every bridge must be read in one layer ("...the 1967 Norwegian Computing Center creation that introduced classes and objects was designed by Ole-Johan Dahl together with" -> bridge *Simula 67*, answer Kristen Nygaard).
 
-98 items (source bank `lens-eval-multilingual-multihop.json`, parent `multihop-mt`,
+100 items (source bank `lens-eval-multihop-hard.json`, parent `multihop-mt`,
 frozen 2026-09-10). Plain render, one read position: the final prompt token, immediately
 before the answer word. Every item and every bridge was gated on Qwen3.6-27B (greedy-verified,
 then >= 8/10 at temperature 0.7).
 
-Example: a two-hop prompt in another language → the bridge's English name among four confusables, and the language among four neighbours, both in one layer.
+Example: "Fact: the 1967 Norwegian Computing Center creation that introduced the concepts of class and object was designed by Ole-Johan Dahl together with" → bridge `Simula 67` among ALGOL 68, Smalltalk-80, PL/I, Modula-2.
 
-Judged units: `bridge_native` (frozen `mc` block) and `language`.
+Judged units: `bridge1` (and `bridge2` on 3-hop items), each a five-way question from the bank's frozen `mc` block.
 
 The bank file is a frozen copy of the source repo's hard-tier bank: its `family` header and `contract` block describe the source's regex contract and are not read by this judge.
 
@@ -23,7 +23,7 @@ The bank file is a frozen copy of the source repo's hard-tier bank: its `family`
 - **Conjunctive:** a layer passes an item only when EVERY judged unit is picked correctly at
   that layer; item pass = any layer. `extras.unit_any_layer` gives each unit's any-layer
   accuracy on its own, `extras.abstain_rate` the escape rate, `extras.kinds` the pick counts.
-- **Options** are frozen per item (`tests/golden/multilingual_multihop_options.json`): the bank's `mc` blocks
+- **Options** are frozen per item (`tests/golden/multihop_mt_options.json`): the bank's `mc` blocks
   where they exist (concept, bridge and readout units: four same-kind confusables written by
   the source repo's option pass), the source instrument's fixed confusable set per language, and
   for typo corrections four other items' corrections drawn with a seeded rule. Option order is a
@@ -43,11 +43,11 @@ The bank file is a frozen copy of the source repo's hard-tier bank: its `family`
 ## Readouts
 
 `{"id": "<item name>", "layer": L, "pos": P, "samples": [...]}` rows; `tokens` rows for a token
-lens. `examples/readouts/multilingual_multihop.jsonl` is a toy file for `dry_run=True`.
+lens. `examples/readouts/multihop_mt.jsonl` is a toy file for `dry_run=True`.
 
 ```
-wsbench judge family=multilingual_multihop readouts=examples/readouts/multilingual_multihop.jsonl out=outputs/toy/multilingual_multihop dry_run=True
-wsbench judge family=multilingual_multihop readouts=<arm>.jsonl out=outputs/<arm>/multilingual_multihop limit=3
+wsbench judge family=multihop_mt readouts=examples/readouts/multihop_mt.jsonl out=outputs/toy/multihop_mt dry_run=True
+wsbench judge family=multihop_mt readouts=<arm>.jsonl out=outputs/<arm>/multihop_mt limit=3
 ```
 
 ## Judge prompts

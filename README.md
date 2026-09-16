@@ -6,8 +6,8 @@ prose (an "O-lens": a few sampled sentences per position) or a top-10 token bag 
 tokens with scores). Each eval pairs a frozen item bank with a judge prompt that asks whether
 the readout carries the latent the item was built around — the inferred user attribute, the
 composed two-hop relation, the plan the model is about to act on — without echoing the
-prompt. The evals fall into six groups (Basic, Safety, Association, Bag of words, Precision,
-Logical processing) and share one judge layer: Gemini 3.8 Flash via OpenRouter by default, with
+prompt. The evals fall into seven groups (Basic single-token, Basic multi-token, Safety, Association,
+Bag of words, Precision, Logical processing) and share one judge layer: Gemini 3.8 Flash via OpenRouter by default, with
 two documented pins (see [Judges](#judges)). This repo owns judging only; readout generation
 stays with the lens producer, which hands over one JSONL file per (family, arm).
 
@@ -46,7 +46,7 @@ The in-house `<gen_dir>/<label>/L###.jsonl` layout converts with
 
 ## The evals
 
-### Basic
+### Basic (single token)
 
 **Association** — [`evals/association/README.md`](evals/association/README.md)
 - *What it is:* A scene implies a concept the text never names (a Portuguese carnival, a chess game, a childhood); does the lens name it at the final prompt token.
@@ -82,35 +82,37 @@ The in-house `<gen_dir>/<label>/L###.jsonl` layout converts with
 - *What it is:* The model is told to think about a concept, not to think about it, or to hide a secret word or preference while copying an unrelated sentence; does the lens read the held concept at the positions where the model is writing.
 - *Example:* "Think about the body part clavicle while you write. Now write exactly this sentence: \"The committee approved the minutes without changes.\"" → target `clavicle`, read at each token of the copied sentence.
 - *Judged by:* one 6-way MC call per readout row (gold + 4 same-subfamily concepts + cannot tell) with a `basis` field; pass = gold picked as content (not narration of the instruction) at any row, evidence quote verified. Per-subfamily credit rules; the think vs don't-think pair contrast is reported.
-**Multihop (hard)** — [`evals/multihop_hard/README.md`](evals/multihop_hard/README.md)
-- *What it is:* A two- or three-hop factual prompt; every bridge concept must be read, as a multi-token form, in one layer ("...the 1967 Norwegian Computing Center creation that introduced classes and objects was designed by Ole-Johan Dahl together with" -> bridge *Simula 67*, answer Kristen Nygaard).
-- *Example:* "Fact: the 1967 Norwegian Computing Center creation that introduced the concepts of class and object was designed by Ole-Johan Dahl together with" → required bridge `Simula 67` (forms: Simula 67, the Simula language); optional target `Kristen Nygaard`.
-- *Judged by:* no LLM judge: conjunctive regex over multi-token unit forms, an item passes a layer only when every required unit hits there; chance = permutation null. Token readouts are summarized first.
+### Basic (multi-token)
 
-**Multilingual (hard)** — [`evals/multilingual_hard/README.md`](evals/multilingual_hard/README.md)
-- *What it is:* A non-English prompt whose answer is a multi-token concept; the lens must name both the concept (in the prompt's language, English or Chinese) and the language, in one layer.
-- *Example:* a Polish sentence about a concept → required units `concept` (pl / en / zh forms) and `language` ("Polish", "波兰语", ...), both in one layer.
-- *Judged by:* no LLM judge: conjunctive regex over multi-token unit forms, an item passes a layer only when every required unit hits there; chance = permutation null. Token readouts are summarized first.
+**Multihop (multi-token)** — [`evals/multihop_mt/README.md`](evals/multihop_mt/README.md)
+- *What it is:* A two- or three-hop factual prompt whose bridge concepts are multi-token names; every bridge must be read in one layer ("...the 1967 Norwegian Computing Center creation that introduced classes and objects was designed by Ole-Johan Dahl together with" -> bridge *Simula 67*, answer Kristen Nygaard).
+- *Example:* "Fact: the 1967 Norwegian Computing Center creation that introduced the concepts of class and object was designed by Ole-Johan Dahl together with" → bridge `Simula 67` among ALGOL 68, Smalltalk-80, PL/I, Modula-2.
+- *Judged by:* one prompt-blind five-way call per (item, layer, unit) with a cannot-tell escape and a verbatim-quote gate; a layer passes only when every judged unit is picked correctly; item passes at any layer.
 
-**Typo (hard)** — [`evals/typo_hard/README.md`](evals/typo_hard/README.md)
-- *What it is:* A sentence ending in a misspelled multi-token word or phrase; the lens must name the corrected form.
-- *Example:* a sentence ending in a misspelling → required unit `correction` (the corrected multi-token form).
-- *Judged by:* no LLM judge: conjunctive regex over multi-token unit forms, an item passes a layer only when every required unit hits there; chance = permutation null. Token readouts are summarized first.
+**Multilingual (multi-token)** — [`evals/multilingual_mt/README.md`](evals/multilingual_mt/README.md)
+- *What it is:* A non-English prompt whose answer is a multi-token concept; the judge must pick both the concept's English name and the passage's language, each from five options, in one layer.
+- *Example:* a Polish sentence about a concept → the concept's English name among four same-kind confusables, and Polish among Czech, Slovak, Ukrainian, Croatian, both in one layer.
+- *Judged by:* one prompt-blind five-way call per (item, layer, unit) with a cannot-tell escape and a verbatim-quote gate; a layer passes only when every judged unit is picked correctly; item passes at any layer.
 
-**Basic readout (hard)** — [`evals/basic_readout_hard/README.md`](evals/basic_readout_hard/README.md)
-- *What it is:* The model's obvious next concept when that concept is a multi-token phrase (a dynasty, a compound, a named process); on the L2 factual items the language must be read too.
-- *Example:* a factual prompt whose completion is the Aghlabid dynasty → required unit `readout` (forms: Aghlabid dynasty, Aghlabids, Banu al-Aghlab).
-- *Judged by:* no LLM judge: conjunctive regex over multi-token unit forms, an item passes a layer only when every required unit hits there; chance = permutation null. Token readouts are summarized first.
+**Typo (multi-token)** — [`evals/typo_mt/README.md`](evals/typo_mt/README.md)
+- *What it is:* A sentence ending in a misspelled multi-token word or phrase; the judge must pick the corrected form from five candidates.
+- *Example:* a sentence ending in a misspelling → the corrected phrase among four other items' corrected phrases.
+- *Judged by:* one prompt-blind five-way call per (item, layer, unit) with a cannot-tell escape and a verbatim-quote gate; a layer passes only when every judged unit is picked correctly; item passes at any layer.
+
+**Basic readout (multi-token)** — [`evals/basic_readout_mt/README.md`](evals/basic_readout_mt/README.md)
+- *What it is:* The model's obvious next concept when it is a multi-token phrase (a dynasty, a compound, a named process); on the L2 factual items the language is judged too.
+- *Example:* a factual prompt completing to the Aghlabid dynasty → `Aghlabid dynasty` among four other dynasties.
+- *Judged by:* one prompt-blind five-way call per (item, layer, unit) with a cannot-tell escape and a verbatim-quote gate; a layer passes only when every judged unit is picked correctly; item passes at any layer.
 
 **Multilingual multihop** — [`evals/multilingual_multihop/README.md`](evals/multilingual_multihop/README.md)
-- *What it is:* A non-English two-hop prompt; the bridge concept must be read in English or Chinese (the native forms), with the L2 bridge form and the language as optional extra units.
-- *Example:* a two-hop prompt in another language → required unit `bridge_native` (the bridge in English or Chinese); the L2 bridge and the language are reported, not required.
-- *Judged by:* no LLM judge: conjunctive regex over multi-token unit forms, an item passes a layer only when every required unit hits there; chance = permutation null. Token readouts are summarized first.
+- *What it is:* A non-English two-hop prompt; the judge must pick the bridge concept's English name and the passage's language, in one layer.
+- *Example:* a two-hop prompt in another language → the bridge's English name among four confusables, and the language among four neighbours, both in one layer.
+- *Judged by:* one prompt-blind five-way call per (item, layer, unit) with a cannot-tell escape and a verbatim-quote gate; a layer passes only when every judged unit is picked correctly; item passes at any layer.
 
 **Multilingual typo** — [`evals/multilingual_typo/README.md`](evals/multilingual_typo/README.md)
-- *What it is:* A non-English sentence ending in a misspelled word; the lens must name the correction (in the prompt's language, English or Chinese) and the language, in one layer ("...المسمى الأدريناللين" -> correction adrenaline, language Arabic).
-- *Example:* an Arabic sentence ending in الأدريناللين → required units `correction` (الأدرينالين, the hormone adrenaline, 肾上腺素) and `language` (Arabic, 阿拉伯语), both in one layer.
-- *Judged by:* no LLM judge: conjunctive regex over multi-token unit forms, an item passes a layer only when every required unit hits there; chance = permutation null. Token readouts are summarized first.
+- *What it is:* A non-English sentence ending in a misspelled word; the judge must pick the correction's English name and the passage's language, in one layer ("...المسمى الأدريناللين" -> adrenaline, Arabic).
+- *Example:* an Arabic sentence ending in الأدريناللين → `the hormone adrenaline` among four other corrections, and Arabic among Persian, Urdu, Hebrew, Pashto.
+- *Judged by:* one prompt-blind five-way call per (item, layer, unit) with a cannot-tell escape and a verbatim-quote gate; a layer passes only when every judged unit is picked correctly; item passes at any layer.
 
 ### Safety
 
@@ -180,13 +182,13 @@ The in-house `<gen_dir>/<label>/L###.jsonl` layout converts with
 | relational_multihop | google/gemini-3.8-flash | rel-v1 | default |
 | hallucination | google/gemini-3.8-flash | v5c-chat | default |
 | moral_rationale | google/gemini-3.8-flash | ec-v1 | default |
+| multilingual_typo | google/gemini-3.8-flash | mc-2026-09-16 | default (shared forced-choice judge of the multi-token families) |
+| multilingual_multihop | google/gemini-3.8-flash | mc-2026-09-16 | default (shared forced-choice judge of the multi-token families) |
+| basic_readout_mt | google/gemini-3.8-flash | mc-2026-09-16 | default (shared forced-choice judge of the multi-token families) |
+| typo_mt | google/gemini-3.8-flash | mc-2026-09-16 | default (shared forced-choice judge of the multi-token families) |
+| multilingual_mt | google/gemini-3.8-flash | mc-2026-09-16 | default (shared forced-choice judge of the multi-token families) |
+| multihop_mt | google/gemini-3.8-flash | mc-2026-09-16 | default (shared forced-choice judge of the multi-token families) |
 | directed_modulation | google/gemini-3.8-flash | dm-2026-09-16 | default (own MC judge; single-tier, no screen) |
-| multilingual_typo | none (regex); summarizer google/gemini-3.8-flash for token readouts | conjunctive-regex-2026-09-16 | deterministic scorer, no judge by design |
-| multilingual_multihop | none (regex); summarizer google/gemini-3.8-flash for token readouts | conjunctive-regex-2026-09-16 | deterministic scorer, no judge by design |
-| basic_readout_hard | none (regex); summarizer google/gemini-3.8-flash for token readouts | conjunctive-regex-2026-09-16 | deterministic scorer, no judge by design |
-| typo_hard | none (regex); summarizer google/gemini-3.8-flash for token readouts | conjunctive-regex-2026-09-16 | deterministic scorer, no judge by design |
-| multilingual_hard | none (regex); summarizer google/gemini-3.8-flash for token readouts | conjunctive-regex-2026-09-16 | deterministic scorer, no judge by design |
-| multihop_hard | none (regex); summarizer google/gemini-3.8-flash for token readouts | conjunctive-regex-2026-09-16 | deterministic scorer, no judge by design |
 | typo | google/gemini-3.8-flash | bank-2026-09-16 | default (shared bank judge of the basic families) |
 | poetry | google/gemini-3.8-flash | bank-2026-09-16 | default (shared bank judge of the basic families) |
 | multilingual | google/gemini-3.8-flash | bank-2026-09-16 | default (shared bank judge of the basic families) |

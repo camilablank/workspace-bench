@@ -38,7 +38,8 @@ class JudgeArgs:
 class EvalSpec:
     name: str  # family key, e.g. "moral_rationale"
     title: str  # README name, e.g. "Moral rationale"
-    group: str  # "basic" | "safety" | "association" | "bag_of_words" | "precision" | "logic"
+    group: str  # "basic" | "basic_mt" | "safety" | "association" | "bag_of_words" | "precision"
+    #            | "logic"
     bank: Path  # evals/<family>/items.json, relative to REPO_ROOT
     judge: JudgeConfig
     metric: str

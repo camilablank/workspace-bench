@@ -7,7 +7,15 @@ import re
 from wsbench import registry
 from wsbench.registry import REPO_ROOT
 
-GROUPS = ["Basic", "Safety", "Association", "Bag of words", "Precision", "Logical processing"]
+GROUPS = [
+    "Basic (single token)",
+    "Basic (multi-token)",
+    "Safety",
+    "Association",
+    "Bag of words",
+    "Precision",
+    "Logical processing",
+]
 LABELS = ("*What it is:*", "*Example:*", "*Judged by:*")
 
 
@@ -53,7 +61,8 @@ def test_every_family_has_an_entry_with_three_labelled_lines():
 
 def test_group_membership_matches_registry():
     text = _readme()
-    by_group = {"basic": "Basic", "safety": "Safety", "association": "Association"}
+    by_group = {"basic": "Basic (single token)", "basic_mt": "Basic (multi-token)"}
+    by_group |= {"safety": "Safety", "association": "Association"}
     by_group |= {"bag_of_words": "Bag of words"}
     by_group |= {"precision": "Precision", "logic": "Logical processing"}
     starts = {g: text.index(f"### {g}") for g in GROUPS}

@@ -1,6 +1,6 @@
-"""Multilingual multihop: a hard multi-token family, conjunctive regex over units, no judge."""
+"""Multilingual multihop: a multi-token basic family on the forced-choice judge."""
 
-from wsbench.hard.family import hard_family
+from wsbench.multitoken.family import mt_family
 from wsbench.registry import register
 
-SPEC = register(hard_family("multilingual_multihop", "Multilingual multihop"))
+SPEC = register(mt_family("multilingual_multihop", "Multilingual multihop", calls_per_arm="≈ 2.2k"))
