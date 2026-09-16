@@ -6,6 +6,11 @@ lines; the runs themselves are executed by the main session with real keys (`OPE
 from `/workspace/camila/.env`, read per command, never exported) and their outputs are committed
 as small summary JSON, not raw verdicts.
 
+
+> **Status (2026-09-16):** only §1 (the script) and the tests ship in this PR. The runs (§2), the
+> κ doc and the README agreement lines (§3) are deferred until Camila asks — the repo carries the
+> capability, not the spend.
+
 ## Reference arm and inputs (all local; `A` = `/workspace/agam/global-workspace/outputs/oracle_lens_evals`,
 `C` = `/workspace/camila/global-workspace-clean/.claude/worktrees`)
 
