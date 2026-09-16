@@ -11,7 +11,7 @@ from pathlib import Path
 import pydra
 
 from wsbench import registry, runner
-from wsbench.baselines import lucky_guessing
+from wsbench.baselines import lucky_guessing, prompt_only
 from wsbench.judge_config import JudgeConfig, resolve
 from wsbench.llm import JudgeConfigError
 from wsbench.readouts import convert_gen_dir, convert_read_json
@@ -246,11 +246,12 @@ class ReportRuns(Command):
             print(f"unreadable results: {e}", file=sys.stderr)
             return EXIT_USAGE
         m = macro(results)
-        floors = lucky_guessing.floors() if self.floors else None
+        floors = floor_columns() if self.floors else None
         table = markdown_table(results, m, floors=floors)
         (self.dir / "summary.md").write_text(table, encoding="utf-8")
         if self.json:
-            out = {"families": [r.to_json() for r in results], "macro": m, "floors": floors}
+            raw = {"lucky_guessing": lucky_guessing.floors(), "prompt_only": prompt_only.floors()}
+            out = {"families": [r.to_json() for r in results], "macro": m, "floors": raw}
             print(json.dumps(out))
             return 0
         print(table, end="")
@@ -302,6 +303,21 @@ class ConvertReadJson(Command):
             f"empty={rep.n_empty} skipped={rep.skipped}"
         )
         return 0
+
+
+def floor_columns() -> dict[str, dict[str, str]]:
+    """The report's floor columns from the frozen baselines: lucky guessing (blind / described
+    means) and prompt-only (judged rate), each only where the stamp matches the instrument."""
+
+    def f(v: object) -> str:
+        return "—" if v is None else f"{float(v):.3f}"
+
+    lucky = {
+        fam: f"{f(e.get('blind', {}).get('mean'))} / {f(e.get('described', {}).get('mean'))}"
+        for fam, e in lucky_guessing.floors().items()
+    }
+    po = {fam: f(e.get("rate")) for fam, e in prompt_only.floors().items()}
+    return {"lucky guess (blind / described)": lucky, "prompt-only": po}
 
 
 class Baseline(Command):
@@ -382,30 +398,44 @@ class Baseline(Command):
 
 
 class Freeze(Command):
-    """Fold a finished baseline run into the tracked ``evals/baselines/<kind>.json``."""
+    """Fold a finished baseline run into the tracked ``evals/baselines/<kind>.json``.
+    ``kind=lucky_guessing``: ``src`` holds ``<family>/<variant>.json`` from ``wsbench baseline``.
+    ``kind=prompt_only``: ``src`` holds ``<family>/results.json`` from ``wsbench run`` on the
+    prompt-only readouts; ``source`` is the generation's ``run_config.json``."""
 
     def __init__(self) -> None:
         super().__init__()
         self.kind = "lucky_guessing"
-        self.src = "outputs/baselines/lucky_guessing"
+        self.src = ""
         self.dst = ""
+        self.source = ""
 
     def finalize(self) -> None:
         self.kind = str(self.kind)
-        self.src = _path(self.src)
+        self.src = _path(self.src) if self.src else None
         self.dst = _path(self.dst) if self.dst else None
+        self.source = _path(self.source) if self.source else None
 
     def execute(self) -> int:
-        if self.kind != "lucky_guessing":
-            print(f"unknown baseline kind {self.kind!r}; known: lucky_guessing", file=sys.stderr)
-            return EXIT_USAGE
-        dst = self.dst or lucky_guessing.FROZEN
         try:
-            frozen = lucky_guessing.freeze(self.src, dst)
-        except ValueError as e:
+            if self.kind == "lucky_guessing":
+                dst = self.dst or lucky_guessing.FROZEN
+                src = self.src or Path("outputs/baselines/lucky_guessing")
+                frozen = lucky_guessing.freeze(src, dst)
+            elif self.kind == "prompt_only":
+                dst = self.dst or prompt_only.FROZEN
+                src = self.src or Path("outputs/prompt-only")
+                frozen = prompt_only.freeze(src, dst, source=self.source)
+            else:
+                print(
+                    f"unknown baseline kind {self.kind!r}; known: lucky_guessing, prompt_only",
+                    file=sys.stderr,
+                )
+                return EXIT_USAGE
+        except (ValueError, OSError) as e:
             print(str(e), file=sys.stderr)
             return EXIT_USAGE
-        print(f"froze {sorted(frozen)} -> {dst}")
+        print(f"froze {sorted(k for k in frozen if not k.startswith('_'))} -> {dst}")
         return 0
 
 

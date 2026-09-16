@@ -7,7 +7,6 @@ import random
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any
 
 SCHEMA_VERSION = 1
 _COUNT_KEYS = (
@@ -155,29 +154,23 @@ def _yn(b: bool) -> str:
     return "yes" if b else "no"
 
 
-def _floor(entry: Mapping[str, Any] | None) -> str:
-    """``blind / described`` lucky-guessing means for one family, ``—`` when not frozen."""
-    if not entry:
-        return "—"
-    return " / ".join(_fmt(entry.get(v, {}).get("mean")) for v in ("blind", "described"))
-
-
 def markdown_table(
     results: Sequence[FamilyResult],
     macro_row: dict | None,
     *,
-    floors: Mapping[str, Mapping[str, Any]] | None = None,
+    floors: Mapping[str, Mapping[str, str]] | None = None,
 ) -> str:
-    """One row per family; ``floors`` (family -> variant -> frozen lucky-guessing entry) adds a
-    ``lucky guess`` column, blind / described."""
-    extra = " lucky guess (blind / described) |" if floors is not None else ""
+    """One row per family; ``floors`` (column title -> family -> cell text) adds one column per
+    measured floor, ``—`` where a family has none."""
+    cols = list(floors or {})
+    extra = "".join(f" {c} |" for c in cols)
     lines = [
         f"| family | metric | value | 95% CI | n | chance |{extra} judge | pinned | complete |",
-        "|---|---|---|---|---|---|" + ("---|" if floors is not None else "") + "---|---|---|",
+        "|---|---|---|---|---|---|" + "---|" * len(cols) + "---|---|---|",
     ]
     for r in results:
         chance = _fmt(r.chance) + (f" ({r.chance_label})" if r.chance_label else "")
-        lucky = f" {_floor(floors.get(r.family))} |" if floors is not None else ""
+        lucky = "".join(f" {(floors or {})[c].get(r.family, '—')} |" for c in cols)
         judge = str(r.config.get("judge_model", "?"))
         metric = r.metric if r.higher_is_better else f"{r.metric} (lower is better)"
         k = r.extras.get("n_items_without_readouts")
@@ -190,7 +183,7 @@ def markdown_table(
         n_fam = len(macro_row.get("families", []))
         excluded = macro_row.get("excluded", [])
         excl = ", ".join(f"{e['family']} ({e['reason']})" for e in excluded)
-        pad = " — |" if floors is not None else ""
+        pad = " — |" * len(cols)
         lines.append(
             f"| **macro** | pass_rate | {_fmt(macro_row.get('value'))} | — | {n_fam} families "
             f"| — |{pad} — | — | excluded: {excl or 'none'} |"

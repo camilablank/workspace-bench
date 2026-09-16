@@ -252,3 +252,89 @@ def test_cli_uniform_and_dry_run(tmp_path, capsys, monkeypatch):
     assert "List 1" in capsys.readouterr().out
     assert main(["baseline", "families=nope"]) == 2
     assert main(["baseline", "kind=other"]) == 2
+
+
+def test_prompt_only_freeze_and_floors(tmp_path):
+    from wsbench.baselines import prompt_only as po
+    from wsbench.results import FamilyResult, write_results
+
+    spec = registry.FAMILIES["typo_mt"]
+
+    def result(family, version, value=0.31, **cfg):
+        return FamilyResult(
+            family=family,
+            metric="pass_rate",
+            value=value,
+            ci95=(0.2, 0.4),
+            n_items=100,
+            higher_is_better=True,
+            chance=None,
+            chance_label=None,
+            complete=True,
+            pinned_instrument=True,
+            config={
+                "judge_model": "google/gemini-3.8-flash",
+                "prompt_version": version,
+                "layers_judged": [20],
+                **cfg,
+            },
+            counts={
+                "n_expected_cells": 100,
+                "n_missing_cells": 0,
+                "n_unjudged_cells": 0,
+                "n_empty_cells": 0,
+                "skipped_rows": 0,
+                "spend_usd": 0.1,
+            },
+            extras={"n_items_decided": 97},
+        )
+
+    run = tmp_path / "po"
+    write_results(run / "typo_mt", result("typo_mt", spec.judge.prompt_version))
+    src = tmp_path / "run_config.json"
+    src.write_text(
+        json.dumps(
+            {
+                "model": "Qwen/Qwen3.6-27B",
+                "adapter": None,
+                "prompt_kind": "prompt_only_summary",
+                "sampling": {"k": 1},
+            }
+        )
+    )
+    dst = tmp_path / "prompt_only.json"
+    frozen = po.freeze(run, dst, source=src)
+    assert frozen["typo_mt"]["rate"] == 0.31 and frozen["typo_mt"]["n_items_decided"] == 97
+    assert frozen["_source"]["prompt_kind"] == "prompt_only_summary"
+    assert po.floors(dst) == {"typo_mt": frozen["typo_mt"]}
+    # a stale instrument is refused at freeze time and dropped at read time
+    write_results(run / "typo_mt", result("typo_mt", "old-version"))
+    with pytest.raises(ValueError):
+        po.freeze(run, dst)
+    stale = json.loads(dst.read_text())
+    stale["typo_mt"]["instrument"] = "old-version"
+    dst.write_text(json.dumps(stale))
+    assert po.floors(dst) == {}
+    # subset runs are refused
+    write_results(run / "typo_mt", result("typo_mt", spec.judge.prompt_version, limit=3))
+    with pytest.raises(ValueError):
+        po.freeze(run, dst)
+    assert main(["freeze", "kind=prompt_only", f"src={run}", f"dst={dst}"]) == 2
+    assert main(["freeze", "kind=nope"]) == 2
+
+
+def test_report_floor_columns(tmp_path, monkeypatch):
+    from wsbench.cli import floor_columns
+    from wsbench.results import markdown_table
+
+    monkeypatch.setattr(lg, "floors", lambda: {"typo_mt": {"blind": {"mean": 0.5}}})
+    from wsbench.baselines import prompt_only as po
+
+    monkeypatch.setattr(po, "floors", lambda: {"typo_mt": {"rate": 0.25}})
+    cols = floor_columns()
+    assert cols["lucky guess (blind / described)"]["typo_mt"] == "0.500 / —"
+    assert cols["prompt-only"]["typo_mt"] == "0.250"
+    table = markdown_table([], {"value": None, "families": [], "excluded": []}, floors=cols)
+    head = table.splitlines()[0]
+    assert "| lucky guess (blind / described) | prompt-only |" in head
+    assert table.splitlines()[2].count("|") == head.count("|")
