@@ -276,7 +276,7 @@ def score(
             content_idx=content_idx,
             n_tokens_total=len(ci.tokens),
             support=support["p"].get(ci.key),
-            support_expected=True,
+            support_expected=bool(content_idx),  # no content token -> no Stage P call -> ok/NaN
         )
         meta = {"status": status, "has_text": ci.has_text, "n_text_tokens": ci.n_text_tokens}
         real[ci.layer].append((meta, s))
@@ -310,7 +310,7 @@ def score(
                 content_idx=f_idx,
                 n_tokens_total=len(ci.foil_tokens),
                 support=support["pfoil"].get(ci.key),
-                support_expected=True,
+                support_expected=bool(f_idx),
             )
             foil[ci.layer].append(({**meta, "status": f_status}, fs))
             row["foil_status"] = f_status

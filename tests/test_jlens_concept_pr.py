@@ -610,3 +610,20 @@ def test_content_token_filter_matches_reference_tokens() -> None:
         else next(it["pos"] for it in items if it["id"] == LABELS[0]),
     )
     assert [is_content_token(t) for t in toks] == [True] * 10
+
+
+def test_no_content_token_cell_is_ok_with_nan():
+    import math
+
+    from wsbench.evals.jlens_concept_pr.score import score_one_cell
+
+    status, prec, rec = score_one_cell(
+        concepts=["a", "b"],
+        had_text=True,
+        by_idx={},
+        content_idx=[],
+        n_tokens_total=10,
+        support=None,
+        support_expected=False,
+    )
+    assert status == "ok" and math.isnan(prec) and math.isnan(rec)
