@@ -307,6 +307,10 @@ def test_prompt_only_freeze_and_floors(tmp_path):
     assert frozen["typo_mt"]["rate"] == 0.31 and frozen["typo_mt"]["n_items_decided"] == 97
     assert frozen["_source"]["prompt_kind"] == "prompt_only_summary"
     assert po.floors(dst) == {"typo_mt": frozen["typo_mt"]}
+    # an excluded family is skipped at freeze time and never shown
+    mc = registry.FAMILIES["multi_concept_directed_modulation"]
+    write_results(run / mc.name, result(mc.name, mc.judge.prompt_version, value=1.0))
+    assert mc.name not in po.freeze(run, dst)
     # a stale instrument is refused at freeze time and dropped at read time
     write_results(run / "typo_mt", result("typo_mt", "old-version"))
     with pytest.raises(ValueError):

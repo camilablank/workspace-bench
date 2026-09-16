@@ -11,6 +11,11 @@ from wsbench.registry import REPO_ROOT
 from wsbench.results import read_results
 
 FROZEN = REPO_ROOT / "evals" / "baselines" / "prompt_only.json"
+# Families where the prompt states the answer outright, so the stock model's summary names it
+# every time (multi-concept DM scored 1.0): not a floor, never frozen or shown (Agam, 2026-09-16).
+EXCLUDED: dict[str, str] = {
+    "multi_concept_directed_modulation": "the prompt dictates the concepts; prompt-only is 1.0"
+}
 SOURCE_KEYS = ("model", "adapter", "prompt_kind", "prompt_template", "sampling", "layers")
 
 
@@ -31,6 +36,8 @@ def freeze(run_dir: Path, dst: Path = FROZEN, *, source: Path | None = None) -> 
     frozen: dict[str, Any] = {}
     for path in sorted(run_dir.glob("*/results.json")):
         r = read_results(path.parent)
+        if r.family in EXCLUDED:
+            continue
         if r.config.get("items") or r.config.get("limit"):
             raise ValueError(f"freeze: {path} is a subset run, not a baseline")
         if r.value is None:
@@ -85,5 +92,7 @@ def floors(dst: Path = FROZEN) -> dict[str, dict[str, Any]]:
     return {
         fam: e
         for fam, e in frozen.items()
-        if not fam.startswith("_") and e.get("instrument") == versions.get(fam)
+        if not fam.startswith("_")
+        and fam not in EXCLUDED
+        and e.get("instrument") == versions.get(fam)
     }

@@ -60,7 +60,16 @@ wsbench report dir=outputs/<arm>                       # lucky guess column besi
 Runs write `outputs/baselines/lucky_guessing/<family>/<variant>.json` (per-item prompts, picks,
 aggregate); `freeze` refuses a `limit` pilot and merges per family into the tracked file.
 
-## Prompt-only (next)
+## Prompt-only (`prompt_only.json`)
 
-Stock Qwen3.6-27B given the prompt text and asked what the model is thinking, no activation;
-its summaries are judged by each family's own instrument. Lands as `prompt_only.json`.
+Stock Qwen3.6-27B given the exact prompt text up to the read token and asked what a language
+model would be thinking there, no activation (the source repo's `prompt_only_summary`, k=1,
+T=1.0, one generation per prompt position replicated into every layer file). The summaries are
+judged by each family's own instrument at one layer (`wsbench run ... layers=20`; identical rows
+across layers make any-layer equal per-layer), and `wsbench freeze kind=prompt_only` records the
+rate with the judge model and prompt version. Not item-blind: a floor, never a competitor lens.
+Whatever a lens scores above it needed the activation.
+
+Excluded: multi_concept_directed_modulation. Its prompt dictates the concepts ("Think about the
+plumber's blue ladder ..."), so the stock model names them every time (measured 1.0) and the
+number says nothing about the lens; it is neither frozen nor shown.
