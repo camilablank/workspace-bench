@@ -28,8 +28,12 @@ def _families() -> list[str]:
 def test_family_prompts_verbatim_in_readme(family: str):
     mod = importlib.import_module(f"wsbench.evals.{family}.prompts")
     prompts: dict[str, str] = mod.PROMPTS
-    assert prompts, family
-    blocks = fenced_blocks((ROOT / "evals" / family / "README.md").read_text(encoding="utf-8"))
+    readme = (ROOT / "evals" / family / "README.md").read_text(encoding="utf-8")
+    if not prompts:  # a regex-scored family: the README must say so
+        assert "**No LLM judge.**" in readme, family
+        assert mod.PROMPT_VERSION.startswith("conjunctive-regex") and mod.PROMPT_VERSION in readme
+        return
+    blocks = fenced_blocks(readme)
     assert blocks
     for name, text in prompts.items():
         assert isinstance(text, str) and text

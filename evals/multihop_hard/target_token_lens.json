@@ -1,0 +1,696 @@
+{
+ "mhh-1967-norwegian-classes-objects-codesigner": {
+  "target": 3,
+  "target_alts": [
+   2
+  ]
+ },
+ "mhh-1973-triple-crown-stud-farm": {
+  "target": 4,
+  "target_alts": [
+   8
+  ]
+ },
+ "mhh-1975-kit-chip-designer": {
+  "target": 4,
+  "target_alts": [
+   3,
+   10
+  ]
+ },
+ "mhh-1976philadelphia-bacterium": {
+  "target": 5,
+  "target_alts": [
+   5
+  ]
+ },
+ "mhh-adwa-victor-accord": {
+  "target": 5,
+  "target_alts": [
+   5,
+   4
+  ]
+ },
+ "mhh-africa-cataract-range": {
+  "target": 4,
+  "target_alts": [
+   3,
+   4,
+   4
+  ]
+ },
+ "mhh-akbar-dinilahi": {
+  "target": 4,
+  "target_alts": [
+   4,
+   4,
+   6
+  ]
+ },
+ "mhh-altair-mits-albuquerque": {
+  "target": 1,
+  "target_alts": [
+   4
+  ]
+ },
+ "mhh-angelfalls-auyantepui-canaima": {
+  "target": 5,
+  "target_alts": [
+   5,
+   7
+  ]
+ },
+ "mhh-atsign-mail": {
+  "target": 6,
+  "target_alts": [
+   2,
+   7,
+   3
+  ]
+ },
+ "mhh-aztec-coatepec-sister": {
+  "target": 5,
+  "target_alts": [
+   5,
+   9
+  ]
+ },
+ "mhh-barber-menotti-spoleto": {
+  "target": 3,
+  "target_alts": [
+   6,
+   5
+  ]
+ },
+ "mhh-bellerophon-fountain": {
+  "target": 2,
+  "target_alts": [
+   3,
+   3
+  ]
+ },
+ "mhh-brancusi-ensemble": {
+  "target": 5,
+  "target_alts": [
+   4,
+   5
+  ]
+ },
+ "mhh-captive-caesar-relief-site": {
+  "target": 6,
+  "target_alts": [
+   6,
+   6,
+   6
+  ]
+ },
+ "mhh-chicxulub-orizaba": {
+  "target": 5,
+  "target_alts": [
+   6,
+   8
+  ]
+ },
+ "mhh-cshell-author-firm-buyer": {
+  "target": 2,
+  "target_alts": [
+   1,
+   3
+  ]
+ },
+ "mhh-derbyshire-unit": {
+  "target": 5,
+  "target_alts": [
+   4
+  ]
+ },
+ "mhh-endpermian-volcanic-province": {
+  "target": 4,
+  "target_alts": [
+   5,
+   5
+  ]
+ },
+ "mhh-eurasia-highest-active-volcano-center": {
+  "target": 10,
+  "target_alts": [
+   10,
+   9
+  ]
+ },
+ "mhh-fourrow-layout": {
+  "target": 6,
+  "target_alts": [
+   2,
+   6,
+   4
+  ]
+ },
+ "mhh-funkbrothers-studio": {
+  "target": 3,
+  "target_alts": [
+   2,
+   3
+  ]
+ },
+ "mhh-gentileschi-florence-body": {
+  "target": 6,
+  "target_alts": [
+   4
+  ]
+ },
+ "mhh-hedren-daughter-film": {
+  "target": 2,
+  "target_alts": [
+   8
+  ]
+ },
+ "mhh-hisarlik-mycenae-display": {
+  "target": 3,
+  "target_alts": [
+   6,
+   7
+  ]
+ },
+ "mhh-isenheim-unterlinden": {
+  "target": 4,
+  "target_alts": [
+   4,
+   5
+  ]
+ },
+ "mhh-jpsi-slac": {
+  "target": 5,
+  "target_alts": [
+   2,
+   5,
+   10
+  ]
+ },
+ "mhh-kakania-author-birthplace": {
+  "target": 3,
+  "target_alts": [
+   8,
+   5
+  ]
+ },
+ "mhh-kalevala-smith-sender": {
+  "target": 5,
+  "target_alts": [
+   4,
+   7,
+   6
+  ]
+ },
+ "mhh-kinski-paristexas": {
+  "target": 3,
+  "target_alts": [
+   2
+  ]
+ },
+ "mhh-lassell-uranian-moons": {
+  "target": 4,
+  "target_alts": [
+   4
+  ]
+ },
+ "mhh-laughton-korda-henry": {
+  "target": 6,
+  "target_alts": [
+   7,
+   5
+  ]
+ },
+ "mhh-mansamusa-sahili": {
+  "target": 7,
+  "target_alts": [
+   3,
+   7,
+   3
+  ]
+ },
+ "mhh-martinson-cowinner": {
+  "target": 3,
+  "target_alts": [
+   8
+  ]
+ },
+ "mhh-mesopotamian-wildman-cedar": {
+  "target": 2,
+  "target_alts": [
+   3,
+   5
+  ]
+ },
+ "mhh-moho-mohole": {
+  "target": 3,
+  "target_alts": [
+   2,
+   5
+  ]
+ },
+ "mhh-motherdemos-lab-town": {
+  "target": 3,
+  "target_alts": [
+   5
+  ]
+ },
+ "mhh-norse-ratatoskr-worldtree": {
+  "target": 4,
+  "target_alts": [
+   5,
+   3
+  ]
+ },
+ "mhh-pitchblende-jachymov": {
+  "target": 4,
+  "target_alts": [
+   3,
+   6,
+   3
+  ]
+ },
+ "mhh-plinyelder-naturalis": {
+  "target": 3,
+  "target_alts": [
+   2,
+   3
+  ]
+ },
+ "mhh-prowse-clockwork": {
+  "target": 4,
+  "target_alts": [
+   3
+  ]
+ },
+ "mhh-rhapsody-orchestrator": {
+  "target": 4,
+  "target_alts": [
+   4,
+   6
+  ]
+ },
+ "mhh-rivera-detroit": {
+  "target": 4,
+  "target_alts": [
+   5,
+   2
+  ]
+ },
+ "mhh-samarkand-observatory-grandfather": {
+  "target": 3,
+  "target_alts": [
+   3,
+   2
+  ]
+ },
+ "mhh-sampo-ilmarinen": {
+  "target": 3,
+  "target_alts": [
+   5
+  ]
+ },
+ "mhh-saratov-botanist-persecutor": {
+  "target": 4,
+  "target_alts": [
+   7,
+   2
+  ]
+ },
+ "mhh-satantango-director": {
+  "target": 4,
+  "target_alts": [
+   3
+  ]
+ },
+ "mhh-satie-background-genre": {
+  "target": 6,
+  "target_alts": [
+   2
+  ]
+ },
+ "mhh-simula-norsk-regnesentral": {
+  "target": 3,
+  "target_alts": [
+   3,
+   4
+  ]
+ },
+ "mhh-ssem-williams-kilburn-tube": {
+  "target": 6,
+  "target_alts": [
+   5,
+   2,
+   5,
+   3
+  ]
+ },
+ "mhh-streptomycin-griseus": {
+  "target": 7,
+  "target_alts": [
+   5
+  ]
+ },
+ "mhh-summer-winter-gold-host-town": {
+  "target": 6,
+  "target_alts": [
+   3,
+   7
+  ]
+ },
+ "mhh-tanganyika-outflow-3hop": {
+  "target": 4,
+  "target_alts": [
+   3,
+   2
+  ]
+ },
+ "mhh-ternary-moscow-brusentsov": {
+  "target": 5,
+  "target_alts": [
+   5,
+   8,
+   3
+  ]
+ },
+ "mhh-tintinnabuli-elegy-town": {
+  "target": 5,
+  "target_alts": [
+   2
+  ]
+ },
+ "mhh-toland-wuthering": {
+  "target": 4,
+  "target_alts": []
+ },
+ "mhh-tordesillas-zaragoza": {
+  "target": 3,
+  "target_alts": [
+   5,
+   8
+  ]
+ },
+ "mhh-valerian-shapur-relief": {
+  "target": 6,
+  "target_alts": [
+   6,
+   6
+  ]
+ },
+ "mhh-vavilov-lysenkoism": {
+  "target": 3,
+  "target_alts": [
+   3,
+   4
+  ]
+ },
+ "mhh-villalobos-birthplace": {
+  "target": 3,
+  "target_alts": [
+   1
+  ]
+ },
+ "mhh-walcott-1909-quarry-preserve": {
+  "target": 4,
+  "target_alts": [
+   2
+  ]
+ },
+ "mhh-wohler-berzelius": {
+  "target": 7,
+  "target_alts": [
+   7,
+   4
+  ]
+ },
+ "mhh-zhangzeduan-dynasty": {
+  "target": 3,
+  "target_alts": [
+   2,
+   2
+  ]
+ },
+ "mhh-adwa-baratieri": {
+  "target": 4,
+  "target_alts": [
+   2,
+   5
+  ]
+ },
+ "mhh-amur-accord-qing-ruler": {
+  "target": 3,
+  "target_alts": [
+   2,
+   3,
+   4,
+   2,
+   6
+  ]
+ },
+ "mhh-bartholdi-belfort": {
+  "target": 5,
+  "target_alts": [
+   6,
+   5
+  ]
+ },
+ "mhh-boethius-amalasuintha": {
+  "target": 4,
+  "target_alts": [
+   4,
+   4,
+   4
+  ]
+ },
+ "mhh-borglum-son": {
+  "target": 3,
+  "target_alts": [
+   4
+  ]
+ },
+ "mhh-alexiad-adriatic-defeat": {
+  "target": 3,
+  "target_alts": [
+   2,
+   4
+  ]
+ },
+ "mhh-anlushan-xuanzong-suzong": {
+  "target": 5,
+  "target_alts": [
+   2,
+   2
+  ]
+ },
+ "mhh-arts-ghiberti-innocenti": {
+  "target": 4,
+  "target_alts": [
+   5,
+   7
+  ]
+ },
+ "mhh-brock-thermus-taq": {
+  "target": 4,
+  "target_alts": [
+   5,
+   2
+  ]
+ },
+ "mhh-charlotte-guest-dowlais": {
+  "target": 6,
+  "target_alts": [
+   5
+  ]
+ },
+ "mhh-deinonychus-yale-newhaven": {
+  "target": 4,
+  "target_alts": [
+   2
+  ]
+ },
+ "mhh-geo-sondoong-phongnha-quangbinh-2": {
+  "target": 2,
+  "target_alts": [
+   2,
+   2
+  ]
+ },
+ "mhh-grotius-mareliberum-selden": {
+  "target": 3,
+  "target_alts": [
+   10,
+   8
+  ]
+ },
+ "mhh-hisarlik-hoard-home": {
+  "target": 6,
+  "target_alts": [
+   3,
+   7
+  ]
+ },
+ "mhh-lampedusa-gattopardo-director": {
+  "target": 4,
+  "target_alts": [
+   2,
+   5
+  ]
+ },
+ "mhh-meitner-109-darmstadt": {
+  "target": 2,
+  "target_alts": [
+   4,
+   5
+  ]
+ },
+ "mhh-meitner-meitnerium-armbruster": {
+  "target": 4,
+  "target_alts": [
+   3
+  ]
+ },
+ "mhh-rublev-sacrifice-nykvist": {
+  "target": 4,
+  "target_alts": [
+   6
+  ]
+ },
+ "mhh-rufus-henry-whiteship": {
+  "target": 3,
+  "target_alts": [
+   2,
+   4,
+   3
+  ]
+ },
+ "mhh-slipher-lowell-tombaugh": {
+  "target": 4,
+  "target_alts": [
+   5,
+   3
+  ]
+ },
+ "mhh-vaneyck-goldenfleece": {
+  "target": 5,
+  "target_alts": [
+   2,
+   8
+  ]
+ },
+ "mhh-wyeth-chaddsford": {
+  "target": 3,
+  "target_alts": [
+   5,
+   4
+  ]
+ },
+ "mhh-wyeth-ncwyeth-stevenson": {
+  "target": 2,
+  "target_alts": [
+   9
+  ]
+ },
+ "mhh-yuezhi-envoy-capital": {
+  "target": 2,
+  "target_alts": [
+   2,
+   5
+  ]
+ },
+ "mhh-belisarius-procopius-secret-history": {
+  "target": 3,
+  "target_alts": [
+   2,
+   2,
+   8
+  ]
+ },
+ "mhh-ezana-frumentius-consecrator": {
+  "target": 5,
+  "target_alts": [
+   3,
+   4,
+   5
+  ]
+ },
+ "mhh-kalevala-lonnrot-kanteletar": {
+  "target": 4,
+  "target_alts": [
+   5
+  ]
+ },
+ "mhh-magellan-elcano-sanlucar": {
+  "target": 6,
+  "target_alts": [
+   6,
+   3
+  ]
+ },
+ "mhh-pilgrim-monk-novelist": {
+  "target": 3,
+  "target_alts": [
+   3,
+   5,
+   3
+  ]
+ },
+ "mhh-rhys-bronte-currerbell": {
+  "target": 3,
+  "target_alts": []
+ },
+ "mhh-wollaston-olbers": {
+  "target": 4,
+  "target_alts": [
+   3,
+   3,
+   6,
+   2
+  ]
+ },
+ "mhh-51peg-peebles": {
+  "target": 3,
+  "target_alts": [
+   5,
+   8,
+   3,
+   5
+  ]
+ },
+ "mhh-barnard-lick": {
+  "target": 3,
+  "target_alts": [
+   4,
+   5
+  ]
+ },
+ "mhh-blinddoge-1204-latinruler": {
+  "target": 4,
+  "target_alts": [
+   5,
+   5,
+   2
+  ]
+ },
+ "mhh-charlesv-donjohn-escorial": {
+  "target": 3,
+  "target_alts": [
+   6,
+   4
+  ]
+ },
+ "mhh-riverblindness-ivermectin-strep": {
+  "target": 7,
+  "target_alts": [
+   8,
+   5
+  ]
+ },
+ "mhh-wallenstein-schiller-raeuber": {
+  "target": 3,
+  "target_alts": [
+   3,
+   3,
+   8
+  ]
+ }
+}
