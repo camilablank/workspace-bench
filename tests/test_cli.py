@@ -91,7 +91,7 @@ def readouts(tmp_path):
 
 
 def test_list_empty_registry(capsys):
-    assert registry.FAMILIES == {}
+    registry.FAMILIES.clear()  # the real families are already imported; load_all re-adds none
     assert main(["list"]) == 0
     assert "no families registered yet" in capsys.readouterr().out
 
@@ -264,3 +264,33 @@ def test_convert_gen_dir(tmp_path, capsys):
     )
     cells, rep = load_readouts(out)
     assert len(cells) == 2 and rep.kind == "prose"
+
+
+def test_opt_and_aux_models_reach_the_family(readouts, tmp_path, monkeypatch):
+    seen: dict = {}
+
+    def run(args: JudgeArgs) -> FamilyResult:
+        seen["extra"] = args.extra
+        seen["aux"] = dict(args.aux_models)
+        return _stub_run(args)
+
+    monkeypatch.delenv("WSBENCH_JUDGE_MODEL", raising=False)
+    register(
+        EvalSpec(
+            name="stub2",
+            title="Stub2",
+            group="logic",
+            bank=Path("evals/stub/items.json"),
+            judge=JudgeConfig(aux_models={"summarizer": "m/s"}),
+            metric="pass_rate",
+            higher_is_better=True,
+            run=run,
+        )
+    )
+    out = tmp_path / "o"
+    argv = ["judge", "stub2", "--readouts", str(readouts), "--out", str(out)]
+    assert main([*argv, "--opt", "char_cap=5", "--opt", "x=a=b"]) == 0
+    assert seen == {"extra": {"char_cap": "5", "x": "a=b"}, "aux": {"summarizer": "m/s"}}
+    assert main(argv) == 0 and seen["extra"] == {}
+    with pytest.raises(SystemExit):
+        main([*argv, "--opt", "novalue"])

@@ -5,7 +5,8 @@ One JSONL row per cell::
     {"id": "<item id>", "layer": 36, "pos": 33, "samples": ["...", "..."]}
     {"id": "<item id>", "layer": 36, "pos": 33, "tokens": ["Ġword", "..."], "scores": [10.8, 9.9]}
 
-A file is all-prose or all-tokens. Malformed lines are counted, never fatal.
+Either row may carry an optional ``"token": "<read-site token>"`` string. A file is
+all-prose or all-tokens. Malformed lines are counted, never fatal.
 """
 
 from __future__ import annotations
@@ -35,6 +36,7 @@ class Cell:
     samples: tuple[str, ...] | None  # prose lens
     tokens: tuple[str, ...] | None  # top-k token lens (vocab strings, best first)
     scores: tuple[float, ...] | None
+    token: str | None = None  # the read-site token string, when the producer recorded it
 
     @property
     def kind(self) -> Kind:
@@ -82,10 +84,13 @@ def _parse_row(row: Any) -> Cell | None:
     has_samples, has_tokens = "samples" in row, "tokens" in row
     if has_samples == has_tokens:
         return None
+    token = row.get("token")
+    if token is not None and not isinstance(token, str):
+        return None
     if has_samples:
         if "scores" in row or not _str_list(row["samples"]):
             return None
-        return Cell(id_, layer, pos, tuple(row["samples"]), None, None)
+        return Cell(id_, layer, pos, tuple(row["samples"]), None, None, token)
     tokens = row["tokens"]
     if not _str_list(tokens):
         return None
@@ -95,7 +100,7 @@ def _parse_row(row: Any) -> Cell | None:
         if not isinstance(sc, list) or len(sc) != len(tokens) or not all(_is_num(v) for v in sc):
             return None
         scores = tuple(float(v) for v in sc)
-    return Cell(id_, layer, pos, None, tuple(tokens), scores)
+    return Cell(id_, layer, pos, None, tuple(tokens), scores, token)
 
 
 def load_readouts(
@@ -205,6 +210,8 @@ def convert_gen_dir(
                     n_malformed += 1
                     continue
                 new: dict[str, Any] = {"id": id_, "layer": layer, "pos": row["pos"]}
+                if isinstance(row.get("token"), str):
+                    new["token"] = row["token"]
                 if kind == "prose":
                     new["samples"] = row["samples"]
                 else:

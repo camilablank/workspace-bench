@@ -194,3 +194,33 @@ def test_invalid_utf8_line_is_malformed_not_fatal(tmp_path):
     cells, rep = load_readouts(f)
     assert len(cells) == 2 and rep.skipped["malformed"] == 0
     assert "\ufffd" in cells[1].samples[0]
+
+
+def test_token_field_is_optional(tmp_path):
+    p = _write(
+        tmp_path / "r.jsonl",
+        [
+            {"id": "a", "layer": 1, "pos": 0, "samples": ["x"], "token": "'s"},
+            {"id": "a", "layer": 1, "pos": 1, "samples": ["x"]},
+            {"id": "a", "layer": 1, "pos": 2, "samples": ["x"], "token": 7},
+        ],
+    )
+    cells, rep = load_readouts(p)
+    assert [c.token for c in cells] == ["'s", None]
+    assert rep.skipped["malformed"] == 1
+    assert Cell("a", 1, 0, ("x",), None, None).token is None
+
+
+def test_convert_passes_token_through(tmp_path):
+    g = tmp_path / "gen" / "item1"
+    g.mkdir(parents=True)
+    (g / "L036.jsonl").write_text(
+        json.dumps({"pos": 2, "samples": ["s"], "token": "'s"})
+        + "\n"
+        + json.dumps({"pos": 3, "samples": ["t"]})
+        + "\n"
+    )
+    out = tmp_path / "c.jsonl"
+    convert_gen_dir(tmp_path / "gen", out, kind="tokens")
+    cells, _ = load_readouts(out)
+    assert [c.token for c in cells] == ["'s", None]

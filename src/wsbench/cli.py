@@ -30,15 +30,37 @@ def _csv_strs(s: str) -> list[str]:
     return [x.strip() for x in s.split(",") if x.strip()]
 
 
+def _opts(pairs: list[str]) -> dict[str, str]:
+    out: dict[str, str] = {}
+    for p in pairs:
+        if "=" not in p:
+            raise SystemExit(f"--opt expects KEY=VALUE, got {p!r}")
+        k, v = p.split("=", 1)
+        out[k.strip()] = v
+    return out
+
+
 def _add_judge_flags(p: argparse.ArgumentParser) -> None:
     p.add_argument("--judge-model", default=None, help="override the family's pinned judge")
     p.add_argument("--layers", type=_csv_ints, default=None, help="e.g. 20,36")
     p.add_argument("--items", type=_csv_strs, default=None, help="subset of item ids, e.g. a,b")
     p.add_argument("--limit", type=int, default=0, help="judge at most N items (0 = no limit)")
-    p.add_argument("--allow-missing", action="store_true")
+    p.add_argument(
+        "--allow-missing",
+        action="store_true",
+        help="accepted for every family; a no-op for families whose bank carries no "
+        "position list (n_missing_cells is always 0 there)",
+    )
     p.add_argument("--concurrency", type=int, default=64)
     p.add_argument("--rpm", type=float, default=240.0)
     p.add_argument("--dry-run", action="store_true")
+    p.add_argument(
+        "--opt",
+        action="append",
+        default=[],
+        metavar="KEY=VALUE",
+        help="family-specific option (repeatable), e.g. --opt char_cap=24000",
+    )
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -111,6 +133,8 @@ def _judge_family(
         concurrency=args.concurrency,
         rpm=args.rpm,
         dry_run=args.dry_run,
+        aux_models=spec.judge.aux_models,
+        extra=_opts(args.opt),
     )
     result = spec.run(jargs)
     path = write_results(out, result)
