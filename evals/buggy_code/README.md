@@ -40,9 +40,8 @@ subset, so `complete` is false for such a run).
   `extras.per_stratum` splits it by consequence class and language group; `anti_rate_buggy`,
   `corrective_rate_buggy` and the rung counts per source are beside it. No regex or numeric
   matcher anywhere (the source's value matcher false-positived on small integers and stays out).
-- The pairwise blind pick of the source docs (chance 0.5) needs an explicit buggy-to-twin map,
-  which the frozen bank does not carry (25 buggy, 24 clean, no `twin` field); it is not
-  implemented here.
+- The source docs' pairwise blind pick (chance 0.5) is not used: only 10 of the 25 buggy
+  programs have an exact clean twin, too few pairs for a usable interval.
 - An item whose cell is empty is S0; an unjudged cell leaves its item out of both rates. Missing
   cells are fatal (exit 2) unless `allow_missing=True`. `net_S2` is not a pass rate, so the
   family is listed but not averaged into the macro.
