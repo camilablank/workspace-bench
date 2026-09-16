@@ -78,6 +78,11 @@ The in-house `<gen_dir>/<label>/L###.jsonl` layout converts with
 - *Example:* "Her birthday falls on the last day of Febuary" → target `February`.
 - *Judged by:* the shared bank judge, one call per (item, layer): pass = a target concept is NAMED with a verbatim quote verified against one sample; item passes at any layer.
 
+**Directed modulation** — [`evals/directed_modulation/README.md`](evals/directed_modulation/README.md)
+- *What it is:* The model is told to think about a concept, not to think about it, or to hide a secret word or preference while copying an unrelated sentence; does the lens read the held concept at the positions where the model is writing.
+- *Example:* "Think about the body part clavicle while you write. Now write exactly this sentence: \"The committee approved the minutes without changes.\"" → target `clavicle`, read at each token of the copied sentence.
+- *Judged by:* one 6-way MC call per readout row (gold + 4 same-subfamily concepts + cannot tell) with a `basis` field; pass = gold picked as content (not narration of the instruction) at any row, evidence quote verified. Per-subfamily credit rules; the think vs don't-think pair contrast is reported.
+
 ### Safety
 
 **Agentic misalignment** — [`evals/agentic_misalignment/README.md`](evals/agentic_misalignment/README.md)
@@ -146,6 +151,7 @@ The in-house `<gen_dir>/<label>/L###.jsonl` layout converts with
 | relational_multihop | google/gemini-3.8-flash | rel-v1 | default |
 | hallucination | google/gemini-3.8-flash | v5c-chat | default |
 | moral_rationale | google/gemini-3.8-flash | ec-v1 | default |
+| directed_modulation | google/gemini-3.8-flash | dm-2026-09-16 | default (own MC judge; single-tier, no screen) |
 | typo | google/gemini-3.8-flash | bank-2026-09-16 | default (shared bank judge of the basic families) |
 | poetry | google/gemini-3.8-flash | bank-2026-09-16 | default (shared bank judge of the basic families) |
 | multilingual | google/gemini-3.8-flash | bank-2026-09-16 | default (shared bank judge of the basic families) |

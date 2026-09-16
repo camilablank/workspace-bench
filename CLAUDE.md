@@ -48,6 +48,11 @@ cell). `wsbench convert-gen-dir gen_dir=GEN out=F.jsonl kind=prose|tokens` conve
   sample, item pass at any layer, undecided items (unjudged or missing cell, no positive) out of
   the denominator; readout id = `banks.label_of(name)`. Missing cells are fatal (exit 2) unless
   `allow_missing=True`; empty cells are negatives without a call.
+- directed_modulation (`group="basic"`, own judge): one 6-way MC call per (item, layer, position,
+  sample) row, options seeded over the WHOLE bank (golden in `tests/golden/`), `basis` decides
+  content vs instruction narration, evidence must be a verbatim span or the positive is voided;
+  headline = `content_bound` at any row; undecided items (unjudged row or missing layer, no
+  positive) leave every rate's denominator.
 - Cell shapes: moral = tail-5 positions, 1-2 calls/cell; relational = max-pos row per (item,
   layer); role-bound = every row, 3 MCs/call; conjunctive = one call per item over the
   `[L<layer>]` blob (`opts=char_cap=N`); user_modeling = k samples -> k calls, item key `name`

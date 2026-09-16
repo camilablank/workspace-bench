@@ -4,16 +4,16 @@ Live checklist for the basic-evals and baselines work (Agam). One PR per line; s
 items before any scale run. Status: [ ] open · [~] in PR · [x] merged.
 
 ## Foundation
-- [~] pydra CLI (`wsbench <command> key=value`), replacing argparse; rebuilt on main after phases 1-7 merged. Branch: agam/pydra-cli.
+- [x] pydra CLI (`wsbench <command> key=value`), merged 2026-09-16 (#9).
 
-## Basic evals, single token (desideratum 1) — regex + bank judge; DM has its own judge
-- [ ] association
-- [~] basic-readout. Branch: agam/eval-basic_readout (stacked).
-- [~] multihop. Branch: agam/eval-multihop (stacked).
-- [~] multilingual. Branch: agam/eval-multilingual (stacked).
-- [~] poetry. Branch: agam/eval-poetry (stacked).
-- [~] typo. Branch: agam/eval-typo (stacked).
-- [ ] directed-modulation
+## Basic evals, single token (desideratum 1) — bank judge; DM has its own judge
+- [x] association (merged 2026-09-16, #16)
+- [x] basic-readout (merged 2026-09-16, #16)
+- [x] multihop (merged 2026-09-16, #16)
+- [x] multilingual (merged 2026-09-16, #16)
+- [x] poetry (merged 2026-09-16, #16)
+- [x] typo (merged 2026-09-16, #16)
+- [~] directed-modulation. Branch: agam/eval-directed-modulation.
 
 ## Basic evals, multi-token hard (desideratum 2) — conjunctive regex only, no judge
 - [ ] multihop-hard
