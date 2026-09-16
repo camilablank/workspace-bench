@@ -44,5 +44,5 @@ too many false positives); prompt-only is not shown for multi_concept_directed_m
 - [ ] buggy_code
 - [ ] arithmetic_intermediates — Gemini judge; variants (Agam, 2026-09-16): KEEP absval, addmul,
       floordiv, frac, fracadd, fraccomp, fracint, fracsmall, muladd, mulmid, sign, signpair, subsub,
-      subsubx (+ maxsel as the echo control); REMOVE addmulx, dec16, halflead, halftrail, halves,
-      mulmul, negdec, negdiv8, negdiv8x.
+      subsubx; REMOVE addmulx, dec16, halflead, halftrail, halves, maxsel, mulmul, negdec, negdiv8,
+      negdiv8x.
