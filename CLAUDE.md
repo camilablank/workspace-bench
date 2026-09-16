@@ -11,9 +11,10 @@ One JSONL file per (family, arm), one row per cell; a file is all-prose or all-t
 {"id": "<item id>", "layer": 36, "pos": 33, "samples": ["...", "..."]}
 {"id": "<item id>", "layer": 36, "pos": 33, "tokens": ["Ġword", "..."], "scores": [10.8, 9.9]}
 ```
-`readouts.load_readouts` validates rows (malformed lines are counted, never fatal), keeps the
-first of a duplicate `(id, layer, pos)`, and counts empty readouts (a result, not a missing
-cell). `wsbench convert-gen-dir GEN --out F.jsonl --kind prose|tokens` converts the in-house
+Either row may carry an optional `"token": "<read-site token>"` (relational_multihop asserts
+the blank is `'s`). `readouts.load_readouts` validates rows (malformed lines are counted,
+never fatal), keeps the first of a duplicate `(id, layer, pos)`, and counts empty readouts (a
+result, not a missing cell). `wsbench convert-gen-dir GEN --out F.jsonl --kind prose|tokens` converts the in-house
 `<gen_dir>/<label>/L###.jsonl` layout (id = directory name, layer = filename).
 
 ## Judge layer (`llm.py`, `judge_config.py`)
@@ -29,6 +30,28 @@ cell). `wsbench convert-gen-dir GEN --out F.jsonl --kind prose|tokens` converts 
   returns `None` and leaves the cell unjudged; it never scores.
 - `stream_json_async` is the primitive (one loop, one pacer); `stream_json` wraps it.
 
+## MC families (phase 2: moral_rationale, relational_multihop, role_bound_association,
+## conjunctive_association)
+- Shared helpers: `mc.py` (`CANNOT`, `seed_int`, `seeded_shuffle`, `listing`, `classify`,
+  `join_samples`), `mcjudge.py` (`Call` + `run_calls`: one schema per batch, fingerprint
+  `(prompt_version, model, reasoning, system, user)`, cache payload `{result, meta}` in
+  `<out>/cells.jsonl`; `Preflighter` runs `preflight` once per model before the first uncached
+  call; `item_scope` = bank ∩ `--items` then `--limit`; `base_config` / `base_counts`),
+  `summarizer.py` (the one token-bag -> prose step for `tokens` readouts, prompt in
+  `docs/summarizer.md`, cache key `summ:<key>`, model `aux_models["summarizer"]` or the judge).
+- Option lists are ported from the source scripts and gated by goldens: `tests/golden/
+  <family>_options.json` + `<family>_prompt.txt` were produced by the SOURCE scripts' own
+  option functions (`tests/golden/make_<family>.py`, run with `uv run --no-sync python
+  tests/golden/make_<family>.py`; the makers import `/workspace/camila/global-workspace-clean`
+  by path and are excluded from collection). Regenerate only if the source changes.
+- Cell rules: moral = tail-5 positions per (item, layer), 1-2 calls per cell; relational =
+  max-pos row per (item, layer), X+Y calls; role-bound = every row, 3 MCs per call;
+  conjunctive = one call per item over the `[L<layer>]` blob (`--opt char_cap=N`, default
+  200000; items missing a layer are excluded). `n_missing_cells` is always 0 for these four
+  (`--allow-missing` is a no-op); empty cells are skipped, not judged.
+- `--opt key=value` (repeatable) fills `JudgeArgs.extra`; `JudgeArgs.aux_models` comes from the
+  family's `JudgeConfig.aux_models`.
+
 ## Results contract (`results.py`)
 `results.json` = `{schema_version, family, complete, pinned_instrument, config, n_items,
 counts: {n_expected_cells, n_missing_cells, n_unjudged_cells, n_empty_cells, skipped_rows,
@@ -38,8 +61,10 @@ cells, and empty cells <= 5% of expected. `report`'s macro averages only complet
 `pass_rate` families and lists every exclusion with its reason.
 
 ## Invariants
-- Every judge prompt lives in the family's `prompts.py` AND verbatim in the family README
-  under "Judge prompts", with a test asserting equality. Bump `prompt_version` on any edit.
+- Every judge prompt lives in the family's `prompts.py` (exported in `PROMPTS`, templates with
+  `{name}` placeholders rendered by `str.replace`, never `str.format`) AND verbatim in a fenced
+  block of the family README under "Judge prompts"; `tests/test_prompts_in_readme.py` asserts
+  equality (the summarizer's against `docs/summarizer.md`). Bump `prompt_version` on any edit.
 - Failures (`None` verdicts, refusals, missing cells) never score; they are counted.
 - Frozen banks under `evals/<family>/items.json` are never edited in place.
 - `spec.run` returns a `FamilyResult` and writes nothing; the CLI writes `results.json`.

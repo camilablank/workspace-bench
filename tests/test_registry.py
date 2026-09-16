@@ -38,11 +38,19 @@ def test_get_error_lists_known():
     assert "alpha, beta" in str(ei.value)
 
 
-def test_load_all_empty_package_idempotent():
+MC_FAMILIES = {
+    "moral_rationale",
+    "relational_multihop",
+    "role_bound_association",
+    "conjunctive_association",
+}
+
+
+def test_load_all_registers_families_idempotently():
     load_all()
-    assert registry.FAMILIES == {}
-    load_all()
-    assert registry.FAMILIES == {}
+    assert set(registry.FAMILIES) >= MC_FAMILIES
+    load_all()  # a second import registers nothing twice (would raise)
+    assert set(registry.FAMILIES) >= MC_FAMILIES
 
 
 def test_repo_root_and_judge_args():
@@ -59,4 +67,6 @@ def test_repo_root_and_judge_args():
         "concurrency",
         "rpm",
         "dry_run",
+        "aux_models",
+        "extra",
     }

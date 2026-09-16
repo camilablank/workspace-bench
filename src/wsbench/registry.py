@@ -4,8 +4,8 @@ from __future__ import annotations
 
 import importlib
 import pkgutil
-from collections.abc import Callable
-from dataclasses import dataclass
+from collections.abc import Callable, Mapping
+from dataclasses import dataclass, field
 from pathlib import Path
 
 from wsbench.judge_config import JudgeConfig, ResolvedJudge
@@ -30,6 +30,8 @@ class JudgeArgs:
     concurrency: int
     rpm: float
     dry_run: bool
+    aux_models: Mapping[str, str] = field(default_factory=dict)  # e.g. {"summarizer": model}
+    extra: dict[str, str] = field(default_factory=dict)  # family options from --opt key=value
 
 
 @dataclass(frozen=True)
