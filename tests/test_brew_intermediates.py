@@ -245,7 +245,8 @@ def test_blank_emission_cell_counts_and_failed_call_undecides(tmp_path, monkeypa
             c.key: {"named": [], "primary": "none", "basis": "none"} for c in calls
         },
     )
+    full = JudgeArgs(**{**args.__dict__, "layers": list(range(20, 61, 4))})
     with pytest.raises(SystemExit):
-        judge.run(args)
-    r = judge.run(JudgeArgs(**{**args.__dict__, "allow_missing": True}))
+        judge.run(full)
+    r = judge.run(JudgeArgs(**{**full.__dict__, "allow_missing": True}))
     assert r.counts["n_missing_cells"] == 9 and r.rows[0]["pass"] is None
