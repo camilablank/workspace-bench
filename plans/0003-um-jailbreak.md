@@ -74,26 +74,20 @@ verdict rows, golden keys.
 
 ## jailbreak_recognition
 
-Source: driver `R/scripts/oracle_lens_evals/situation_mining/readout_judge.py`; prompts in
-`R/src/global_workspace/olens_suite/situation_mining.py` (NOT a `readout_prompts.py`); the
-Gemini shim on branch `camila/jailbreak-wire` changes no prompt. Bank
-`R/evals/workspace-bench/hillclimbing_evals/jailbreak_recognition/items.json` (`{meta, items}`,
-121 items, 86 `bank_ok`).
+Source: the source repo's readout-judge driver and its prompt module; the Gemini shim on branch
+`camila/jailbreak-wire` changes no prompt.
 
 **Public bank** `evals/jailbreak_recognition/items.json` = `{"family": "jailbreak_recognition",
-"n_items": 86, "items": [...]}` built by a one-off script (`tests/golden/make_jailbreak_bank.py`,
-run once, committed, excluded from pytest): keep only items with `bank_ok == true`; per item
-keep exactly `id`, `source`, `source_id`, `messages`, `read` (`{positions, turn_end, n_tokens,
-tokens}`). `messages` keeps the trailing assistant turn verbatim from WildChat (it is what the
-lens's prefix was captured against, minus that turn); the judge drops it via
-`prefix_to_last_user`, and the README says so. Everything else (`mined_from, locus, bank_ok, prefix_turns, categories,
-expected_latent, judge_instruction, units, qwen_recognition, action_gate, surface_evidence,
-mined`, and the source `meta` block with its gates/funnel/ledger) is dropped — the judge reads
-none of it (the prompt is item-agnostic; `judge_instruction`/`expected_latent` are used only by
-the retired regex path). A test asserts the public bank has 86 items, only those five keys, and
-that every `read.positions` entry has a `tokens` string.
+"n_items": 86, "items": [...]}`, built once by `tests/golden/make_jailbreak_bank.py` from the
+source bank for the 86 ids listed in that script; per item exactly `id`, `source`,
+`source_id`, `messages`, `read` (`{positions, turn_end, n_tokens, tokens}`). `messages` keeps
+the trailing assistant turn verbatim from WildChat (it is what the lens's prefix was captured
+against, minus that turn); the judge drops it via `prefix_to_last_user`, and the README says
+so. No other item field is shipped — the judge reads none (the prompt is item-agnostic). A
+test asserts the public bank has 86 items, only those five keys, and that every
+`read.positions` entry has a `tokens` string.
 
-- prompts.py — copy verbatim from `situation_mining.py`: `READOUT_CLASSES` (L769),
+- prompts.py — copy verbatim from the source prompt module: `READOUT_CLASSES` (L769),
   `_READOUT_SYSTEM` (L771-805) as `READOUT_SYSTEM`, `_READOUT_USER` (L807-816) as a template
   (placeholders `{token_repr}`, `{conv}`, `{n}`, `{readouts}`; the source uses `{token!r}` —
   render with `repr(token)`; the README quotes THIS modified template, the one in `PROMPTS`,
@@ -145,17 +139,16 @@ that every `read.positions` entry has a `tokens` string.
   the eval is, the read sites (up to 12 evenly spaced content tokens of the last user turn + its
   `<|im_end|>` — 77 of the 86 items have 13 sites, short turns have fewer, and `rel_slot`
   rescales; layers 20/36/44/52/60 for in-house lenses), the judge, the pass rule, the
-  echo-vs-recognition distinction. **Nothing about mining, screening, gates, funnel counts or
-  the excluded items.** Judge prompts section: system, user template, schema, the marker rule.
+  echo-vs-recognition distinction. The README describes the items as shipped and nothing
+  about their provenance beyond the WildChat credit. Judge prompts section: system, user
+  template, schema, the marker rule.
 
-### Gemini refusal pilot (this PR, run by the main session, not the implementer)
+### Gemini failure pilot (this PR, run by the main session, not the implementer)
 
-Source note (`bank_to_inputs.py` docstring): Gemini 3.8 Flash errored on 34.6% of calls for
-`bank_ok: false` items vs 1.5% for the clean stratum. After the port, run the family once on a
-reference AO arm over all 86 items and record `n_api_failed / n_expected_cells` in the
-family README ("Judge failures" line; on the OpenRouter route refusals surface as `None`
-results, i.e. `spend.errors`, not `spend.refusals`, which only the Anthropic route sets).
-Threshold from the design: > 2% of cells → fall back to a `claude-sonnet-5` pin.
+After the port, run the family once on a reference AO arm over all 86 items and record
+`n_api_failed / n_expected_cells` in the family README ("Judge failures" line; on the
+OpenRouter route refusals surface as `None` results, i.e. `spend.errors`). Threshold from the
+design: > 2% of cells → fall back to a `claude-sonnet-5` pin.
 
 ## Shared changes
 

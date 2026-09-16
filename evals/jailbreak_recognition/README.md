@@ -36,10 +36,10 @@ override — its **own read** of the situation, not an echo of the pasted rules?
   bootstrap over item indicators. `chance = None` (free-label recognition judge; no analytic
   floor).
 - **Judge model:** `google/gemini-3.8-flash`, `PROMPT_VERSION = "jb-v1"`.
-- **Judge failures:** pending — the Gemini pilot over all 86 items on a reference arm records
-  `n_api_failed / n_expected_cells` here (on the OpenRouter route a refusal surfaces as a
-  `None` result, i.e. `spend.errors`); above 2% of cells the family falls back to a
-  `claude-sonnet-5` pin.
+- **Judge failures:** not yet measured on a full reference arm. `n_api_failed /
+  n_expected_cells` is reported in every `results.json` (on the OpenRouter route a refusal
+  surfaces as a `None` result); the design's rule is that above 2% of cells the family falls
+  back to a `claude-sonnet-5` pin.
 
 ## Judge prompts
 
