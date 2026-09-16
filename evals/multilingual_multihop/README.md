@@ -1,57 +1,95 @@
 # multilingual_multihop
 
-A non-English two-hop prompt; the bridge concept must be read in English or Chinese (the native forms), with the L2 bridge form and the language as optional extra units.
+A non-English two-hop prompt; the judge must pick the bridge concept's English name and the passage's language, in one layer.
 
-98 items (source bank `lens-eval-multilingual-multihop.json`, family key `multilingual-multihop`, parent
-`multihop-mt`, frozen 2026-09-10). Plain render, one read position: the
-final prompt token, immediately before the answer word. Every item and every bridge was gated on
-Qwen3.6-27B (greedy-verified, then >= 8/10 at temperature 0.7).
+98 items (source bank `lens-eval-multilingual-multihop.json`, parent `multihop-mt`,
+frozen 2026-09-10). Plain render, one read position: the final prompt token, immediately
+before the answer word. Every item and every bridge was gated on Qwen3.6-27B (greedy-verified,
+then >= 8/10 at temperature 0.7).
 
-Example: a two-hop prompt in another language → required unit `bridge_native` (the bridge in English or Chinese); the L2 bridge and the language are reported, not required.
+Example: a two-hop prompt in another language → the bridge's English name among four confusables, and the language among four neighbours, both in one layer.
 
-Units: `bridge_native` (required; en or zh forms), `bridge_l2` and `language` (optional).
+Judged units: `bridge_native` (frozen `mc` block) and `language`.
 
 ## Scoring
 
-**No LLM judge.** The headline is a deterministic conjunctive regex (`wsbench.hard`):
-
-- Contract `{"multi_token": true, "include_target": false, "conjunctive_units": true}`: only multi-token forms may award credit
-  (filtered with the token counts the bank recorded at freeze time, `probe_token_lens`; the
-  `language` units are exempt, `multi_token: false`), and an item passes a layer only when
-  EVERY required unit hits somewhere in that layer's readouts (any position, any single
-  sample). Item pass = any layer.
-- Matcher (`wsbench.matching.unicode_word_matcher`): both sides folded (diacritics, case,
-  apostrophes), Unicode word boundaries; CJK and Hangul forms are substring; numeric forms use
-  the answer-position rule. A phrase is never assembled across two samples.
-- `extras.columns`: `pass`, `any_hit` (any unit hit anywhere, the parent-comparable number) and
-  one `<role>_hit` per unit over the items carrying that role. Rows carry `unit_langs` /
-  `first_lang`, the language-of-readout split.
-- Chance (`chance`): the permutation null — each item's units scored against a donor item's
-  readouts, layer by layer, 20 donors per item over every bank item the readouts file carries,
-  whatever subset is scored (`extras.permutation_null`).
-  A family below three times its null is not a read.
-- Token readouts (a J-lens) are summarized first by the shared summarizer (`docs/summarizer.md`,
-  one call per cell on the resolved judge model, cached in `cells.jsonl`), because a top-10 token
-  bag cannot hold a multi-token form and scores zero raw. A cell whose summary failed leaves its
-  item undecided. Prose runs touch no model, so `judge_model=` overrides leave them pinned.
-- Exactly one read position per (item, layer) is expected (the final prompt token); a file with
-  more is refused. Missing (item, layer) cells over the file's layer set are fatal (exit 2) unless
-  `allow_missing=True`; an item with a missing layer and no passing layer is undecided and out
-  of the denominator. The measured floor is the prompt-only baseline (later PR).
-- Reference (source repo `evals/workspace-bench/hillclimbing_evals/multi_token/HARD.md`, round 1,
-  2026-09-10, same instrument): s3d RL600 0.40, NLA-RL iter400 0.64
-  (NLA ungated by any precision condition).
+- **Headline: judged pass rate.** One forced-choice call per (item, layer, judged unit). The
+  judge never sees the prompt: it reads the cell's readout (the samples at the read position,
+  one per line) and five options, the unit's gold plus four confusables, with the escape
+  "cannot tell" last. It must abstain when the readout names none or several of the options, so
+  a hedged list of candidates fails. A pick counts only with a verbatim quote from the readout.
+- **Conjunctive:** a layer passes an item only when EVERY judged unit is picked correctly at
+  that layer; item pass = any layer. `extras.unit_any_layer` gives each unit's any-layer
+  accuracy on its own, `extras.abstain_rate` the escape rate, `extras.kinds` the pick counts.
+- **Options** are frozen per item (`tests/golden/multilingual_multihop_options.json`): the bank's `mc` blocks
+  where they exist (concept, bridge and readout units: four same-kind confusables written by
+  the source repo's option pass), the source instrument's fixed confusable set per language, and
+  for typo corrections four other items' corrections drawn with a seeded rule. Option order is a
+  seeded shuffle keyed by item and unit, identical for every arm and subset.
+- Token readouts (a J-lens) are summarized first by the shared summarizer (`docs/summarizer.md`),
+  because a top-10 token bag cannot hold a multi-token form; a failed summary leaves its item
+  undecided.
+- An item with no passing layer and an unjudged unit, a failed summary, or a missing (item,
+  layer) cell is undecided and left out of the denominator (`extras.n_items_undecided`); a cell
+  whose samples are all blank is a negative. Exactly one read position per (item, layer) is
+  expected; a file with more is refused. Missing cells are fatal (exit 2) unless
+  `allow_missing=True`.
+- No analytic floor for an any-layer conjunction (1/6 per unit call). The measured floors are
+  the lucky-guessing baseline (an LLM shown only these option lists) and the prompt-only
+  baseline (stock Qwen3.6-27B given the prompt text, no activation), both later PRs.
 
 ## Readouts
 
 `{"id": "<item name>", "layer": L, "pos": P, "samples": [...]}` rows; `tokens` rows for a token
-lens. `examples/readouts/multilingual_multihop.jsonl` is a toy file.
+lens. `examples/readouts/multilingual_multihop.jsonl` is a toy file for `dry_run=True`.
 
 ```
-wsbench judge family=multilingual_multihop readouts=<arm>.jsonl out=outputs/<arm>/multilingual_multihop
+wsbench judge family=multilingual_multihop readouts=examples/readouts/multilingual_multihop.jsonl out=outputs/toy/multilingual_multihop dry_run=True
+wsbench judge family=multilingual_multihop readouts=<arm>.jsonl out=outputs/<arm>/multilingual_multihop limit=3
 ```
 
 ## Judge prompts
 
-None. `prompt_version` (`conjunctive-regex-2026-09-16`) names the
-scorer. The summarizer prompt used for token readouts is in `docs/summarizer.md`.
+`prompt_version`: `mc-2026-09-16`. Judge: the repo default (`google/gemini-3.8-flash`),
+temperature 0. Output schema: `{"choice": "A".."F", "quote": str}`. The user message is the
+`USER` template with the readout, one question (`QUESTION_UNIT` with the unit's role, or
+`QUESTION_LANGUAGE`) and the lettered options, `CANNOT` last.
+
+`SYSTEM`:
+
+```text
+You judge the READOUT of an interpretability lens: text decoded from a language model's internal activations while it read a passage you cannot see. The readout may be noisy, verbose, in any language, and may speculate. You are given ONE multiple-choice question about what the readout NAMES. Pick an option ONLY if the readout clearly names that one option (the same thing, in any language or spelling). If the readout names NONE of the options, or names TWO OR MORE of them (a hedge, a list of candidates, 'X or Y'), choose the "cannot tell" option — a readout must commit to a single answer to be credited. Do not use your own knowledge to fill gaps or to decide which of several named candidates is right. Give a SHORT VERBATIM quote (a few words copied exactly from the readout) that supports your choice; leave it empty when you choose cannot-tell.
+```
+
+`USER`:
+
+```text
+READOUT:
+"""
+{readout}
+"""
+
+{question}
+
+{options}
+
+Answer with the letter.
+```
+
+`QUESTION_UNIT`:
+
+```text
+Which ONE of these does the readout name (unit: {role})?
+```
+
+`QUESTION_LANGUAGE`:
+
+```text
+In which LANGUAGE is the passage the readout describes written? Naming the language counts; so does the readout quoting the passage's words in that language's own script. English and Chinese are the readout's own working languages and are not evidence by themselves.
+```
+
+`CANNOT`:
+
+```text
+cannot tell: the readout names none of these, or several of them
+```

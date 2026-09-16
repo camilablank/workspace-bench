@@ -1,15 +1,15 @@
-# multilingual_typo
+# typo_mt
 
-A non-English sentence ending in a misspelled word; the judge must pick the correction's English name and the passage's language, in one layer ("...المسمى الأدريناللين" -> adrenaline, Arabic).
+A sentence ending in a misspelled multi-token word or phrase; the judge must pick the corrected form from five candidates.
 
-100 items (source bank `lens-eval-multilingual-typo.json`, parent `typo-mt`,
+100 items (source bank `lens-eval-typo-hard.json`, parent `typo-mt`,
 frozen 2026-09-10). Plain render, one read position: the final prompt token, immediately
 before the answer word. Every item and every bridge was gated on Qwen3.6-27B (greedy-verified,
 then >= 8/10 at temperature 0.7).
 
-Example: an Arabic sentence ending in الأدريناللين → `the hormone adrenaline` among four other corrections, and Arabic among Persian, Urdu, Hebrew, Pashto.
+Example: a sentence ending in a misspelling → the corrected phrase among four other items' corrected phrases.
 
-Judged units: `correction` (the English form among four other items' corrections, seeded) and `language`.
+Judged units: `correction`: the corrected form among four other items' corrections (seeded).
 
 ## Scoring
 
@@ -21,7 +21,7 @@ Judged units: `correction` (the English form among four other items' corrections
 - **Conjunctive:** a layer passes an item only when EVERY judged unit is picked correctly at
   that layer; item pass = any layer. `extras.unit_any_layer` gives each unit's any-layer
   accuracy on its own, `extras.abstain_rate` the escape rate, `extras.kinds` the pick counts.
-- **Options** are frozen per item (`tests/golden/multilingual_typo_options.json`): the bank's `mc` blocks
+- **Options** are frozen per item (`tests/golden/typo_mt_options.json`): the bank's `mc` blocks
   where they exist (concept, bridge and readout units: four same-kind confusables written by
   the source repo's option pass), the source instrument's fixed confusable set per language, and
   for typo corrections four other items' corrections drawn with a seeded rule. Option order is a
@@ -41,11 +41,11 @@ Judged units: `correction` (the English form among four other items' corrections
 ## Readouts
 
 `{"id": "<item name>", "layer": L, "pos": P, "samples": [...]}` rows; `tokens` rows for a token
-lens. `examples/readouts/multilingual_typo.jsonl` is a toy file for `dry_run=True`.
+lens. `examples/readouts/typo_mt.jsonl` is a toy file for `dry_run=True`.
 
 ```
-wsbench judge family=multilingual_typo readouts=examples/readouts/multilingual_typo.jsonl out=outputs/toy/multilingual_typo dry_run=True
-wsbench judge family=multilingual_typo readouts=<arm>.jsonl out=outputs/<arm>/multilingual_typo limit=3
+wsbench judge family=typo_mt readouts=examples/readouts/typo_mt.jsonl out=outputs/toy/typo_mt dry_run=True
+wsbench judge family=typo_mt readouts=<arm>.jsonl out=outputs/<arm>/typo_mt limit=3
 ```
 
 ## Judge prompts

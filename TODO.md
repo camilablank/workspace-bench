@@ -15,14 +15,14 @@ items before any scale run. Status: [ ] open · [~] in PR · [x] merged.
 - [x] typo (merged 2026-09-16, #16)
 - [~] directed-modulation. Branch: agam/eval-directed-modulation.
 
-## Basic evals, multi-token hard (desideratum 2) — conjunctive regex only, no judge
-- [~] multihop-hard. Branch: agam/eval-hard-tier.
-- [~] multilingual-hard. Branch: agam/eval-hard-tier.
-- [~] typo-hard. Branch: agam/eval-hard-tier.
-- [~] basic-readout-hard. Branch: agam/eval-hard-tier.
-- [~] multilingual-typo. Branch: agam/eval-hard-tier.
-- [~] multilingual-multihop. Branch: agam/eval-hard-tier.
-- [ ] multi_concept_directed_modulation (deterministic scorer, own read regime)
+## Basic evals, multi-token (desideratum 2) — forced-choice Gemini judge per unit, conjunctive
+- [~] multihop_mt. Branch: agam/multitoken-mc-judge.
+- [~] multilingual_mt. Branch: agam/multitoken-mc-judge.
+- [~] typo_mt. Branch: agam/multitoken-mc-judge.
+- [~] basic_readout_mt. Branch: agam/multitoken-mc-judge.
+- [~] multilingual_typo. Branch: agam/multitoken-mc-judge.
+- [~] multilingual_multihop. Branch: agam/multitoken-mc-judge.
+- [ ] multi_concept_directed_modulation (Gemini judge; own read regime)
 
 ## Baselines
 - [ ] lucky guessing (LLM shown only the option lists; blind / described / uniform), Gemini

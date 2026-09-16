@@ -53,6 +53,15 @@ cell). `wsbench convert-gen-dir gen_dir=GEN out=F.jsonl kind=prose|tokens` conve
   content vs instruction narration, evidence must be a verbatim span or the positive is voided;
   headline = `content_bound` at any row; undecided items (unjudged row or missing layer, no
   positive) leave every rate's denominator.
+- Multi-token families (`group="basic_mt"`: multihop_mt, multilingual_mt, typo_mt,
+  basic_readout_mt, multilingual_multihop, multilingual_typo) share `src/wsbench/multitoken/`
+  (`prompts.py`, `options.py`, `family.py` = `mt_family(name, title, calls_per_arm=)`): one
+  prompt-blind forced-choice call per (item, layer, judged unit), 5 options + a cannot-tell
+  escape, options seeded over the WHOLE bank (goldens in `tests/golden/<family>_options.json`),
+  a correct pick needs a verbatim (folded) quote from the readout, a layer passes only when EVERY
+  judged unit is correct, item pass at any layer; the language unit is judged for every L2 item
+  and a native-script quote of the passage counts. No regex rate anywhere; the floors are the
+  lucky-guessing and prompt-only baselines.
 - Cell shapes: moral = tail-5 positions, 1-2 calls/cell; relational = max-pos row per (item,
   layer); role-bound = every row, 3 MCs/call; conjunctive = one call per item over the
   `[L<layer>]` blob (`opts=char_cap=N`); user_modeling = k samples -> k calls, item key `name`
@@ -98,8 +107,8 @@ macro averages only complete `pass_rate` families and lists every exclusion with
   returns a `FamilyResult` and writes nothing. `counts` has a fixed key set (other tallies go
   in `extras`); no `Spend` crosses the family boundary. Cache rows are append-only.
 - README: each family entry is `**<spec.title>** — [link]` followed by exactly three lines
-  `- *What it is:*` / `- *Example:*` / `- *Judged by:*`, grouped Safety · Association · Bag of
-  words · Precision · Logical processing. Credits live in README §Credits and NOTICE.md, one
+  `- *What it is:*` / `- *Example:*` / `- *Judged by:*`, grouped Basic (single token) · Basic
+  (multi-token) · Safety · Association · Bag of words · Precision · Logical processing. Credits live in README §Credits and NOTICE.md, one
   bullet per external source; in-house families get no credit line.
 
 ## Adding a family
