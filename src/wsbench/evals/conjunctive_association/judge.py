@@ -76,7 +76,14 @@ def build_blob(texts: dict[int, str], layers: list[int], char_cap: int) -> str:
 
 
 def run(args: JudgeArgs) -> FamilyResult:
-    char_cap = int(args.extra.get("char_cap", DEFAULT_CHAR_CAP))
+    try:
+        char_cap = int(args.extra.get("char_cap", DEFAULT_CHAR_CAP))
+    except ValueError:
+        raise SystemExit(
+            f"--opt char_cap must be an integer (got {args.extra['char_cap']!r})"
+        ) from None
+    if char_cap < 1:
+        raise SystemExit(f"--opt char_cap must be >= 1 (got {char_cap})")
     bank = load_bank(FAMILY)
     scope = item_scope(bank, args)
     cells, rep = load_readouts(args.readouts, ids=[it["id"] for it in scope], layers=args.layers)

@@ -130,11 +130,7 @@ this repo uses the one shared prompt. The original is quoted here for provenance
 not what this family sends:
 
 ```text
-You are shown the top-10 token readouts from an interpretability lens at one \
-position inside a language model that was reading a passage you cannot see. Tokens may include \
-noise, fragments, other languages (translate them), or byte artifacts. In one or two sentences, \
-state what these outputs are collectively trying to say — the situation or mental content they \
-point to. Commit to the most specific reading the tokens support; do not just say they are noisy.
+You are shown the top-10 token readouts from an interpretability lens at oneposition inside a language model that was reading a passage you cannot see. Tokens may includenoise, fragments, other languages (translate them), or byte artifacts. In one or two sentences,state what these outputs are collectively trying to say — the situation or mental content theypoint to. Commit to the most specific reading the tokens support; do not just say they are noisy.
 ```
 
 ## Instrument change (phase 2)

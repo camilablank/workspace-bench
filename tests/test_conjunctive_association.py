@@ -200,3 +200,31 @@ def test_dry_run_prints_and_makes_no_calls(tmp_path, mk_args, capsys, monkeypatc
     out = capsys.readouterr().out
     assert prompts.SYSTEM in out and "Which of the following does the readout state?" in out
     assert res.value is None and res.rows == [] and res.n_items == 100
+
+
+def test_char_cap_validation(tmp_path):
+    import pytest
+
+    from wsbench import registry
+    from wsbench.evals.conjunctive_association import judge as cj
+    from wsbench.judge_config import JudgeConfig, resolve
+    from wsbench.registry import JudgeArgs
+
+    def args(v: str) -> JudgeArgs:
+        return JudgeArgs(
+            readouts=registry.REPO_ROOT / "examples/readouts/conjunctive_association.jsonl",
+            out=tmp_path,
+            judge=resolve(JudgeConfig()),
+            layers=None,
+            items=None,
+            limit=0,
+            allow_missing=False,
+            concurrency=1,
+            rpm=1e9,
+            dry_run=True,
+            extra={"char_cap": v},
+        )
+
+    for bad in ("abc", "0", "-5"):
+        with pytest.raises(SystemExit):
+            cj.run(args(bad))

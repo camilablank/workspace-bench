@@ -140,11 +140,7 @@ this repo uses the one shared prompt. The original is quoted here for provenance
 not what this family sends:
 
 ```text
-You are shown the top-k token readouts from an interpretability lens at one \
-position inside a language model that was reading a passage you cannot see. Tokens may include \
-noise, fragments, other languages (translate them), or byte artifacts. In one or two sentences, \
-state what these outputs are collectively trying to say — the situation or mental content they \
-point to. Commit to the most specific reading the tokens support; do not just say they are noisy.
+You are shown the top-k token readouts from an interpretability lens at oneposition inside a language model that was reading a passage you cannot see. Tokens may includenoise, fragments, other languages (translate them), or byte artifacts. In one or two sentences,state what these outputs are collectively trying to say — the situation or mental content theypoint to. Commit to the most specific reading the tokens support; do not just say they are noisy.
 ```
 
 ## Instrument change (phase 2)
@@ -158,7 +154,9 @@ the source default is not carried over. Phase 7 measures the change. Numbers pro
 
 `n_missing_cells` is always 0 (the bank carries no position list; `--allow-missing` is a
 no-op). `n_empty_cells` counts selected cells whose readout text is empty — they are skipped,
-never judged. `n_unjudged_cells` counts selected non-empty cells that got no verdict (API
+never judged. `n_unjudged_cells` counts selected non-empty cells with any failed call — for a
+deliberative cell, a failure on either side marks the cell unjudged even though the surviving
+side's row is kept and scored (API
 failure, summary failure); an in-scope item with no judged cell counts as a fail.
 Verdicts are cached append-only in `<out>/cells.jsonl`, keyed by the call key and a fingerprint
 of `(PROMPT_VERSION, judge model, reasoning, system, user)`; rerunning retries only failures.

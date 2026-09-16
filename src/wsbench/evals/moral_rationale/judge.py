@@ -138,7 +138,8 @@ def select_cells(cells: list[Cell]) -> list[Cell]:
 def run(args: JudgeArgs) -> FamilyResult:
     bank = load_bank(FAMILY)
     scope = item_scope(bank, args)
-    mcs = {it["id"]: build_mcs(it, *build_pools(bank)) for it in scope}
+    pools = build_pools(bank)
+    mcs = {it["id"]: build_mcs(it, *pools) for it in scope}
     cells, rep = load_readouts(args.readouts, ids=[it["id"] for it in scope], layers=args.layers)
     selected = select_cells(cells)
     nonempty = [c for c in selected if not c.empty]
