@@ -246,7 +246,7 @@ class ReportRuns(Command):
             print(f"unreadable results: {e}", file=sys.stderr)
             return EXIT_USAGE
         m = macro(results)
-        floors = lucky_guessing.floors() if self.floors else {}
+        floors = lucky_guessing.floors() if self.floors else None
         table = markdown_table(results, m, floors=floors)
         (self.dir / "summary.md").write_text(table, encoding="utf-8")
         if self.json:
@@ -400,7 +400,11 @@ class Freeze(Command):
             print(f"unknown baseline kind {self.kind!r}; known: lucky_guessing", file=sys.stderr)
             return EXIT_USAGE
         dst = self.dst or lucky_guessing.FROZEN
-        frozen = lucky_guessing.freeze(self.src, dst)
+        try:
+            frozen = lucky_guessing.freeze(self.src, dst)
+        except ValueError as e:
+            print(str(e), file=sys.stderr)
+            return EXIT_USAGE
         print(f"froze {sorted(frozen)} -> {dst}")
         return 0
 

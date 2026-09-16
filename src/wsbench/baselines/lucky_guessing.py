@@ -26,6 +26,8 @@ DEFAULT_DRAWS = 5
 TEMPERATURE = 1.0
 DEFAULT_SEED = 20260908
 VARIANTS = ("blind", "described", "uniform")
+MAX_TOKENS = 64  # the reply is a few integers
+MAX_PICKS = 3  # a multi-select item dictates at most three concepts
 FROZEN = REPO_ROOT / "evals" / "baselines" / "lucky_guessing.json"
 
 SYSTEM = (
@@ -38,8 +40,9 @@ SYSTEM = (
 SYSTEM_MULTI = (
     "You are a guessing baseline for an interpretability benchmark. You will be shown one list "
     "of candidate concepts. You will not be told the question. Between one and three of them "
-    "are correct. Guess which, using whatever the list itself gives away (phrasing, specificity, "
-    "how answer-like a candidate looks). Select at least one. Do not explain."
+    "are correct. Guess which, most likely first, using whatever the list itself gives away "
+    "(phrasing, specificity, how answer-like a candidate looks). Select one to three. Do not "
+    "explain."
 )
 
 # One honest sentence per family for the described variant: what the lists are ABOUT, never the
@@ -313,21 +316,23 @@ def _valid(p: Any, n: int) -> bool:
 def score_draw(reply: dict[str, Any] | None, item: Item) -> dict[str, Any] | None:
     """One draw: raw picks, whether it passes, invalid picks. ``None`` = the call failed (out of
     every denominator). Single-choice items pass when every list is right; ``multi`` items pass
-    when some pick is a gold (the family's pass rule) and record ``exact`` (picks == golds)."""
+    when the FIRST pick is a gold (one guess per draw, like every other family) and record
+    ``any_hit`` (some pick of at most three is gold) and ``exact`` (picks == golds)."""
     if reply is None:
         return None
     if item.multi:
         picks = reply.get("picks")
         picks = picks if isinstance(picks, list) else []
         n = item.n_options[0]
-        good = [p for p in picks if _valid(p, n)]
+        good = list(dict.fromkeys(p for p in picks if _valid(p, n)))[:MAX_PICKS]
         golds = set(item.golds)
         return {
             "picks": picks,
-            "correct": any(p in golds for p in good),
-            "exact": set(good) == golds and len(good) == len(golds),
+            "correct": bool(good) and good[0] in golds,  # first pick: one guess per draw
+            "any_hit": any(p in golds for p in good),
+            "exact": set(good) == golds,
             "n_picks": len(good),
-            "n_invalid": len(picks) - len(good),
+            "n_invalid": sum(not _valid(p, n) for p in picks),
         }
     picks = [reply.get(f"choice{i + 1}") for i in range(len(item.lists))]
     valid = [_valid(p, n) for p, n in zip(picks, item.n_options, strict=True)]
@@ -365,11 +370,14 @@ def aggregate(per_item: dict[str, dict[str, Any]], n_draws: int) -> dict[str, An
             per_draw.append(sum(x["correct"] for x in live) / len(live))
     scored = [r for r in per_item.values() if any(x is not None for x in r["draws"])]
     n_live = sum(x is not None for r in per_item.values() for x in r["draws"])
-    n_picks = sum(len(r["gold"]) for r in per_item.values() for x in r["draws"] if x is not None)
-    n_invalid = sum(x["n_invalid"] for r in per_item.values() for x in r["draws"] if x is not None)
-    exact = [
-        x["exact"] for r in per_item.values() for x in r["draws"] if x is not None and "exact" in x
-    ]
+    live_draws = [(r, x) for r in per_item.values() for x in r["draws"] if x is not None]
+    n_picks = sum(
+        (x["n_picks"] + x["n_invalid"]) if "n_picks" in x else len(r["gold"]) for r, x in live_draws
+    )
+    n_invalid = sum(x["n_invalid"] for _r, x in live_draws)
+    exact = [x["exact"] for _r, x in live_draws if "exact" in x]
+    any_hit = [x["any_hit"] for _r, x in live_draws if "any_hit" in x]
+    picks = [x["n_picks"] for _r, x in live_draws if "n_picks" in x]
     return {
         "mean": statistics.fmean(per_draw) if per_draw else None,
         "std": statistics.stdev(per_draw) if len(per_draw) > 1 else (0.0 if per_draw else None),
@@ -377,6 +385,8 @@ def aggregate(per_item: dict[str, dict[str, Any]], n_draws: int) -> dict[str, An
             sum(bool(r["majority_correct"]) for r in scored) / len(scored) if scored else None
         ),
         "exact": (sum(exact) / len(exact)) if exact else None,
+        "any_hit": (sum(any_hit) / len(any_hit)) if any_hit else None,
+        "mean_picks": (sum(picks) / len(picks)) if picks else None,
         "per_draw": per_draw,
         "n_items": len(scored),
         "n_draws": n_draws,
@@ -387,12 +397,17 @@ def aggregate(per_item: dict[str, dict[str, Any]], n_draws: int) -> dict[str, An
 
 
 def analytic_floor(items: list[Item]) -> float:
-    """Uniform pass rate on these option sets: mean over items of ``prod(1/n)``; for a ``multi``
-    item, one uniform pick hits some gold with probability ``k/n``."""
-    return statistics.fmean(
-        (len(it.golds) / it.n_options[0]) if it.multi else math.prod(1.0 / n for n in it.n_options)
-        for it in items
-    )
+    """Uniform pass rate on these option sets: mean over items of the product over lists of
+    (occurrences of the gold text) / n (a list that repeats the gold label counts it twice);
+    for a ``multi`` item, one uniform pick hits some gold with probability ``k/n``."""
+
+    def one(it: Item) -> float:
+        if it.multi:
+            return len(it.golds) / it.n_options[0]
+        pairs = zip(it.lists, it.golds, strict=True)
+        return math.prod(lst.count(lst[g - 1]) / len(lst) for lst, g in pairs)
+
+    return statistics.fmean(one(it) for it in items)
 
 
 def uniform_reply(item: Item, family: str, draw: int, seed: int) -> dict[str, Any]:
@@ -473,6 +488,7 @@ def run_family(
                     dry_run=dry_run,
                     preflight=pre.for_judge(judge),
                     temperature=TEMPERATURE,
+                    max_tokens=MAX_TOKENS,
                 )
                 for j in js:
                     replies[j] = [
@@ -499,6 +515,7 @@ def run_family(
         "variant": variant,
         "model": "seeded-uniform" if variant == "uniform" else judge.model,
         "prompt_version": PROMPT_VERSION,
+        "instrument": instrument_versions().get(name),  # the judge these lists belong to
         "temperature": None if variant == "uniform" else TEMPERATURE,
         "seed": seed,
         "limit": limit,
@@ -517,7 +534,11 @@ def report_line(r: dict[str, Any]) -> str:
     a = r["aggregate"]
     if a["mean"] is None:
         return f"{r['family']}/{r['variant']}: no scored draws"
-    exact = f" exact={a['exact']:.3f}" if a.get("exact") is not None else ""
+    exact = (
+        f" first-pick; any={a['any_hit']:.3f} exact={a['exact']:.3f} picks={a['mean_picks']:.2f}"
+        if a.get("exact") is not None
+        else ""
+    )
     return (
         f"{r['family']}/{r['variant']}: pass={a['mean']:.3f} ±{a['std']:.3f} "
         f"majority={a['majority']:.3f}{exact} floor={r['analytic_floor']:.3f} "
@@ -542,23 +563,26 @@ def instrument_versions() -> dict[str, str]:
 
 
 def freeze(run_dir: Path, dst: Path = FROZEN) -> dict[str, Any]:
-    """Fold ``run_dir/<family>/<variant>.json`` into ``dst`` as ``{family: {variant: {...}}}``,
-    stamped with the family's judge prompt version; families not in ``run_dir`` keep their prior
-    entry. A run with ``limit`` or without scored draws is refused."""
+    """Fold ``run_dir/<family>/<variant>.json`` into ``dst`` as ``{family: {variant: {...}}}``;
+    entries carry the judge prompt version the lists belonged to (``instrument``). Merges per
+    (family, variant): what is not in ``run_dir`` keeps its prior entry. A ``limit`` pilot or a
+    run without scored draws is refused (ValueError)."""
     versions = instrument_versions()
-    frozen: dict[str, Any] = {}
+    frozen: dict[str, dict[str, Any]] = {}
     for path in sorted(run_dir.glob("*/*.json")):
         r = json.loads(path.read_text(encoding="utf-8"))
         fam, a = r["family"], r["aggregate"]
         if r.get("limit"):
-            raise SystemExit(f"freeze: {path} is a limit={r['limit']} pilot, not a baseline")
+            raise ValueError(f"freeze: {path} is a limit={r['limit']} pilot, not a baseline")
         if a["mean"] is None:
-            raise SystemExit(f"freeze: {path} has no scored draws")
+            raise ValueError(f"freeze: {path} has no scored draws")
         frozen.setdefault(fam, {})[r["variant"]] = {
             "mean": a["mean"],
             "std": a["std"],
             "majority": a["majority"],
             "exact": a.get("exact"),
+            "any_hit": a.get("any_hit"),
+            "mean_picks": a.get("mean_picks"),
             "analytic_floor": r["analytic_floor"],
             "n_items": a["n_items"],
             "n_draws": a["n_draws"],
@@ -566,14 +590,14 @@ def freeze(run_dir: Path, dst: Path = FROZEN) -> dict[str, Any]:
             "n_options_per_list": r["n_options"],
             "model": r["model"],
             "prompt_version": r["prompt_version"],
-            "instrument": versions.get(fam),
+            "instrument": r.get("instrument") or versions.get(fam),
             "written": r["written"],
         }
     if not frozen:
-        raise SystemExit(f"freeze: no <family>/<variant>.json under {run_dir}")
-    prior = json.loads(dst.read_text(encoding="utf-8")) if dst.exists() else {}
-    merged = {k: frozen.get(k, v) for k, v in prior.items()}
-    merged.update({k: v for k, v in frozen.items() if k not in merged})
+        raise ValueError(f"freeze: no <family>/<variant>.json under {run_dir}")
+    merged = json.loads(dst.read_text(encoding="utf-8")) if dst.exists() else {}
+    for fam, variants in frozen.items():
+        merged.setdefault(fam, {}).update(variants)
     dst.parent.mkdir(parents=True, exist_ok=True)
     dst.write_text(json.dumps(merged, indent=1, ensure_ascii=False) + "\n", encoding="utf-8")
     return merged

@@ -70,6 +70,47 @@ def test_lists_match_the_judges_builders():
     assert len(mc) == 25 and all(it.multi and it.n_options == [6] for it in mc)
 
 
+def test_golds_name_the_bank_answers():
+    """Every gold position points at the item's own answer text in the bank."""
+    from wsbench.evals.user_modeling.judge import display_value
+
+    conj = {it["id"]: it for it in lg.load_bank("conjunctive_association")}
+    for it in lg.build_family("conjunctive_association"):
+        assert it.lists[0][it.golds[0] - 1] == conj[it.id]["gold_label"]
+    rb = {it["id"]: it for it in lg.load_bank("role_bound_association")}
+    for it in lg.build_family("role_bound_association"):
+        b = rb[it.id]
+        a_lab = f"{b['names']['a']}, the {b['role_a']}"
+        b_lab = f"{b['names']['b']}, the {b['role_b']}"
+        subj, obj = (a_lab, b_lab) if b["direction"] == "ab" else (b_lab, a_lab)
+        got = [lst[g - 1] for lst, g in zip(it.lists, it.golds, strict=True)]
+        assert got == [subj, b["action"], obj]
+    rel = {it["id"]: it for it in lg.load_bank("relational_multihop")}
+    for it in lg.build_family("relational_multihop"):
+        got = [lst[g - 1] for lst, g in zip(it.lists, it.golds, strict=True)]
+        assert got == [rel[it.id]["hop1"], rel[it.id]["hop2"]]
+    moral = {it["id"]: it for it in lg.load_bank("moral_rationale")}
+    for it in lg.build_family("moral_rationale"):
+        for lst, g in zip(it.lists, it.golds, strict=True):
+            assert lst[g - 1] in moral[it.id]["look_for_reasons"]
+    um = {str(it["name"]): it for it in lg.load_bank("user_modeling")["items"]}
+    for it in lg.build_family("user_modeling"):
+        assert it.lists[0][it.golds[0] - 1] == display_value(str(um[it.id]["attr"]))
+    _h, dm_bank = lg.load_bank_file(REPO / "evals/directed_modulation/items.json")
+    dm = {it["id"]: it for it in dm_bank}
+    for it in lg.build_family("directed_modulation"):
+        assert it.lists[0][it.golds[0] - 1] == dm[it.id]["concept"]
+    _h, mc_bank = lg.load_bank_file(REPO / "evals/multi_concept_directed_modulation/items.json")
+    mc = {it["id"]: it for it in mc_bank}
+    for it in lg.build_family("multi_concept_directed_modulation"):
+        assert sorted(it.lists[0][g - 1] for g in it.golds) == sorted(mc[it.id]["concepts"])
+    _h, mt_bank = lg.load_bank_file(REPO / "evals/multihop_mt/items.json")
+    mt = {it["id"]: it for it in mt_bank}
+    for it in lg.build_family("multihop_mt"):
+        for role, lst, g in zip(it.meta["roles"], it.lists, it.golds, strict=True):
+            assert lst[g - 1] == mt[it.id]["mc"][role]["gold"]
+
+
 def test_analytic_floors():
     one = lg.Item("a", [["x", "y", "z", "w", "v"]], [1])
     two = lg.Item("b", [["x", "y"], ["p", "q", "r"]], [1, 2])
@@ -77,6 +118,8 @@ def test_analytic_floors():
     assert lg.analytic_floor([one]) == pytest.approx(0.2)
     assert lg.analytic_floor([two]) == pytest.approx(1 / 6)
     assert lg.analytic_floor([multi]) == pytest.approx(2 / 6)
+    dup = lg.Item("d", [["x", "y", "x", "z", "w"]], [1])  # a repeated gold label counts twice
+    assert lg.analytic_floor([dup]) == pytest.approx(0.4)
     assert lg.analytic_floor([one, two]) == pytest.approx((0.2 + 1 / 6) / 2)
 
 
@@ -97,9 +140,13 @@ def test_score_draw_and_majority():
     assert lg.majority_correct([None, None], it) is None
     m = lg.Item("m", [["a", "b", "c", "d", "e", "f"]], [2, 5], multi=True)
     hit = lg.score_draw({"picks": [5, 1]}, m)
-    assert hit["correct"] and not hit["exact"] and hit["n_picks"] == 2
-    exact = lg.score_draw({"picks": [2, 5]}, m)
-    assert exact["correct"] and exact["exact"]
+    assert hit["correct"] and hit["any_hit"] and not hit["exact"] and hit["n_picks"] == 2
+    second = lg.score_draw({"picks": [1, 5]}, m)  # gold only in second place: not a pass
+    assert not second["correct"] and second["any_hit"]
+    exact = lg.score_draw({"picks": [2, 5, 5]}, m)
+    assert exact["correct"] and exact["exact"] and exact["n_picks"] == 2
+    flood = lg.score_draw({"picks": [1, 3, 4, 2, 5, 6]}, m)  # capped at three picks
+    assert not flood["correct"] and not flood["any_hit"] and flood["n_picks"] == 3
     miss = lg.score_draw({"picks": [1, 9]}, m)
     assert not miss["correct"] and miss["n_invalid"] == 1
     assert lg.score_draw({"picks": "2"}, m)["n_picks"] == 0
@@ -162,12 +209,19 @@ def test_scripted_blind_run_and_freeze(tmp_path, monkeypatch):
     assert entry["mean"] == 0.75 and entry["model"] == judge.model
     assert entry["instrument"] == registry.FAMILIES["directed_modulation"].judge.prompt_version
     assert frozen["other"]["blind"]["mean"] == 0.1  # untouched
+    assert entry["instrument"] == r["instrument"]  # stamped at run time
+    # a later freeze of one variant keeps the family's other variants
+    r2 = dict(r, variant="uniform", model="seeded-uniform")
+    (run_dir / "directed_modulation" / "blind.json").unlink()
+    (run_dir / "directed_modulation" / "uniform.json").write_text(json.dumps(r2), "utf-8")
+    again = lg.freeze(run_dir, dst)
+    assert set(again["directed_modulation"]) == {"blind", "uniform"}
     live = lg.floors(dst)
     assert "directed_modulation" in live and "other" not in live  # stale instrument dropped
     # a pilot is refused
     r["limit"] = 3
     (run_dir / "directed_modulation" / "blind.json").write_text(json.dumps(r), encoding="utf-8")
-    with pytest.raises(SystemExit):
+    with pytest.raises(ValueError):
         lg.freeze(run_dir, dst)
 
 

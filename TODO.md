@@ -32,3 +32,11 @@ items before any scale run. Status: [ ] open · [~] in PR · [x] merged.
 
 ## Methods (readout files, judged here; generation stays in global-workspace)
 Logit lens · R-Lens · NLA · NLA SFT · J-Lens · OLens · OLens SFT · Template lens.
+
+## Computational / programmatic evals (after the baselines; confirm the plan with Agam first)
+Order (Agam, 2026-09-16): chained intermediates, brew intermediates, then buggy code (quantitative,
+fair judging), arithmetic intermediates last.
+- [ ] chained_intermediates
+- [ ] brew_intermediates
+- [ ] buggy_code
+- [ ] arithmetic_intermediates

@@ -36,7 +36,14 @@ averaged over draws with its std, `majority` the per-item plurality vote. Famili
 | directed_modulation | 1 | 5 | |
 | multihop_mt, typo_mt | 1-2 | 5 | one list per judged unit |
 | multilingual_mt, multilingual_multihop, multilingual_typo, basic_readout_mt | 1-2 | 5 | concept/correction/readout plus the language list for L2 items |
-| multi_concept_directed_modulation | 1 (multi-select) | 6 | pass = some pick is a dictated concept (the family's rule); `exact` = picks equal the dictated set; controls dropped |
+| multi_concept_directed_modulation | 1 (multi-select, one to three picks) | 6 | pass = the FIRST pick is a dictated concept (one guess per draw, like every family); `any_hit` = some pick is, `exact` = the picks equal the dictated set, `mean_picks` beside them; controls dropped |
+
+**Reading a floor against a headline.** A family headline is a max over the read grid (any
+layer, any position), while the floor is one guess per item per draw. The two are comparable
+only when the guesser repeats itself across draws (`majority` close to `mean`): a guesser that
+spreads its picks would clear an any-of-grid rule more often than `mean` says. Check that
+before reading a floor beside a headline. Role-bound's people lists can repeat a label; the
+analytic floor counts a repeated gold twice.
 
 Every entry is stamped with the family's judge `prompt_version` (`instrument`); `wsbench report`
 draws a floor only while it matches the family's current instrument, so a changed judge drops
