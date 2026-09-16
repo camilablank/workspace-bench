@@ -1,5 +1,6 @@
 """The shared multi-token judge: letter parsing, the quote gate, the per-item rule, a toy run."""
 
+import importlib
 import json
 from pathlib import Path
 
@@ -182,7 +183,8 @@ def test_run_family_toy_run_with_a_scripted_judge(tmp_path, monkeypatch):
 
 @pytest.mark.parametrize("name", MT)
 def test_dry_run_on_the_toy_file(name, tmp_path, capsys, monkeypatch):
-    registry.load_all()
+    spec = importlib.import_module(f"wsbench.evals.{name}").SPEC
+    registry.FAMILIES.setdefault(spec.name, spec)  # conftest resets the registry per test
     monkeypatch.delenv("WSBENCH_JUDGE_MODEL", raising=False)
     out = tmp_path / "out"
     example = REPO / "examples/readouts" / f"{name}.jsonl"

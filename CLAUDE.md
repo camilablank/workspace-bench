@@ -75,7 +75,7 @@ cell). `wsbench convert-gen-dir gen_dir=GEN out=F.jsonl kind=prose|tokens` conve
   hallucination = one call per on-site cell (k=1 for tokens), lower-is-better rate; jlens =
   prose only, Stage A -> B/foil -> P (all on the family judge), headline L44, `complete` uses reject rate
   ≤ 5%; agentic = free-text stages A/B/C, `design_score` over 28 misaligned items. Jailbreak,
-  hallucination and jlens have real `n_missing_cells`: **fatal (exit 2) unless
+  hallucination, jlens and multi_concept_directed_modulation have real `n_missing_cells`: **fatal (exit 2) unless
   `allow_missing=True`** (a dry run only reports); for the four MC families it is a no-op.
 - `opts=key=value,k2=v2` fills `JudgeArgs.extra`; `aux_models` comes from the family `JudgeConfig`.
   `EvalSpec.calls_per_arm` / `.sources` feed `wsbench list`; every non-empty `sources` must
