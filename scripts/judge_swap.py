@@ -6,6 +6,11 @@ Gemini) per-cell verdict file on a key BUILT FROM FIELDS and reports cell agreem
 kappa, ``summary`` renders the comparison JSONs as markdown with the design's flag rule
 (kappa < 0.7 -> "flag: prompt review before quoting").
 
+Port failures: only conjunctive_association emits ``pick == "api_fail"`` rows; every other
+family drops a failed cell from ``rows[]`` (it is counted in ``counts.n_unjudged_cells`` /
+``extras.n_api_failed``), so those failures surface here as ``n_only_baseline``, not
+``n_port_failed``. ``extras.port_counts`` copies the port's counts so the two can be reconciled.
+
 Every function above the CLI is pure so the tests can drive it on hand-built fixtures.
 """
 
@@ -34,9 +39,14 @@ SONNET = "claude-sonnet-5"
 GEMINI = "google/gemini-3.8-flash"
 PARITY_TOL = 5e-4
 FAILED = None  # a port row whose verdict never landed
+PORT_FAIL_NOTE = (
+    "this family drops failed port cells from rows[] (no api_fail rows), so port failures "
+    "appear as n_only_baseline; see extras.port_counts"
+)
 
 Key = Hashable
 Labels = dict[Key, bool]
+ItemRule = Callable[[list[tuple[Key, bool]]], bool]  # over one item's (key, label) cells
 
 
 # ---------------------------------------------------------------- banks
@@ -147,7 +157,7 @@ def convert_family(
         return convert_jailbreak_jsonl(src, out, arm=arm, ids=ids)
     rep = convert_gen_dir(src, out, kind="prose", layers=layers)
     if ids is not None:
-        labels = sorted(p.name for p in src.iterdir() if p.is_dir())
+        labels = sorted(p.name for p in src.iterdir() if p.is_dir() and any(p.glob("L*.jsonl")))
         keep = [lab for lab in labels if lab in ids]
         print(f"kept {len(keep)} of {len(labels)} labels (bank ∩ gen dir)")
         _filter_rows_by_id(out, keep)
@@ -204,13 +214,33 @@ def agreement_stats(port: Mapping[Key, bool], base: Mapping[Key, bool]) -> dict:
     }
 
 
-def item_labels(labels: Mapping[Key, bool], item_of: Callable[[Key], str]) -> dict[str, bool]:
-    """The family pass rule shared by every cell family here: ANY true cell per item."""
-    out: dict[str, bool] = {}
+def any_rule(cells: list[tuple[Key, bool]]) -> bool:
+    """The default item rule (relational, role-bound, user_modeling, jailbreak): ANY true cell."""
+    return any(v for _, v in cells)
+
+
+def moral_rule(cells: list[tuple[Key, bool]]) -> bool:
+    """moral_rationale: keys are ``(id, layer, pos, side)``. An item is deliberative when any of
+    its cells has ``side`` in {yes, no} and passes iff any(yes) and any(no); else ANY."""
+    sides = {k[3] for k, _ in cells}
+    if sides & {"yes", "no"}:
+        return any(v for k, v in cells if k[3] == "yes") and any(
+            v for k, v in cells if k[3] == "no"
+        )
+    return any_rule(cells)
+
+
+def item_labels(
+    labels: Mapping[Key, bool],
+    item_of: Callable[[Key], str],
+    item_rule: ItemRule | None = None,
+) -> dict[str, bool]:
+    """Group cells by item and apply the family's item rule (default ``any_rule``)."""
+    rule = item_rule or any_rule
+    grouped: dict[str, list[tuple[Key, bool]]] = {}
     for k, v in labels.items():
-        it = item_of(k)
-        out[it] = out.get(it, False) or bool(v)
-    return out
+        grouped.setdefault(item_of(k), []).append((k, bool(v)))
+    return {it: rule(cells) for it, cells in grouped.items()}
 
 
 def rate(labels: Mapping[Any, bool]) -> float | None:
@@ -227,12 +257,13 @@ def item_level(
     base: Mapping[Key, bool],
     item_of: Callable[[Key], str],
     *,
+    item_rule: ItemRule | None = None,
     near_constant_guard: bool = False,
 ) -> dict:
     """The item rule applied to both sides over the SAME (joined) cells."""
     both = port.keys() & base.keys()
-    p_items = item_labels({k: port[k] for k in both}, item_of)
-    b_items = item_labels({k: base[k] for k in both}, item_of)
+    p_items = item_labels({k: port[k] for k in both}, item_of, item_rule)
+    b_items = item_labels({k: base[k] for k in both}, item_of, item_rule)
     st = agreement_stats(p_items, b_items)
     out = {
         "n_items": st["n_cells_both"],
@@ -268,6 +299,7 @@ class Adapter:
     port_label: Callable[[dict], bool | None]  # None = failed verdict (excluded, counted)
     load_baseline: Callable[[Path, argparse.Namespace], Baseline]
     item_of: Callable[[Key], str] | None  # None = cell is the item (no item level)
+    item_rule: ItemRule | None = None  # None = any_rule
     near_constant_guard: bool = False
 
 
@@ -494,6 +526,7 @@ ADAPTERS: dict[str, Adapter] = {
         port_label=lambda r: _bool_or_none(r.get("correct")),
         load_baseline=_moral_baseline,
         item_of=lambda k: k[0],
+        item_rule=moral_rule,
     ),
     "relational_multihop": Adapter(
         port_key=_rel_key,
@@ -560,6 +593,9 @@ PARITY: dict[str, Callable[[dict], tuple[float | None, str, dict]]] = {
 # ---------------------------------------------------------------- compare
 
 
+_PORT_COUNT_KEYS = ("n_expected_cells", "n_missing_cells", "n_unjudged_cells", "n_empty_cells")
+
+
 def _delta(a: float | None, b: float | None) -> float | None:
     return a - b if a is not None and b is not None else None
 
@@ -600,8 +636,13 @@ def compare(
     st = agreement_stats(port, base.labels)
     both = port.keys() & base.labels.keys()
     item_of = ad.item_of or (lambda k: str(k))
-    joined_port = item_labels({k: port[k] for k in both}, item_of)
-    joined_base = item_labels({k: base.labels[k] for k in both}, item_of)
+    joined_port = item_labels({k: port[k] for k in both}, item_of, ad.item_rule)
+    joined_base = item_labels({k: base.labels[k] for k in both}, item_of, ad.item_rule)
+    port_counts = {k: res.counts.get(k) for k in _PORT_COUNT_KEYS}
+    for k in ("n_api_failed", "n_cells_api_failed"):
+        if k in res.extras:
+            port_counts["n_api_failed"] = res.extras[k]
+    note = base.note if family == "conjunctive_association" else f"{base.note}; {PORT_FAIL_NOTE}"
     out: dict[str, Any] = {
         "family": family,
         "parity": family in PARITY_ONLY,
@@ -612,15 +653,25 @@ def compare(
             "port_joined": rate(joined_port),
             "baseline": rate(joined_base),
             "baseline_published": base.published,
-            "delta": _delta(res.value, rate(joined_base)),
+            "delta": _delta(rate(joined_port), rate(joined_base)),
+            "delta_published": _delta(res.value, base.published),
         },
         "item_level": None
         if ad.item_of is None
-        else item_level(port, base.labels, ad.item_of, near_constant_guard=ad.near_constant_guard),
+        else item_level(
+            port,
+            base.labels,
+            ad.item_of,
+            item_rule=ad.item_rule,
+            near_constant_guard=ad.near_constant_guard,
+        ),
         "port_model": port_model,
         "baseline_model": base.model,
-        "baseline_note": base.note,
-        "extras": {k: v for k, v in base.extras.items() if k != "parts"},
+        "baseline_note": note,
+        "extras": {
+            **{k: v for k, v in base.extras.items() if k != "parts"},
+            "port_counts": port_counts,
+        },
     }
     parts = base.extras.get("parts")
     if parts:  # relational: x_ok / y_ok agreement alongside pass
@@ -658,7 +709,7 @@ def render_summary(comparisons: list[dict]) -> str:
     parity = sorted((c for c in comparisons if c.get("parity")), key=lambda c: c["family"])
     lines = [
         "| family | n cells | cell agreement | κ | baseline headline (model) | Gemini headline "
-        "| Δ | verdict |",
+        "| Δ (same cells) | verdict |",
         "|---|---|---|---|---|---|---|---|",
     ]
     for c in swapped:

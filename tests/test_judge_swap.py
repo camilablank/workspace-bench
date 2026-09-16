@@ -94,14 +94,16 @@ def test_agreement_three_of_four_gives_kappa_half():
 # ---------------------------------------------------------------- convert
 
 
-def test_convert_gen_dir_ids_from_bank(tmp_path, monkeypatch):
+def test_convert_gen_dir_ids_from_bank(tmp_path, monkeypatch, capsys):
     gen = tmp_path / "gen"
     for label in ("oa-keep", "eb-drop"):
         _write_jsonl(
             gen / label / "L036.jsonl",
             [{"pos": 3, "samples": ["s1", "s2"]}, {"pos": 4, "samples": ["s3"]}],
         )
-    monkeypatch.setattr(js, "bank_ids", lambda family: {"oa-keep", "oa-absent"})
+    (gen / "judge").mkdir()  # the sbum dir's judge/ subdir is not a label
+    (gen / "judge" / "user-modeling.json").write_text("{}")
+    monkeypatch.setattr(js, "bank_ids", lambda family: {"oa-keep", "oa-absent", "judge"})
     out = tmp_path / "out.jsonl"
     rep = js.convert_family("role_bound_association", gen, out, ids_from_bank=True)
     cells, rep2 = load_readouts(out)
@@ -109,6 +111,7 @@ def test_convert_gen_dir_ids_from_bank(tmp_path, monkeypatch):
     assert rep.n_rows == rep2.n_rows == 2 and rep.kind == "prose"
     assert sum(rep2.skipped.values()) == 0
     assert "kind=prose" in js.describe_grid(out)
+    assert "kept 1 of 2 labels" in capsys.readouterr().out
 
 
 def test_convert_gen_dir_without_bank_keeps_all(tmp_path):
@@ -157,18 +160,21 @@ def test_convert_jailbreak_jsonl(tmp_path, monkeypatch):
 
 
 def _moral_rows():
-    # port: 4 cells + 1 only-port; correct = T T F F (+T)
+    # i1 committed (2 cells), i2 deliberative (yes+no, both fail), i4 deliberative (both pass),
+    # i3 only on the port side
     return [
         {"id": "i1", "layer": 20, "pos": 7, "side": "committed", "pick": "gold", "correct": True},
         {"id": "i1", "layer": 36, "pos": 7, "side": "committed", "pick": "gold", "correct": True},
         {"id": "i2", "layer": 20, "pos": 9, "side": "yes", "pick": "other", "correct": False},
         {"id": "i2", "layer": 20, "pos": 9, "side": "no", "pick": "other", "correct": False},
+        {"id": "i4", "layer": 20, "pos": 9, "side": "yes", "pick": "gold", "correct": True},
+        {"id": "i4", "layer": 20, "pos": 9, "side": "no", "pick": "gold", "correct": True},
         {"id": "i3", "layer": 20, "pos": 1, "side": "committed", "pick": "gold", "correct": True},
     ]
 
 
-def test_compare_moral_rationale(tmp_path):
-    base = {
+def _moral_baseline():
+    return {
         "aggregate": {
             "committed": {"pass_any": 3, "total": 4},
             "deliberative": {"both_sides_any": 1, "total": 4},
@@ -177,30 +183,55 @@ def test_compare_moral_rationale(tmp_path):
             {"id": "i1", "layer": 20, "pos": 7, "side": "committed", "correct": True},
             {"id": "i1", "layer": 36, "pos": 7, "side": "committed", "correct": True},
             {"id": "i2", "layer": 20, "pos": 9, "side": "yes", "correct": False},
-            {"id": "i2", "layer": 20, "pos": 9, "side": "no", "correct": True},
+            {"id": "i2", "layer": 20, "pos": 9, "side": "no", "correct": True},  # one side only
+            {"id": "i4", "layer": 20, "pos": 9, "side": "yes", "correct": True},
+            {"id": "i4", "layer": 20, "pos": 9, "side": "no", "correct": False},  # one side only
             {"id": "i9", "layer": 20, "pos": 9, "side": "committed", "correct": False},
         ],
     }
+
+
+def test_moral_rule_committed_vs_deliberative():
+    committed = [(("i", 20, 1, "committed"), False), (("i", 36, 1, "committed"), True)]
+    assert js.moral_rule(committed) is True  # ANY
+    one_side = [(("i", 20, 1, "yes"), True), (("i", 20, 1, "no"), False)]
+    assert js.any_rule(one_side) is True and js.moral_rule(one_side) is False
+    both = [(("i", 20, 1, "yes"), True), (("i", 36, 1, "no"), True)]
+    assert js.moral_rule(both) is True
+    no_side_cells = [(("i", 20, 1, "yes"), False)]  # deliberative with only a yes cell
+    assert js.moral_rule(no_side_cells) is False
+
+
+def test_compare_moral_rationale(tmp_path):
     out = js.compare(
         "moral_rationale",
         _results("moral_rationale", _moral_rows(), value=0.6),
-        _write_json(tmp_path / "b.json", base),
+        _write_json(tmp_path / "b.json", _moral_baseline()),
     )
     assert out["parity"] is False
-    assert out["n_cells_both"] == 4 and out["n_only_port"] == 1 and out["n_only_baseline"] == 1
-    assert out["agreement"] == pytest.approx(0.75)
-    assert out["cohen_kappa"] == pytest.approx(0.5)
+    assert out["n_cells_both"] == 6 and out["n_only_port"] == 1 and out["n_only_baseline"] == 1
+    # cells port T T F F T T vs base T T F T T F -> 4/6 agree; tt=3 tf=1 ft=1 ff=1 -> kappa 0.25
+    assert out["agreement"] == pytest.approx(4 / 6)
+    assert out["cohen_kappa"] == pytest.approx(0.25)
+    assert out["confusion"] == {"tt": 3, "tf": 1, "ft": 1, "ff": 1}
     assert out["n_port_failed"] == 0
-    assert out["headline"]["port"] == 0.6
-    assert out["headline"]["baseline_published"] == pytest.approx(0.5)
-    # joined items: i1 (both true), i2 (port F, base T) -> baseline any-rule 2/2, port 1/2
-    assert out["headline"]["baseline"] == pytest.approx(1.0)
-    assert out["headline"]["port_joined"] == pytest.approx(0.5)
-    assert out["headline"]["delta"] == pytest.approx(0.6 - 1.0)
-    assert out["item_level"]["n_items"] == 2 and out["item_level"]["agreement"] == 0.5
-    assert out["item_level"]["kappa"] is None  # baseline constant over 2 items
+    h = out["headline"]
+    assert h["port"] == 0.6
+    assert h["baseline_published"] == pytest.approx(0.5)
+    # deliberative items need BOTH sides: baseline passes only i1 (i2/i4 have one side each),
+    # the port passes i1 and i4. ANY would have given the baseline 3/3 — the rule is locked in.
+    assert h["baseline"] == pytest.approx(1 / 3)
+    assert h["port_joined"] == pytest.approx(2 / 3)
+    assert h["delta"] == pytest.approx(2 / 3 - 1 / 3)  # same cells, same rule
+    assert h["delta_published"] == pytest.approx(0.6 - 0.5)
+    il = out["item_level"]
+    assert il["n_items"] == 3 and il["agreement"] == pytest.approx(2 / 3)
+    assert il["kappa"] == pytest.approx(0.4)
+    assert il["port_rate"] == pytest.approx(2 / 3) and il["baseline_rate"] == pytest.approx(1 / 3)
     assert out["baseline_model"] == "claude-opus-5"
     assert out["port_model"] == "google/gemini-3.8-flash"
+    assert "n_only_baseline" in out["baseline_note"]  # non-conj: failures are dropped rows
+    assert out["extras"]["port_counts"]["n_unjudged_cells"] is None  # fixture carries no counts
 
 
 def test_compare_relational_multihop(tmp_path):
@@ -291,6 +322,7 @@ def test_compare_conjunctive_and_n_port_failed(tmp_path):
     assert out["n_cells_both"] == 4 and out["n_only_baseline"] == 1  # q5 failed on the port side
     assert out["agreement"] == pytest.approx(0.75)
     assert out["item_level"] is None
+    assert "n_only_baseline" not in out["baseline_note"]  # conj is the one api_fail family
     assert out["headline"]["baseline"] == pytest.approx(0.25)
     assert out["headline"]["baseline_published"] == pytest.approx(0.52)
 
@@ -499,6 +531,21 @@ def test_compare_parity_families(tmp_path):
     assert out["headline"]["delta"] == pytest.approx(0.03)
 
 
+def test_port_counts_copied_into_extras(tmp_path):
+    results = _results("relational_multihop", [], value=None, extras={"n_cells_api_failed": 2})
+    results["counts"] = {"n_expected_cells": 600, "n_unjudged_cells": 2, "spend_usd": 1.0}
+    base = _write_json(tmp_path / "b.json", {"verdicts": {}})
+    out = js.compare("relational_multihop", results, base)
+    pc = out["extras"]["port_counts"]
+    assert pc == {
+        "n_expected_cells": 600,
+        "n_missing_cells": None,
+        "n_unjudged_cells": 2,
+        "n_empty_cells": None,
+        "n_api_failed": 2,
+    }
+
+
 def test_compare_unknown_family_raises(tmp_path):
     with pytest.raises(KeyError):
         js.compare("nope", _results("nope", []), _write_json(tmp_path / "x.json", {}))
@@ -569,11 +616,47 @@ def test_summary_flag_rule():
 # ---------------------------------------------------------------- CLI round trip
 
 
+ALLOWED_TOP_KEYS = {
+    "family",
+    "parity",
+    "n_cells_both",
+    "n_only_port",
+    "n_only_baseline",
+    "agreement",
+    "cohen_kappa",
+    "confusion",
+    "confusion_extras",
+    "n_port_failed",
+    "headline",
+    "item_level",
+    "port_model",
+    "baseline_model",
+    "baseline_note",
+    "extras",
+}
+
+
 def test_cli_compare_and_summary(tmp_path):
-    res = _write_json(tmp_path / "results.json", _results("moral_rationale", _moral_rows(), 0.6))
+    marker_id, marker_text = "ITEM-ZETA-7731", "READOUT-TEXT-SENTINEL"
+    rows = [
+        {**r, "id": marker_id, "quote": marker_text, "samples": [marker_text]}
+        for r in _moral_rows()[:2]
+    ]
+    res = _write_json(tmp_path / "results.json", _results("moral_rationale", rows, 0.6))
     base = _write_json(
         tmp_path / "b.json",
-        {"verdicts": [{"id": "i1", "layer": 20, "pos": 7, "side": "committed", "correct": True}]},
+        {
+            "verdicts": [
+                {
+                    "id": marker_id,
+                    "layer": 20,
+                    "pos": 7,
+                    "side": "committed",
+                    "correct": True,
+                    "quote": marker_text,
+                }
+            ]
+        },
     )
     out = tmp_path / "docs" / "moral_rationale.json"
     rc = js.main(
@@ -590,8 +673,11 @@ def test_cli_compare_and_summary(tmp_path):
         ]
     )
     assert rc == 0
-    d = json.loads(out.read_text())
+    raw = out.read_text()
+    d = json.loads(raw)
     assert d["n_cells_both"] == 1 and d["cohen_kappa"] is None
+    assert set(d) <= ALLOWED_TOP_KEYS and "rows" not in d
+    assert marker_id not in raw and marker_text not in raw  # no ids, no readout text
     md = tmp_path / "docs" / "summary.md"
     assert js.main(["summary", str(out), "--out", str(md)]) == 0
     assert js.FLAG in md.read_text()
