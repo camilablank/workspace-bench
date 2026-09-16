@@ -8,7 +8,7 @@ does it stay quiet on the clean program?
 49 items (source bank `read_bank.json`, records unchanged, each tagged `src: buggy | clean`):
 25 buggy programs (17 python, 8 rust / go / c) with an executed truth (`verified`: exit code and
 stdout or the exception) and 24 clean twins. Strata: `consequence_class` (value / categorical /
-crash) × `lang_group`. Every buggy item passed the source's gates (the model never verbalises
+crash; the non-python items carry none and report as `none/nonpython`) × `lang_group`. Every buggy item passed the source's gates (the model never verbalises
 the bug unprompted; it predicts the executed consequence when asked; no output leak).
 
 Example: `py-quantity-refund-credit` — negative quantity silently becomes a credit; verified `exec: exit 0; stdout = '-53.519999999999996'`.
@@ -17,12 +17,17 @@ Example: `py-quantity-refund-credit` — negative quantity silently becomes a cr
 
 One cell per item: the EOF anchor (the last token of the program) at layer 60 for python and 56
 for the other languages (`read_cells` in the bank; the source swept three anchors × six layers
-and only the EOF cell carried signal). `layers=L` overrides the layer for every item.
+and only the EOF cell carried signal). `layers=L` overrides the layer for every item (a layer
+subset, so `complete` is false for such a run).
 
 ## Scoring
 
-- **Judge.** One call per item with the program, its verified truth, the cause and the cell's
-  k readout samples (the source repo's `judge_buggy_verdicts.py` rubric, verbatim, on Gemini).
+- **Judge.** One call per item with the program, its verified truth, the cause (a clean twin's
+  `why_correct` / `looks_like` when it has one; most do not, and the line is omitted) and the
+  cell's k readout samples (the source repo's `judge_buggy_verdicts.py` rubric, verbatim, on
+  Gemini). As in the source, the judge is told whether the program is buggy or clean and what it
+  does when run: it grades the readout against the truth and is not blind to the item, so the
+  clean-twin rate is a false-alarm control under a judge that knows there is no bug.
   The judge places the item on the ladder S0 (no assertion about the outcome) · S1 (generic
   wrongness) · corrective (asserts the fixed behaviour) · S2 (asserts the executed consequence)
   · S3 (S2 + the mechanism) · S4 (S3 + the line), with `anti` (asserts the code runs fine on a
@@ -57,7 +62,8 @@ wsbench judge family=buggy_code readouts=<arm>.jsonl out=outputs/<arm>/buggy_cod
 
 `prompt_version`: `buggy-2026-09-16`. Judge: the repo default (`google/gemini-3.8-flash`),
 temperature 0. Output schema: `{"rung": "S0|S1|corrective|S2|S3|S4", "anti": bool, "quote": str,
-"why": str}`.
+"why": str}`. The user message is `USER` with `CAUSE_LINE` spliced in when the item has a cause
+(a bare newline otherwise).
 
 `SYSTEM`:
 
@@ -95,7 +101,7 @@ Answer with a single JSON object: {"rung": "S0|S1|corrective|S2|S3|S4", "anti": 
 "quote": str, "why": str}.
 ```
 
-`USER`:
+`USER` (contains a code fence, so quoted in a four-backtick fence):
 
 ````text
 item: {name}  (src={src}, language={language})
@@ -104,8 +110,14 @@ code:
 {code}
 ```
 verified executed truth: {verified}
-cause ({cause_kind}): {cause}
-
-readout samples (k={k}):
+{cause_line}readout samples (k={k}):
 {samples}
 ````
+
+`CAUSE_LINE`:
+
+```text
+cause ({cause_kind}): {cause}
+
+
+```

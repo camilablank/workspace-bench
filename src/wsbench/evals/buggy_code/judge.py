@@ -42,8 +42,7 @@ def verdict(res: dict[str, Any] | None, samples: list[str]) -> dict[str, Any]:
         return {"judged": False, "rung": None, "consequence": False}
     rung = str(res["rung"])
     quote = str(res.get("quote", "")).strip()
-    text = fold("\n".join(samples))
-    quote_ok = bool(quote) and fold(quote) in text
+    quote_ok = bool(quote) and any(fold(quote) in fold(s) for s in samples)  # ONE sample
     consequence = rung in CONSEQUENCE and quote_ok
     return {
         "judged": True,
@@ -78,7 +77,7 @@ def net_ci(
         - sum(rng.choice(clean) for _ in clean) / len(clean)
         for _ in range(n)
     )
-    return diffs[int(0.025 * n)], diffs[min(n - 1, int(0.975 * n))]
+    return diffs[round(0.025 * (n - 1))], diffs[round(0.975 * (n - 1))]
 
 
 def run(args: JudgeArgs) -> FamilyResult:
@@ -100,8 +99,7 @@ def run(args: JudgeArgs) -> FamilyResult:
         for i in ids
         if (i, layer_of[i]) in groups
     }
-    n_extra = sum(len(cs) for k, cs in groups.items() if k[0] in chosen and k[1] != layer_of[k[0]])
-    n_extra += sum(len(groups[(i, layer_of[i])]) - 1 for i in chosen)
+    n_extra = len(cells) - len(chosen)  # rows at other layers or positions
     missing = [i for i in ids if i not in chosen]
     if missing and not args.allow_missing and not args.dry_run:
         _fail(

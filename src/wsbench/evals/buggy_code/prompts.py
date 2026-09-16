@@ -44,11 +44,12 @@ USER = (
     "item: {name}  (src={src}, language={language})\n"
     "code:\n```\n{code}\n```\n"
     "verified executed truth: {verified}\n"
-    "cause ({cause_kind}): {cause}\n\n"
+    "{cause_line}"
     "readout samples (k={k}):\n{samples}"
 )
+CAUSE_LINE = "cause ({cause_kind}): {cause}\n\n"
 
-PROMPTS: dict[str, str] = {"SYSTEM": SYSTEM, "USER": USER}
+PROMPTS: dict[str, str] = {"SYSTEM": SYSTEM, "USER": USER, "CAUSE_LINE": CAUSE_LINE}
 
 SCHEMA = schema_block(
     "verdict",
@@ -62,17 +63,33 @@ SCHEMA = schema_block(
 )
 
 
+def cause_of(item: dict) -> str | None:
+    """A buggy item's ``cause``; a clean twin's ``why_correct`` or ``looks_like`` when it has one
+    (most clean records carry neither, and then the line is omitted rather than filled with ?)."""
+    for key in ("cause", "why_correct", "looks_like"):
+        if item.get(key):
+            return str(item[key])
+    return None
+
+
 def render_user(item: dict, samples: list[str]) -> str:
     src = str(item["src"])
     lines = "\n".join(f"[{i}] {s}" for i, s in enumerate(samples))
+    cause = cause_of(item)
+    cause_line = (
+        CAUSE_LINE.replace(
+            "{cause_kind}", "the bug" if src == "buggy" else "the twin context"
+        ).replace("{cause}", cause)
+        if cause
+        else "\n"
+    )
     return (
         USER.replace("{name}", str(item["name"]))
         .replace("{src}", src)
         .replace("{language}", str(item.get("language", "?")))
         .replace("{code}", str(item["code"]))
         .replace("{verified}", str(item.get("verified", "?")))
-        .replace("{cause_kind}", "the bug" if src == "buggy" else "the twin context")
-        .replace("{cause}", str(item.get("cause", "?")))
+        .replace("{cause_line}", cause_line)
         .replace("{k}", str(len(samples)))
         .replace("{samples}", lines)
     )

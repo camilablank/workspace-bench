@@ -52,8 +52,10 @@ def test_render_user_has_the_ground_truth_and_samples():
     user = render_user(it, ["# Expected: -53.52", "assert total < 0"])
     assert it["code"] in user and it["verified"] in user and "cause (the bug):" in user
     assert "readout samples (k=2):\n[0] # Expected: -53.52\n[1] assert total < 0" in user
-    clean = next(i for i in items if i["src"] == "clean")
-    assert "cause (the twin context):" in render_user(clean, ["x"])
+    clean = next(i for i in items if i["src"] == "clean" and not i.get("why_correct"))
+    assert "cause (" not in render_user(clean, ["x"])  # no placeholder cause for a bare twin
+    told = next(i for i in items if i["src"] == "clean" and i.get("why_correct"))
+    assert f"cause (the twin context): {told['why_correct']}" in render_user(told, ["x"])
 
 
 def test_verdict_quote_gate():
@@ -66,6 +68,9 @@ def test_verdict_quote_gate():
         {"rung": "S3", "anti": False, "quote": "not in any sample", "why": ""}, samples
     )
     assert not v["consequence"] and v["unverified"] and v["rung"] == "S3"
+    # a quote must sit inside ONE sample
+    v = judge.verdict({"rung": "S2", "anti": False, "quote": "total)\n- looks", "why": ""}, samples)
+    assert v["unverified"] and not v["consequence"]
     v = judge.verdict({"rung": "S1", "anti": True, "quote": "looks fine", "why": ""}, samples)
     assert not v["consequence"] and v["anti"] and not v["unverified"]
     assert (
@@ -175,3 +180,47 @@ def test_registered_readme_and_dry_run(tmp_path, capsys, monkeypatch):
     r = read_results(out)
     assert r.value is None and r.extras["n_items_without_readouts"] == 46
     assert "verified executed truth:" in capsys.readouterr().out
+
+
+def test_clean_false_alarms_subtract_and_empty_cell_is_s0(tmp_path, monkeypatch):
+    _h, items = load_bank(BANK)
+    by_id = {it["id"]: it for it in items}
+    ids = sorted({json.loads(x)["id"] for x in EXAMPLE.read_text().splitlines() if x.strip()})
+    buggy = [i for i in ids if by_id[i]["src"] == "buggy"]
+    clean = [i for i in ids if by_id[i]["src"] == "clean"]
+    rows = [json.loads(x) for x in EXAMPLE.read_text().splitlines() if x.strip()]
+    for r in rows:
+        if r["id"] == buggy[1]:
+            r["samples"] = ["", "  "]  # an empty cell
+    path = tmp_path / "r.jsonl"
+    path.write_text("".join(json.dumps(r) + "\n" for r in rows))
+
+    def fake_run_calls(calls, **kw):
+        out = {}
+        for c in calls:
+            text = c.user.split("[0] ", 1)[1][:15]
+            out[c.key] = {"rung": "S2", "anti": False, "quote": text, "why": "asserts a bug"}
+        return out
+
+    monkeypatch.setattr(judge, "run_calls", fake_run_calls)
+    args = JudgeArgs(
+        readouts=path,
+        out=tmp_path / "out",
+        judge=resolve(JudgeConfig(prompt_version=PROMPT_VERSION)),
+        layers=None,
+        items=ids,
+        limit=0,
+        allow_missing=False,
+        concurrency=1,
+        rpm=1.0,
+        dry_run=False,
+    )
+    r = judge.run(args)
+    rows_by = {row["id"]: row for row in r.rows}
+    assert rows_by[buggy[1]]["rung"] == "S0" and rows_by[buggy[1]].get("empty")
+    assert rows_by[clean[0]]["consequence"]  # the clean twin read as buggy: a false alarm
+    assert r.extras["buggy_S2_rate"] == 0.5 and r.extras["clean_S2_rate"] == 1.0
+    assert r.value == pytest.approx(-0.5)  # false alarms pull the headline below zero
+    assert r.extras["n_calls"] == 2 and r.counts["n_empty_cells"] == 1
+    strata = r.extras["per_stratum"]
+    assert set(strata) and all(s["clean_S2"] == 1.0 for s in strata.values())
