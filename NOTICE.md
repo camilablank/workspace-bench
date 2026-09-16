@@ -17,8 +17,7 @@ identified by label prefix.
 ## Judge models
 
 - Gemini 3.8 Flash (Google) via OpenRouter — the default judge; Claude Sonnet 5 (Anthropic) —
-  judge for `agentic_misalignment` and `jailbreak_recognition`; DeepSeek V4 Flash via OpenRouter
-  — `jlens_concept_pr` Stage A concept extraction.
+  judge for `agentic_misalignment` and `jailbreak_recognition`.
 - Terms: the respective API terms of service. Judge verdicts are cached locally per run and not
   redistributed with the repo.
 

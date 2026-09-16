@@ -101,7 +101,7 @@ Families that must keep a non-default pin, and why (decision points for Camila, 
 |---|---|---|
 | agentic_misalignment | claude-sonnet-5 (stages A–C) | judge of record (#239); no Gemini agreement data exists |
 | jailbreak_recognition | claude-sonnet-5 | **Decided 2026-09-16 (Camila):** Gemini 3.8 Flash refuses a share of jailbreak cells; Sonnet 5 is the judge of record. The README states this reason next to the pin. |
-| jlens_concept_pr Stage A | deepseek/deepseek-v4-flash | concept-extraction lists are frozen with this model; Stage B/P already Gemini |
+| ~~jlens_concept_pr Stage A~~ | ~~deepseek/deepseek-v4-flash~~ | **Retired 2026-09-16 (Camila):** Stage A now runs on Gemini 3.8 Flash like B/P (`jlens-pr-v2`); the source's DeepSeek concept lists are not comparable |
 
 Everything else (user-modelling, conjunctive, role-bound, relational, moral, hallucination)
 uses Gemini 3.8 Flash. **Jailbreak (decided 2026-09-16):** pinned to Sonnet 5 as its judge of
@@ -302,7 +302,7 @@ source repo names most of these only by nickname, so the full citations below ar
 | family | credit | what was taken | terms |
 |---|---|---|---|
 | **All nine** | Qwen3.6-27B (Alibaba) — the model being read | rollouts / responses in every bank | Qwen licence (Apache-2.0 for the 3.x line; confirm the 3.6 card) |
-| **All nine** | Gemini 3.8 Flash via OpenRouter; Claude Sonnet 5 (Anthropic); DeepSeek V4 Flash via OpenRouter (jlens Stage A) | judge models | API terms only |
+| **All nine** | Gemini 3.8 Flash via OpenRouter; Claude Sonnet 5 (Anthropic) | judge models | API terms only |
 | agentic_misalignment | Lynch, Wright, Larson, Troy, Ritchie, Mindermann, Perez, Hubinger. *Agentic Misalignment: How LLMs Could Be an Insider Threat.* Anthropic, June 2025. arXiv:2510.05179. Code: github.com/anthropic-experimental/agentic-misalignment | 18 of 32 scenarios = the repo's 18-condition grid (blackmail / leaking / murder × goal × urgency), generated with its `scripts/generate_prompts.py` and production system prompts; 14 scenarios in-house | MIT (their repo); state it in NOTICE |
 | jailbreak_recognition | Zhao, Ren, Hessel, Cardie, Choi, Deng. *WildChat: 1M ChatGPT Interaction Logs in the Wild.* ICLR 2024. arXiv:2405.01470. HF `allenai/WildChat-1M` | all 86 public (non-explicit) items are verbatim WildChat conversations (`source: wildchat`, `source_id` kept) | ODC-BY (attribution required). The open source-repo TODO "confirm WildChat license/PII posture before mirroring" is closed by ODC-BY plus keeping only `bank_ok` items; note in NOTICE |
 | jailbreak_recognition | Karvonen, Ong, Kantamneni, Marks. *CHIVE.* arXiv:2608.16747. github.com/adamkarvonen/chive | transcript render contract and the adapted precompute apps for external lenses | credit in family README |
