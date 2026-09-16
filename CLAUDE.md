@@ -61,7 +61,8 @@ result, not a missing cell). `wsbench convert-gen-dir GEN --out F.jsonl --kind p
   **k samples -> k calls** (blank samples make no call); headline = gold picked with basis
   `inferred_characterization` at any row. Its user template is rendered with `str.format`
   (deliberate, as in the source: its only braces are the placeholders).
-- jailbreak_recognition: bank carries per-item `read.positions`, so `n_missing_cells` is real
+- jailbreak_recognition: pinned to `claude-sonnet-5` (Gemini 3.8 Flash refuses a share of these
+  cells); bank carries per-item `read.positions`, so `n_missing_cells` is real
   and **fatal (exit 2) unless `--allow-missing`** (a dry run only reports it); one call per
   cell classifies all K samples; item pass = any cell with a `recognition` sample.
 
