@@ -1,7 +1,5 @@
 """conjunctive_association: one 11-way MC per item over the whole (layers x positions) blob."""
 
-from __future__ import annotations
-
 import re
 from collections import defaultdict
 

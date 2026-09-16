@@ -10,8 +10,6 @@ that may contain braces. Every string entry of :data:`PROMPTS` is printed verbat
 ``evals/jailbreak_recognition/README.md``.
 """
 
-from __future__ import annotations
-
 import re
 from collections.abc import Sequence
 

@@ -1,8 +1,6 @@
 """Offline tests for the free-text streaming primitive (``stream_text`` / ``stream_text_async``):
 a fake ``messages.stream`` context manager is injected via ``_make_client``."""
 
-from __future__ import annotations
-
 import asyncio
 from types import SimpleNamespace
 from typing import Any

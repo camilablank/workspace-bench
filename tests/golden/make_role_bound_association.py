@@ -3,8 +3,6 @@
 Run: cd <this repo> && uv run --no-sync python tests/golden/make_role_bound_association.py
 """
 
-from __future__ import annotations
-
 import sys
 from pathlib import Path
 

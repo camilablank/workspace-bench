@@ -1,8 +1,6 @@
 """Every prompt string a family sends lives verbatim in its README (and the summarizer's in
 docs/summarizer.md) inside a fenced block."""
 
-from __future__ import annotations
-
 import importlib
 import re
 from pathlib import Path

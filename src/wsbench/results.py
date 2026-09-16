@@ -1,12 +1,11 @@
 """The one results schema every family writes, plus CI, completeness, macro and the table."""
 
-from __future__ import annotations
-
 import json
 import random
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, field
 from pathlib import Path
+from typing import Self
 
 SCHEMA_VERSION = 1
 _COUNT_KEYS = (
@@ -58,7 +57,7 @@ class FamilyResult:
         }
 
     @classmethod
-    def from_json(cls, d: dict) -> FamilyResult:
+    def from_json(cls, d: dict) -> Self:
         if d.get("schema_version") != SCHEMA_VERSION:
             raise ValueError(
                 f"results schema_version {d.get('schema_version')!r} != {SCHEMA_VERSION}"

@@ -1,12 +1,10 @@
 """Append-only JSONL verdict cache: rows are never rewritten, a changed fingerprint appends."""
 
-from __future__ import annotations
-
 import hashlib
 import json
 import time
 from pathlib import Path
-from typing import Any
+from typing import Any, Self
 
 _RESERVED = ("key", "fp", "ts")
 
@@ -64,7 +62,7 @@ class Cache:
     def __len__(self) -> int:
         return self._n
 
-    def __enter__(self) -> Cache:
+    def __enter__(self) -> Self:
         return self
 
     def __exit__(self, *exc: object) -> None:

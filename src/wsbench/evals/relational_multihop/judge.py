@@ -1,7 +1,5 @@
 """relational_multihop: two 11-way MCs (X outer, Y inner) per (item, layer) at the blank."""
 
-from __future__ import annotations
-
 import random
 from collections import defaultdict
 

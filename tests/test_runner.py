@@ -1,7 +1,5 @@
 """``wsbench run --all``: fail-soft per family, one preflight per model, concurrency."""
 
-from __future__ import annotations
-
 import json
 import threading
 from pathlib import Path

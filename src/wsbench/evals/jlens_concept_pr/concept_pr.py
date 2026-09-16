@@ -23,8 +23,6 @@ Punctuation J-lens tokens are not content (``is_content_token``) and are exclude
 recall denominator before this module sees them.
 """
 
-from __future__ import annotations
-
 import math
 import re
 import unicodedata

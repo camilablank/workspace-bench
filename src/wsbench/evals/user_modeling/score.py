@@ -1,8 +1,6 @@
 """user_modeling scoring: headline = gold picked with basis ``inferred_characterization`` at any
 (layer, pos, sample) row of the item; ``correct`` / ``distractor`` are the any-row companions."""
 
-from __future__ import annotations
-
 from collections import defaultdict
 
 from wsbench.mcjudge import is_subset

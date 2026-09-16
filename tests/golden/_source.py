@@ -5,8 +5,6 @@ The source repo is read-only and outside this package; its judge scripts import
 source ``src/`` and ``scripts/oracle_lens/latent_eval`` go on ``sys.path`` first.
 """
 
-from __future__ import annotations
-
 import importlib.util
 import json
 import sys

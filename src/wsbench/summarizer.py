@@ -6,8 +6,6 @@ source repo's ``oa_eb_readout_judge.py`` / ``judge_relational_multihop.py``; it 
 verbatim in ``docs/summarizer.md`` (a test asserts equality).
 """
 
-from __future__ import annotations
-
 import dataclasses
 from collections.abc import Callable, Mapping, Sequence
 

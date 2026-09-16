@@ -10,8 +10,6 @@
 * ``on_result(i, result)`` fires as each call lands so callers can cache as they go.
 """
 
-from __future__ import annotations
-
 import asyncio
 import json
 import os

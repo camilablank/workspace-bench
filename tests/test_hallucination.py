@@ -4,8 +4,6 @@ Ported from ``hallucination-bench/tests/{test_judge,test_cli,test_sites,test_dat
 wsbench entrypoint (``judge.run`` with the shared fake client).
 """
 
-from __future__ import annotations
-
 import json
 from collections import Counter
 from pathlib import Path

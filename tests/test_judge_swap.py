@@ -4,8 +4,6 @@ The script is not part of the package, so it is loaded by path. No readout text 
 any source file appears here; every cell is synthetic.
 """
 
-from __future__ import annotations
-
 import argparse
 import importlib.util
 import json

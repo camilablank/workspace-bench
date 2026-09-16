@@ -9,8 +9,6 @@ not ``results.bootstrap_ci``. ``n_items`` is the number of items in scope; the v
 readout-level ratio.
 """
 
-from __future__ import annotations
-
 import random
 from collections import defaultdict
 from collections.abc import Callable, Sequence

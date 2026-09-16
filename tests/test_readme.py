@@ -1,7 +1,5 @@
 """The public docs: README entries for all nine families, Credits, NOTICE.md, CITATION.cff."""
 
-from __future__ import annotations
-
 import re
 
 from wsbench import registry

@@ -1,7 +1,5 @@
 """moral_rationale: 6-way MC per (item, layer, pos, side) over the tail-5 positions."""
 
-from __future__ import annotations
-
 import random
 from collections import defaultdict
 from dataclasses import dataclass

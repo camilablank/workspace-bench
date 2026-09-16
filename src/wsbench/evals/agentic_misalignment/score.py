@@ -7,8 +7,6 @@ stream and hi index). The scoring golden ``tests/golden/agentic_misalignment_sco
 produced by the source functions.
 """
 
-from __future__ import annotations
-
 import random
 from collections.abc import Mapping, Sequence
 from typing import Any

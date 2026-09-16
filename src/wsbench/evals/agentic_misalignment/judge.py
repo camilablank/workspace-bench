@@ -16,8 +16,6 @@ The prompt-scope rule (``pos < rollout_start``) is the producer's obligation: a 
 for this family must contain prompt positions only; every row is in scope here.
 """
 
-from __future__ import annotations
-
 import re
 from collections import defaultdict
 from collections.abc import Callable, Sequence

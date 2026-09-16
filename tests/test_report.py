@@ -1,7 +1,5 @@
 """``markdown_table`` formatting and ``wsbench report --json``."""
 
-from __future__ import annotations
-
 import json
 
 from wsbench.cli import main

@@ -11,8 +11,6 @@ byte-for-byte, never reflow it. Templates carry ``{name}`` placeholders substitu
 ``evals/jlens_concept_pr/README.md``.
 """
 
-from __future__ import annotations
-
 import json
 import re
 from collections.abc import Sequence

@@ -1,7 +1,5 @@
 """The judge loop every MC family shares: cached, fingerprinted, one schema per batch."""
 
-from __future__ import annotations
-
 import json
 import threading
 from collections.abc import Callable

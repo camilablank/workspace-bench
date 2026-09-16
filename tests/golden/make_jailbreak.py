@@ -10,8 +10,6 @@ stubbed so the maker runs in this repo's environment.
 Run: cd <this repo> && uv run --no-sync python tests/golden/make_jailbreak.py
 """
 
-from __future__ import annotations
-
 import importlib
 import json
 import sys

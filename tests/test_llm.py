@@ -1,7 +1,5 @@
 """Offline tests for the structured-JSON client: fakes are injected via ``_make_client``."""
 
-from __future__ import annotations
-
 import asyncio
 import json
 from types import SimpleNamespace

@@ -6,8 +6,6 @@ Run: cd <this repo> && uv run --no-sync python tests/golden/make_agentic_misalig
 (after tests/golden/make_agentic_bank.py, whose bank supplies the Stage C scenario).
 """
 
-from __future__ import annotations
-
 import importlib.util
 import json
 import sys

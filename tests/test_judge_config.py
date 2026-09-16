@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from wsbench.judge_config import (
     DEFAULT_JUDGE,
     DEFAULT_REASONING,

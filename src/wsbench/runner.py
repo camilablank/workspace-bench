@@ -1,7 +1,5 @@
 """``wsbench run``: judge several families concurrently, fail-soft, one preflight per model."""
 
-from __future__ import annotations
-
 import argparse
 import os
 import sys

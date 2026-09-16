@@ -16,8 +16,6 @@ Headline layer: the one judged layer if there is exactly one, else L44; with sev
 layers and no L44 the headline is ``None`` (value / ci95 ``None``, ``n_items`` 0, incomplete).
 """
 
-from __future__ import annotations
-
 import math
 from collections import Counter, defaultdict
 from collections.abc import Iterable, Sequence
