@@ -91,6 +91,11 @@ cell). `wsbench convert-gen-dir gen_dir=GEN out=F.jsonl kind=prose|tokens` conve
   item at its `read_cells` layer (60 python / 56 other; `layers=L` overrides), max-pos row; one
   consequence-ladder call per item with the program + verified truth; S2+ needs a verbatim quote;
   value = P(S2+ | buggy) − P(S2+ | clean), chance 0.0, bootstrap CI over the two sets.
+- arithmetic_intermediates (`group="computational"`, own judge): one frozen (layer, pos) cell per
+  item (`cell` in the bank; `layers=L` overrides), rows elsewhere ignored and counted; free-recall
+  call, named values verified against the readout's numerals (`quantities`) or a non-digit quote;
+  pass = a kept value within the variant's tolerance of `intermediates[0]`; `cross` = the same
+  rule over the item's `null_set` intermediates (permutation null). No analytic floor.
 - Cell shapes: moral = tail-5 positions, 1-2 calls/cell; relational = max-pos row per (item,
   layer); role-bound = every row, 3 MCs/call; conjunctive = one call per item over the
   `[L<layer>]` blob (`opts=char_cap=N`); user_modeling = k samples -> k calls, item key `name`

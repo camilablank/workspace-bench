@@ -1,0 +1,229 @@
+"""arithmetic_intermediates: the bank, tolerance and verification rules, the verdict with its
+permutation null, a scripted run and a dry run."""
+
+import json
+from pathlib import Path
+
+import pytest
+
+from wsbench import registry
+from wsbench.banks import load_bank
+from wsbench.cli import main
+from wsbench.evals.arithmetic_intermediates import judge
+from wsbench.evals.arithmetic_intermediates.prompts import PROMPT_VERSION, SYSTEM
+from wsbench.judge_config import JudgeConfig, resolve
+from wsbench.registry import JudgeArgs
+from wsbench.results import read_results
+
+REPO = Path(__file__).resolve().parents[1]
+BANK = REPO / "evals/arithmetic_intermediates/items.json"
+EXAMPLE = REPO / "examples/readouts/arithmetic_intermediates.jsonl"
+KEPT = {
+    "absval", "addmul", "floordiv", "frac", "fracadd", "fraccomp", "fracint", "fracsmall",
+    "muladd", "mulmid", "sign", "signpair", "subsub", "subsubx",
+}  # fmt: skip
+
+
+@pytest.fixture(autouse=True)
+def _registered():
+    from wsbench.evals.arithmetic_intermediates import SPEC
+
+    registry.FAMILIES.setdefault(SPEC.name, SPEC)
+
+
+def test_bank():
+    header, items = load_bank(BANK)
+    assert header["family"] == "arithmetic_intermediates" and len(items) == 596
+    assert set(header["variants"]) == KEPT and "maxsel" in header["removed_variants"]
+    names = {it["name"] for it in items}
+    for it in items:
+        v = header["variants"][it["variant"]]
+        assert it["tolerance"] == v["tolerance"] and it["cell"] == v["cell"]
+        assert it["cell"]["layer"] in (56, 60) and it["cell"]["pos"] in (-7, -8)
+        assert it["intermediates"] and float(it["intermediates"][0]) == float(
+            it["intermediates"][0]
+        )
+        assert it["null_set"] and all(n in names for n in it["null_set"])
+        assert all(n != it["name"] for n in it["null_set"])
+    assert sum(v["n_items"] for v in header["variants"].values()) == 596
+
+
+def test_tolerance_and_quantities():
+    assert judge.tolerance_ok(-51.0, -51.0, "exact") and not judge.tolerance_ok(
+        51.0, -51.0, "exact"
+    )
+    assert judge.tolerance_ok(74.0, 73.0, "rel2pct") and not judge.tolerance_ok(
+        75.0, 73.0, "rel2pct"
+    )
+    assert judge.quantities("- 2. The total is 4,816 and -51.\n- 17,000") == [
+        4816.0,
+        -51.0,
+        17000.0,
+    ]
+    assert judge.quantities("Step 3: 0.777778 \u2248 \uff17.\uff15") == [0.777778, 7.5]
+    assert judge.quantities("29.") == [29.0]  # a bare number on its own line is a value
+
+
+def test_verified_and_verdict():
+    text = "- 271 - 322 = -51, then times 14\n- 结果是 负五十一"
+    assert judge.verified(-51.0, text, "") and not judge.verified(-52.0, text, "")
+    assert judge.verified(-52.0, text, "负五十一")  # a non-digit quote vouches (CJK numeral)
+    assert not judge.verified(-52.0, text, "-52")  # a digit quote does not
+    nulls = [-40.0, -60.0, 12.0]
+    v = judge.verdict(
+        {"values": [-51, 14], "basis": "arithmetic", "quote": "-51"}, -51.0, "exact", nulls, text
+    )
+    assert (
+        v["kind"] == "hit"
+        and v["hit"]
+        and v["top1_hit"]
+        and v["cross"] == 0.0
+        and v["kept"] == [-51.0, 14.0]
+    )
+    v = judge.verdict(
+        {"values": [-40, -51], "basis": "numeral_bag", "quote": ""},
+        -51.0,
+        "exact",
+        nulls,
+        "-40 and -51",
+    )
+    assert v["hit"] and not v["top1_hit"] and v["cross"] == pytest.approx(1 / 3)
+    v = judge.verdict(
+        {"values": [99], "basis": "stated_result", "quote": "ninety-nine"},
+        -51.0,
+        "exact",
+        nulls,
+        text,
+    )
+    assert v["kind"] == "unverified" and not v["hit"]
+    v = judge.verdict(
+        {"values": [14], "basis": "stated_result", "quote": "14"}, -51.0, "exact", nulls, text
+    )
+    assert v["kind"] == "other" and v["cross"] == 0.0
+    assert (
+        judge.verdict({"values": [], "basis": "none", "quote": ""}, -51.0, "exact", nulls, text)[
+            "kind"
+        ]
+        == "none"
+    )
+    assert judge.verdict(
+        {"values": [True, 1, 2, 3, 4], "basis": "none", "quote": ""}, 1.0, "exact", [], "1 2 3 4"
+    )["values"] == [1.0, 2.0, 3.0]
+    assert judge.verdict(None, -51.0, "exact", nulls, text)["judged"] is False
+    # relative tolerance: 4.30 counts for a 4.333 intermediate at 2%
+    v = judge.verdict(
+        {"values": [4.303030303030303], "basis": "arithmetic", "quote": ""},
+        4.333333,
+        "rel2pct",
+        [],
+        "142/33 = 4.303030303030303",
+    )
+    assert v["hit"]
+
+
+def test_scripted_run(tmp_path, monkeypatch):
+    _h, items = load_bank(BANK)
+    by_id = {it["id"]: it for it in items}
+    ids = sorted({json.loads(x)["id"] for x in EXAMPLE.read_text().splitlines() if x.strip()})
+    assert len(ids) == 4
+    pick = {by_id[i]["variant"]: i for i in ids}
+    a, b, c, d = pick["sign"], pick["addmul"], pick["frac"], pick["subsub"]
+
+    def fake_run_calls(calls, **kw):
+        out = {}
+        for call in calls:
+            i = call.meta["item"]
+            target = float(by_id[i]["intermediates"][0])
+            if i == a:  # names the intermediate
+                out[call.key] = {
+                    "states_value": True,
+                    "values": [target],
+                    "basis": "arithmetic",
+                    "quote": "",
+                }
+            elif i == b:  # names a null item's intermediate (a cross hit, not a hit)
+                other = float(by_id[by_id[i]["null_set"][0]]["intermediates"][0])
+                out[call.key] = {
+                    "states_value": True,
+                    "values": [other],
+                    "basis": "stated_result",
+                    "quote": "the sum",  # a verbatim non-digit quote vouches for the value
+                }
+            elif i == c:
+                out[call.key] = None
+            else:
+                out[call.key] = {"states_value": False, "values": [], "basis": "none", "quote": ""}
+        return out
+
+    monkeypatch.setattr(judge, "run_calls", fake_run_calls)
+    args = JudgeArgs(
+        readouts=EXAMPLE,
+        out=tmp_path / "out",
+        judge=resolve(JudgeConfig(prompt_version=PROMPT_VERSION)),
+        layers=None,
+        items=ids,
+        limit=0,
+        allow_missing=False,
+        concurrency=1,
+        rpm=1.0,
+        dry_run=False,
+    )
+    r = judge.run(args)
+    rows = {row["id"]: row for row in r.rows}
+    assert rows[a]["pass"] is True and rows[a]["kind"] == "hit" and rows[a]["cross"] == 0.0
+    assert rows[b]["pass"] is False and rows[b]["kind"] == "other" and rows[b]["cross"] > 0
+    assert rows[c]["pass"] is None and rows[d]["pass"] is False
+    assert r.value == pytest.approx(1 / 3) and r.extras["n_items_decided"] == 3
+    assert r.extras["cross"] > 0 and r.extras["net"] < r.value
+    assert r.counts["n_unjudged_cells"] == 1 and r.counts["n_missing_cells"] == 0
+    assert set(r.extras["per_variant"]) <= KEPT and r.extras["per_role"]
+
+
+def test_rows_off_the_frozen_cell_are_ignored_and_missing_is_fatal(tmp_path, monkeypatch):
+    monkeypatch.setattr(judge, "run_calls", lambda calls, **kw: {})
+    _h, items = load_bank(BANK)
+    it = items[0]
+    rows = [
+        {
+            "id": it["id"],
+            "layer": it["cell"]["layer"],
+            "pos": it["cell"]["pos"] + 1,
+            "samples": ["x"],
+        },
+        {"id": it["id"], "layer": 20, "pos": it["cell"]["pos"], "samples": ["x"]},
+    ]
+    path = tmp_path / "r.jsonl"
+    path.write_text("".join(json.dumps(x) + "\n" for x in rows))
+    base = {
+        "readouts": path,
+        "out": tmp_path / "out",
+        "judge": resolve(JudgeConfig(prompt_version=PROMPT_VERSION)),
+        "layers": None,
+        "items": [it["id"]],
+        "limit": 0,
+        "allow_missing": False,
+        "concurrency": 1,
+        "rpm": 1.0,
+        "dry_run": False,
+    }
+    with pytest.raises(SystemExit) as e:
+        judge.run(JudgeArgs(**base))
+    assert e.value.code == 2
+    r = judge.run(JudgeArgs(**{**base, "allow_missing": True}))
+    assert r.counts["n_missing_cells"] == 1 and r.extras["n_rows_off_cell"] == 2
+    with pytest.raises(SystemExit):
+        judge.run(JudgeArgs(**{**base, "layers": [56, 60]}))
+
+
+def test_registered_readme_and_dry_run(tmp_path, capsys, monkeypatch):
+    from wsbench.evals.arithmetic_intermediates import SPEC
+
+    assert SPEC.group == "computational" and SPEC.judge.prompt_version == PROMPT_VERSION
+    assert SYSTEM in (REPO / "evals/arithmetic_intermediates/README.md").read_text(encoding="utf-8")
+    monkeypatch.delenv("WSBENCH_JUDGE_MODEL", raising=False)
+    out = tmp_path / "out"
+    argv = ["judge", f"family={SPEC.name}", f"readouts={EXAMPLE}", f"out={out}", "dry_run=True"]
+    assert main(argv) == 0
+    r = read_results(out)
+    assert r.value is None and r.extras["n_items_without_readouts"] == 592
+    assert "Lens output:" in capsys.readouterr().out
