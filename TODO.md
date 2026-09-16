@@ -12,7 +12,7 @@ items before any scale run. Status: [ ] open · [~] in PR · [x] merged.
 - [~] multihop. Branch: agam/eval-multihop (stacked).
 - [~] multilingual. Branch: agam/eval-multilingual (stacked).
 - [~] poetry. Branch: agam/eval-poetry (stacked).
-- [ ] typo
+- [~] typo. Branch: agam/eval-typo (stacked).
 - [ ] directed-modulation
 
 ## Basic evals, multi-token hard (desideratum 2) — conjunctive regex only, no judge
