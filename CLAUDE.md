@@ -87,6 +87,10 @@ cell). `wsbench convert-gen-dir gen_dir=GEN out=F.jsonl kind=prose|tokens` conve
   multi-select colour call per non-empty, non-screened cell over the item's `options_adjacent`;
   pass = K·G > ΣO over the emission cells (source bundle rule), `null`/`baseline` per item, stir
   cells the control. No analytic floor.
+- buggy_code (`group="computational"`, own judge, metric `net_S2`, not a pass rate): one cell per
+  item at its `read_cells` layer (60 python / 56 other; `layers=L` overrides), max-pos row; one
+  consequence-ladder call per item with the program + verified truth; S2+ needs a verbatim quote;
+  value = P(S2+ | buggy) − P(S2+ | clean), chance 0.0, bootstrap CI over the two sets.
 - Cell shapes: moral = tail-5 positions, 1-2 calls/cell; relational = max-pos row per (item,
   layer); role-bound = every row, 3 MCs/call; conjunctive = one call per item over the
   `[L<layer>]` blob (`opts=char_cap=N`); user_modeling = k samples -> k calls, item key `name`

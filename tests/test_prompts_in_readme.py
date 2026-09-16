@@ -12,11 +12,12 @@ import pytest
 from wsbench import registry, summarizer
 
 ROOT = Path(__file__).resolve().parents[1]
-_FENCE = re.compile(r"```[^\n]*\n(.*?)```", re.DOTALL)
+# fences of any length (```` when a prompt itself contains ```), closed by the same run
+_FENCE = re.compile(r"(`{3,})[^\n]*\n(.*?)\1", re.DOTALL)
 
 
 def fenced_blocks(md: str) -> list[str]:
-    return _FENCE.findall(md)
+    return [body for _fence, body in _FENCE.findall(md)]
 
 
 def _families() -> list[str]:
