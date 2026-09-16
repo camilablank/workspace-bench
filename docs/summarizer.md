@@ -18,7 +18,7 @@ readout. The interpreter sees only the tokens: no stimulus, no options, no gold.
 - Per-family bundle text: moral_rationale / role_bound_association = `render_bag` of the row;
   relational_multihop = the `[position …]` bundle line; conjunctive_association = the per
   (layer, item) `" | "` blob. See each family README.
-- `--dry-run` on a `tokens` file prints only the summarizer prompt (no judge prompt exists
+- `dry_run=True` on a `tokens` file prints only the summarizer prompt (no judge prompt exists
   before a summary).
 
 ## Prompt

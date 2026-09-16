@@ -669,12 +669,10 @@ def test_cli_dry_run_on_example(tmp_path, capsys, monkeypatch):
     rc = main(
         [
             "judge",
-            "agentic_misalignment",
-            "--readouts",
-            str(EXAMPLE),
-            "--out",
-            str(tmp_path / "o"),
-            "--dry-run",
+            "family=agentic_misalignment",
+            f"readouts={EXAMPLE}",
+            f"out={tmp_path / 'o'}",
+            "dry_run=True",
         ]
     )
     assert rc == 0

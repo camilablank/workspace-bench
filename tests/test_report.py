@@ -74,7 +74,7 @@ def test_macro_row_and_not_in_macro_footnotes():
 def test_report_json(tmp_path, capsys):
     write_results(tmp_path / "a", _res("a"))
     write_results(tmp_path / "hal", _res("hal", metric="hallucination_rate", value=0.2))
-    assert main(["report", str(tmp_path), "--json"]) == 0
+    assert main(["report", f"dir={tmp_path}", "json=True"]) == 0
     d = json.loads(capsys.readouterr().out)
     assert set(d) == {"families", "macro"}
     assert [f["family"] for f in d["families"]] == ["a", "hal"]
@@ -84,6 +84,6 @@ def test_report_json(tmp_path, capsys):
     summary = (tmp_path / "summary.md").read_text()
     assert "| a |" in summary and "- hal: metric (hallucination_rate)" in summary
 
-    assert main(["report", str(tmp_path)]) == 0
+    assert main(["report", f"dir={tmp_path}"]) == 0
     out = capsys.readouterr().out
     assert "| a |" in out and "Not in macro:" in out and "wrote" in out
