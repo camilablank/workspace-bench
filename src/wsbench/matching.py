@@ -60,7 +60,8 @@ def fold(s: str) -> str:
 def answer_number_matcher(digits: str) -> Callable[[str], bool]:
     """The number in answer position (after ``=`` / ``answer:`` / ``等于`` ...) or alone at the
     start of the text, with full-number identity (84 is not 84.5 or 184); CJK numerals and
-    fullwidth digits count in the same positions."""
+    fullwidth digits count in the same positions. The text is matched as written (the English
+    markers are lowercase), as in the source scorer."""
     num = re.escape(digits) + r"(?![\d.,]?\d)(?!\.\d)"
     after_context = re.compile(_ANSWER_CONTEXT + _WRAP + num)
     at_start = re.compile(r"\A[\s$*#>\-]*" + num + r"(?!\s*[+\-*/×÷^=]\s*\d)")  # noqa: RUF001
@@ -68,7 +69,7 @@ def answer_number_matcher(digits: str) -> Callable[[str], bool]:
     value = int(digits)
 
     def numeric(text: str) -> bool:
-        folded = text.lower().translate(FULLWIDTH_DIGITS)
+        folded = text.translate(FULLWIDTH_DIGITS)
         if after_context.search(folded) or at_start.search(folded):
             return True
         return any(parse_cjk_numeral(m) == value for m in cjk.findall(folded))

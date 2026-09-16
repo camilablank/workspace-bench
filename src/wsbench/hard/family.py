@@ -22,7 +22,7 @@ from wsbench.hard.conjunctive import (
     permutation_chance,
 )
 from wsbench.hard.contract import BankContract, ScoredUnit, contract_for, scored_units, token_lens
-from wsbench.judge_config import DEFAULT_JUDGE, JudgeConfig
+from wsbench.judge_config import JudgeConfig
 from wsbench.llm import Spend
 from wsbench.mcjudge import Preflighter, base_config, is_subset, item_scope, with_readout_count
 from wsbench.readouts import Cell, load_readouts
@@ -32,7 +32,7 @@ from wsbench.summarizer import SUMMARIZER_PROMPT_VERSION, aux_judge, render_bag,
 
 GROUP = "basic"
 SCORER_VERSION = "conjunctive-regex-2026-09-16"
-CHANCE_LABEL = "permutation null: the item's units scored against a donor item's readouts"
+CHANCE_LABEL = "permutation null: each item's units scored against a donor item's readouts"
 
 
 def hard_family(name: str, title: str, *, n_items: int = 100) -> EvalSpec:
@@ -41,7 +41,7 @@ def hard_family(name: str, title: str, *, n_items: int = 100) -> EvalSpec:
         title=title,
         group=GROUP,
         bank=Path("evals") / name / "items.json",
-        judge=JudgeConfig(prompt_version=SCORER_VERSION, aux_models={"summarizer": DEFAULT_JUDGE}),
+        judge=JudgeConfig(prompt_version=SCORER_VERSION),
         metric="pass_rate",
         higher_is_better=True,
         run=lambda args: run_family(args, name=name),
@@ -63,9 +63,8 @@ def load_units(
     sidecar = json.loads(sidecar_path.read_text(encoding="utf-8")) if sidecar_path.exists() else {}
     units = {}
     for it in items:
-        alts = sidecar.get(it["name"], {}).get("target_alts") if it.get("target_alts") else []
         ntok = (
-            token_lens(it, alts, need_target=contract.include_target)
+            token_lens(it, sidecar.get(it["name"]), need_target=contract.include_target)
             if contract.multi_token
             else None
         )
@@ -74,7 +73,7 @@ def load_units(
 
 
 def layer_rows(cells: list[Cell], texts: dict[str, str] | None) -> dict[str, LayerRows]:
-    """item -> layer -> one sample list per readout row. With ``texts`` (summarized token bags,
+    """item -> layer -> one sample list per readout cell. With ``texts`` (summarized token bags,
     keyed by cell) each cell contributes its one summary."""
     out: dict[str, LayerRows] = defaultdict(lambda: defaultdict(list))
     for c in cells:
@@ -87,27 +86,43 @@ def layer_rows(cells: list[Cell], texts: dict[str, str] | None) -> dict[str, Lay
     return {i: dict(v) for i, v in out.items()}
 
 
+def _fail(msg: str) -> None:
+    print(msg, file=sys.stderr)
+    raise SystemExit(2)
+
+
 def run_family(args: JudgeArgs, *, name: str) -> FamilyResult:
     _header, items, _contract, units = load_units(name)
     scope = item_scope(items, args)
     ids = [it["id"] for it in scope]
-    cells, rep = load_readouts(args.readouts, ids=ids, layers=args.layers)
+    # the null is measured over every bank item the file carries, not just the scored scope
+    all_cells, rep = load_readouts(
+        args.readouts, ids=[it["id"] for it in items], layers=args.layers
+    )
+    in_scope = set(ids)
+    cells = [c for c in all_cells if c.id in in_scope]
     layers = args.layers if args.layers is not None else rep.layers
-    present = {(c.id, c.layer) for c in cells}
-    missing = [(i, layer) for i in ids for layer in layers if (i, layer) not in present]
-    if missing and not args.allow_missing and not args.dry_run:
-        print(
-            f"{name}: {len(missing)} of {len(ids) * len(layers)} (item, layer) cells have no "
-            "readout; pass allow_missing=True to score the rest",
-            file=sys.stderr,
+    positions: dict[tuple[str, int], set[int]] = defaultdict(set)
+    for c in all_cells:
+        positions[(c.id, c.layer)].add(c.pos)
+    multi = sorted(k for k, ps in positions.items() if len(ps) > 1)
+    if multi:
+        _fail(
+            f"{name}: {len(multi)} (item, layer) cells carry more than one read position "
+            f"(first: {multi[0]}); this family reads the final prompt token only"
         )
-        raise SystemExit(2)
+    missing = [(i, layer) for i in ids for layer in layers if (i, layer) not in positions]
+    if missing and not args.allow_missing and not args.dry_run:
+        _fail(
+            f"{name}: {len(missing)} of {len(ids) * len(layers)} (item, layer) cells have no "
+            "readout; pass allow_missing=True to score the rest"
+        )
 
     spend = Spend()
     texts: dict[str, str] | None = None
     n_unjudged = 0
     if rep.kind == "tokens":
-        bundles = {c.key: render_bag(c.tokens or (), c.scores) for c in cells if c.tokens}
+        bundles = {c.key: render_bag(c.tokens or (), c.scores) for c in all_cells if c.tokens}
         sjudge = aux_judge(args.judge, args.aux_models, "summarizer")
         with Cache(args.out / "cells.jsonl") as cache:
             summ = summarize(
@@ -121,22 +136,23 @@ def run_family(args: JudgeArgs, *, name: str) -> FamilyResult:
                 preflight=Preflighter(args.dry_run).for_judge(sjudge),
             )
         texts = {k: v for k, v in summ.items() if v is not None}
-        n_unjudged = len(bundles) - len(texts)
+        n_unjudged = sum(1 for c in cells if c.tokens and c.key not in texts)
 
-    rows = layer_rows(cells, texts)
+    all_rows = layer_rows(all_cells, texts)
     results: dict[str, dict[str, Any]] = {}
     for i in ids:
-        by_layer = {layer: layer_unit_hits(r, units[i]) for layer, r in rows.get(i, {}).items()}
+        by_layer = {layer: layer_unit_hits(r, units[i]) for layer, r in all_rows.get(i, {}).items()}
         results[i] = item_result(by_layer, units[i])
-    incomplete = {i for i, _layer in missing}
+    incomplete = {i for i, _layer in missing} if cells else set(ids)
     if texts is not None:  # a cell whose summary failed is unjudged; its item is undecided
-        for c in cells:
-            if c.tokens and c.key not in texts:
-                incomplete.add(c.id)
+        incomplete |= {c.id for c in cells if c.tokens and c.key not in texts}
     decided = {i: r for i, r in results.items() if r["pass"] or i not in incomplete}
     passes = [1.0 if r["pass"] else 0.0 for r in decided.values()]
-    null = permutation_chance([(units[i], rows.get(i, {})) for i in ids])
+    null = permutation_chance(
+        [(units[it["id"]], all_rows[it["id"]]) for it in items if it["id"] in all_rows]
+    )
     n_empty = sum(1 for c in cells if not any(s.strip() for s in (c.samples or c.tokens or ())))
+    pinned = args.judge.pinned or rep.kind != "tokens"  # prose runs touch no model
     result = FamilyResult(
         family=name,
         metric="pass_rate",
@@ -148,23 +164,27 @@ def run_family(args: JudgeArgs, *, name: str) -> FamilyResult:
         chance_label=CHANCE_LABEL,
         complete=bool(cells)
         and completeness(
-            pinned=args.judge.pinned,
+            pinned=pinned,
             subset=is_subset(args),
-            n_expected=len(cells),
+            n_expected=len(ids) * len(layers),
             n_missing=len(missing),
             n_unjudged=n_unjudged,
             n_empty=n_empty,
         ),
-        pinned_instrument=args.judge.pinned,
+        pinned_instrument=pinned,
         config=base_config(
             args,
             SCORER_VERSION,
             kind=rep.kind or "prose",
             layers_judged=layers,
             summarizer=SUMMARIZER_PROMPT_VERSION if texts is not None else None,
+            summarizer_model=aux_judge(args.judge, args.aux_models, "summarizer").model
+            if texts is not None
+            else None,
         ),
+        # a cell is one (item, layer) readout at the single read position
         counts={
-            "n_expected_cells": len(cells),
+            "n_expected_cells": len(ids) * len(layers),
             "n_missing_cells": len(missing),
             "n_unjudged_cells": n_unjudged,
             "n_empty_cells": n_empty,

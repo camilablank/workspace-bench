@@ -31,7 +31,7 @@ def test_family_prompts_verbatim_in_readme(family: str):
     readme = (ROOT / "evals" / family / "README.md").read_text(encoding="utf-8")
     if not prompts:  # a regex-scored family: the README must say so
         assert "**No LLM judge.**" in readme, family
-        assert isinstance(mod.PROMPT_VERSION, str) and mod.PROMPT_VERSION in readme
+        assert mod.PROMPT_VERSION.startswith("conjunctive-regex") and mod.PROMPT_VERSION in readme
         return
     blocks = fenced_blocks(readme)
     assert blocks

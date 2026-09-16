@@ -61,11 +61,11 @@ def _numeric_match_of(raw: Mapping[str, Any]) -> NumericMatch:
 
 
 def token_lens(
-    item: Mapping[str, Any], target_alts_lens: list[int] | None, *, need_target: bool
+    item: Mapping[str, Any], sidecar: Mapping[str, Any] | None, *, need_target: bool
 ) -> dict[str, int]:
     """form -> Qwen token count, from the bank's ``probe_token_lens`` (recorded at freeze time
-    with the real tokenizer) and, when the contract scores the target, the family's sidecar for
-    ``target_alts``."""
+    with the real tokenizer) and, when the contract scores the target, the family's sidecar
+    (``{"target": n, "target_alts": [n, ...]}`` per item) for ``target_alts``."""
     ptl = item["probe_token_lens"]
     out: dict[str, int] = {}
     for unit in item.get("units") or []:
@@ -80,9 +80,13 @@ def token_lens(
         out[str(item["target"])] = int(ptl["target"])
     alts = [str(a) for a in item.get("target_alts", [])]
     if need_target and alts:
-        if target_alts_lens is None or len(target_alts_lens) != len(alts):
+        if sidecar is None or len(sidecar.get("target_alts", [])) != len(alts):
             raise ValueError(f"item {item['name']!r}: target_alts token lens missing")
-        out.update(zip(alts, target_alts_lens, strict=True))
+        if int(sidecar["target"]) != int(ptl["target"]):
+            raise ValueError(
+                f"item {item['name']!r}: sidecar target token count disagrees with the bank"
+            )
+        out.update(zip(alts, sidecar["target_alts"], strict=True))
     return out
 
 

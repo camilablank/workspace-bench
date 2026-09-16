@@ -27,15 +27,19 @@ Units: `correction` (required; L2 / en / zh forms) and `language` (required).
   one `<role>_hit` per unit over the items carrying that role. Rows carry `unit_langs` /
   `first_lang`, the language-of-readout split.
 - Chance (`chance`): the permutation null — each item's units scored against a donor item's
-  readouts, layer by layer, 20 donors per item over the whole bank (`extras.permutation_null`).
+  readouts, layer by layer, 20 donors per item over every bank item the readouts file carries,
+  whatever subset is scored (`extras.permutation_null`).
   A family below three times its null is not a read.
 - Token readouts (a J-lens) are summarized first by the shared summarizer (`docs/summarizer.md`,
-  one aux call per cell, cached in `cells.jsonl`), because a top-10 token bag cannot hold a
-  multi-token form and scores zero raw. A cell whose summary failed leaves its item undecided.
-- Missing (item, layer) cells over the file's layer set are fatal (exit 2) unless
+  one call per cell on the resolved judge model, cached in `cells.jsonl`), because a top-10 token
+  bag cannot hold a multi-token form and scores zero raw. A cell whose summary failed leaves its
+  item undecided. Prose runs touch no model, so `judge_model=` overrides leave them pinned.
+- Exactly one read position per (item, layer) is expected (the final prompt token); a file with
+  more is refused. Missing (item, layer) cells over the file's layer set are fatal (exit 2) unless
   `allow_missing=True`; an item with a missing layer and no passing layer is undecided and out
   of the denominator. The measured floor is the prompt-only baseline (later PR).
-- Reference (source repo, 2026-09-10, same instrument): s3d RL600 0.78, NLA-RL iter400 0.94
+- Reference (source repo `evals/workspace-bench/hillclimbing_evals/multi_token/HARD.md`, round 1,
+  2026-09-10, same instrument): s3d RL600 0.78, NLA-RL iter400 0.94
   (NLA ungated by any precision condition).
 
 ## Readouts
