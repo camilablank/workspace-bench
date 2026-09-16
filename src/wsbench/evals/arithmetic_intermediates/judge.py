@@ -36,9 +36,14 @@ CHANCE_LABEL = (
     "item's null set (extras.cross) and the prompt-only baseline"
 )
 _NUMERAL = re.compile(r"(?<![\d.])-?\d[\d,]*(?:\.\d+)?(?!\d)(?!\.\d)")
-# fullwidth digits, full stop, comma and hyphen-minus (U+FF10.., U+FF0E, U+FF0C, U+FF0D) -> ASCII
+# fullwidth digits, full stop, comma, hyphen-minus (U+FF10.., U+FF0E, U+FF0C, U+FF0D) and the
+# real minus sign (U+2212) -> ASCII
 _FULLWIDTH = str.maketrans(
-    "".join(chr(0xFF10 + d) for d in range(10)) + "\uff0e\uff0c\uff0d", "0123456789.,-"
+    "".join(chr(0xFF10 + d) for d in range(10)) + "\uff0e\uff0c\uff0d\u2212", "0123456789.,--"
+)
+_NUMERIC_QUOTE = re.compile(r"[-\s\d.,]*")  # a quote that is only a number never vouches
+_HAS_NUMERAL = re.compile(
+    r"[\d\u96f6\u4e00\u4e8c\u4e24\u4e09\u56db\u4e94\u516d\u4e03\u516b\u4e5d\u5341\u767e\u5343\u4e07\u70b9\u8d1f]"
 )
 
 
@@ -54,7 +59,9 @@ def quantities(text: str) -> list[float]:
     labels stripped as the source scorer does; used only to VERIFY that a value the judge names
     is in the text, never to score."""
     t = text.translate(_FULLWIDTH)
-    t = re.sub(r"(?m)^[ \t]*-?[ \t]*\d+\.[ \t]+(?=[A-Za-z*_#`(])", " ", t)
+    t = re.sub(
+        r"(?m)^[ \t]*(?:-[ \t]+)?\d+\.[ \t]+(?=[A-Za-z*_#`(])", " ", t
+    )  # "2. foo" / "- 2. foo"
     t = re.sub(r"(?i)step\s*\d+", " ", t)
     out: list[float] = []
     for m in _NUMERAL.finditer(t):
@@ -66,15 +73,20 @@ def quantities(text: str) -> list[float]:
     return out
 
 
-def verified(value: float, text: str, quote: str) -> bool:
-    """A named value counts when the readout writes it (to six decimals) or the judge's quote is
-    verbatim in the readout (a Chinese numeral is credited that way)."""
+def verified(value: float, text: str, quote: str, *, top: bool = True) -> bool:
+    """A named value counts when the readout writes it (to six decimals). The judge's quote can
+    vouch only for the TOP value (the schema says it supports that one), and only when it is
+    verbatim in the readout, is not itself a bare number, and contains a numeral (digits or a
+    Chinese numeral such as 负五十一: the route for values the numeral regex cannot read)."""
     if any(abs(q - value) <= 1e-6 * max(1.0, abs(value)) for q in quantities(text)):
         return True
+    q = quote.strip().translate(_FULLWIDTH)
     return (
-        bool(quote)
-        and not quote.strip().lstrip("-").replace(".", "").isdigit()
-        and fold(quote) in fold(text)
+        top
+        and bool(q)
+        and not _NUMERIC_QUOTE.fullmatch(q)
+        and _HAS_NUMERAL.search(q) is not None
+        and fold(q) in fold(text.translate(_FULLWIDTH))
     )
 
 
@@ -95,7 +107,7 @@ def verdict(
         else []
     )
     quote = str(res.get("quote", "")).strip()
-    kept = [v for v in named if verified(v, text, quote)]
+    kept = [v for k, v in enumerate(named) if verified(v, text, quote, top=k == 0)]
     hit = any(tolerance_ok(v, target, tol) for v in kept)
     cross = (
         sum(any(tolerance_ok(v, n, tol) for v in kept) for n in nulls) / len(nulls)

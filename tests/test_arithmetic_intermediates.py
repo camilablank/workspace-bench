@@ -62,13 +62,21 @@ def test_tolerance_and_quantities():
     ]
     assert judge.quantities("Step 3: 0.777778 \u2248 \uff17.\uff15") == [0.777778, 7.5]
     assert judge.quantities("29.") == [29.0]  # a bare number on its own line is a value
+    assert judge.quantities("-51. Then times 14") == [-51.0, 14.0]  # a negative is not a bullet
+    assert judge.quantities("- 2. The answer is 9") == [9.0]  # a bulleted list marker is
+    assert judge.quantities("\u221251 and \u2212 3") == [-51.0, 3.0]  # the real minus sign
 
 
 def test_verified_and_verdict():
     text = "- 271 - 322 = -51, then times 14\n- 结果是 负五十一"
     assert judge.verified(-51.0, text, "") and not judge.verified(-52.0, text, "")
-    assert judge.verified(-52.0, text, "负五十一")  # a non-digit quote vouches (CJK numeral)
-    assert not judge.verified(-52.0, text, "-52")  # a digit quote does not
+    assert judge.verified(-52.0, text, "负五十一")  # a CJK-numeral quote vouches for the top value
+    assert not judge.verified(-52.0, text, "负五十一", top=False)  # only for the top value
+    assert not judge.verified(-52.0, text, "-52")  # a bare-number quote does not
+    assert not judge.verified(-52.0, text, "4,816") and not judge.verified(
+        999.0, text, "then times"
+    )
+    assert not judge.verified(-52.0, text, "not here 五")  # must be verbatim
     nulls = [-40.0, -60.0, 12.0]
     v = judge.verdict(
         {"values": [-51, 14], "basis": "arithmetic", "quote": "-51"}, -51.0, "exact", nulls, text
@@ -147,7 +155,7 @@ def test_scripted_run(tmp_path, monkeypatch):
                     "states_value": True,
                     "values": [other],
                     "basis": "stated_result",
-                    "quote": "the sum",  # a verbatim non-digit quote vouches for the value
+                    "quote": "",
                 }
             elif i == c:
                 out[call.key] = None
@@ -155,9 +163,17 @@ def test_scripted_run(tmp_path, monkeypatch):
                 out[call.key] = {"states_value": False, "values": [], "basis": "none", "quote": ""}
         return out
 
+    # item b's readout writes a null item's intermediate, so the value verifies and crosses
+    other = by_id[by_id[b]["null_set"][0]]["intermediates"][0]
+    rows = [json.loads(x) for x in EXAMPLE.read_text().splitlines() if x.strip()]
+    for row in rows:
+        if row["id"] == b:
+            row["samples"] = [f"- the sum comes to {other}"]
+    path = tmp_path / "r.jsonl"
+    path.write_text("".join(json.dumps(x) + "\n" for x in rows))
     monkeypatch.setattr(judge, "run_calls", fake_run_calls)
     args = JudgeArgs(
-        readouts=EXAMPLE,
+        readouts=path,
         out=tmp_path / "out",
         judge=resolve(JudgeConfig(prompt_version=PROMPT_VERSION)),
         layers=None,

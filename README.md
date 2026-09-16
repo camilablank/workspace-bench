@@ -135,6 +135,7 @@ The in-house `<gen_dir>/<label>/L###.jsonl` layout converts with
 - *What it is:* Short programs with one verified bug and their clean twins, read at the end of the file with nothing asked; does the lens assert the bug's executed consequence, and stay quiet on the clean twin?
 - *Example:* an order total that multiplies a returned item's quantity −3 into a credit; verified stdout `-53.52` → a readout asserting a negative total is S2.
 - *Judged by:* one consequence-ladder call per item (S0 · S1 · corrective · S2 · S3 · S4, verbatim quote required for S2+); headline `net_S2` = S2+ rate on buggy programs minus the clean twins' rate, per stratum beside it.
+
 **Arithmetic intermediates** — [`evals/arithmetic_intermediates/README.md`](evals/arithmetic_intermediates/README.md)
 - *What it is:* A bare two- or three-operation expression answered with no chain of thought; the intermediate is never written. Fourteen expression shapes, one frozen (layer, position) read cell each.
 - *Example:* `Compute (271 - 322) * 14.` → intermediate −51 at layer 56, eight tokens before the end of the prompt.

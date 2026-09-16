@@ -17,10 +17,10 @@ the prompt). Bare render.
 | `addmul` | `(a + b) * c` | 43 | rel2pct | L60, -8 | comparison |
 | `floordiv` | `floor(a / b) + c` | 21 | exact | L60, -7 | structural |
 | `frac` | `(p / q) * (p*q*k)` | 116 | rel2pct | L60, -8 | structural |
-| `fracadd` | `(a / b) + (c / b),  b odd, b | (a+c)` | 63 | rel2pct | L56, -8 | structural |
+| `fracadd` | `(a / b) + (c / b),  b odd, b \| (a+c)` | 63 | rel2pct | L56, -8 | structural |
 | `fraccomp` | `((a + b) / c) * (c*e)` | 44 | rel2pct | L56, -8 | structural |
-| `fracint` | `(a / b) + (c / b),  b | a, b | c` | 32 | rel2pct | L56, -8 | comparison |
-| `fracsmall` | `(a / b) + (c / b),  a,c single-digit, b | (a+c)` | 16 | rel2pct | L56, -8 | comparison |
+| `fracint` | `(a / b) + (c / b),  b \| a, b \| c` | 32 | rel2pct | L56, -8 | comparison |
+| `fracsmall` | `(a / b) + (c / b),  a,c single-digit, b \| (a+c)` | 16 | rel2pct | L56, -8 | comparison |
 | `muladd` | `(a * b) + c` | 35 | rel2pct | L60, -8 | structural |
 | `mulmid` | `(a * b) + (c * d),  products 60-100` | 33 | rel2pct | L56, -8 | comparison |
 | `sign` | `(a - b) * c` | 25 | exact | L56, -8 | comparison |
@@ -40,15 +40,17 @@ Example: `(271 - 322) * 14` → intermediate -51, answer -714.
   cell: the judge names the numbers the readout presents as computed values, ranked, at most
   three, or none (the chained-intermediates judge with its task sentence changed to a bare
   arithmetic expression). A named value is kept only when the readout writes it (any numeral to
-  six decimals, list markers and step labels excluded) or the judge's quote is verbatim and not
-  a bare number (a Chinese numeral is credited that way). No regex or numeric matcher scores
+  six decimals, list markers and step labels excluded) or, for the top-ranked value only, the
+  judge's quote is verbatim, contains a numeral and is not itself a bare number (a Chinese
+  numeral is credited that way). No regex or numeric matcher scores
   anything: the numerals are read only to verify what the judge named.
 - **Pass** (`value` in the source's terms): some kept value lies within the variant's tolerance
   of the headline intermediate (`exact`, or a relative 2%; the source's `tolerance_ok`, sign-
   aware). `extras.top1_rate` is the stricter top-ranked-value rate.
 - **Floors.** No analytic floor. `cross` is the permutation null: the same rule against the
-  intermediates of the item's `null_set` (the other items of its variant whose intermediates are
-  separated from this one by at least four tolerances), averaged over that set; `net = value −
+  intermediates of the item's `null_set` (the other items of its variant whose intermediates the
+  source kept apart by about four tolerances; two muladd pairs sit closer, harmless at 2%),
+  averaged over that set; `net = value −
   cross`. `extras.per_variant` gives n / value / cross / net / tolerance / role per variant,
   `extras.per_role` the structural vs comparison split; `extras.committed_rate` the calls that
   named anything. The prompt-only baseline is not item-blind here (the stock model computes the
