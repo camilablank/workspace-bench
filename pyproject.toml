@@ -5,7 +5,7 @@ description = "workspace-bench: nine evals of whether an activation-reading lens
 readme = "README.md"
 license = "MIT"
 requires-python = ">=3.12"
-dependencies = ["openai>=1.40", "anthropic>=1.0"]
+dependencies = ["openai>=1.40", "anthropic>=1.0", "numpy>=1.26"]
 
 [project.optional-dependencies]
 dev = ["pytest>=8", "ruff>=0.6"]

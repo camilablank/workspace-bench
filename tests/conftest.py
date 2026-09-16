@@ -38,6 +38,7 @@ class FakeClient:
 
         self.responder = responder
         self.calls: list[tuple[str, str]] = []
+        self.kwargs: list[dict] = []  # every create() kwargs (model, temperature, ...)
         self.chat = SimpleNamespace(completions=SimpleNamespace(create=self._create))
 
     async def _create(self, **kw):
@@ -46,6 +47,7 @@ class FakeClient:
 
         system, user = kw["messages"][0]["content"], kw["messages"][1]["content"]
         self.calls.append((system, user))
+        self.kwargs.append(kw)
         r = self.responder(system, user)
         if r is None:
             raise BadRequestError("fake failure")

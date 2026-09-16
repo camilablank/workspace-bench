@@ -34,11 +34,20 @@ def run_calls(
     rpm: float,
     dry_run: bool,
     preflight: Callable[[], None] | None = None,
+    validate: Callable[[Call, dict], bool] | None = None,
+    temperature: float | None = None,
+    max_tokens: int | None = None,
 ) -> dict[str, dict | None]:
     """key -> parsed result (``None`` = failed). Cached non-failed results are reused; the rest
     go through :func:`llm.stream_json` in one batch. Every landed result (incl. ``None``) is
     ``cache.put`` immediately as ``{"result": r, "meta": call.meta}``. ``dry_run`` prints the
-    first call's prompts and returns ``{}`` without any client."""
+    first call's prompts and returns ``{}`` without any client.
+
+    ``judge`` is per batch (a stage may run on an aux model with its own reasoning);
+    ``temperature`` / ``max_tokens`` pass through to the client and the fingerprint is
+    ``(prompt_version, model, reasoning, temperature, system, user)``. A landed result that fails
+    ``validate(call, result)`` is stored as ``{"result": None, "meta": {**call.meta, "raw": r}}``
+    (so the next run re-queues the key) and returned as ``None``."""
     if dry_run:
         if calls:
             c = calls[0]
@@ -53,7 +62,9 @@ def run_calls(
     out: dict[str, dict | None] = {}
     pending: list[tuple[Call, str]] = []
     for c in calls:
-        fp = fingerprint(prompt_version, judge.model, judge.reasoning, c.system, c.user)
+        fp = fingerprint(
+            prompt_version, judge.model, judge.reasoning, temperature, c.system, c.user
+        )
         row = cache.get(c.key, fp)
         if row is not None:
             out[c.key] = row["result"]
@@ -65,6 +76,10 @@ def run_calls(
 
     def on_result(i: int, r: dict | None) -> None:
         c, fp = pending[i]
+        if r is not None and validate is not None and not validate(c, r):
+            cache.put(c.key, fp, {"result": None, "meta": {**c.meta, "raw": r}})
+            out[c.key] = None
+            return
         cache.put(c.key, fp, {"result": r, "meta": c.meta})
         out[c.key] = r
 
@@ -75,9 +90,11 @@ def run_calls(
         schema=schema,
         model=judge.model,
         reasoning=judge.reasoning,
+        temperature=temperature,
         on_result=on_result,
         concurrency=concurrency,
         rpm=rpm,
+        max_tokens=max_tokens,
         spend=spend,
     )
     for c, _fp in pending:

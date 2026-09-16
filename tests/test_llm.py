@@ -428,3 +428,32 @@ def test_real_clients_are_built_with_expected_kwargs(monkeypatch):
     assert {"output_config", "system", "timeout", "max_tokens"} <= set(a)
     o = inspect.signature(AsyncCompletions.create).parameters
     assert {"extra_body", "response_format", "max_tokens", "timeout"} <= set(o)
+
+
+# ---------------------------------------------------------------- temperature (phase 4)
+
+
+def test_openrouter_temperature_passed_or_omitted(keys, fast, monkeypatch):
+    fake = FakeOpenRouter([_or_response('{"a": 1}'), _or_response('{"a": 1}')])
+    _collect([("s", "u")], GEMINI, fake, monkeypatch, temperature=0.0)
+    assert fake.calls[0]["temperature"] == 0.0
+    _collect([("s", "u")], GEMINI, fake, monkeypatch)
+    assert "temperature" not in fake.calls[1]
+
+
+def test_openrouter_max_tokens_override(keys, fast, monkeypatch):
+    fake = FakeOpenRouter([_or_response('{"a": 1}')])
+    _collect([("s", "u")], GEMINI, fake, monkeypatch, max_tokens=16000)
+    assert fake.calls[0]["max_tokens"] == 16000
+
+
+def test_anthropic_temperature_dropped_with_one_warning(keys, fast, monkeypatch, capsys):
+    fake = FakeAnthropic([_claude_response('{"a": 1}'), _claude_response('{"a": 1}')])
+    got, _ = _collect([("s", "u"), ("s", "u2")], CLAUDE, fake, monkeypatch, temperature=0.0)
+    assert got == {0: {"a": 1}, 1: {"a": 1}}
+    assert all("temperature" not in kw for kw in fake.calls)
+    out = capsys.readouterr().out
+    assert out.count("temperature") == 1 and CLAUDE in out
+    fake2 = FakeAnthropic([_claude_response('{"a": 1}')])
+    _collect([("s", "u")], CLAUDE, fake2, monkeypatch)
+    assert "temperature" not in capsys.readouterr().out

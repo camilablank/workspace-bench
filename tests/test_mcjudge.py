@@ -148,3 +148,93 @@ def test_item_scope_and_subset_and_config():
         "allow_missing",
         "items",
     }
+
+
+# ---------------------------------------------------------------- phase 4: validate / temperature
+
+
+def test_run_calls_validate_stores_failure_and_requeues(tmp_path: Path, fake_llm):
+    """A landed result that fails ``validate`` is cached as a failure (raw kept in meta) and
+    returned as ``None``; the next run re-issues exactly that key."""
+    fake = fake_llm(lambda s, u: {"choice": 1} if u == "good" else {"choice": 99})
+    calls = [Call("a", "S", "good", {"g": 1}), Call("b", "S", "bad", {"g": 2})]
+    with Cache(tmp_path / "cells.jsonl") as cache:
+        got = run_calls(
+            calls,
+            schema=SCHEMA,
+            judge=JUDGE,
+            prompt_version="v",
+            cache=cache,
+            spend=Spend(),
+            concurrency=2,
+            rpm=1e9,
+            dry_run=False,
+            validate=lambda call, r: r.get("choice") != 99 and call.key == "a",
+        )
+    assert got == {"a": {"choice": 1}, "b": None} and len(fake.calls) == 2
+    rows = [json.loads(line) for line in (tmp_path / "cells.jsonl").read_text().splitlines()]
+    b = next(r for r in rows if r["key"] == "b")
+    assert b["result"] is None and b["meta"] == {"g": 2, "raw": {"choice": 99}}
+    fake2 = fake_llm(lambda s, u: {"choice": 3})
+    with Cache(tmp_path / "cells.jsonl") as cache:
+        got = run_calls(
+            calls,
+            schema=SCHEMA,
+            judge=JUDGE,
+            prompt_version="v",
+            cache=cache,
+            spend=Spend(),
+            concurrency=2,
+            rpm=1e9,
+            dry_run=False,
+        )
+    assert got == {"a": {"choice": 1}, "b": {"choice": 3}}
+    assert [u for _s, u in fake2.calls] == ["bad"]
+
+
+def test_run_calls_temperature_and_max_tokens_reach_the_client_and_the_fingerprint(
+    tmp_path: Path, fake_llm
+):
+    fake = fake_llm(lambda s, u: {"choice": 1})
+    calls = [Call("a", "S", "u", {})]
+    common: dict = {
+        "schema": SCHEMA,
+        "judge": JUDGE,
+        "prompt_version": "v",
+        "spend": Spend(),
+        "concurrency": 1,
+        "rpm": 1e9,
+    }
+    with Cache(tmp_path / "c.jsonl") as cache:
+        run_calls(calls, cache=cache, dry_run=False, temperature=0.0, max_tokens=16000, **common)
+        assert fake.calls and len(fake.calls) == 1
+        # same key + prompts at another temperature is a cache miss (fingerprint carries it)
+        run_calls(calls, cache=cache, dry_run=False, **common)
+        assert len(fake.calls) == 2
+        run_calls(calls, cache=cache, dry_run=False, temperature=0.0, **common)
+        assert len(fake.calls) == 2  # cached
+    rows = [json.loads(line) for line in (tmp_path / "c.jsonl").read_text().splitlines()]
+    assert len({r["fp"] for r in rows}) == 2
+
+
+def test_run_calls_per_batch_judge(tmp_path: Path, fake_llm):
+    import dataclasses
+
+    fake = fake_llm(lambda s, u: {"choice": 1})
+    aux = dataclasses.replace(JUDGE, model="deepseek/x", reasoning={"enabled": False})
+    with Cache(tmp_path / "c.jsonl") as cache:
+        got = run_calls(
+            [Call("a", "S", "u", {})],
+            schema=SCHEMA,
+            judge=aux,
+            prompt_version="v",
+            cache=cache,
+            spend=Spend(),
+            concurrency=1,
+            rpm=1e9,
+            dry_run=False,
+        )
+    assert got == {"a": {"choice": 1}}
+    assert fake.calls == [("S", "u")]
+    assert fake.kwargs[0]["model"] == "deepseek/x"
+    assert fake.kwargs[0]["extra_body"]["reasoning"] == {"enabled": False}

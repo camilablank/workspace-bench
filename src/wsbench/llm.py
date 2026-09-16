@@ -163,6 +163,7 @@ async def _openrouter_once(
     schema: dict[str, Any],
     model: str,
     reasoning: dict[str, Any] | None,
+    temperature: float | None,
     max_tokens: int,
     timeout: float,
     spend: Spend,
@@ -173,6 +174,9 @@ async def _openrouter_once(
     }
     if reasoning is not None:
         extra_body["reasoning"] = reasoning
+    kwargs: dict[str, Any] = {}
+    if temperature is not None:
+        kwargs["temperature"] = temperature
     resp = await client.chat.completions.create(
         timeout=timeout,
         model=model,
@@ -180,6 +184,7 @@ async def _openrouter_once(
         messages=[{"role": "system", "content": system}, {"role": "user", "content": user}],
         response_format={"type": "json_schema", "json_schema": schema},
         extra_body=extra_body,
+        **kwargs,
     )
     spend.calls += 1
     if not getattr(resp, "choices", None):  # an error delivered in a 200 body
@@ -240,6 +245,7 @@ async def _one(
     schema: dict[str, Any],
     model: str,
     reasoning: dict[str, Any] | None,
+    temperature: float | None,
     max_tokens: int,
     timeout: float,
     rpm: float,
@@ -269,6 +275,7 @@ async def _one(
                 schema=schema,
                 model=model,
                 reasoning=reasoning,
+                temperature=temperature,
                 max_tokens=max_tokens,
                 timeout=timeout,
                 spend=spend,
@@ -305,6 +312,7 @@ async def stream_json_async(
     model: str,
     on_result: Callable[[int, dict[str, Any] | None], None],
     reasoning: dict[str, Any] | None = None,
+    temperature: float | None = None,
     concurrency: int = 64,
     rpm: float = 240.0,
     max_tokens: int | None = None,
@@ -313,7 +321,9 @@ async def stream_json_async(
 ) -> Spend:
     """Run ``(system, user)`` prompt pairs concurrently, handing each parsed result (or
     ``None``) to ``on_result(index, result)`` as it lands. Raises :class:`JudgeConfigError` on
-    a config problem. Builds no client when there is nothing to call."""
+    a config problem. Builds no client when there is nothing to call. ``temperature`` is sent on
+    the OpenRouter route only: newer Claude models reject the field (400), so the Anthropic route
+    drops it with one printed warning per batch."""
     spend = spend or Spend()
     if not prompts:
         return spend
@@ -321,6 +331,9 @@ async def stream_json_async(
         raise JudgeConfigError(f"concurrency must be >= 1 and rpm > 0 (got {concurrency}, {rpm})")
     route_ = route(model)
     key = api_key(model)
+    if temperature is not None and route_ == "anthropic":
+        print(f"  llm: dropping temperature={temperature} for {model} (Anthropic route rejects it)")
+        temperature = None
     if max_tokens is None:
         max_tokens = _DEFAULT_MAX_TOKENS[route_]
     client = _make_client(route_, key)
@@ -336,6 +349,7 @@ async def stream_json_async(
                 schema=schema,
                 model=model,
                 reasoning=reasoning,
+                temperature=temperature,
                 max_tokens=max_tokens,
                 timeout=timeout,
                 rpm=rpm,
@@ -371,6 +385,7 @@ def stream_json(
     model: str,
     on_result: Callable[[int, dict[str, Any] | None], None],
     reasoning: dict[str, Any] | None = None,
+    temperature: float | None = None,
     concurrency: int = 64,
     rpm: float = 240.0,
     max_tokens: int | None = None,
@@ -389,6 +404,7 @@ def stream_json(
             model=model,
             on_result=on_result,
             reasoning=reasoning,
+            temperature=temperature,
             concurrency=concurrency,
             rpm=rpm,
             max_tokens=max_tokens,

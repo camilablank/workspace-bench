@@ -107,8 +107,10 @@ def _n_items(spec: EvalSpec) -> str:
         return "?"
     if isinstance(d, list):
         return str(len(d))
-    if isinstance(d, dict) and isinstance(d.get("items"), list):
-        return str(len(d["items"]))
+    if isinstance(d, dict):
+        for key in ("items", "prompts"):  # {meta, items} banks; the jlens acts manifest
+            if isinstance(d.get(key), list):
+                return str(len(d[key]))
     return "?"
 
 
