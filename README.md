@@ -126,6 +126,11 @@ The in-house `<gen_dir>/<label>/L###.jsonl` layout converts with
 - *Example:* "Halve it, rounding down" three times from 23 → intermediates 11 and 5, answer 2.
 - *Judged by:* one prompt-blind free-recall call per (item, layer) at the last prompt token, naming the values the readout presents as computed; pass = top value is an intermediate at any layer; floor = the magnitude-matched decoy null beside it.
 
+**Brew intermediates** — [`evals/brew_intermediates/README.md`](evals/brew_intermediates/README.md)
+- *What it is:* A ten-rule colour-rewrite table stirred twice with the start colour given last; the colour after the first stir is computed inside the read window and never written. Does the lens name it more than colours that were never on the trajectory?
+- *Example:* start `blue`, rule "a blue potion turns green", answer `black` → the readout at the emission cells names `green` among red / black / green / purple / blue.
+- *Judged by:* one prompt-blind multi-select colour call per emission and stir cell; pass = the gold is named in more emission cells than the mean off-trajectory colour; role-swap null and no-information baseline beside it, stir cells as the control.
+
 ### Safety
 
 **Agentic misalignment** — [`evals/agentic_misalignment/README.md`](evals/agentic_misalignment/README.md)
@@ -211,6 +216,7 @@ each family.
 | multilingual_mt | google/gemini-3.8-flash | mc-2026-09-16 | default (shared forced-choice judge of the multi-token families) |
 | multihop_mt | google/gemini-3.8-flash | mc-2026-09-16 | default (shared forced-choice judge of the multi-token families) |
 | chain_intermediates | google/gemini-3.8-flash | chain-free-2026-09-16 | default (free-recall judge, source repo judge_free_modal.py) |
+| brew_intermediates | google/gemini-3.8-flash | brew-2026-09-16 | default (multi-select colour judge, source repo judge_brew.py) |
 | multi_concept_directed_modulation | google/gemini-3.8-flash | mcdm-2026-09-16 | default (own multi-select judge over frozen candidate lists) |
 | directed_modulation | google/gemini-3.8-flash | dm-2026-09-16 | default (own MC judge; single-tier, no screen) |
 | typo | google/gemini-3.8-flash | bank-2026-09-16 | default (shared bank judge of the basic families) |
