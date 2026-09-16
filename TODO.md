@@ -10,7 +10,7 @@ items before any scale run. Status: [ ] open · [~] in PR · [x] merged.
 - [ ] association
 - [~] basic-readout. Branch: agam/eval-basic_readout (stacked).
 - [~] multihop. Branch: agam/eval-multihop (stacked).
-- [ ] multilingual
+- [~] multilingual. Branch: agam/eval-multilingual (stacked).
 - [ ] poetry
 - [ ] typo
 - [ ] directed-modulation
