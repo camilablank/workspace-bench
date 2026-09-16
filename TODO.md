@@ -8,7 +8,6 @@ Open work only; merged work is in the git log and the README.
       gold 0.66 and 0.46 of the time from option shape alone (uniform 0.13 / 0.14).
 - [ ] Decide whether the single-token basics with high prompt-only floors (typo 1.00, multihop
       0.90, multilingual 0.76, basic_readout 0.72, poetry 0.71) stay headline evals.
-- [ ] buggy_code pairwise blind pick (chance 0.5): needs an authored buggy-to-clean-twin map.
 - [ ] Move `evals/jlens_concept_pr/gen-jlens-pr-jlens/` (4.6 MB, 3.6k files of producer output)
       out of git.
 - [ ] Per-family empirical nulls where a family has none.
