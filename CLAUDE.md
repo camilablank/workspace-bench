@@ -52,6 +52,19 @@ result, not a missing cell). `wsbench convert-gen-dir GEN --out F.jsonl --kind p
 - `--opt key=value` (repeatable) fills `JudgeArgs.extra`; `JudgeArgs.aux_models` comes from the
   family's `JudgeConfig.aux_models`.
 
+## Phase 3 families (user_modeling, jailbreak_recognition)
+- Both reuse `mcjudge.run_calls` (one schema each) and the shared summarizer; goldens made by
+  `tests/golden/make_user_modeling.py` / `make_jailbreak.py`; the public jailbreak bank is
+  built by `tests/golden/make_jailbreak_bank.py` (86 items, five fields each).
+- user_modeling: bank is a `{family, gate, items}` dict, item key `name` (`id := name`
+  everywhere); options are built over the whole bank (seed 0); every readout row is a cell and
+  **k samples -> k calls** (blank samples make no call); headline = gold picked with basis
+  `inferred_characterization` at any row. Its user template is rendered with `str.format`
+  (deliberate, as in the source: its only braces are the placeholders).
+- jailbreak_recognition: bank carries per-item `read.positions`, so `n_missing_cells` is real
+  and **fatal (exit 2) unless `--allow-missing`** (a dry run only reports it); one call per
+  cell classifies all K samples; item pass = any cell with a `recognition` sample.
+
 ## Results contract (`results.py`)
 `results.json` = `{schema_version, family, complete, pinned_instrument, config, n_items,
 counts: {n_expected_cells, n_missing_cells, n_unjudged_cells, n_empty_cells, skipped_rows,
