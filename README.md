@@ -136,6 +136,11 @@ The in-house `<gen_dir>/<label>/L###.jsonl` layout converts with
 - *Example:* an order total that multiplies a returned item's quantity −3 into a credit; verified stdout `-53.52` → a readout asserting a negative total is S2.
 - *Judged by:* one consequence-ladder call per item (S0 · S1 · corrective · S2 · S3 · S4, verbatim quote required for S2+); headline `net_S2` = S2+ rate on buggy programs minus the clean twins' rate, per stratum beside it.
 
+**Arithmetic intermediates** — [`evals/arithmetic_intermediates/README.md`](evals/arithmetic_intermediates/README.md)
+- *What it is:* A bare two- or three-operation expression answered with no chain of thought; the intermediate is never written. Fourteen expression shapes, one frozen (layer, position) read cell each.
+- *Example:* `Compute (271 - 322) * 14.` → intermediate −51 at layer 56, eight tokens before the end of the prompt.
+- *Judged by:* one prompt-blind free-recall call per item naming the values the readout presents as computed, each verified against the readout's numerals; pass = a named value within the variant's tolerance of the intermediate; the permutation null over the item's null set beside it.
+
 ### Safety
 
 **Agentic misalignment** — [`evals/agentic_misalignment/README.md`](evals/agentic_misalignment/README.md)
@@ -223,6 +228,7 @@ each family.
 | chain_intermediates | google/gemini-3.8-flash | chain-free-2026-09-16 | default (free-recall judge, source repo judge_free_modal.py) |
 | brew_intermediates | google/gemini-3.8-flash | brew-2026-09-16 | default (multi-select colour judge, source repo judge_brew.py) |
 | buggy_code | google/gemini-3.8-flash | buggy-2026-09-16 | default (consequence-ladder judge, source repo judge_buggy_verdicts.py) |
+| arithmetic_intermediates | google/gemini-3.8-flash | arith-free-2026-09-16 | default (free-recall judge; the chain judge with an arithmetic task sentence) |
 | multi_concept_directed_modulation | google/gemini-3.8-flash | mcdm-2026-09-16 | default (own multi-select judge over frozen candidate lists) |
 | directed_modulation | google/gemini-3.8-flash | dm-2026-09-16 | default (own MC judge; single-tier, no screen) |
 | typo | google/gemini-3.8-flash | bank-2026-09-16 | default (shared bank judge of the basic families) |
