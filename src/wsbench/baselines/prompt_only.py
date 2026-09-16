@@ -94,5 +94,6 @@ def floors(dst: Path = FROZEN) -> dict[str, dict[str, Any]]:
         for fam, e in frozen.items()
         if not fam.startswith("_")
         and fam not in EXCLUDED
+        and versions.get(fam) is not None
         and e.get("instrument") == versions.get(fam)
     }

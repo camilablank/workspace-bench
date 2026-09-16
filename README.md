@@ -179,7 +179,8 @@ The in-house `<gen_dir>/<label>/L###.jsonl` layout converts with
 Every judged pass rate is read against measured floors in [`evals/baselines/`](evals/baselines/README.md):
 **lucky guessing** (the repo judge shown only each family's option lists: blind, described and
 seeded-uniform variants, five draws at temperature 1.0, stamped with the family's judge prompt
-version) and, next, **prompt-only** (stock Qwen3.6-27B given the prompt text, no activation).
+version) and **prompt-only** (stock Qwen3.6-27B given the prompt text, no activation, judged
+by each family's own instrument).
 `wsbench baseline` measures, `wsbench freeze` records, `wsbench report` draws the floors beside
 each family.
 

@@ -25,9 +25,9 @@ items before any scale run. Status: [ ] open · [~] in PR · [x] merged.
 - [x] multi_concept_directed_modulation (#21)
 
 ## Baselines
-- [~] lucky guessing (judge shown only the option lists; blind / described / uniform), Gemini. Branch: agam/lucky-guessing.
-- [ ] prompt-only (stock Qwen summary of what the model is thinking, scored by each family's
-      own instrument); readouts generated in global-workspace, scored and frozen here
+- [x] lucky guessing (judge shown only the option lists; blind / described / uniform), Gemini (#22)
+- [x] prompt-only (stock Qwen summary, scored by each family's own instrument at one layer; 13
+      families, multi_concept_directed_modulation excluded) (#22)
 - [ ] per-family empirical nulls (later)
 
 ## Methods (readout files, judged here; generation stays in global-workspace)

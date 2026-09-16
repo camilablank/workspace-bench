@@ -34,7 +34,8 @@ averaged over draws with its std, `majority` the per-item plurality vote. Famili
 | moral_rationale | 1 or 2 | 5 | committed items one list, deliberative items one per side |
 | user_modeling | 1 | 5 | |
 | directed_modulation | 1 | 5 | |
-| multihop_mt, typo_mt | 1-2 | 5 | one list per judged unit |
+| typo_mt | 1 | 5 | the correction |
+| multihop_mt | 1-2 | 5 | one list per bridge |
 | multilingual_mt, multilingual_multihop, multilingual_typo, basic_readout_mt | 1-2 | 5 | concept/correction/readout plus the language list for L2 items |
 | multi_concept_directed_modulation | 1 (multi-select, one to three picks) | 6 | pass = the FIRST pick is a dictated concept (one guess per draw, like every family); `any_hit` = some pick is, `exact` = the picks equal the dictated set, `mean_picks` beside them; controls dropped |
 
@@ -58,7 +59,9 @@ wsbench report dir=outputs/<arm>                       # lucky guess column besi
 ```
 
 Runs write `outputs/baselines/lucky_guessing/<family>/<variant>.json` (per-item prompts, picks,
-aggregate); `freeze` refuses a `limit` pilot and merges per family into the tracked file.
+aggregate); `freeze` refuses a `limit` pilot and merges per (family, variant) into the tracked file.
+A blind floor can sit below the uniform one (relational 0.000, typo_mt 0.134 vs 0.166): the
+guesser's shape heuristics are anti-correlated with the gold there, not a bug.
 
 ## Prompt-only (`prompt_only.json`)
 
@@ -69,6 +72,10 @@ judged by each family's own instrument at one layer (`wsbench run ... layers=20`
 across layers make any-layer equal per-layer), and `wsbench freeze kind=prompt_only` records the
 rate with the judge model and prompt version. Not item-blind: a floor, never a competitor lens.
 Whatever a lens scores above it needed the activation.
+
+Covered: the six single-token basics, directed_modulation and the six multi-token families (13);
+the prompt-only readouts exist for those banks only. Entries carry `complete: false` by
+construction, because judging one layer is a layer subset of the family's grid.
 
 Excluded: multi_concept_directed_modulation. Its prompt dictates the concepts ("Think about the
 plumber's blue ladder ..."), so the stock model names them every time (measured 1.0) and the

@@ -586,6 +586,7 @@ def freeze(run_dir: Path, dst: Path = FROZEN) -> dict[str, Any]:
             "analytic_floor": r["analytic_floor"],
             "n_items": a["n_items"],
             "n_draws": a["n_draws"],
+            "n_api_fail": a["n_api_fail"],
             "invalid_rate": a["invalid_rate"],
             "n_options_per_list": r["n_options"],
             "model": r["model"],
@@ -612,7 +613,8 @@ def floors(dst: Path = FROZEN) -> dict[str, dict[str, Any]]:
     frozen = json.loads(dst.read_text(encoding="utf-8"))
     out: dict[str, dict[str, Any]] = {}
     for fam, variants in frozen.items():
-        live = {v: e for v, e in variants.items() if e.get("instrument") == versions.get(fam)}
+        current = versions.get(fam)
+        live = {v: e for v, e in variants.items() if current and e.get("instrument") == current}
         if live:
             out[fam] = live
     return out
