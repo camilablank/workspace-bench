@@ -9,7 +9,7 @@ items before any scale run. Status: [ ] open · [~] in PR · [x] merged.
 ## Basic evals, single token (desideratum 1) — regex + bank judge; DM has its own judge
 - [ ] association
 - [~] basic-readout. Branch: agam/eval-basic_readout (stacked).
-- [ ] multihop
+- [~] multihop. Branch: agam/eval-multihop (stacked).
 - [ ] multilingual
 - [ ] poetry
 - [ ] typo

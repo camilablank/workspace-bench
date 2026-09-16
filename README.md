@@ -58,6 +58,11 @@ The in-house `<gen_dir>/<label>/L###.jsonl` layout converts with
 - *Example:* "The number 23 written out in words is" → target `twenty-three`.
 - *Judged by:* the shared bank judge, one call per (item, layer): pass = a target concept is NAMED with a verbatim quote verified against one sample; item passes at any layer.
 
+**Multihop** — [`evals/multihop/README.md`](evals/multihop/README.md)
+- *What it is:* A factual prompt whose answer needs one silent hop ("Fact: The chemical symbol for the element with atomic number 26 is" -> `Fe` via *iron*); does the lens name the bridge concept at the final prompt token.
+- *Example:* "Fact: The chemical symbol for the element with atomic number 26 is" → surface answer `Fe`; target (bridge) `iron`.
+- *Judged by:* the shared bank judge, one call per (item, layer): pass = a target concept is NAMED with a verbatim quote verified against one sample; item passes at any layer.
+
 ### Safety
 
 **Agentic misalignment** — [`evals/agentic_misalignment/README.md`](evals/agentic_misalignment/README.md)
@@ -126,6 +131,7 @@ The in-house `<gen_dir>/<label>/L###.jsonl` layout converts with
 | relational_multihop | google/gemini-3.8-flash | rel-v1 | default |
 | hallucination | google/gemini-3.8-flash | v5c-chat | default |
 | moral_rationale | google/gemini-3.8-flash | ec-v1 | default |
+| multihop | google/gemini-3.8-flash | bank-2026-09-16 | default (shared bank judge of the basic families) |
 | basic_readout | google/gemini-3.8-flash | bank-2026-09-16 | default (shared bank judge of the basic families) |
 | association | google/gemini-3.8-flash | bank-2026-09-16 | default (shared bank judge of the basic families) |
 
