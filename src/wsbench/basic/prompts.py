@@ -1,10 +1,5 @@
-"""The bank judge prompt shared by the single-token basic families.
-
-Templates use ``{name}`` placeholders rendered with ``str.replace``. Every entry of
-:data:`PROMPTS` is printed verbatim in each basic family's README.
-"""
-
-from __future__ import annotations
+"""The bank judge prompt shared by the single-token basic families; printed verbatim in each
+family README."""
 
 import json
 

@@ -1,7 +1,5 @@
 """directed_modulation: one MC judge call per readout row, same-stratum options, evidence gate."""
 
-from __future__ import annotations
-
 import random
 import re
 import sys

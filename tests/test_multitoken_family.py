@@ -1,7 +1,6 @@
 """The shared multi-token judge: letter parsing, the quote gate, the per-item rule, a toy run."""
 
-from __future__ import annotations
-
+import importlib
 import json
 from pathlib import Path
 
@@ -10,6 +9,7 @@ import pytest
 from wsbench import registry
 from wsbench.cli import main
 from wsbench.judge_config import JudgeConfig, resolve
+from wsbench.mc import letter_index
 from wsbench.multitoken import family as fam
 from wsbench.multitoken.options import option_sets
 from wsbench.multitoken.prompts import CANNOT, LETTERS, PROMPT_VERSION
@@ -28,36 +28,42 @@ MT = [
 OPTS = ["alpha", "beta", "gamma", "delta", "epsilon", CANNOT]
 
 
-def test_pick_index_accepts_only_a_lone_letter():
-    assert fam.pick_index("B") == 1 and fam.pick_index(" c. ") == 2 and fam.pick_index("f") == 5
-    assert fam.pick_index("cannot tell") is None  # never read as option C
-    assert fam.pick_index("") is None and fam.pick_index(None) is None
-    assert fam.pick_index("AB") is None and fam.pick_index("G") is None
+def test_letter_index_accepts_a_letter_or_a_letter_with_its_own_option():
+    assert letter_index("B", OPTS) == 1 and letter_index(" c. ", OPTS) == 2
+    assert letter_index("f", OPTS) == 5 and letter_index("D. delta", OPTS) == 3
+    assert letter_index("d) Delta", OPTS) == 3 and letter_index("F. " + CANNOT, OPTS) == 5
+    assert letter_index("cannot tell", OPTS) is None  # never read as option C
+    assert letter_index("A. beta", OPTS) is None  # a letter with another option's text
+    assert letter_index("", OPTS) is None and letter_index(None, OPTS) is None
+    assert letter_index("AB", OPTS) is None and letter_index("G", OPTS) is None
+    assert letter_index("F", OPTS[:5]) is None  # past the list
+    assert letter_index("B. beta.", OPTS) == 1  # trailing punctuation after the option text
 
 
 def test_verdict_kinds_and_the_quote_gate():
     readout = "the readout says Gamma is here, plainly"
-    unavailable = fam.verdict(None, 2, 6, readout)
+    unavailable = fam.verdict(None, 2, OPTS, readout)
     assert unavailable["kind"] == "unavailable" and not unavailable["judged"]
-    ok = fam.verdict({"choice": "C", "quote": "gamma is here"}, 2, 6, readout)
+    ok = fam.verdict({"choice": "C", "quote": "gamma is here"}, 2, OPTS, readout)
     assert ok["kind"] == "correct" and ok["correct"] and ok["quote_ok"]
-    bad_quote = fam.verdict({"choice": "C", "quote": "not in the readout"}, 2, 6, readout)
+    bad_quote = fam.verdict({"choice": "C", "quote": "not in the readout"}, 2, OPTS, readout)
     assert bad_quote["kind"] == "correct" and not bad_quote["correct"] and not bad_quote["quote_ok"]
-    empty_quote = fam.verdict({"choice": "C", "quote": ""}, 2, 6, readout)
+    empty_quote = fam.verdict({"choice": "C", "quote": ""}, 2, OPTS, readout)
     assert not empty_quote["correct"]
-    wrong = fam.verdict({"choice": "A", "quote": "the readout"}, 2, 6, readout)
+    wrong = fam.verdict({"choice": "A", "quote": "the readout"}, 2, OPTS, readout)
     assert wrong["kind"] == "distractor" and not wrong["correct"]
-    cannot = fam.verdict({"choice": "F", "quote": ""}, 2, 6, readout)
+    cannot = fam.verdict({"choice": "F", "quote": ""}, 2, OPTS, readout)
     assert cannot["kind"] == "cannot" and not cannot["correct"]
-    text = fam.verdict({"choice": "cannot tell", "quote": ""}, 2, 6, readout)
+    text = fam.verdict({"choice": "cannot tell", "quote": ""}, 2, OPTS, readout)
     assert text["kind"] == "invalid" and text["judged"] and not text["correct"]
-    past = fam.verdict({"choice": "F", "quote": ""}, 2, 5, readout)
+    past = fam.verdict({"choice": "F", "quote": ""}, 2, OPTS[:5], readout)
     assert past["kind"] == "invalid"
 
 
 def test_fold_is_accent_case_and_quote_insensitive():
     assert fam.fold("Curaçao\u2019s") == "curacao's"
     assert fam.fold("ÉCOLE") == "ecole"
+    assert fam.fold("\u201cquoted\u201d \u2018x\u2019") == "\"quoted\" 'x'"
 
 
 def _v(item, layer, role, kind, correct, judged=True):
@@ -177,7 +183,8 @@ def test_run_family_toy_run_with_a_scripted_judge(tmp_path, monkeypatch):
 
 @pytest.mark.parametrize("name", MT)
 def test_dry_run_on_the_toy_file(name, tmp_path, capsys, monkeypatch):
-    registry.load_all()
+    spec = importlib.import_module(f"wsbench.evals.{name}").SPEC
+    registry.FAMILIES.setdefault(spec.name, spec)  # conftest resets the registry per test
     monkeypatch.delenv("WSBENCH_JUDGE_MODEL", raising=False)
     out = tmp_path / "out"
     example = REPO / "examples/readouts" / f"{name}.jsonl"

@@ -114,6 +114,11 @@ The in-house `<gen_dir>/<label>/L###.jsonl` layout converts with
 - *Example:* an Arabic sentence ending in الأدريناللين → `the hormone adrenaline` among four other corrections, and Arabic among Persian, Urdu, Hebrew, Pashto.
 - *Judged by:* one prompt-blind five-way call per (item, layer, unit) with a cannot-tell escape and a verbatim-quote gate; a layer passes only when every judged unit is picked correctly; item passes at any layer.
 
+**Multi-concept directed modulation** — [`evals/multi_concept_directed_modulation/README.md`](evals/multi_concept_directed_modulation/README.md)
+- *What it is:* The model holds one to three unrelated concepts in mind while writing a dictated sentence; the lens reads the writing positions. Do the held concepts come back, how many, and does the binding ("Adam being angry at Betty" vs the reverse) survive?
+- *Example:* "Think about the plumber's blue ladder leaning against the mango tree. Now write this sentence: ..." → a write-cell readout naming `plumber`, `blue ladder` or `mango tree` among six candidates.
+- *Judged by:* one prompt-blind multi-select call per in-sentence write cell with a verbatim-quote gate; item passes when any cell names a dictated concept; controls and off-task items excluded.
+
 ### Safety
 
 **Agentic misalignment** — [`evals/agentic_misalignment/README.md`](evals/agentic_misalignment/README.md)
@@ -188,6 +193,7 @@ The in-house `<gen_dir>/<label>/L###.jsonl` layout converts with
 | typo_mt | google/gemini-3.8-flash | mc-2026-09-16 | default (shared forced-choice judge of the multi-token families) |
 | multilingual_mt | google/gemini-3.8-flash | mc-2026-09-16 | default (shared forced-choice judge of the multi-token families) |
 | multihop_mt | google/gemini-3.8-flash | mc-2026-09-16 | default (shared forced-choice judge of the multi-token families) |
+| multi_concept_directed_modulation | google/gemini-3.8-flash | mcdm-2026-09-16 | default (own multi-select judge over frozen candidate lists) |
 | directed_modulation | google/gemini-3.8-flash | dm-2026-09-16 | default (own MC judge; single-tier, no screen) |
 | typo | google/gemini-3.8-flash | bank-2026-09-16 | default (shared bank judge of the basic families) |
 | poetry | google/gemini-3.8-flash | bank-2026-09-16 | default (shared bank judge of the basic families) |

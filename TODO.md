@@ -13,16 +13,16 @@ items before any scale run. Status: [ ] open · [~] in PR · [x] merged.
 - [x] multilingual (merged 2026-09-16, #16)
 - [x] poetry (merged 2026-09-16, #16)
 - [x] typo (merged 2026-09-16, #16)
-- [~] directed-modulation. Branch: agam/eval-directed-modulation.
+- [x] directed_modulation (#17)
 
 ## Basic evals, multi-token (desideratum 2) — forced-choice Gemini judge per unit, conjunctive
-- [~] multihop_mt. Branch: agam/multitoken-mc-judge.
-- [~] multilingual_mt. Branch: agam/multitoken-mc-judge.
-- [~] typo_mt. Branch: agam/multitoken-mc-judge.
-- [~] basic_readout_mt. Branch: agam/multitoken-mc-judge.
-- [~] multilingual_typo. Branch: agam/multitoken-mc-judge.
-- [~] multilingual_multihop. Branch: agam/multitoken-mc-judge.
-- [ ] multi_concept_directed_modulation (Gemini judge; own read regime)
+- [x] multihop_mt (#20)
+- [x] multilingual_mt (#20)
+- [x] typo_mt (#20)
+- [x] basic_readout_mt (#20)
+- [x] multilingual_typo (#20)
+- [x] multilingual_multihop (#20)
+- [~] multi_concept_directed_modulation (multi-select Gemini judge over write cells; region gate). Branch: agam/multi-concept-dm.
 
 ## Baselines
 - [ ] lucky guessing (LLM shown only the option lists; blind / described / uniform), Gemini

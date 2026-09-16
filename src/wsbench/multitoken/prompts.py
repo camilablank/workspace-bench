@@ -1,15 +1,5 @@
-"""Verbatim prompts of the multi-token forced-choice judge.
-
-Source: ``src/global_workspace/olens_suite/bank/mc_judge.py`` in the source repo, with one
-change: the language question also credits a readout that quotes the passage in its own script
-(the source's regex contract credited native-script forms of the language unit; without this the
-judge asks the lens to *name* the language, which verbalizer readouts rarely do). The judge
-never sees the prompt: it reads the readout and one multiple-choice question per judged unit.
-Templates use ``{name}`` placeholders rendered with ``str.replace``. Every entry of
-:data:`PROMPTS` is printed verbatim in each multi-token family's README.
-"""
-
-from __future__ import annotations
+"""Prompts of the multi-token forced-choice judge (source repo ``mc_judge.py``; the language
+question also credits a native-script quote, see the family READMEs). Printed verbatim there."""
 
 from wsbench.llm import schema_block
 

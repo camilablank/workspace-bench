@@ -1,7 +1,5 @@
 """Frozen bank files: loading, the per-item target rule, and the readout-id rule."""
 
-from __future__ import annotations
-
 import json
 import re
 from pathlib import Path

@@ -1,11 +1,5 @@
-"""Verbatim prompts of the directed-modulation judge.
-
-Source: ``src/global_workspace/judges/oracle_lens_judge.py`` in the source repo (the
-``dm_concept`` probe). Templates use ``{name}`` placeholders rendered with ``str.replace``.
-Every entry of :data:`PROMPTS` is printed verbatim in ``evals/directed_modulation/README.md``.
-"""
-
-from __future__ import annotations
+"""Prompts of the directed-modulation judge (source repo ``oracle_lens_judge.py``, ``dm_concept``
+probe); printed verbatim in the family README."""
 
 from wsbench.llm import schema_block
 

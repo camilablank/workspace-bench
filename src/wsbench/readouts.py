@@ -222,3 +222,56 @@ def convert_gen_dir(
     _, rep = load_readouts(out)
     rep.skipped["malformed"] += n_malformed
     return rep
+
+
+def convert_read_json(path: Path, out: Path) -> LoadReport:
+    """The source repo's write-cell read (``{"layers": [...], "records": [{"name", "rels",
+    "tokens", "ao": {"<layer>": [[sample, ...] per rel]}}]}``) -> one contract file: ``id`` is
+    the item label, ``pos`` the cell's offset from the last completion token (``rels`` are
+    stored nearest-last first), ``token`` the token read at that cell."""
+    from wsbench.banks import label_of
+
+    path, out = Path(path), Path(out)
+    d = json.loads(path.read_bytes().decode("utf-8", "replace"))
+    if (
+        not isinstance(d, dict)
+        or not isinstance(d.get("layers"), list)
+        or not isinstance(d.get("records"), list)
+    ):
+        raise ValueError(f"{path}: expected an object with 'layers' and 'records' lists")
+    layers = [int(x) for x in d["layers"]]
+    n_malformed = 0
+    out.parent.mkdir(parents=True, exist_ok=True)
+    with out.open("w", encoding="utf-8") as fh:
+        for rec in d["records"]:
+            if not isinstance(rec, dict) or not isinstance(rec.get("name"), str):
+                n_malformed += 1
+                continue
+            rels, tokens, ao = rec.get("rels"), rec.get("tokens"), rec.get("ao")
+            if not (isinstance(rels, list) and isinstance(tokens, list) and isinstance(ao, dict)):
+                n_malformed += 1
+                continue
+            if len(rels) != len(tokens) or not all(_is_int(r) for r in rels):
+                n_malformed += 1
+                continue
+            id_ = label_of(rec["name"])
+            for layer in layers:
+                per_rel = ao.get(str(layer))
+                if not isinstance(per_rel, list) or len(per_rel) != len(rels):
+                    n_malformed += 1
+                    continue
+                for rel, token, samples in zip(rels, tokens, per_rel, strict=True):
+                    if not isinstance(samples, list):
+                        n_malformed += 1
+                        continue
+                    row = {
+                        "id": id_,
+                        "layer": layer,
+                        "pos": int(rel),
+                        "token": str(token),
+                        "samples": [str(x) for x in samples],
+                    }
+                    fh.write(json.dumps(row, ensure_ascii=False) + "\n")
+    _, rep = load_readouts(out)
+    rep.skipped["malformed"] += n_malformed
+    return rep

@@ -1,7 +1,5 @@
 """Bank judge: one call per (item, layer) through ``mcjudge.run_calls``, verbatim-quote gate."""
 
-from __future__ import annotations
-
 import re
 import unicodedata
 from dataclasses import dataclass

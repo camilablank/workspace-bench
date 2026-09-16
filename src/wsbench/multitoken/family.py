@@ -1,15 +1,7 @@
-"""The multi-token basic families: a prompt-blind forced-choice judge per unit, conjunctive.
-
-One judge call per (item, layer, judged unit): the readout and five options (the unit's gold
-plus four confusables) with an escape. A layer passes an item only when every judged unit is
-picked correctly, with a verbatim quote, at that layer; item pass = any layer. Token readouts
-(a J-lens) go through the shared summarizer first.
-"""
-
-from __future__ import annotations
+"""Multi-token basic families: one forced-choice judge call per (item, layer, unit); a layer
+passes when every unit is picked correctly with a verbatim quote, an item at any layer."""
 
 import sys
-import unicodedata
 from collections import defaultdict
 from pathlib import Path
 from typing import Any
@@ -18,6 +10,7 @@ from wsbench.banks import load_bank
 from wsbench.cache import Cache
 from wsbench.judge_config import JudgeConfig
 from wsbench.llm import Spend
+from wsbench.mc import fold, letter_index
 from wsbench.mcjudge import (
     Call,
     Preflighter,
@@ -56,26 +49,16 @@ def mt_family(name: str, title: str, *, calls_per_arm: str) -> EvalSpec:
     )
 
 
-def fold(s: str) -> str:
-    s = unicodedata.normalize("NFKD", s).replace("\u2019", "'")
-    return "".join(c for c in s if not unicodedata.combining(c)).casefold()
-
-
-def pick_index(choice: Any) -> int | None:
-    """The option index named by a judge's ``choice``: a lone letter (``"B"``, ``"b."``), else
-    None. Free text such as ``"cannot tell"`` is NOT read as option C."""
-    s = str(choice or "").strip().rstrip(".").strip().upper()
-    return LETTERS.index(s) if len(s) == 1 and s in LETTERS else None
-
-
-def verdict(res: dict[str, Any] | None, gold_idx: int, n_opts: int, readout: str) -> dict[str, Any]:
+def verdict(
+    res: dict[str, Any] | None, gold_idx: int, options: list[str], readout: str
+) -> dict[str, Any]:
     """One judge answer: ``correct`` / ``distractor`` / ``cannot`` / ``invalid``; a correct pick
     counts only with a verbatim (folded) quote from the readout. ``invalid`` (no lone letter, or
     a letter past the option list) is judged and negative: the instrument answered, wrongly."""
     if res is None:
         return {"judged": False, "kind": "unavailable", "correct": False}
-    idx = pick_index(res.get("choice"))
-    if idx is None or idx >= n_opts:
+    idx = letter_index(res.get("choice"), options)
+    if idx is None:
         return {
             "judged": True,
             "pick": str(res.get("choice", "")).strip() or None,
@@ -84,7 +67,7 @@ def verdict(res: dict[str, Any] | None, gold_idx: int, n_opts: int, readout: str
             "quote_ok": False,
         }
     letter = LETTERS[idx]
-    if idx == n_opts - 1:
+    if idx == len(options) - 1:
         return {
             "judged": True,
             "pick": letter,
@@ -163,8 +146,8 @@ def run_family(args: JudgeArgs, *, name: str) -> FamilyResult:
                     empty.add((c.id, c.layer))
         calls: list[Call] = []
         meta: dict[
-            str, tuple[str, int, str, int, int, str]
-        ] = {}  # key -> item, layer, role, gold, n, readout
+            str, tuple[str, int, str, int, list[str], str]
+        ] = {}  # key -> item, layer, role, gold, options, readout
         for (item_id, layer), cs in sorted(positions.items()):
             cell = cs[0]
             readout = texts.get(cell.key)
@@ -172,7 +155,7 @@ def run_family(args: JudgeArgs, *, name: str) -> FamilyResult:
                 continue
             for role, (opts, gold_idx) in options[item_id].items():
                 key = f"{item_id}|L{layer:03d}|{role}"
-                meta[key] = (item_id, layer, role, gold_idx, len(opts), readout)
+                meta[key] = (item_id, layer, role, gold_idx, opts, readout)
                 calls.append(
                     Call(
                         key=key,
@@ -196,8 +179,8 @@ def run_family(args: JudgeArgs, *, name: str) -> FamilyResult:
         )
 
     verdicts: list[dict[str, Any]] = []
-    for key, (item_id, layer, role, gold_idx, n_opts, readout) in meta.items():
-        v = verdict(results.get(key), gold_idx, n_opts, readout)
+    for key, (item_id, layer, role, gold_idx, opts, readout) in meta.items():
+        v = verdict(results.get(key), gold_idx, opts, readout)
         verdicts.append(
             {
                 "item": item_id,
