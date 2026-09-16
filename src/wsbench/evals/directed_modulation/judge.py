@@ -2,12 +2,12 @@
 
 import random
 import re
-import sys
 from dataclasses import dataclass
 from typing import Any
 
 from wsbench.banks import load_bank
 from wsbench.cache import Cache
+from wsbench.family import require_cells
 from wsbench.llm import Spend
 from wsbench.mc import classify, seed_int
 from wsbench.mcjudge import Call, Preflighter, item_scope, run_calls, with_readout_count
@@ -137,14 +137,7 @@ def run(args: JudgeArgs) -> FamilyResult:
     cells, rep = load_readouts(args.readouts, ids=list(by_id), layers=args.layers)
     layers = args.layers if args.layers is not None else rep.layers
     missing = missing_cells(list(by_id), layers, cells)
-    if missing and not args.allow_missing and not args.dry_run:
-        n_exp = len(by_id) * len(layers)
-        print(
-            f"directed_modulation: {len(missing)} of {n_exp} (item, layer) cells have no readout; "
-            "pass allow_missing=True to score the rest",
-            file=sys.stderr,
-        )
-        raise SystemExit(2)
+    require_cells("directed_modulation", missing, len(by_id) * len(layers), args)
     rows, n_empty = readout_rows(cells)
     tokens = rep.kind == "tokens"
     options = option_sets(bank)  # drawn over the whole bank, never the selected subset

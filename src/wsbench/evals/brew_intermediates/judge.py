@@ -4,26 +4,17 @@ Regions, the null and the baseline are explained in the family README."""
 
 import hashlib
 import random
-import sys
 from fractions import Fraction
 from typing import Any
 
 from wsbench.banks import load_bank
 from wsbench.cache import Cache
+from wsbench.family import cell_text, fail, mean, pass_rate_result, require_cells
 from wsbench.llm import Spend
-from wsbench.mcjudge import (
-    Call,
-    Preflighter,
-    base_config,
-    is_subset,
-    item_scope,
-    run_calls,
-    with_readout_count,
-)
+from wsbench.mcjudge import Call, Preflighter, item_scope, run_calls, with_readout_count
 from wsbench.readouts import load_readouts
 from wsbench.registry import REPO_ROOT, JudgeArgs
-from wsbench.results import FamilyResult, bootstrap_ci, completeness
-from wsbench.summarizer import render_bag
+from wsbench.results import FamilyResult
 
 from .prompts import PROMPT_VERSION, SCHEMA, SEED, SYSTEM, mentions_any_colour, render_user
 
@@ -90,15 +81,6 @@ def rule(cells: list[dict[str, Any]]) -> dict[str, Any] | None:
     }
 
 
-def _fail(msg: str) -> None:
-    print(msg, file=sys.stderr)
-    raise SystemExit(2)
-
-
-def _mean(xs: list[float]) -> float | None:
-    return sum(xs) / len(xs) if xs else None
-
-
 def run(args: JudgeArgs) -> FamilyResult:
     _header, items = load_bank(BANK)
     scope = item_scope(items, args)
@@ -106,7 +88,7 @@ def run(args: JudgeArgs) -> FamilyResult:
     by_id = {it["id"]: it for it in scope}
     region_set = args.extra.get("regions", "headline")
     if region_set not in REGION_SETS:
-        _fail(f"{NAME}: opts=regions= must be one of {sorted(REGION_SETS)}, got {region_set!r}")
+        fail(f"{NAME}: opts=regions= must be one of {sorted(REGION_SETS)}, got {region_set!r}")
     wanted = set(REGION_SETS[region_set])
     # the read cells: every pinned position whose region is judged
     positions = {
@@ -117,21 +99,13 @@ def run(args: JudgeArgs) -> FamilyResult:
     have = {(c.id, c.layer, c.pos): c for c in cells}
     expected = [(i, layer, p) for i in ids for layer in layers for p in positions[i]]
     missing = [k for k in expected if k not in have]
-    if missing and not args.allow_missing and not args.dry_run:
-        _fail(
-            f"{NAME}: {len(missing)} of {len(expected)} (item, layer, cell) readouts are missing; "
-            "pass allow_missing=True to score the rest"
-        )
+    require_cells(NAME, missing, len(expected), args)
     judged_cells = [have[k] for k in expected if k in have]
 
     texts: dict[tuple[str, int, int], str] = {}
     empty: set[tuple[str, int, int]] = set()
     for c in judged_cells:
-        text = (
-            render_bag(c.tokens or (), c.scores)
-            if c.tokens is not None
-            else "\n".join(s for s in (c.samples or ()) if s.strip())
-        )
+        text, _plain = cell_text(c)
         if text.strip():
             texts[(c.id, c.layer, c.pos)] = text
         else:
@@ -147,7 +121,6 @@ def run(args: JudgeArgs) -> FamilyResult:
     screened = {k for k, t in texts.items() if not mentions_any_colour(t)}
 
     spend = Spend()
-    pre = Preflighter(args.dry_run)
     with Cache(args.out / "cells.jsonl") as cache:
         calls = [
             Call(
@@ -169,7 +142,7 @@ def run(args: JudgeArgs) -> FamilyResult:
             concurrency=args.concurrency,
             rpm=args.rpm,
             dry_run=args.dry_run,
-            preflight=pre.for_judge(args.judge),
+            preflight=Preflighter(args.dry_run).for_judge(args.judge),
             temperature=0.0,
         )
 
@@ -193,67 +166,42 @@ def run(args: JudgeArgs) -> FamilyResult:
         )
     rows = [_item_row(by_id[i], gold[i], offs[i], verdicts, missing, empty) for i in ids]
     decided = [r for r in rows if r["pass"] is not None]
-    passes = [1.0 if r["pass"] else 0.0 for r in decided]
-    unjudged = {(v["item"], v["layer"], v["pos"]) for v in verdicts if not v["judged"]}
-    result = FamilyResult(
-        family=NAME,
-        metric="pass_rate",
-        value=sum(passes) / len(passes) if passes else None,
-        ci95=bootstrap_ci(passes) if passes else None,
-        n_items=len(ids),
-        higher_is_better=True,
-        chance=None,
-        chance_label=CHANCE_LABEL,
-        complete=bool(cells)
-        and completeness(
-            pinned=args.judge.pinned,
-            subset=is_subset(args),
-            n_expected=len(expected),
-            n_missing=len(missing),
-            n_unjudged=len(unjudged),
-            n_empty=len(empty),
-        ),
-        pinned_instrument=args.judge.pinned,
-        config=base_config(
-            args, PROMPT_VERSION, kind=rep.kind or "prose", layers_judged=layers, regions=region_set
-        ),
+    result = pass_rate_result(
+        name=NAME,
+        args=args,
+        prompt_version=PROMPT_VERSION,
+        rows=rows,
+        cells=cells,
+        rep=rep,
         # a cell is one (item, layer, pinned position) readout; one call per cell not screened
-        counts={
-            "n_expected_cells": len(expected),
-            "n_missing_cells": len(missing),
-            "n_unjudged_cells": len(unjudged),
-            "n_empty_cells": len(empty),
-            "skipped_rows": sum(rep.skipped.values()),
-            "spend_usd": spend.usd,
-        },
+        n_expected=len(expected),
+        n_missing=len(missing),
+        n_unjudged=len({(v["item"], v["layer"], v["pos"]) for v in verdicts if not v["judged"]}),
+        n_empty=len(empty),
+        spend=spend,
+        chance_label=CHANCE_LABEL,
+        config_extra={"layers_judged": layers, "regions": region_set},
         extras={
             "n_calls": len(calls),
             "n_screened_cells": len(screened),
-            "n_items_decided": len(decided),
-            "n_items_undecided": len(ids) - len(decided),
             "regions_judged": sorted(wanted),
-            "null": _mean([r["emit"]["null"] for r in decided if r["emit"]]),
-            "baseline": _mean([r["emit"]["baseline"] for r in decided if r["emit"]]),
-            "stir_pass_rate": _mean([float(r["stir"]["pass"]) for r in decided if r["stir"]]),
-            "stir_null": _mean([r["stir"]["null"] for r in decided if r["stir"]]),
+            "null": mean(r["emit"]["null"] for r in decided if r["emit"]),
+            "baseline": mean(r["emit"]["baseline"] for r in decided if r["emit"]),
+            "stir_pass_rate": mean(float(r["stir"]["pass"]) for r in decided if r["stir"]),
+            "stir_null": mean(r["stir"]["null"] for r in decided if r["stir"]),
             "cell_gold_rate": {
-                reg: _mean(
-                    [float(v["gold"]) for v in verdicts if v["judged"] and v["region"] == reg]
-                )
+                reg: mean(float(v["gold"]) for v in verdicts if v["judged"] and v["region"] == reg)
                 for reg in sorted(wanted)
             },
             "cell_off_rate": {
-                reg: _mean(
-                    [
-                        sum(v["offs"]) / len(v["offs"])
-                        for v in verdicts
-                        if v["judged"] and v["region"] == reg and v["offs"]
-                    ]
+                reg: mean(
+                    sum(v["offs"]) / len(v["offs"])
+                    for v in verdicts
+                    if v["judged"] and v["region"] == reg and v["offs"]
                 )
                 for reg in sorted(wanted)
             },
         },
-        rows=rows,
     )
     return with_readout_count(result, scope, cells)
 
@@ -283,6 +231,8 @@ def _item_row(
         i == item_id and regions[str(p)] in EMIT for i, _l, p in missing
     )
     emit_stats = rule(emit) if emit else None
+    # unlike the any-layer families a pass here needs EVERY emission cell judged: the rule
+    # counts cells, so an unjudged or missing one leaves the item undecided even if it clears
     passed: bool | None = None if incomplete or emit_stats is None else emit_stats["pass"]
     return {
         "id": item_id,

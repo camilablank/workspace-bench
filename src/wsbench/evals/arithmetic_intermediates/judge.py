@@ -1,30 +1,28 @@
 """Arithmetic intermediates: a blind free-recall judge names the values a readout presents as
 computed at one frozen cell per variant; an item passes when a named value lands within its
-variant's tolerance of the never-written intermediate. The permutation null (``cross``) and the
-per-variant table are explained in the family README."""
+variant's tolerance of the never-written intermediate. Null and per-variant table: the README."""
 
 import re
-import sys
 from collections import defaultdict
 from typing import Any
 
 from wsbench.banks import load_bank
 from wsbench.cache import Cache
+from wsbench.family import (
+    cell_text,
+    fail,
+    mean,
+    pass_rate_result,
+    rate,
+    require_cells,
+    tri_state,
+)
 from wsbench.llm import Spend
 from wsbench.mc import fold
-from wsbench.mcjudge import (
-    Call,
-    Preflighter,
-    base_config,
-    is_subset,
-    item_scope,
-    run_calls,
-    with_readout_count,
-)
+from wsbench.mcjudge import Call, Preflighter, item_scope, run_calls, with_readout_count
 from wsbench.readouts import Cell, load_readouts
 from wsbench.registry import REPO_ROOT, JudgeArgs
-from wsbench.results import FamilyResult, bootstrap_ci, completeness
-from wsbench.summarizer import render_bag
+from wsbench.results import FamilyResult
 
 from .prompts import MAX_VALUES, PROMPT_VERSION, SCHEMA, SYSTEM, render_user
 
@@ -42,9 +40,7 @@ _FULLWIDTH = str.maketrans(
     "".join(chr(0xFF10 + d) for d in range(10)) + "\uff0e\uff0c\uff0d\u2212", "0123456789.,--"
 )
 _NUMERIC_QUOTE = re.compile(r"[-\s\d.,]*")  # a quote that is only a number never vouches
-_HAS_NUMERAL = re.compile(
-    r"[\d\u96f6\u4e00\u4e8c\u4e24\u4e09\u56db\u4e94\u516d\u4e03\u516b\u4e5d\u5341\u767e\u5343\u4e07\u70b9\u8d1f]"
-)
+_HAS_NUMERAL = re.compile(r"[\d零一二两三四五六七八九十百千万点负]")
 
 
 def tolerance_ok(got: float, target: float, tol: str) -> bool:
@@ -135,19 +131,6 @@ def verdict(
     }
 
 
-def _fail(msg: str) -> None:
-    print(msg, file=sys.stderr)
-    raise SystemExit(2)
-
-
-def _rate(flags: list[bool]) -> float | None:
-    return sum(flags) / len(flags) if flags else None
-
-
-def _mean(xs: list[float]) -> float | None:
-    return sum(xs) / len(xs) if xs else None
-
-
 def run(args: JudgeArgs) -> FamilyResult:
     header, items = load_bank(BANK)
     scope = item_scope(items, args)
@@ -155,10 +138,11 @@ def run(args: JudgeArgs) -> FamilyResult:
     by_id = {it["id"]: it for it in scope}
     by_name = {it["name"]: it for it in items}
     if args.layers and len(args.layers) > 1:
-        _fail(f"{NAME}: one frozen cell per item; pass a single layer or none, not {args.layers}")
+        fail(f"{NAME}: one frozen cell per item; pass a single layer or none, not {args.layers}")
     layer_of = {i: (args.layers[0] if args.layers else int(by_id[i]["cell"]["layer"])) for i in ids}
     pos_of = {i: int(by_id[i]["cell"]["pos"]) for i in ids}
     cells, rep = load_readouts(args.readouts, ids=ids, layers=args.layers)
+    # the read cell is the item's frozen (layer, pos); every other row is off-cell
     have: dict[str, Cell] = {}
     n_off_cell = 0
     for c in cells:
@@ -167,21 +151,12 @@ def run(args: JudgeArgs) -> FamilyResult:
         else:
             n_off_cell += 1
     missing = [i for i in ids if i not in have]
-    if missing and not args.allow_missing and not args.dry_run:
-        _fail(
-            f"{NAME}: {len(missing)} of {len(ids)} items have no readout at their frozen cell "
-            "(layer, pos); pass allow_missing=True to score the rest"
-        )
-    texts: dict[str, str] = {}
-    plain: dict[str, str] = {}
-    empty: set[str] = set()
+    require_cells(NAME, missing, len(ids), args)
+    texts, plain, empty = {}, {}, set()
     for i, c in have.items():
-        if c.tokens is not None:
-            text, bare = render_bag(c.tokens, c.scores), " | ".join(c.tokens)
-        else:
-            text = bare = "\n".join(s for s in (c.samples or ()) if s.strip())
-        if text.strip():
-            texts[i], plain[i] = text, bare
+        judge_text, bare = cell_text(c)
+        if judge_text.strip():
+            texts[i], plain[i] = judge_text, bare
         else:
             empty.add(i)
     target = {i: float(by_id[i]["intermediates"][0]) for i in ids}
@@ -192,7 +167,6 @@ def run(args: JudgeArgs) -> FamilyResult:
     }
 
     spend = Spend()
-    pre = Preflighter(args.dry_run)
     with Cache(args.out / "cells.jsonl") as cache:
         calls = [
             Call(
@@ -214,7 +188,7 @@ def run(args: JudgeArgs) -> FamilyResult:
             concurrency=args.concurrency,
             rpm=args.rpm,
             dry_run=args.dry_run,
-            preflight=pre.for_judge(args.judge),
+            preflight=Preflighter(args.dry_run).for_judge(args.judge),
             temperature=0.0,
         )
 
@@ -249,26 +223,23 @@ def run(args: JudgeArgs) -> FamilyResult:
                 "tolerance": tol[i],
                 "layer": layer_of[i],
                 "pos": pos_of[i],
-                "pass": v["hit"] if v["judged"] else None,
+                "pass": tri_state(v["hit"], not v["judged"]),
                 **v,
             }
         )
     decided = [r for r in rows if r["pass"] is not None]
-    passes = [1.0 if r["pass"] else 0.0 for r in decided]
-    unjudged = [r for r in rows if not r["judged"] and r["kind"] != "missing"]
     kinds: dict[str, int] = defaultdict(int)
     for r in rows:
         kinds[r["kind"]] += 1
-    cross_rates = [r["cross"] for r in decided if r["cross"] is not None]
-    value_rate = _rate([bool(r["pass"]) for r in decided])
-    cross_rate = _mean(cross_rates)
+    value_rate = rate(bool(r["pass"]) for r in decided)
+    cross_rate = mean(r["cross"] for r in decided if r["cross"] is not None)
     per_variant = {}
     for v in header["variants"]:
         vs = [r for r in decided if r["variant"] == v]
         if not vs:
             continue
-        val = _rate([bool(r["pass"]) for r in vs])
-        crs = _mean([r["cross"] for r in vs if r["cross"] is not None])
+        val = rate(bool(r["pass"]) for r in vs)
+        crs = mean(r["cross"] for r in vs if r["cross"] is not None)
         per_variant[v] = {
             "n": len(vs),
             "value": val,
@@ -277,58 +248,37 @@ def run(args: JudgeArgs) -> FamilyResult:
             "tolerance": header["variants"][v]["tolerance"],
             "role": header["variants"][v]["role"],
         }
-    result = FamilyResult(
-        family=NAME,
-        metric="pass_rate",
-        value=value_rate,
-        ci95=bootstrap_ci(passes) if passes else None,
-        n_items=len(ids),
-        higher_is_better=True,
-        chance=None,
-        chance_label=CHANCE_LABEL,
-        complete=bool(cells)
-        and completeness(
-            pinned=args.judge.pinned,
-            subset=is_subset(args),
-            n_expected=len(ids),
-            n_missing=len(missing),
-            n_unjudged=len(unjudged),
-            n_empty=len(empty),
-        ),
-        pinned_instrument=args.judge.pinned,
-        config=base_config(
-            args,
-            PROMPT_VERSION,
-            kind=rep.kind or "prose",
-            layers_judged=sorted(set(layer_of.values())),
-        ),
+    result = pass_rate_result(
+        name=NAME,
+        args=args,
+        prompt_version=PROMPT_VERSION,
+        rows=rows,
+        cells=cells,
+        rep=rep,
         # a cell is one item at its frozen (layer, pos); one call per non-empty cell
-        counts={
-            "n_expected_cells": len(ids),
-            "n_missing_cells": len(missing),
-            "n_unjudged_cells": len(unjudged),
-            "n_empty_cells": len(empty),
-            "skipped_rows": sum(rep.skipped.values()) + n_off_cell,
-            "spend_usd": spend.usd,
-        },
+        n_expected=len(ids),
+        n_missing=len(missing),
+        n_unjudged=sum(1 for r in rows if not r["judged"] and r["kind"] != "missing"),
+        n_empty=len(empty),
+        spend=spend,
+        chance_label=CHANCE_LABEL,
+        skipped_extra=n_off_cell,
+        config_extra={"layers_judged": sorted(set(layer_of.values()))},
         extras={
             "n_calls": len(calls),
             "n_rows_off_cell": n_off_cell,
-            "n_items_decided": len(decided),
-            "n_items_undecided": len(ids) - len(decided),
             "cross": cross_rate,
             "net": (value_rate - cross_rate)
             if value_rate is not None and cross_rate is not None
             else None,
-            "top1_rate": _rate([bool(r.get("top1_hit")) for r in decided]),
-            "committed_rate": _rate([bool(r["values"]) for r in rows if r["judged"]]),
+            "top1_rate": rate(bool(r.get("top1_hit")) for r in decided),
+            "committed_rate": rate(bool(r["values"]) for r in rows if r["judged"]),
             "kinds": dict(kinds),
             "per_variant": per_variant,
             "per_role": {
-                role: _rate([bool(r["pass"]) for r in decided if r["role"] == role])
+                role: rate(bool(r["pass"]) for r in decided if r["role"] == role)
                 for role in sorted({r["role"] for r in decided})
             },
         },
-        rows=rows,
     )
     return with_readout_count(result, scope, cells)

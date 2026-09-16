@@ -2,26 +2,27 @@
 an item passes when some cell names a dictated concept. Regions, capacity and false picks are
 explained in the family README."""
 
-import sys
 from collections import defaultdict
 from typing import Any
 
 from wsbench.banks import load_bank
 from wsbench.cache import Cache
-from wsbench.llm import Spend
-from wsbench.mc import fold, letter_index
-from wsbench.mcjudge import (
-    Call,
-    Preflighter,
-    base_config,
-    is_subset,
-    item_scope,
-    run_calls,
-    with_readout_count,
+from wsbench.family import (
+    cell_text,
+    fail,
+    mean,
+    pass_rate_result,
+    quote_in,
+    rate,
+    require_cells,
+    tri_state,
 )
+from wsbench.llm import Spend
+from wsbench.mc import letter_index
+from wsbench.mcjudge import Call, Preflighter, item_scope, run_calls, with_readout_count
 from wsbench.readouts import load_readouts
 from wsbench.registry import REPO_ROOT, JudgeArgs
-from wsbench.results import FamilyResult, bootstrap_ci, completeness
+from wsbench.results import FamilyResult
 from wsbench.summarizer import SUMMARIZER_PROMPT_VERSION, aux_judge, render_bag, summarize
 
 from .options import option_sets, partner_of
@@ -51,14 +52,12 @@ def verdict(
     own: list[str] = []
     false: list[str] = []
     n_unverified = n_invalid = 0
-    folded = fold(readout)
     for p in picks:
         idx = letter_index(p.get("choice") if isinstance(p, dict) else None, options)
         if idx is None:
             n_invalid += 1
             continue
-        quote = str(p.get("quote", "")).strip()
-        if not quote or fold(quote) not in folded:
+        if not quote_in(str(p.get("quote", "")), readout):
             n_unverified += 1
             continue
         target = own if idx in gold else false
@@ -74,19 +73,6 @@ def verdict(
         "n_invalid": n_invalid,
         "picks": picks,
     }
-
-
-def _fail(msg: str) -> None:
-    print(msg, file=sys.stderr)
-    raise SystemExit(2)
-
-
-def _rate(flags: list[bool]) -> float | None:
-    return sum(flags) / len(flags) if flags else None
-
-
-def _mean(xs: list[float]) -> float | None:
-    return sum(xs) / len(xs) if xs else None
 
 
 def run(args: JudgeArgs) -> FamilyResult:
@@ -111,7 +97,7 @@ def run(args: JudgeArgs) -> FamilyResult:
     window: dict[str, dict[int, str]] = defaultdict(dict)
     untokened = sorted({c.id for c in cells if c.token is None})
     if untokened:
-        _fail(
+        fail(
             f"{NAME}: {len(untokened)} items have readout rows without a `token` (first: "
             f"{untokened[0]}); this family labels write-cell regions from the window's tokens, "
             "so every row must carry the token read at its `pos` (convert-read-json writes it)"
@@ -131,11 +117,7 @@ def run(args: JudgeArgs) -> FamilyResult:
     have = {(c.id, c.layer, c.pos): c for c in cells}
     expected = [(i, layer, p) for i in ids for layer in layers for p in judged_pos[i]]
     missing = [k for k in expected if k not in have]
-    if missing and not args.allow_missing and not args.dry_run:
-        _fail(
-            f"{NAME}: {len(missing)} of {len(expected)} in-sentence (item, layer, cell) readouts "
-            "are missing; pass allow_missing=True to score the rest"
-        )
+    require_cells(NAME, missing, len(expected), args)
     judged_cells = [have[k] for k in expected if k in have]
 
     spend = Spend()
@@ -162,9 +144,9 @@ def run(args: JudgeArgs) -> FamilyResult:
             empty = {(c.id, c.layer, c.pos) for c in judged_cells if not c.tokens}
         else:
             for c in judged_cells:
-                joined = "\n".join(s for s in (c.samples or ()) if s.strip())
-                if joined:
-                    texts[c.key] = joined
+                text, _plain = cell_text(c)
+                if text.strip():
+                    texts[c.key] = text
                 else:
                     empty.add((c.id, c.layer, c.pos))
         calls: list[Call] = []
@@ -222,7 +204,6 @@ def run(args: JudgeArgs) -> FamilyResult:
         for i in ids
     ]
     decided = [r for r in rows if r["pass"] is not None]
-    passes = [1.0 if r["pass"] else 0.0 for r in decided]
     unjudged_cells = {
         (v["item"], v["layer"], v["pos"]) for v in verdicts if not v["judged"]
     } | unsummarized
@@ -231,51 +212,31 @@ def run(args: JudgeArgs) -> FamilyResult:
         kinds[v["kind"]] += 1
     judged = [v for v in verdicts if v["judged"]]
     controls = {r["id"] for r in rows if r["reason"] == "control"}
-    strata = sorted({r["stratum"] for r in decided})
-    result = FamilyResult(
-        family=NAME,
-        metric="pass_rate",
-        value=sum(passes) / len(passes) if passes else None,
-        ci95=bootstrap_ci(passes) if passes else None,
-        n_items=len(ids),
-        higher_is_better=True,
-        chance=None,
-        chance_label=CHANCE_LABEL,
-        complete=bool(cells)
-        and completeness(
-            pinned=args.judge.pinned,
-            subset=is_subset(args),
-            n_expected=len(expected),
-            n_missing=len(missing),
-            n_unjudged=len(unjudged_cells),
-            n_empty=len(empty),
-        ),
-        pinned_instrument=args.judge.pinned,
-        config=base_config(
-            args,
-            PROMPT_VERSION,
-            kind=rep.kind or "prose",
-            layers_judged=layers,
-            summarizer=SUMMARIZER_PROMPT_VERSION if rep.kind == "tokens" else None,
-        ),
+    result = pass_rate_result(
+        name=NAME,
+        args=args,
+        prompt_version=PROMPT_VERSION,
+        rows=rows,
+        cells=cells,
+        rep=rep,
         # a cell is one in-sentence (item, layer, write position) readout; one call per cell
-        counts={
-            "n_expected_cells": len(expected),
-            "n_missing_cells": len(missing),
-            "n_unjudged_cells": len(unjudged_cells),
-            "n_empty_cells": len(empty),
-            "skipped_rows": sum(rep.skipped.values()),
-            "spend_usd": spend.usd,
+        n_expected=len(expected),
+        n_missing=len(missing),
+        n_unjudged=len(unjudged_cells),
+        n_empty=len(empty),
+        spend=spend,
+        chance_label=CHANCE_LABEL,
+        config_extra={
+            "layers_judged": layers,
+            "summarizer": SUMMARIZER_PROMPT_VERSION if rep.kind == "tokens" else None,
         },
         extras={
             "n_calls": len(calls),
-            "n_items_decided": len(decided),
-            "n_items_undecided": len(ids) - len(decided),
             "n_controls": len(controls),
             "n_off_task": sum(1 for r in rows if r["reason"] == "off_task"),
             "kinds": dict(kinds),
             "capacity": {
-                k: _mean([r["capacity"][k] for r in decided if r["capacity"]])
+                k: mean(r["capacity"][k] for r in decided if r["capacity"])
                 for k in (
                     "per_activation_max",
                     "per_cell_union",
@@ -283,18 +244,18 @@ def run(args: JudgeArgs) -> FamilyResult:
                     "per_activation_mean",
                 )
             },
-            "false_pick_rate": _rate([bool(v["false"]) for v in judged]),
-            "control_pick_rate": _rate(
-                [bool(v["own"] or v["false"]) for v in judged if v["item"] in controls]
+            "false_pick_rate": rate(bool(v["false"]) for v in judged),
+            "control_pick_rate": rate(
+                bool(v["own"] or v["false"]) for v in judged if v["item"] in controls
             ),
-            "partner_confusion_rate": _rate(
-                [r["partner_picked"] for r in decided if r["partner_picked"] is not None]
+            "partner_confusion_rate": rate(
+                r["partner_picked"] for r in decided if r["partner_picked"] is not None
             ),
             "per_stratum": {
-                s: _rate([bool(r["pass"]) for r in decided if r["stratum"] == s]) for s in strata
+                s: rate(bool(r["pass"]) for r in decided if r["stratum"] == s)
+                for s in sorted({r["stratum"] for r in decided})
             },
         },
-        rows=rows,
     )
     return with_readout_count(result, scope, cells)
 
@@ -335,16 +296,9 @@ def _item_row(
         or any(i == item_id for i, _l, _p in unsummarized)
         or any(i == item_id for i, _l, _p in missing)
     )
-    passed: bool | None
-    if reason is not None:
-        passed = None
-    elif hits:
-        passed = True
-    elif incomplete:
+    passed = None if reason is not None else tri_state(bool(hits), incomplete)
+    if reason is None and passed is None:
         reason = "unjudged"
-        passed = None
-    else:
-        passed = False
     # capacity over judged in-sentence activations (empty cells decode nothing)
     decoded = [len(v["own"]) for v in mine if v["judged"]] + [
         0 for i, _l, _p in empty if i == item_id

@@ -33,78 +33,30 @@ cell). `wsbench convert-gen-dir gen_dir=GEN out=F.jsonl kind=prose|tokens` conve
   free-text Anthropic-only primitive.
 
 ## Family conventions
-- `mcjudge.py`: `Call` + `run_calls` (one schema per batch, per-batch `judge`,
-  `temperature`/`max_tokens`, fingerprint `(prompt_version, model, reasoning, temperature,
-  system, user)`, cache `{result, meta}` in `<out>/cells.jsonl`, `validate` re-queues a
-  landed-but-invalid answer); `Preflighter` = one preflight per (model, reasoning) per PROCESS
-  (`mcjudge._PREFLIGHTED`, module-global, lock-guarded); `item_scope` = bank ∩ `items=` then
-  `limit=`; `base_config`/`base_counts`; `with_readout_count(score.score(...), scope, cells)`
-  wraps every return and sets `extras["n_items_without_readouts"]`. `mc.py` = option helpers;
-  `summarizer.py` = token bag -> prose (prompt in `docs/summarizer.md`).
-- Option lists are ported from the source scripts and gated by goldens in `tests/golden/`.
-- Basic families (`group="basic"`: association, basic_readout, ...) share `src/wsbench/basic/`
-  (`prompts.py` = the bank judge prompt, `judge.py`, `family.py` = `bank_family(name, title)`):
-  one call per (item, layer) over every position's samples, verbatim quote verified against ONE
-  sample, item pass at any layer, undecided items (unjudged or missing cell, no positive) out of
-  the denominator; readout id = `banks.label_of(name)`. Missing cells are fatal (exit 2) unless
-  `allow_missing=True`; empty cells are negatives without a call.
-- directed_modulation (`group="basic"`, own judge): one 6-way MC call per (item, layer, position,
-  sample) row, options seeded over the WHOLE bank (golden in `tests/golden/`), `basis` decides
-  content vs instruction narration, evidence must be a verbatim span or the positive is voided;
-  headline = `content_bound` at any row; undecided items (unjudged row or missing layer, no
-  positive) leave every rate's denominator.
-- Multi-token families (`group="basic_mt"`: multihop_mt, multilingual_mt, typo_mt,
-  basic_readout_mt, multilingual_multihop, multilingual_typo) share `src/wsbench/multitoken/`
-  (`prompts.py`, `options.py`, `family.py` = `mt_family(name, title, calls_per_arm=)`): one
-  prompt-blind forced-choice call per (item, layer, judged unit), 5 options + a cannot-tell
-  escape, options seeded over the WHOLE bank (goldens in `tests/golden/<family>_options.json`),
-  a correct pick needs a verbatim (folded) quote from the readout, a layer passes only when EVERY
-  judged unit is correct, item pass at any layer; the language unit is judged for every L2 item
-  and a native-script quote of the passage counts. No regex rate anywhere; the floors are the
-  lucky-guessing and prompt-only baselines.
-- multi_concept_directed_modulation (`group="basic_mt"`, own judge): rows are write cells
-  (`pos` = offset from the last completion token, `token` required); only in-sentence cells
-  (`regions.py`) are judged, one multi-select call each over six frozen candidates (own concepts +
-  binding partner's + seeded draws, golden in `tests/golden/`); a selection needs a verbatim quote;
-  item passes when any cell names a dictated concept; controls/off-task items leave the
-  denominator; `wsbench convert-read-json` converts the source `read.json`.
-- Baselines (`src/wsbench/baselines/`): `lucky_guessing` builds every MC family's option lists
-  from the judges' own builders (escape dropped), asks the repo judge blind / described / uniform,
-  five draws at T=1.0 through `run_calls`; `wsbench freeze` merges runs into
-  `evals/baselines/lucky_guessing.json` stamped with each family's judge `prompt_version`, and
-  `report` shows a floor only while that stamp matches (`lucky_guessing.floors`). A `limit` pilot
-  is never frozen. `prompt_only.freeze` folds `outputs/prompt-only/<family>/results.json` (each
-  family's judge on the stock model's prompt-only summaries, judged at one layer) into
-  `evals/baselines/prompt_only.json`; `prompt_only.EXCLUDED` names families whose prompt states
-  the answer (multi_concept_directed_modulation), never frozen or shown.
-- chain_intermediates (`group="computational"`, own judge): one free-recall call per (item,
-  layer) at the last prompt token (max-pos row; other rows ignored and counted); token lenses are
-  judged as their bag, no summarizer; a top value needs the digits in the readout or a verbatim
-  quote; pass = top value is an intermediate at any layer; `extras.null_top1_near` is the ±3
-  decoy null. No analytic floor.
-- brew_intermediates (`group="computational"`, own judge): rows at the bank's 24 pinned positions
-  per item (`regions`); `opts=regions=headline` (default: emission + stir cells) or `all`; one
-  multi-select colour call per non-empty, non-screened cell over the item's `options_adjacent`;
-  pass = K·G > ΣO over the emission cells (source bundle rule), `null`/`baseline` per item, stir
-  cells the control. No analytic floor.
-- buggy_code (`group="computational"`, own judge, metric `net_S2`, not a pass rate): one cell per
-  item at its `read_cells` layer (60 python / 56 other; `layers=L` overrides), max-pos row; one
-  consequence-ladder call per item with the program + verified truth; S2+ needs a verbatim quote;
-  value = P(S2+ | buggy) − P(S2+ | clean), chance 0.0, bootstrap CI over the two sets.
-- arithmetic_intermediates (`group="computational"`, own judge): one frozen (layer, pos) cell per
-  item (`cell` in the bank; `layers=L` overrides), rows elsewhere ignored and counted; free-recall
-  call, named values verified against the readout's numerals (`quantities`) or a non-digit quote;
-  pass = a kept value within the variant's tolerance of `intermediates[0]`; `cross` = the same
-  rule over the item's `null_set` intermediates (permutation null). No analytic floor.
-- Cell shapes: moral = tail-5 positions, 1-2 calls/cell; relational = max-pos row per (item,
-  layer); role-bound = every row, 3 MCs/call; conjunctive = one call per item over the
-  `[L<layer>]` blob (`opts=char_cap=N`); user_modeling = k samples -> k calls, item key `name`
-  (`id := name`), headline basis `inferred_characterization`; jailbreak = one call per cell;
-  hallucination = one call per on-site cell (k=1 for tokens), lower-is-better rate; jlens =
-  prose only, Stage A -> B/foil -> P (all on the family judge), headline L44, `complete` uses reject rate
-  ≤ 5%; agentic = free-text stages A/B/C, `design_score` over 28 misaligned items. Jailbreak,
-  hallucination, jlens and multi_concept_directed_modulation have real `n_missing_cells`: **fatal (exit 2) unless
-  `allow_missing=True`** (a dry run only reports); for the four MC families it is a no-op.
+- `wsbench/family.py` holds the helpers the newer families share: `require_cells` (missing
+  cells exit 2 unless `allow_missing=True`; a dry run only reports), `cell_text` (a token bag is
+  judged scored but verified against bare tokens), `last_pos_rows`, `quote_in` (verbatim after
+  `mc.fold`), `tri_state` (pass / fail / undecided), `rate` / `mean`, `pass_rate_result` (the
+  pass-rate `FamilyResult` epilogue: decided-only value, bootstrap CI, completeness, counts).
+  A pass-rate family's `run()` is: load bank -> `item_scope` -> `load_readouts` -> select cells ->
+  `cell_text` -> `Call`s -> `run_calls` -> per-cell verdicts -> per-item rows -> `pass_rate_result`
+  -> `with_readout_count`. `chain_intermediates/judge.py` is the shortest complete example.
+- `mcjudge.py`: `Call` + `run_calls` (one schema per batch, fingerprint `(prompt_version, model,
+  reasoning, temperature, system, user)`, cache `{result, meta}` in `<out>/cells.jsonl`,
+  `validate` re-queues an invalid answer); `Preflighter` (one preflight per model per process);
+  `item_scope` = bank ∩ `items=` then `limit=`; `base_config` / `base_counts`. `mc.py`: seeds,
+  shuffles, `fold`, `letter_index` (a lone letter or a letter with its own option text).
+  `summarizer.py`: token bag -> prose (prompt in `docs/summarizer.md`).
+- Shared judges: `basic/` (the bank judge, `bank_family(name, title)`) and `multitoken/`
+  (forced choice per unit, `mt_family(name, title, calls_per_arm=)`); their families are three-line
+  packages under `evals/`. Option lists are pinned by goldens in `tests/golden/`.
+- Baselines (`baselines/`): `lucky_guessing` (option lists from the judges' own builders, blind /
+  described / uniform) and `prompt_only`; `wsbench freeze` stamps entries with the family's
+  `prompt_version`, and `report` shows a floor only while the stamp matches.
+- Per-family read regimes, pass rules and floors are documented in each `evals/<family>/README.md`
+  (the source of truth); do not restate them here. Camila's original families (agentic, jailbreak,
+  hallucination, jlens_concept_pr, moral, relational, role-bound, conjunctive, user_modeling) keep
+  their own `judge.py` + `score.py`.
 - `opts=key=value,k2=v2` fills `JudgeArgs.extra`; `aux_models` comes from the family `JudgeConfig`.
   `EvalSpec.calls_per_arm` / `.sources` feed `wsbench list`; every non-empty `sources` must
   appear verbatim in README §Credits and NOTICE.md (`tests/test_readme.py`).
@@ -146,21 +98,22 @@ macro averages only complete `pass_rate` families and lists every exclusion with
   bullet per external source; in-house families get no credit line.
 
 ## Adding a family
-`src/wsbench/evals/<family>/{prompts,judge,score}.py` (`judge.py` ends with
-`return with_readout_count(score.score(...), scope, cells)`), or for a single-token basic
-family just `__init__.py` + `prompts.py` re-exporting `wsbench.basic.prompts`; register an `EvalSpec` in the
-package `__init__` (incl. `calls_per_arm`, `sources`); add `evals/<family>/{items.json,README.md}`,
-a toy `examples/readouts/<family>.jsonl`, an offline `tests/test_<family>.py` (fake
-`llm._make_client` and `llm.preflight`), the README entry and, if external, a credit.
+`src/wsbench/evals/<family>/{__init__,prompts,judge}.py` following the skeleton above (register an
+`EvalSpec` in `__init__` with `calls_per_arm` and `sources`), `evals/<family>/{items.json,README.md}`
+with every prompt verbatim, a toy `examples/readouts/<family>.jsonl` (a few rows), an offline
+`tests/test_<family>.py` (monkeypatch the module's `run_calls`), the README entry and Judges row,
+and a credit if the items are external. Smoke `limit=3` live before any full run.
 
 ## Workflow
 - CLI (pydra, `wsbench <command> key=value ...`): `wsbench list` | `wsbench judge family=F
   readouts=F.jsonl out=DIR` | `wsbench run all=True readouts_root=DIR out=DIR` |
-  `wsbench report dir=DIR` | `wsbench convert-gen-dir gen_dir=GEN out=F.jsonl kind=prose|tokens`.
+  `wsbench report dir=DIR` | `wsbench baseline` / `wsbench freeze` | `wsbench convert-gen-dir
+  gen_dir=GEN out=F.jsonl kind=prose|tokens` | `wsbench convert-read-json read=R out=F.jsonl`.
   Shared judge keys: `judge_model=`, `layers=20,36`, `items=a,b`, `limit=N`, `allow_missing=True`,
   `concurrency=64`, `rpm=240`, `dry_run=True`, `opts=k=v,k2=v2`; `--show` prints the resolved
   config, `--help` a command's keys. Each command is a `pydra.Config` in `cli.py`: declare a
   field in `__init__`, normalise it in `finalize()`; `runner.py` reads the same attribute names.
 - `uv sync --extra dev`; `uv run pytest -q`; `uv run ruff check .`; `uv run ruff format .`. Keys
-in the environment or an untracked `.env`, never committed; tests make no network calls. Work
-in a git worktree; PRs are gated by `.github/workflows/ci.yml` (ruff + pytest).
+in the environment, never committed; tests make no network calls. Work
+in a git worktree (prefix commands with `PYTHONPATH=src` when it shares the main checkout's
+`.venv`); PRs are gated by `.github/workflows/ci.yml` (ruff + pytest).

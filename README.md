@@ -1,48 +1,62 @@
 # workspace-bench
 
 Evals of whether an activation-reading lens surfaces what Qwen3.6-27B computes but never
-writes. A lens reads the model's residual stream at one token position and produces either
-prose (an "O-lens": a few sampled sentences per position) or a top-10 token bag (a "J-lens":
-tokens with scores). Each eval pairs a frozen item bank with a judge prompt that asks whether
-the readout carries the latent the item was built around — the inferred user attribute, the
-composed two-hop relation, the plan the model is about to act on — without echoing the
-prompt. The evals fall into eight groups (Basic single-token, Basic multi-token, Computational, Safety,
-Association, Bag of words, Precision, Logical processing) and share one judge layer: Gemini 3.8 Flash via OpenRouter by default, with
-two documented pins (see [Judges](#judges)). This repo owns judging only; readout generation
-stays with the lens producer, which hands over one JSONL file per (family, arm).
+writes. A lens reads the model's residual stream at a token position and produces either prose
+(an "O-lens": sampled sentences) or a top-10 token bag (a "J-lens": tokens with scores). Each eval
+pairs a frozen item bank with a judge that checks whether the readout carries the latent the item
+was built around, without echoing the prompt. Every judge is Gemini 3.8 Flash via OpenRouter
+except two pinned families (see [Judges](#judges)). This repo owns judging only: a lens producer
+hands over one JSONL readout file per (family, arm), and `wsbench` scores it.
 
 ## Quickstart
 
 ```bash
 git clone https://github.com/camilablank/workspace-bench && cd workspace-bench
 uv sync --extra dev
-uv run pytest -q                                   # offline; no key needed
-uv run wsbench list                                # families, judge pins, cost, credit
-
-# dry run on the toy example (prints the first judge prompt, makes no call, needs no key)
-uv run wsbench judge family=moral_rationale readouts=examples/readouts/moral_rationale.jsonl \
-    out=/tmp/wsb/moral_rationale dry_run=True
-
-# a real judge run on one family (OPENROUTER_API_KEY=sk-or-... in the environment or .env)
-uv run wsbench judge family=moral_rationale readouts=readouts/moral_rationale.jsonl out=out/moral_rationale
-
-# every family from DIR/<family>.jsonl, three families at a time under one 240 rpm pacer, resumable
-uv run wsbench run all=True readouts_root=readouts/ out=out/
-uv run wsbench report dir=out/                     # out/*/results.json -> table + macro
+uv run pytest -q                 # offline, no key needed
+uv run wsbench list              # every family: group, items, metric, judge, prompt version, cost
 ```
 
-`claude-*` judges need `ANTHROPIC_API_KEY`; everything else goes through OpenRouter.
+Keys are read from the environment (export them, never commit them): `OPENROUTER_API_KEY=sk-or-...`
+for every Gemini family, `ANTHROPIC_API_KEY` for the two Claude-pinned ones.
 
-**Readout contract.** One JSONL file per (family, arm), one row per cell, all-prose or
-all-tokens; the `id` is the bank item id and `pos` a prompt token index:
+### Score one arm end to end
+
+```bash
+# 1. readouts: one JSONL per family in one directory (see the contract below)
+uv run wsbench convert-gen-dir gen_dir=GEN/ out=readouts/s3d/multihop.jsonl kind=prose
+
+# 2. check one family without spending anything: prints the first judge prompt, no call
+uv run wsbench judge family=multihop readouts=readouts/s3d/multihop.jsonl out=out/s3d/multihop dry_run=True
+
+# 3. smoke three items, then the whole arm (every family with a readouts file; resumable)
+uv run wsbench judge family=multihop readouts=readouts/s3d/multihop.jsonl out=out/s3d/multihop limit=3
+uv run wsbench run all=True readouts_root=readouts/s3d out=out/s3d
+
+# 4. one table: value, CI, n, and the lucky-guess and prompt-only floors beside each family
+uv run wsbench report dir=out/s3d
+```
+
+Output layout: `out/<arm>/<family>/results.json` (the result) and `cells.jsonl` (every judge
+verdict, so a re-run only pays for what is missing); `out/<arm>/summary.md` (the table) and
+`run.json` (per-family status and spend). Shared keys on `judge` and `run`: `layers=20,36`,
+`items=a,b`, `limit=N`, `allow_missing=True`, `dry_run=True`, `judge_model=`, `concurrency=`,
+`rpm=`, `opts=k=v`; `--help` prints a command's keys, `--show` the resolved config.
+
+**Readout contract.** One row per cell, all-prose or all-tokens; `id` is the bank item id, `pos`
+the read position, `token` the read-site token when the producer has it:
 
 ```json
 {"id": "ec-ransom-chat_tf", "layer": 36, "pos": 33, "samples": ["The model is weighing ...", "..."]}
 {"id": "ec-ransom-chat_tf", "layer": 36, "pos": 33, "tokens": ["Ġransom", "Ġincentive", "..."], "scores": [10.8, 9.9, 1.2]}
 ```
 
-The in-house `<gen_dir>/<label>/L###.jsonl` layout converts with
-`uv run wsbench convert-gen-dir gen_dir=GEN out=readouts/<family>.jsonl kind=prose|tokens`.
+Converters: `convert-gen-dir` for the in-house `<gen_dir>/<label>/L###.jsonl` layout and
+`convert-read-json` for the write-cell `read.json` of multi_concept_directed_modulation. Each
+family README states which cells it reads (last prompt token, pinned positions, a frozen cell).
+
+Working in a git worktree that shares the main checkout's `.venv`: prefix commands with
+`PYTHONPATH=src`, because the editable install points at the main checkout.
 
 ## The evals
 
@@ -208,35 +222,41 @@ each family.
 
 ## Judges
 
-| family | judge model | prompt version | why |
-|---|---|---|---|
-| agentic_misalignment | claude-sonnet-5 | am-narrative-v1 | pinned: judge of record for this family; no Gemini agreement data |
-| jailbreak_recognition | claude-sonnet-5 | jb-v1 | pinned: Gemini 3.8 Flash refuses to judge a share of jailbreak cells, which would leave them unjudged; Sonnet 5 judges them all |
-| jlens_concept_pr | google/gemini-3.8-flash | jlens-pr-v2 | default judge for all three stages (the source ran Stage A on DeepSeek V4 Flash; changed here 2026-09-16, see the family README) |
-| user_modeling | google/gemini-3.8-flash | um-v2 | default |
-| conjunctive_association | google/gemini-3.8-flash | comp-v1 | default |
-| role_bound_association | google/gemini-3.8-flash | oa-v1 | default |
-| relational_multihop | google/gemini-3.8-flash | rel-v1 | default |
-| hallucination | google/gemini-3.8-flash | v5c-chat | default |
-| moral_rationale | google/gemini-3.8-flash | ec-v1 | default |
-| multilingual_typo | google/gemini-3.8-flash | mc-2026-09-16 | default (shared forced-choice judge of the multi-token families) |
-| multilingual_multihop | google/gemini-3.8-flash | mc-2026-09-16 | default (shared forced-choice judge of the multi-token families) |
-| basic_readout_mt | google/gemini-3.8-flash | mc-2026-09-16 | default (shared forced-choice judge of the multi-token families) |
-| typo_mt | google/gemini-3.8-flash | mc-2026-09-16 | default (shared forced-choice judge of the multi-token families) |
-| multilingual_mt | google/gemini-3.8-flash | mc-2026-09-16 | default (shared forced-choice judge of the multi-token families) |
-| multihop_mt | google/gemini-3.8-flash | mc-2026-09-16 | default (shared forced-choice judge of the multi-token families) |
-| chain_intermediates | google/gemini-3.8-flash | chain-free-2026-09-16 | default (free-recall judge, source repo judge_free_modal.py) |
-| brew_intermediates | google/gemini-3.8-flash | brew-2026-09-16 | default (multi-select colour judge, source repo judge_brew.py) |
-| buggy_code | google/gemini-3.8-flash | buggy-2026-09-16 | default (consequence-ladder judge, source repo judge_buggy_verdicts.py) |
-| arithmetic_intermediates | google/gemini-3.8-flash | arith-free-2026-09-16 | default (free-recall judge; the chain judge with an arithmetic task sentence) |
-| multi_concept_directed_modulation | google/gemini-3.8-flash | mcdm-2026-09-16 | default (own multi-select judge over frozen candidate lists) |
-| directed_modulation | google/gemini-3.8-flash | dm-2026-09-16 | default (own MC judge; single-tier, no screen) |
-| typo | google/gemini-3.8-flash | bank-2026-09-16 | default (shared bank judge of the basic families) |
-| poetry | google/gemini-3.8-flash | bank-2026-09-16 | default (shared bank judge of the basic families) |
-| multilingual | google/gemini-3.8-flash | bank-2026-09-16 | default (shared bank judge of the basic families) |
-| multihop | google/gemini-3.8-flash | bank-2026-09-16 | default (shared bank judge of the basic families) |
-| basic_readout | google/gemini-3.8-flash | bank-2026-09-16 | default (shared bank judge of the basic families) |
-| association | google/gemini-3.8-flash | bank-2026-09-16 | default (shared bank judge of the basic families) |
+Every family runs on `google/gemini-3.8-flash` except two pins: **agentic_misalignment** stays on
+`claude-sonnet-5` (its judge of record, no Gemini agreement data) and **jailbreak_recognition**
+on `claude-sonnet-5` (Gemini refuses to judge a share of jailbreak cells). The prompt version is
+the instrument: bump it on any prompt edit, and a frozen baseline only applies to a matching
+version.
+
+| family | judge model | prompt version |
+|---|---|---|
+| agentic_misalignment | claude-sonnet-5 | am-narrative-v1 |
+| arithmetic_intermediates | google/gemini-3.8-flash | arith-free-2026-09-16 |
+| association | google/gemini-3.8-flash | bank-2026-09-16 |
+| basic_readout | google/gemini-3.8-flash | bank-2026-09-16 |
+| basic_readout_mt | google/gemini-3.8-flash | mc-2026-09-16 |
+| brew_intermediates | google/gemini-3.8-flash | brew-2026-09-16 |
+| buggy_code | google/gemini-3.8-flash | buggy-2026-09-16 |
+| chain_intermediates | google/gemini-3.8-flash | chain-free-2026-09-16 |
+| conjunctive_association | google/gemini-3.8-flash | comp-v1 |
+| directed_modulation | google/gemini-3.8-flash | dm-2026-09-16 |
+| hallucination | google/gemini-3.8-flash | v5c-chat |
+| jailbreak_recognition | claude-sonnet-5 | jb-v1 |
+| jlens_concept_pr | google/gemini-3.8-flash | jlens-pr-v2 |
+| moral_rationale | google/gemini-3.8-flash | ec-v1 |
+| multi_concept_directed_modulation | google/gemini-3.8-flash | mcdm-2026-09-16 |
+| multihop | google/gemini-3.8-flash | bank-2026-09-16 |
+| multihop_mt | google/gemini-3.8-flash | mc-2026-09-16 |
+| multilingual | google/gemini-3.8-flash | bank-2026-09-16 |
+| multilingual_mt | google/gemini-3.8-flash | mc-2026-09-16 |
+| multilingual_multihop | google/gemini-3.8-flash | mc-2026-09-16 |
+| multilingual_typo | google/gemini-3.8-flash | mc-2026-09-16 |
+| poetry | google/gemini-3.8-flash | bank-2026-09-16 |
+| relational_multihop | google/gemini-3.8-flash | rel-v1 |
+| role_bound_association | google/gemini-3.8-flash | oa-v1 |
+| typo | google/gemini-3.8-flash | bank-2026-09-16 |
+| typo_mt | google/gemini-3.8-flash | mc-2026-09-16 |
+| user_modeling | google/gemini-3.8-flash | um-v2 |
 
 - Override precedence: `judge_model=` flag > `WSBENCH_JUDGE_MODEL` env > the family pin.
 - `pinned_instrument` is true only when the resolved model equals the family pin; a result
@@ -269,8 +289,7 @@ complete pass-rate families into a **macro** row and lists every exclusion with 
 (`design_score`) are never in the macro. `run` also writes `run.json` (per-family status, result
 path, spend, the judge overrides in force).
 
-Cost: ≈ 120k judge calls per arm over the nine families (≈ 8 h wall-clock at 240 rpm on one key);
-per-family estimates are the `calls/arm` column of `wsbench list`. Every family caches per-cell
+Cost: the `calls/arm` column of `wsbench list` per family. Every family caches per-cell
 verdicts in `<out>/<family>/cells.jsonl`, so a re-run only pays for what is missing.
 
 ## Credits

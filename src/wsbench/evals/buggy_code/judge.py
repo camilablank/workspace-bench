@@ -3,18 +3,18 @@ cell; headline ``net_S2`` = P(consequence read | buggy) - P(consequence read | c
 strata and the quote gate are explained in the family README."""
 
 import random
-import sys
 from collections import defaultdict
 from typing import Any
 
 from wsbench.banks import load_bank
 from wsbench.cache import Cache
+from wsbench.family import cell_text, fail, quote_in, rate, require_cells
 from wsbench.llm import Spend
-from wsbench.mc import fold
 from wsbench.mcjudge import (
     Call,
     Preflighter,
     base_config,
+    base_counts,
     is_subset,
     item_scope,
     run_calls,
@@ -23,7 +23,6 @@ from wsbench.mcjudge import (
 from wsbench.readouts import Cell, load_readouts
 from wsbench.registry import REPO_ROOT, JudgeArgs
 from wsbench.results import FamilyResult, completeness
-from wsbench.summarizer import render_bag
 
 from .prompts import CONSEQUENCE, PROMPT_VERSION, RUNGS, SCHEMA, SYSTEM, render_user
 
@@ -42,7 +41,7 @@ def verdict(res: dict[str, Any] | None, samples: list[str]) -> dict[str, Any]:
         return {"judged": False, "rung": None, "consequence": False}
     rung = str(res["rung"])
     quote = str(res.get("quote", "")).strip()
-    quote_ok = bool(quote) and any(fold(quote) in fold(s) for s in samples)  # ONE sample
+    quote_ok = any(quote_in(quote, s) for s in samples)  # ONE sample
     consequence = rung in CONSEQUENCE and quote_ok
     return {
         "judged": True,
@@ -54,15 +53,6 @@ def verdict(res: dict[str, Any] | None, samples: list[str]) -> dict[str, Any]:
         "quote_ok": quote_ok,
         "why": str(res.get("why", "")),
     }
-
-
-def _fail(msg: str) -> None:
-    print(msg, file=sys.stderr)
-    raise SystemExit(2)
-
-
-def _rate(flags: list[bool]) -> float | None:
-    return sum(flags) / len(flags) if flags else None
 
 
 def net_ci(
@@ -90,7 +80,7 @@ def run(args: JudgeArgs) -> FamilyResult:
     # one cell per item: its read layer (or the override), the max-pos row = the EOF anchor
     layer_of = {i: (args.layers[0] if args.layers else read_layer[i]) for i in ids}
     if args.layers and len(args.layers) > 1:
-        _fail(f"{NAME}: one read layer per item; pass a single layer or none, not {args.layers}")
+        fail(f"{NAME}: one read layer per item; pass a single layer or none, not {args.layers}")
     groups: dict[tuple[str, int], list[Cell]] = defaultdict(list)
     for c in cells:
         groups[(c.id, c.layer)].append(c)
@@ -101,16 +91,14 @@ def run(args: JudgeArgs) -> FamilyResult:
     }
     n_extra = len(cells) - len(chosen)  # rows at other layers or positions
     missing = [i for i in ids if i not in chosen]
-    if missing and not args.allow_missing and not args.dry_run:
-        _fail(
-            f"{NAME}: {len(missing)} of {len(ids)} items have no readout at their read layer; "
-            "pass allow_missing=True to score the rest"
-        )
+    require_cells(NAME, missing, len(ids), args)
     samples: dict[str, list[str]] = {}
     empty: set[str] = set()
     for i, c in chosen.items():
+        # the judge reads each prose sample separately (the one-sample quote rule); a token
+        # lens is one scored bag
         ss = (
-            [render_bag(c.tokens, c.scores)]
+            [cell_text(c)[0]]
             if c.tokens is not None
             else [s for s in (c.samples or ()) if s.strip()]
         )
@@ -120,7 +108,6 @@ def run(args: JudgeArgs) -> FamilyResult:
             empty.add(i)
 
     spend = Spend()
-    pre = Preflighter(args.dry_run)
     with Cache(args.out / "cells.jsonl") as cache:
         calls = [
             Call(
@@ -142,7 +129,7 @@ def run(args: JudgeArgs) -> FamilyResult:
             concurrency=args.concurrency,
             rpm=args.rpm,
             dry_run=args.dry_run,
-            preflight=pre.for_judge(args.judge),
+            preflight=Preflighter(args.dry_run).for_judge(args.judge),
             temperature=0.0,
         )
 
@@ -168,7 +155,7 @@ def run(args: JudgeArgs) -> FamilyResult:
     judged = [r for r in rows if r["judged"]]
     buggy = [r["consequence"] for r in judged if r["src"] == "buggy"]
     clean = [r["consequence"] for r in judged if r["src"] == "clean"]
-    b_rate, c_rate = _rate(buggy), _rate(clean)
+    b_rate, c_rate = rate(buggy), rate(clean)
     value = (b_rate - c_rate) if b_rate is not None and c_rate is not None else None
     n_unjudged = sum(1 for r in rows if not r["judged"] and not r.get("missing"))
     rungs: dict[str, dict[str, int]] = {"buggy": defaultdict(int), "clean": defaultdict(int)}
@@ -189,9 +176,9 @@ def run(args: JudgeArgs) -> FamilyResult:
         c = [r["consequence"] for r in judged if r["src"] == "clean" and r["lang_group"] == lg]
         per_stratum[f"{cls}/{lg}"] = {
             "n_buggy": len(b),
-            "buggy_S2": _rate(b),
-            "clean_S2": _rate(c),
-            "net_S2": (_rate(b) - _rate(c)) if b and c else None,
+            "buggy_S2": rate(b),
+            "clean_S2": rate(c),
+            "net_S2": (rate(b) - rate(c)) if b and c else None,
         }
     result = FamilyResult(
         family=NAME,
@@ -219,14 +206,14 @@ def run(args: JudgeArgs) -> FamilyResult:
             layers_judged=sorted(set(layer_of.values())),
         ),
         # a cell is one item at its read layer; one call per non-empty cell
-        counts={
-            "n_expected_cells": len(ids),
-            "n_missing_cells": len(missing),
-            "n_unjudged_cells": n_unjudged,
-            "n_empty_cells": len(empty),
-            "skipped_rows": sum(rep.skipped.values()) + n_extra,
-            "spend_usd": spend.usd,
-        },
+        counts=base_counts(
+            n_expected=len(ids),
+            n_missing=len(missing),
+            n_unjudged=n_unjudged,
+            n_empty=len(empty),
+            skipped_rows=sum(rep.skipped.values()) + n_extra,
+            spend=spend,
+        ),
         extras={
             "n_calls": len(calls),
             "n_rows_not_at_read_cell": n_extra,
@@ -234,11 +221,11 @@ def run(args: JudgeArgs) -> FamilyResult:
             "clean_S2_rate": c_rate,
             "n_buggy_judged": len(buggy),
             "n_clean_judged": len(clean),
-            "anti_rate_buggy": _rate([bool(r.get("anti")) for r in judged if r["src"] == "buggy"]),
-            "corrective_rate_buggy": _rate(
-                [r["rung"] == "corrective" for r in judged if r["src"] == "buggy"]
+            "anti_rate_buggy": rate(bool(r.get("anti")) for r in judged if r["src"] == "buggy"),
+            "corrective_rate_buggy": rate(
+                r["rung"] == "corrective" for r in judged if r["src"] == "buggy"
             ),
-            "unverified_S2_rate": _rate([bool(r.get("unverified")) for r in judged]),
+            "unverified_S2_rate": rate(bool(r.get("unverified")) for r in judged),
             "rungs": {k: dict(v) for k, v in rungs.items()},
             "per_stratum": per_stratum,
         },
