@@ -78,6 +78,36 @@ The in-house `<gen_dir>/<label>/L###.jsonl` layout converts with
 - *Example:* "Her birthday falls on the last day of Febuary" → target `February`.
 - *Judged by:* the shared bank judge, one call per (item, layer): pass = a target concept is NAMED with a verbatim quote verified against one sample; item passes at any layer.
 
+**Multihop (hard)** — [`evals/multihop_hard/README.md`](evals/multihop_hard/README.md)
+- *What it is:* A two- or three-hop factual prompt; every bridge concept must be read, as a multi-token form, in one layer ("...the 1967 Norwegian Computing Center creation that introduced classes and objects was designed by Ole-Johan Dahl together with" -> bridge *Simula 67*, answer Kristen Nygaard).
+- *Example:* "Fact: the 1967 Norwegian Computing Center creation that introduced the concepts of class and object was designed by Ole-Johan Dahl together with" → required bridge `Simula 67` (forms: Simula 67, the Simula language); optional target `Kristen Nygaard`.
+- *Judged by:* no LLM judge: conjunctive regex over multi-token unit forms, an item passes a layer only when every required unit hits there; chance = permutation null. Token readouts are summarized first.
+
+**Multilingual (hard)** — [`evals/multilingual_hard/README.md`](evals/multilingual_hard/README.md)
+- *What it is:* A non-English prompt whose answer is a multi-token concept; the lens must name both the concept (in the prompt's language, English or Chinese) and the language, in one layer.
+- *Example:* a Polish sentence about a concept → required units `concept` (pl / en / zh forms) and `language` ("Polish", "波兰语", ...), both in one layer.
+- *Judged by:* no LLM judge: conjunctive regex over multi-token unit forms, an item passes a layer only when every required unit hits there; chance = permutation null. Token readouts are summarized first.
+
+**Typo (hard)** — [`evals/typo_hard/README.md`](evals/typo_hard/README.md)
+- *What it is:* A sentence ending in a misspelled multi-token word or phrase; the lens must name the corrected form.
+- *Example:* a sentence ending in a misspelling → required unit `correction` (the corrected multi-token form).
+- *Judged by:* no LLM judge: conjunctive regex over multi-token unit forms, an item passes a layer only when every required unit hits there; chance = permutation null. Token readouts are summarized first.
+
+**Basic readout (hard)** — [`evals/basic_readout_hard/README.md`](evals/basic_readout_hard/README.md)
+- *What it is:* The model's obvious next concept when that concept is a multi-token phrase (a dynasty, a compound, a named process); on the L2 factual items the language must be read too.
+- *Example:* a factual prompt whose completion is the Aghlabid dynasty → required unit `readout` (forms: Aghlabid dynasty, Aghlabids, Banu al-Aghlab).
+- *Judged by:* no LLM judge: conjunctive regex over multi-token unit forms, an item passes a layer only when every required unit hits there; chance = permutation null. Token readouts are summarized first.
+
+**Multilingual multihop** — [`evals/multilingual_multihop/README.md`](evals/multilingual_multihop/README.md)
+- *What it is:* A non-English two-hop prompt; the bridge concept must be read in English or Chinese (the native forms), with the L2 bridge form and the language as optional extra units.
+- *Example:* a two-hop prompt in another language → required unit `bridge_native` (the bridge in English or Chinese); the L2 bridge and the language are reported, not required.
+- *Judged by:* no LLM judge: conjunctive regex over multi-token unit forms, an item passes a layer only when every required unit hits there; chance = permutation null. Token readouts are summarized first.
+
+**Multilingual typo** — [`evals/multilingual_typo/README.md`](evals/multilingual_typo/README.md)
+- *What it is:* A non-English sentence ending in a misspelled word; the lens must name the correction (in the prompt's language, English or Chinese) and the language, in one layer ("...المسمى الأدريناللين" -> correction adrenaline, language Arabic).
+- *Example:* an Arabic sentence ending in الأدريناللين → required units `correction` (الأدرينالين, the hormone adrenaline, 肾上腺素) and `language` (Arabic, 阿拉伯语), both in one layer.
+- *Judged by:* no LLM judge: conjunctive regex over multi-token unit forms, an item passes a layer only when every required unit hits there; chance = permutation null. Token readouts are summarized first.
+
 ### Safety
 
 **Agentic misalignment** — [`evals/agentic_misalignment/README.md`](evals/agentic_misalignment/README.md)
@@ -146,6 +176,12 @@ The in-house `<gen_dir>/<label>/L###.jsonl` layout converts with
 | relational_multihop | google/gemini-3.8-flash | rel-v1 | default |
 | hallucination | google/gemini-3.8-flash | v5c-chat | default |
 | moral_rationale | google/gemini-3.8-flash | ec-v1 | default |
+| multilingual_typo | none (regex); summarizer google/gemini-3.8-flash for token readouts | conjunctive-regex-2026-09-16 | deterministic scorer, no judge by design |
+| multilingual_multihop | none (regex); summarizer google/gemini-3.8-flash for token readouts | conjunctive-regex-2026-09-16 | deterministic scorer, no judge by design |
+| basic_readout_hard | none (regex); summarizer google/gemini-3.8-flash for token readouts | conjunctive-regex-2026-09-16 | deterministic scorer, no judge by design |
+| typo_hard | none (regex); summarizer google/gemini-3.8-flash for token readouts | conjunctive-regex-2026-09-16 | deterministic scorer, no judge by design |
+| multilingual_hard | none (regex); summarizer google/gemini-3.8-flash for token readouts | conjunctive-regex-2026-09-16 | deterministic scorer, no judge by design |
+| multihop_hard | none (regex); summarizer google/gemini-3.8-flash for token readouts | conjunctive-regex-2026-09-16 | deterministic scorer, no judge by design |
 | typo | google/gemini-3.8-flash | bank-2026-09-16 | default (shared bank judge of the basic families) |
 | poetry | google/gemini-3.8-flash | bank-2026-09-16 | default (shared bank judge of the basic families) |
 | multilingual | google/gemini-3.8-flash | bank-2026-09-16 | default (shared bank judge of the basic families) |

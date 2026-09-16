@@ -16,12 +16,12 @@ items before any scale run. Status: [ ] open · [~] in PR · [x] merged.
 - [ ] directed-modulation
 
 ## Basic evals, multi-token hard (desideratum 2) — conjunctive regex only, no judge
-- [ ] multihop-hard
-- [ ] multilingual-hard
-- [ ] typo-hard
-- [ ] basic-readout-hard
-- [ ] multilingual-typo
-- [ ] multilingual-multihop
+- [~] multihop-hard. Branch: agam/eval-hard-tier.
+- [~] multilingual-hard. Branch: agam/eval-hard-tier.
+- [~] typo-hard. Branch: agam/eval-hard-tier.
+- [~] basic-readout-hard. Branch: agam/eval-hard-tier.
+- [~] multilingual-typo. Branch: agam/eval-hard-tier.
+- [~] multilingual-multihop. Branch: agam/eval-hard-tier.
 - [ ] multi_concept_directed_modulation (deterministic scorer, own read regime)
 
 ## Baselines
