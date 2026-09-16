@@ -13,7 +13,7 @@ items before any scale run. Status: [ ] open · [~] in PR · [x] merged.
 - [x] multilingual (merged 2026-09-16, #16)
 - [x] poetry (merged 2026-09-16, #16)
 - [x] typo (merged 2026-09-16, #16)
-- [~] directed-modulation. Branch: agam/eval-directed-modulation.
+- [x] directed_modulation (#17)
 
 ## Basic evals, multi-token (desideratum 2) — forced-choice Gemini judge per unit, conjunctive
 - [x] multihop_mt (#20)

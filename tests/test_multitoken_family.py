@@ -36,6 +36,7 @@ def test_letter_index_accepts_a_letter_or_a_letter_with_its_own_option():
     assert letter_index("", OPTS) is None and letter_index(None, OPTS) is None
     assert letter_index("AB", OPTS) is None and letter_index("G", OPTS) is None
     assert letter_index("F", OPTS[:5]) is None  # past the list
+    assert letter_index("B. beta.", OPTS) == 1  # trailing punctuation after the option text
 
 
 def test_verdict_kinds_and_the_quote_gate():
@@ -61,6 +62,7 @@ def test_verdict_kinds_and_the_quote_gate():
 def test_fold_is_accent_case_and_quote_insensitive():
     assert fam.fold("Curaçao\u2019s") == "curacao's"
     assert fam.fold("ÉCOLE") == "ecole"
+    assert fam.fold("\u201cquoted\u201d \u2018x\u2019") == "\"quoted\" 'x'"
 
 
 def _v(item, layer, role, kind, correct, judged=True):
