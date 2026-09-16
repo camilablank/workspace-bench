@@ -8,11 +8,11 @@ items before any scale run. Status: [ ] open · [~] in PR · [x] merged.
 
 ## Basic evals, single token (desideratum 1) — regex + bank judge; DM has its own judge
 - [ ] association
-- [ ] basic-readout
-- [ ] multihop
-- [ ] multilingual
-- [ ] poetry
-- [ ] typo
+- [~] basic-readout. Branch: agam/eval-basic_readout (stacked).
+- [~] multihop. Branch: agam/eval-multihop (stacked).
+- [~] multilingual. Branch: agam/eval-multilingual (stacked).
+- [~] poetry. Branch: agam/eval-poetry (stacked).
+- [~] typo. Branch: agam/eval-typo (stacked).
 - [ ] directed-modulation
 
 ## Basic evals, multi-token hard (desideratum 2) — conjunctive regex only, no judge

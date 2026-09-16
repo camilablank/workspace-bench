@@ -1,6 +1,6 @@
 # workspace-bench — agent runbook
 
-`wsbench` is nine evals of whether an activation-reading lens (prose "O-lens" samples or
+`wsbench` is a growing set of evals of whether an activation-reading lens (prose "O-lens" samples or
 top-k "J-lens" tokens) surfaces what a model computes but never writes. Every family plugs
 into the shared package in `src/wsbench/` (client, judge config, cache, readout contract,
 results schema, registry, runner, CLI). Design: `plans/0000-bench-v2-design.md`; phase plans
@@ -42,6 +42,12 @@ cell). `wsbench convert-gen-dir gen_dir=GEN out=F.jsonl kind=prose|tokens` conve
   wraps every return and sets `extras["n_items_without_readouts"]`. `mc.py` = option helpers;
   `summarizer.py` = token bag -> prose (prompt in `docs/summarizer.md`).
 - Option lists are ported from the source scripts and gated by goldens in `tests/golden/`.
+- Basic families (`group="basic"`: association, basic_readout, ...) share `src/wsbench/basic/`
+  (`prompts.py` = the bank judge prompt, `judge.py`, `family.py` = `bank_family(name, title)`):
+  one call per (item, layer) over every position's samples, verbatim quote verified against ONE
+  sample, item pass at any layer, undecided items (unjudged or missing cell, no positive) out of
+  the denominator; readout id = `banks.label_of(name)`. Missing cells are fatal (exit 2) unless
+  `allow_missing=True`; empty cells are negatives without a call.
 - Cell shapes: moral = tail-5 positions, 1-2 calls/cell; relational = max-pos row per (item,
   layer); role-bound = every row, 3 MCs/call; conjunctive = one call per item over the
   `[L<layer>]` blob (`opts=char_cap=N`); user_modeling = k samples -> k calls, item key `name`
@@ -93,7 +99,8 @@ macro averages only complete `pass_rate` families and lists every exclusion with
 
 ## Adding a family
 `src/wsbench/evals/<family>/{prompts,judge,score}.py` (`judge.py` ends with
-`return with_readout_count(score.score(...), scope, cells)`); register an `EvalSpec` in the
+`return with_readout_count(score.score(...), scope, cells)`), or for a single-token basic
+family just `__init__.py` + `prompts.py` re-exporting `wsbench.basic.prompts`; register an `EvalSpec` in the
 package `__init__` (incl. `calls_per_arm`, `sources`); add `evals/<family>/{items.json,README.md}`,
 a toy `examples/readouts/<family>.jsonl`, an offline `tests/test_<family>.py` (fake
 `llm._make_client` and `llm.preflight`), the README entry and, if external, a credit.

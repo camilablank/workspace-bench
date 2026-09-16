@@ -1,12 +1,12 @@
 # workspace-bench
 
-Nine evals of whether an activation-reading lens surfaces what Qwen3.6-27B computes but never
+Evals of whether an activation-reading lens surfaces what Qwen3.6-27B computes but never
 writes. A lens reads the model's residual stream at one token position and produces either
 prose (an "O-lens": a few sampled sentences per position) or a top-10 token bag (a "J-lens":
 tokens with scores). Each eval pairs a frozen item bank with a judge prompt that asks whether
 the readout carries the latent the item was built around — the inferred user attribute, the
 composed two-hop relation, the plan the model is about to act on — without echoing the
-prompt. The nine evals fall into five groups (Safety, Association, Bag of words, Precision,
+prompt. The evals fall into six groups (Basic, Safety, Association, Bag of words, Precision,
 Logical processing) and share one judge layer: Gemini 3.8 Flash via OpenRouter by default, with
 three documented pins (see [Judges](#judges)). This repo owns judging only; readout generation
 stays with the lens producer, which hands over one JSONL file per (family, arm).
@@ -26,7 +26,7 @@ uv run wsbench judge family=moral_rationale readouts=examples/readouts/moral_rat
 # a real judge run on one family (OPENROUTER_API_KEY=sk-or-... in the environment or .env)
 uv run wsbench judge family=moral_rationale readouts=readouts/moral_rationale.jsonl out=out/moral_rationale
 
-# all nine from DIR/<family>.jsonl, three families at a time under one 240 rpm pacer, resumable
+# every family from DIR/<family>.jsonl, three families at a time under one 240 rpm pacer, resumable
 uv run wsbench run all=True readouts_root=readouts/ out=out/
 uv run wsbench report dir=out/                     # out/*/results.json -> table + macro
 ```
@@ -44,7 +44,39 @@ all-tokens; the `id` is the bank item id and `pos` a prompt token index:
 The in-house `<gen_dir>/<label>/L###.jsonl` layout converts with
 `uv run wsbench convert-gen-dir gen_dir=GEN out=readouts/<family>.jsonl kind=prose|tokens`.
 
-## The nine evals
+## The evals
+
+### Basic
+
+**Association** — [`evals/association/README.md`](evals/association/README.md)
+- *What it is:* A scene implies a concept the text never names (a Portuguese carnival, a chess game, a childhood); does the lens name it at the final prompt token.
+- *Example:* "Os tambores começaram na avenida ao anoitecer, e as fantasias cobertas de plumas dançaram até o amanhecer." → target `carnaval`.
+- *Judged by:* the shared bank judge, one call per (item, layer): pass = a target concept is NAMED with a verbatim quote verified against one sample; item passes at any layer.
+
+**Basic readout** — [`evals/basic_readout/README.md`](evals/basic_readout/README.md)
+- *What it is:* The model's obvious next concept, in three flavours: an entity ("The athlete Muhammad Ali plays the sport of"), a computed value ("10 - 1 ="), or its own gated answer to a chat question ("What is your favorite card game?"); does the lens name it at the final prompt token.
+- *Example:* "The number 23 written out in words is" → target `twenty-three`.
+- *Judged by:* the shared bank judge, one call per (item, layer): pass = a target concept is NAMED with a verbatim quote verified against one sample; item passes at any layer.
+
+**Multihop** — [`evals/multihop/README.md`](evals/multihop/README.md)
+- *What it is:* A factual prompt whose answer needs one silent hop ("Fact: The chemical symbol for the element with atomic number 26 is" -> `Fe` via *iron*); does the lens name the bridge concept at the final prompt token.
+- *Example:* "Fact: The chemical symbol for the element with atomic number 26 is" → surface answer `Fe`; target (bridge) `iron`.
+- *Judged by:* the shared bank judge, one call per (item, layer): pass = a target concept is NAMED with a verbatim quote verified against one sample; item passes at any layer.
+
+**Multilingual** — [`evals/multilingual/README.md`](evals/multilingual/README.md)
+- *What it is:* A non-English prompt with a one-word answer ("Sechs geteilt durch zwei ist" -> `drei`); does the lens name the concept, in any language, at the final prompt token.
+- *Example:* "Sechs geteilt durch zwei ist" → answer `drei`; target concept `three` (a readout saying *drei*, *three* or *三* all count).
+- *Judged by:* the shared bank judge, one call per (item, layer): pass = a target concept is NAMED with a verbatim quote verified against one sample; item passes at any layer.
+
+**Poetry** — [`evals/poetry/README.md`](evals/poetry/README.md)
+- *What it is:* A rhyming couplet cut before its last word ("...follow where he'd"); does the lens name the rhyme word (`led`) at the final prompt token.
+- *Example:* "A rhyming couplet: The captain pointed at the route ahead, And told his crew to follow where he'd" → target `led`.
+- *Judged by:* the shared bank judge, one call per (item, layer): pass = a target concept is NAMED with a verbatim quote verified against one sample; item passes at any layer.
+
+**Typo** — [`evals/typo/README.md`](evals/typo/README.md)
+- *What it is:* A sentence ending in a misspelled word ("...the last day of Febuary"); does the lens name the corrected word (`February`) at the final prompt token.
+- *Example:* "Her birthday falls on the last day of Febuary" → target `February`.
+- *Judged by:* the shared bank judge, one call per (item, layer): pass = a target concept is NAMED with a verbatim quote verified against one sample; item passes at any layer.
 
 ### Safety
 
@@ -114,6 +146,12 @@ The in-house `<gen_dir>/<label>/L###.jsonl` layout converts with
 | relational_multihop | google/gemini-3.8-flash | rel-v1 | default |
 | hallucination | google/gemini-3.8-flash | v5c-chat | default |
 | moral_rationale | google/gemini-3.8-flash | ec-v1 | default |
+| typo | google/gemini-3.8-flash | bank-2026-09-16 | default (shared bank judge of the basic families) |
+| poetry | google/gemini-3.8-flash | bank-2026-09-16 | default (shared bank judge of the basic families) |
+| multilingual | google/gemini-3.8-flash | bank-2026-09-16 | default (shared bank judge of the basic families) |
+| multihop | google/gemini-3.8-flash | bank-2026-09-16 | default (shared bank judge of the basic families) |
+| basic_readout | google/gemini-3.8-flash | bank-2026-09-16 | default (shared bank judge of the basic families) |
+| association | google/gemini-3.8-flash | bank-2026-09-16 | default (shared bank judge of the basic families) |
 
 - Override precedence: `judge_model=` flag > `WSBENCH_JUDGE_MODEL` env > the family pin.
 - `pinned_instrument` is true only when the resolved model equals the family pin; a result

@@ -31,6 +31,7 @@ def test_register_get_and_duplicate():
 
 
 def test_get_error_lists_known():
+    registry.FAMILIES.clear()
     register(_spec("beta"))
     register(_spec("alpha"))
     with pytest.raises(KeyError) as ei:
