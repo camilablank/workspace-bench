@@ -8,7 +8,7 @@ and not just the concepts?
   `stereotypicality` ∈ congruent / incongruent / neutral), verbatim copy of the source repo's
   `…/role_bound_association/items.json`.
 - **Cells:** **every row** of the readouts file (all layers × all positions) — the instrument;
-  `--layers` / `--items` restrict. One call per row answers three MCs in one response.
+  `layers=` / `items=` restrict. One call per row answers three MCs in one response.
 - **Site pass** = all three correct; **item pass** = any site.
 - **Metric:** `pass_rate` = passing items / items in scope; bootstrap CI over items.
   `chance = None`; per site (1/6)^3; the any-of-grid floor in `extras.any_of_grid_floor`
@@ -165,11 +165,11 @@ You are shown the top-10 token readouts from an interpretability lens at oneposi
 The source script judged with `claude-opus-5` (its `--model` default). This port judges with the
 repo default, **`google/gemini-3.8-flash`** (`JudgeConfig()`), reasoning `{"effort": "minimal"}`;
 the source default is not carried over. Phase 7 measures the change. Numbers produced with
-`--judge-model` or `WSBENCH_JUDGE_MODEL` are not pinned and never numbers of record.
+`judge_model=` or `WSBENCH_JUDGE_MODEL` are not pinned and never numbers of record.
 
 ## Failure accounting
 
-`n_missing_cells` is always 0 (the bank carries no position list; `--allow-missing` is a
+`n_missing_cells` is always 0 (the bank carries no position list; `allow_missing=True` is a
 no-op). `n_empty_cells` counts selected cells whose readout text is empty — they are skipped,
 never judged. `n_unjudged_cells` counts selected non-empty cells that got no verdict (API
 failure, summary failure); an in-scope item with no judged cell counts as a fail.

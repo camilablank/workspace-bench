@@ -55,8 +55,8 @@ treats every row as in scope. Likewise the source's J-lens capture capped positi
 positions it read, and there is no `max_positions` option. `rows[].n_prompt_positions =
 max(pos) + 1` over the rows present is informational.
 
-Layers default to all layers present in the file; `--layers` restricts them. `--opt stride=N`
-keeps positions with `pos % N == 0` (default 1). `--opt chunk_chars=N` sets the Stage B
+Layers default to all layers present in the file; `layers=` restricts them. `opts=stride=N`
+keeps positions with `pos % N == 0` (default 1). `opts=chunk_chars=N` sets the Stage B
 consolidator budget per chunk (default 60000, the source default).
 
 ## Stages
@@ -86,7 +86,7 @@ reply up to 64k; no system block, no schema).
 uncached positions of all items), B-partials (multi-chunk items), B-consolidate, C. An item with
 any Stage A failure skips B and C in that run (nothing is cached for them); its failed
 positions count in `n_unjudged_cells` and its missing Stage C record makes `complete` false.
-`--dry-run` prints the first Stage A prompt and makes no call.
+`dry_run=True` prints the first Stage A prompt and makes no call.
 
 **Cache** (`<out>/cells.jsonl`): keys `A:<label>:p<pos>`, `B:<label>` (+ `B:<label>:chunk<i>`),
 `C:<label>`; fingerprints are chained and cover the readout text —
@@ -126,7 +126,7 @@ macro groups by category) and `misalignment_rate`.
   `n_unjudged_cells` = Stage A failures + B/C call failures on items whose Stage A was complete;
   `n_empty_cells` = empty readouts; `skipped_rows`; `spend_usd` (0 on the Anthropic route —
   token counts are in `extras.usage`). `config` adds `stride`, `chunk_chars`, `layers_read`.
-- `complete` = pinned judge, no `--items`/`--limit`/`--layers` subset, and every misaligned
+- `complete` = pinned judge, no `items=`/`limit=`/`layers=` subset, and every misaligned
   item has a Stage C record.
 
 **Retired "actual" mode.** The source also had a `--score-mode actual` (`SCORE_PROMPT` /
@@ -146,7 +146,7 @@ not take the misaligned action. They never enter the headline; they are the fals
 
 `JudgeConfig(model="claude-sonnet-5", prompt_version="am-narrative-v1", reasoning=None)` —
 the judge of record and the only non-default pin in the repo. No Gemini agreement data exists
-for this family, so `--judge-model`/`WSBENCH_JUDGE_MODEL` overrides produce unpinned numbers
+for this family, so `judge_model=`/`WSBENCH_JUDGE_MODEL` overrides produce unpinned numbers
 that are never numbers of record; a non-`claude-*` override is refused (`JudgeConfigError`:
 the free-text stages need the Anthropic route). `ResolvedJudge.reasoning` is ignored; the
 per-stage thinking setting above governs.

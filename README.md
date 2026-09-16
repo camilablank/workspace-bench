@@ -20,15 +20,15 @@ uv run pytest -q                                   # offline; no key needed
 uv run wsbench list                                # families, judge pins, cost, credit
 
 # dry run on the toy example (prints the first judge prompt, makes no call, needs no key)
-uv run wsbench judge moral_rationale --readouts examples/readouts/moral_rationale.jsonl \
-    --out /tmp/wsb/moral_rationale --dry-run
+uv run wsbench judge family=moral_rationale readouts=examples/readouts/moral_rationale.jsonl \
+    out=/tmp/wsb/moral_rationale dry_run=True
 
 # a real judge run on one family (OPENROUTER_API_KEY=sk-or-... in the environment or .env)
-uv run wsbench judge moral_rationale --readouts readouts/moral_rationale.jsonl --out out/moral_rationale
+uv run wsbench judge family=moral_rationale readouts=readouts/moral_rationale.jsonl out=out/moral_rationale
 
 # all nine from DIR/<family>.jsonl, three families at a time under one 240 rpm pacer, resumable
-uv run wsbench run --all --readouts-root readouts/ --out out/
-uv run wsbench report out/                         # out/*/results.json -> table + macro
+uv run wsbench run all=True readouts_root=readouts/ out=out/
+uv run wsbench report dir=out/                     # out/*/results.json -> table + macro
 ```
 
 `claude-*` judges need `ANTHROPIC_API_KEY`; everything else goes through OpenRouter.
@@ -42,7 +42,7 @@ all-tokens; the `id` is the bank item id and `pos` a prompt token index:
 ```
 
 The in-house `<gen_dir>/<label>/L###.jsonl` layout converts with
-`uv run wsbench convert-gen-dir GEN --out readouts/<family>.jsonl --kind prose|tokens`.
+`uv run wsbench convert-gen-dir gen_dir=GEN out=readouts/<family>.jsonl kind=prose|tokens`.
 
 ## The nine evals
 
@@ -115,7 +115,7 @@ The in-house `<gen_dir>/<label>/L###.jsonl` layout converts with
 | hallucination | google/gemini-3.8-flash | v5c-chat | default |
 | moral_rationale | google/gemini-3.8-flash | ec-v1 | default |
 
-- Override precedence: `--judge-model` flag > `WSBENCH_JUDGE_MODEL` env > the family pin.
+- Override precedence: `judge_model=` flag > `WSBENCH_JUDGE_MODEL` env > the family pin.
 - `pinned_instrument` is true only when the resolved model equals the family pin; a result
   judged by an override is never a number of record and can never be `complete`.
 - Aux models (the summarizer for token readouts, jlens Stage A) come from the family's
@@ -136,7 +136,7 @@ ci95, chance, chance_label, higher_is_better, extras}, rows}`. Failed calls, ref
 cells never score; they are counted. `extras.n_items_without_readouts` counts in-scope items with
 no row in the readouts file (`report` shows it as `n (k no readouts)`).
 
-`complete` = pinned judge, no `--items` / `--limit` / `--layers` subset, zero missing and unjudged
+`complete` = pinned judge, no `items=` / `limit=` / `layers=` subset, zero missing and unjudged
 cells, and empty cells ≤ 5% of expected (jlens swaps the unjudged clause for a ≤ 5% reject rate per
 stage; agentic additionally needs a Stage C record for every misaligned item).
 

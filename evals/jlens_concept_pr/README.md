@@ -34,10 +34,10 @@ Not shipped: the source's `items.json` (792 KB capture rows with the exact `inpu
   the J-lens is the reference, not an arm). The cell is (label, layer, eval position); rows at
   any other position are skipped (`pos_not_selected`). `text = concat_samples(samples)` (the
   non-empty stripped samples joined by `\n---\n`).
-- **Grid:** 299 labels x the selected layers (`--layers`, else every layer in the file) at
+- **Grid:** 299 labels x the selected layers (`layers=`, else every layer in the file) at
   `pos == eval_positions[0]`. Any selected layer without a reference file
   `gen-jlens-pr-jlens/<label>/L{layer:03d}.jsonl` is fatal (exit 2) before any call. An
-  ABSENT row is a missing cell (fatal without `--allow-missing`; the source scored it silently as
+  ABSENT row is a missing cell (fatal without `allow_missing=True`; the source scored it silently as
   zero); a PRESENT-but-empty row is scored as zero concepts ("lens silent"), carries
   `has_text = false` and counts in `n_empty_cells` — so the shared "empty cells <= 5% of
   expected" completeness rule applies here, which the source did not have.
@@ -59,7 +59,7 @@ Not shipped: the source's `items.json` (792 KB capture rows with the exact `inpu
   - **P** `<cell>:P<nnn>` — one call per chunk of at most `STAGE_P_CHUNK = 60` concepts, each
     chunk with the cell's FULL content-token set; the scorer concatenates a cell's chunks by
     `offset` and books `missing_p` unless they tile the concept list exactly. **pfoil**
-    `<cell>:Q<nnn>` only with `--opt stage_p_foil=1`.
+    `<cell>:Q<nnn>` only with `opts=stage_p_foil=1`.
   - A parser `ValueError` (drifted, duplicate or missing concept, bad grade) is a **reject**:
     the answer is cached as a failure (`result: null`, raw answer in `meta.raw`) and exactly
     that key is re-queued by the next run, never partially scored.
@@ -80,7 +80,7 @@ Not shipped: the source's `items.json` (792 KB capture rows with the exact `inpu
   raw_recall, foil: {recall_at_10, precision} (precision null unless pfoil), by_layer: {L:
   block}, mean_n_concepts, punct_frac, reject_rate: {stage: {n_requests, n_missing, rate}},
   statuses}`. Per-cell `passed` (precision >= 0.5) in `rows` is display-only.
-- **Complete** = pinned judge, no `--items` / `--limit` / `--layers` subset, zero missing
+- **Complete** = pinned judge, no `items=` / `limit=` / `layers=` subset, zero missing
   cells, empty cells <= 5%, a headline layer, and **every stage's reject rate <= 5%**
   (`JLENS_PR_MAX_REJECT_RATE` of the source stage script) in place of the shared "zero unjudged
   cells" clause; `counts.n_unjudged_cells` still reports the cells with status `missing_a` /
@@ -90,21 +90,21 @@ Not shipped: the source's `items.json` (792 KB capture rows with the exact `inpu
   against the hand labels (0.43 vs hand 0.33 at L44 for the s3d arm), quote the caveat with
   every number.
 - Not ported: `judge_pr.py` (legacy GPT route), `judge_modal.py`, `judge_bakeoff.py`,
-  `validate_precision_judge.py`, `wsbench_stage.sh` (`wsbench run --all` replaces it), the
+  `validate_precision_judge.py`, `wsbench_stage.sh` (`wsbench run all=True` replaces it), the
   bundle adapter, `lexical_support` as a headline (it rides along in `concept_pr.py` unused).
 
 ## Example
 
 ```bash
 # print the Stage A prompt for the first cell (no key, no calls; missing cells are reported)
-uv run wsbench judge jlens_concept_pr --readouts examples/readouts/jlens_concept_pr.jsonl --out /tmp/j --dry-run
+uv run wsbench judge family=jlens_concept_pr readouts=examples/readouts/jlens_concept_pr.jsonl out=/tmp/j dry_run=True
 # an in-house gen dir -> contract file, then a full arm
-uv run wsbench convert-gen-dir outputs/gen-<run>-jlenspr --out readouts/jlens_concept_pr.jsonl --kind prose
-OPENROUTER_API_KEY=sk-or-... uv run wsbench judge jlens_concept_pr --readouts readouts/jlens_concept_pr.jsonl --out outputs/<run>/jlens_concept_pr
+uv run wsbench convert-gen-dir gen_dir=outputs/gen-<run>-jlenspr out=readouts/jlens_concept_pr.jsonl kind=prose
+OPENROUTER_API_KEY=sk-or-... uv run wsbench judge family=jlens_concept_pr readouts=readouts/jlens_concept_pr.jsonl out=outputs/<run>/jlens_concept_pr
 ```
 
 `examples/readouts/jlens_concept_pr.jsonl` is hand-written toy data (three labels at L44 and
-one empty cell at L48); a real run on it needs `--allow-missing`.
+one empty cell at L48); a real run on it needs `allow_missing=True`.
 
 ## Judge prompts
 

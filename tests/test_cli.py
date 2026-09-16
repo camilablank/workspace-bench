@@ -105,14 +105,14 @@ def test_list_with_stub(stub, capsys, tmp_path, monkeypatch):
 
 
 def test_judge_unknown_exit_2(stub, capsys):
-    assert main(["judge", "nope", "--readouts", "x", "--out", "y"]) == 2
+    assert main(["judge", "family=nope", "readouts=x", "out=y"]) == 2
     err = capsys.readouterr().err
     assert "nope" in err and "stub" in err
 
 
 def test_judge_writes_results_and_pinned(stub, readouts, tmp_path, capsys):
     out = tmp_path / "out"
-    assert main(["judge", "stub", "--readouts", str(readouts), "--out", str(out)]) == 0
+    assert main(["judge", "family=stub", f"readouts={readouts}", f"out={out}"]) == 0
     r = read_results(out)
     assert r.family == "stub" and r.pinned_instrument and r.complete and r.n_items == 2
     assert r.config["judge_model"] == GEMINI and r.config["reasoning"] == {"effort": "minimal"}
@@ -126,13 +126,10 @@ def test_judge_writes_results_and_pinned(stub, readouts, tmp_path, capsys):
         main(
             [
                 "judge",
-                "stub",
-                "--readouts",
-                str(readouts),
-                "--out",
-                str(out),
-                "--judge-model",
-                "claude-x",
+                "family=stub",
+                f"readouts={readouts}",
+                f"out={out}",
+                "judge_model=claude-x",
             ]
         )
         == 0
@@ -146,23 +143,16 @@ def test_judge_flags_pass_through(stub, readouts, tmp_path):
     out = tmp_path / "out"
     argv = [
         "judge",
-        "stub",
-        "--readouts",
-        str(readouts),
-        "--out",
-        str(out),
-        "--layers",
-        "20,36",
-        "--items",
-        "a,b",
-        "--limit",
-        "5",
-        "--allow-missing",
-        "--concurrency",
-        "3",
-        "--rpm",
-        "10",
-        "--dry-run",
+        "family=stub",
+        f"readouts={readouts}",
+        f"out={out}",
+        "layers=20,36",
+        "items=a,b",
+        "limit=5",
+        "allow_missing=True",
+        "concurrency=3",
+        "rpm=10",
+        "dry_run=True",
     ]
     assert main(argv) == 0
     r = read_results(out)
@@ -179,7 +169,7 @@ def test_judge_flags_pass_through(stub, readouts, tmp_path):
 
 def test_judge_default_out(stub, readouts, tmp_path, monkeypatch):
     monkeypatch.chdir(tmp_path)
-    assert main(["judge", "stub", "--readouts", str(readouts)]) == 0
+    assert main(["judge", "family=stub", f"readouts={readouts}"]) == 0
     assert (tmp_path / "outputs" / "stub" / "stub" / "results.json").exists()
 
 
@@ -190,7 +180,7 @@ def test_judge_config_error_exit_3(stub, readouts, tmp_path, monkeypatch):
         raise JudgeConfigError("no key")
 
     monkeypatch.setitem(registry.FAMILIES, "stub", dataclasses.replace(stub, run=boom))
-    assert main(["judge", "stub", "--readouts", str(readouts), "--out", str(tmp_path / "o")]) == 3
+    assert main(["judge", "family=stub", f"readouts={readouts}", f"out={tmp_path / 'o'}"]) == 3
 
 
 def test_run_and_report(stub, readouts, tmp_path, capsys):
@@ -209,7 +199,7 @@ def test_run_and_report(stub, readouts, tmp_path, capsys):
     assert other.name == "other"
     root = readouts.parent
     out = tmp_path / "run_out"
-    assert main(["run", "--all", "--readouts-root", str(root), "--out", str(out)]) == 0
+    assert main(["run", "all=True", f"readouts_root={root}", f"out={out}"]) == 0
     printed = capsys.readouterr().out
     assert "other" in printed and "skip" in printed.lower()
     assert (out / "stub" / "results.json").exists()
@@ -217,19 +207,21 @@ def test_run_and_report(stub, readouts, tmp_path, capsys):
     summary = (out / "summary.md").read_text()
     assert "| stub |" in summary and "macro" in summary
 
-    assert main(["run", "--families", "stub", "--readouts-root", str(root), "--out", str(out)]) == 0
-    assert main(["run", "--families", "nope", "--readouts-root", str(root), "--out", str(out)]) == 2
+    assert main(["run", "families=stub", f"readouts_root={root}", f"out={out}"]) == 0
+    assert main(["run", "families=nope", f"readouts_root={root}", f"out={out}"]) == 2
 
     (out / "summary.md").unlink()
-    assert main(["report", str(out)]) == 0
+    assert main(["report", f"dir={out}"]) == 0
     printed = capsys.readouterr().out
     assert "| stub |" in printed and "macro" in printed
     assert (out / "summary.md").exists()
 
 
-def test_run_requires_selection(stub, tmp_path):
-    with pytest.raises(SystemExit):
-        main(["run", "--readouts-root", str(tmp_path), "--out", str(tmp_path / "o")])
+def test_run_requires_exactly_one_selection(stub, tmp_path, capsys):
+    assert main(["run", f"readouts_root={tmp_path}", f"out={tmp_path / 'o'}"]) == 2
+    assert "exactly one" in capsys.readouterr().err
+    argv = ["run", "all=True", "families=stub", f"readouts_root={tmp_path}", f"out={tmp_path}"]
+    assert main(argv) == 2
 
 
 def test_convert_gen_dir(tmp_path, capsys):
@@ -242,13 +234,10 @@ def test_convert_gen_dir(tmp_path, capsys):
         main(
             [
                 "convert-gen-dir",
-                str(tmp_path / "gen"),
-                "--out",
-                str(out),
-                "--kind",
-                "tokens",
-                "--layers",
-                "36",
+                f"gen_dir={tmp_path / 'gen'}",
+                f"out={out}",
+                "kind=tokens",
+                "layers=36",
             ]
         )
         == 0
@@ -261,9 +250,7 @@ def test_convert_gen_dir(tmp_path, capsys):
         and cells[0].layer == 36
     )
     assert "tokens" in capsys.readouterr().out
-    assert (
-        main(["convert-gen-dir", str(tmp_path / "gen"), "--out", str(out), "--kind", "prose"]) == 0
-    )
+    assert main(["convert-gen-dir", f"gen_dir={tmp_path / 'gen'}", f"out={out}", "kind=prose"]) == 0
     cells, rep = load_readouts(out)
     assert len(cells) == 2 and rep.kind == "prose"
 
@@ -290,9 +277,69 @@ def test_opt_and_aux_models_reach_the_family(readouts, tmp_path, monkeypatch):
         )
     )
     out = tmp_path / "o"
-    argv = ["judge", "stub2", "--readouts", str(readouts), "--out", str(out)]
-    assert main([*argv, "--opt", "char_cap=5", "--opt", "x=a=b"]) == 0
+    argv = ["judge", "family=stub2", f"readouts={readouts}", f"out={out}"]
+    assert main([*argv, "opts=char_cap=5,x=a=b"]) == 0
     assert seen == {"extra": {"char_cap": "5", "x": "a=b"}, "aux": {"summarizer": "m/s"}}
     assert main(argv) == 0 and seen["extra"] == {}
     with pytest.raises(SystemExit):
-        main([*argv, "--opt", "novalue"])
+        main([*argv, "opts=novalue"])
+
+
+def test_no_command_and_unknown_command_exit_2(capsys):
+    assert main([]) == 2
+    assert "usage: wsbench" in capsys.readouterr().err
+    assert main(["nope"]) == 2
+    assert "usage: wsbench" in capsys.readouterr().err
+
+
+def test_missing_required_and_unknown_key_exit_2(stub, capsys):
+    assert main(["judge", "family=stub"]) == 2
+    assert "readouts" in capsys.readouterr().err
+    assert main(["judge", "family=stub", "readouts=x", "bogus=1"]) == 2
+    assert "bogus" in capsys.readouterr().err
+
+
+def test_show_and_help(stub, capsys):
+    argv = ["judge", "family=stub", "readouts=x", "layers=20,36", "dry_run=false", "--show"]
+    assert main(argv) == 0
+    shown = json.loads(capsys.readouterr().out)
+    assert shown["family"] == "stub" and shown["layers"] == [20, 36] and shown["limit"] == 0
+    assert shown["items"] is None and shown["dry_run"] is False and shown["opt"] == []
+    assert main(["--help"]) == 0
+    assert "usage: wsbench" in capsys.readouterr().out
+    assert main(["run", "-h"]) == 0
+    out = capsys.readouterr().out
+    assert "readouts_root=<required>" in out and "family_workers=3" in out
+
+
+@pytest.mark.parametrize(
+    "override",
+    [
+        "dry_run=no",
+        "allow_missing=off",
+        "layers=True",
+        "layers=,",
+        "limit=1.9",
+        "limit=None",
+        "rpm=None",
+        "readouts=None",
+        "items=True",
+    ],
+)
+def test_bad_values_exit_2(stub, capsys, override):
+    argv = ["judge", "family=stub", "readouts=x", "out=y", override]
+    if override.startswith("readouts="):
+        argv.remove("readouts=x")
+    assert main(argv) == 2
+    assert "judge:" in capsys.readouterr().err
+
+
+def test_string_bools_and_numeric_items(stub, readouts, tmp_path):
+    out = tmp_path / "out"
+    argv = ["judge", "family=stub", f"readouts={readouts}", f"out={out}", "dry_run=false"]
+    assert main([*argv, "items=1"]) == 0
+    c = read_results(out).config
+    assert c["dry_run"] is False and c["items"] == ["1"]
+    assert main([*argv[:-1], "dry_run=true", "items=1,2", "layers=36"]) == 0
+    c = read_results(out).config
+    assert c["dry_run"] is True and c["items"] == ["1", "2"] and c["layers"] == [36]

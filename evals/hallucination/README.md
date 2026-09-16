@@ -24,9 +24,9 @@ shared client and cache without changing the instrument.
   asserts they agree.
 - **Cells:** every row of the readouts file that sits on a bank read site (`sites[].pos`); rows
   off-site are skipped (`pos_not_selected`). The expected grid is every site of every in-scope
-  item x the selected layers (`--layers`, else every layer in the file). A **missing cell is
-  fatal** (exit 2) unless `--allow-missing` — this family uses the flag, unlike the MC families;
-  a `--dry-run` only reports the missing count. A cell whose readouts are all empty is a result
+  item x the selected layers (`layers=`, else every layer in the file). A **missing cell is
+  fatal** (exit 2) unless `allow_missing=True` — this family uses the flag, unlike the MC families;
+  a `dry_run=True` only reports the missing count. A cell whose readouts are all empty is a result
   (`n_empty_cells`), not a missing cell.
 - **Call unit:** one call per cell with its first **k = 3** non-empty readouts (`HAL_K`). A
   `tokens` file is first decoded from byte-level BPE (`decode_token`) and each cell's bag goes
@@ -54,8 +54,8 @@ shared client and cache without changing the instrument.
   `n_hallucinated`, `n_off_topic`, `n_revoked`, and every block repeated `by_layer` and
   `by_site_kind` (each with its own `ci95`). `config` adds `kind`, `k`,
   `summary_prompt_version` and `judged_layers`.
-- **Complete** = pinned judge, no `--items` / `--limit` subset, zero missing and unjudged cells,
-  empty cells <= 5% of expected. Deviation from the shared rule: **`--layers` is not a subset
+- **Complete** = pinned judge, no `items=` / `limit=` subset, zero missing and unjudged cells,
+  empty cells <= 5% of expected. Deviation from the shared rule: **`layers=` is not a subset
   here** — a single-layer lens judged at its one layer is complete, as in the source.
 - **Judge:** `google/gemini-3.8-flash`, reasoning `{"effort": "minimal"}`,
   `PROMPT_VERSION = "v5c-chat"` — identical to the source pin, so `pinned_instrument` is true
@@ -66,16 +66,16 @@ shared client and cache without changing the instrument.
 
 ```bash
 # print the judge prompt for the first cell (no key, no calls; missing cells are reported)
-uv run wsbench judge hallucination --readouts examples/readouts/hallucination.jsonl --out /tmp/h --dry-run
+uv run wsbench judge family=hallucination readouts=examples/readouts/hallucination.jsonl out=/tmp/h dry_run=True
 # a token lens: the summarizer prompt is printed instead
-uv run wsbench judge hallucination --readouts examples/readouts/hallucination.tokens.jsonl --out /tmp/h --dry-run
+uv run wsbench judge family=hallucination readouts=examples/readouts/hallucination.tokens.jsonl out=/tmp/h dry_run=True
 # judge a full arm
-OPENROUTER_API_KEY=sk-or-... uv run wsbench judge hallucination --readouts my_lens.jsonl --layers 20,36,44,48,60 --out outputs/my_lens/hallucination
+OPENROUTER_API_KEY=sk-or-... uv run wsbench judge family=hallucination readouts=my_lens.jsonl layers=20,36,44,48,60 out=outputs/my_lens/hallucination
 ```
 
 `examples/readouts/hallucination.jsonl` (the source `examples/readouts_toy.jsonl`) and
 `hallucination.tokens.jsonl` (`examples/topk_toy.jsonl`) are hand-written toy data showing the
-formats; they cover two items only, so a real run on them needs `--allow-missing`. Tokens are
+formats; they cover two items only, so a real run on them needs `allow_missing=True`. Tokens are
 the tokenizer's byte-level BPE vocabulary strings (`"Ġlanguages"`), best first, with scores on a
 scale that differs at 2 decimals (logits or cosines, not probabilities).
 

@@ -138,11 +138,11 @@ You are shown the top-10 token readouts from an interpretability lens at oneposi
 The source script judged with `claude-opus-5` (its `--model` default). This port judges with the
 repo default, **`google/gemini-3.8-flash`** (`JudgeConfig()`), reasoning `{"effort": "minimal"}`;
 the source default is not carried over. Phase 7 measures the change. Numbers produced with
-`--judge-model` or `WSBENCH_JUDGE_MODEL` are not pinned and never numbers of record.
+`judge_model=` or `WSBENCH_JUDGE_MODEL` are not pinned and never numbers of record.
 
 ## Failure accounting
 
-`n_missing_cells` is always 0 (the bank carries no position list; `--allow-missing` is a
+`n_missing_cells` is always 0 (the bank carries no position list; `allow_missing=True` is a
 no-op). `n_empty_cells` counts selected cells whose readout text is empty — they are skipped,
 never judged. `n_unjudged_cells` counts selected non-empty cells that got no verdict (API
 failure, summary failure, or an X/Y pair with one failed call — the pair is dropped); an in-scope item with no judged cell counts as a fail.

@@ -14,7 +14,7 @@ the attribute the model inferred, rather than a copy of the words that implied i
   dict with 100 items (47 `selfdescribe` — the attribute only implied by food, idiom, habit …;
   53 `synthsys` — the attribute stated verbatim in the system prompt, an echo floor). The bank
   item key is `name` (e.g. `um-sd-country-00`); **`id := name` everywhere** — readouts rows,
-  `--items`, verdict rows, golden keys. Every item reads at one position (the final prompt
+  `items=`, verdict rows, golden keys. Every item reads at one position (the final prompt
   token); the bank carries no position list.
 - **Cells:** every row of the readouts file (items × layers). **One judge call per
   (item, layer, pos, sample):** k samples make k calls; blank samples are dropped and make no
@@ -142,7 +142,7 @@ cannot tell from the readout
 ### Option rule
 
 One option set per item, computed over the **whole 100-item bank** — independent of
-`--items` / `--limit` / which ids have readouts — so options are invariant across runs and
+`items=` / `limit=` / which ids have readouts — so options are invariant across runs and
 the golden always applies. (The source pooled only items that had readout rows, so a subset
 changed the options; this port deliberately does not.) `seed = 0`.
 
@@ -259,11 +259,11 @@ model over the whole grid). This port is single tier: every cell goes once to th
 **`google/gemini-3.8-flash`** (`JudgeConfig()`), reasoning `{"effort": "minimal"}`. Not
 ported: the regex `proxy_hit` column, the hallucination overlay, the screen tier,
 `--samples first|bundle` (every sample is judged, as `--samples all`). Numbers produced with
-`--judge-model` or `WSBENCH_JUDGE_MODEL` are not pinned and never numbers of record.
+`judge_model=` or `WSBENCH_JUDGE_MODEL` are not pinned and never numbers of record.
 
 ## Failure accounting
 
-`n_missing_cells` is always 0 (the bank carries no position list; `--allow-missing` is a
+`n_missing_cells` is always 0 (the bank carries no position list; `allow_missing=True` is a
 no-op). `n_empty_cells` counts all-blank cells — skipped, never judged. `n_unjudged_cells`
 counts non-empty cells none of whose sample calls landed (API failure, summary failure);
 `extras.n_api_failed` counts the failed calls. An in-scope item with no judged row counts as a
