@@ -18,7 +18,6 @@ SPEC = register(
             model=DEFAULT_JUDGE,
             prompt_version=PROMPT_VERSION,
             reasoning={"effort": "minimal"},
-            aux_models={"extract": judge.EXTRACT_MODEL},
         ),
         metric="precision",
         higher_is_better=True,

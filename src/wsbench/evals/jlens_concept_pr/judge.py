@@ -3,8 +3,9 @@
 Port of ``scripts/oracle_lens_evals/jlens_pr/{judge_openrouter,judge_pr,items}.py`` (the judge
 of record) onto the shared client and cache. Three judged stages, one ``run_calls`` batch each:
 
-* Stage A (concept split) on ``aux_models["extract"]`` (DeepSeek-V4-Flash, reasoning off): one
-  call per cell with text, ``text = concat_samples(samples)``;
+* Stage A (concept split) on the family judge (Gemini 3.8 Flash in this repo; the source ran
+  it on DeepSeek-V4-Flash, see the README's instrument note): one call per cell with text,
+  ``text = concat_samples(samples)``;
 * Stage B (per-token recall grades) on the judge: one call per CONTENT reference token per cell
   with concepts; the ``foil`` pass grades the same concepts against a seeded within-family
   derangement partner's tokens (keys ``:F..``) and runs by default;
@@ -65,7 +66,6 @@ from .prompts import (
 
 FAMILY = "jlens_concept_pr"
 HEADLINE_LAYER = 44
-EXTRACT_MODEL = "deepseek/deepseek-v4-flash"
 FOIL_SEED = 0
 MAX_TOKENS = 16000  # every stage: a 60-concept response echoes every concept back
 STAGE_P_TEMPERATURE = 0.0
@@ -185,13 +185,13 @@ def n_text_tokens(text: str) -> int:
 
 
 def extract_judge(args: JudgeArgs) -> ResolvedJudge:
-    """Stage A's judge: ``aux_models["extract"]`` with reasoning off (the Flash of record ran
-    non-thinking), pinned/source inherited from the resolved judge."""
+    """Stage A's judge: ``aux_models["extract"]`` if a family ever sets one, else the family
+    judge itself (Camila, 2026-09-16: Stage A runs on Gemini 3.8 Flash like Stages B and P)."""
+    model = args.aux_models.get("extract")
+    if model is None or model == args.judge.model:
+        return args.judge
     return ResolvedJudge(
-        model=args.aux_models.get("extract", args.judge.model),
-        reasoning={"enabled": False},
-        pinned=args.judge.pinned,
-        source=args.judge.source,
+        model=model, reasoning=None, pinned=args.judge.pinned, source=args.judge.source
     )
 
 

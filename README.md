@@ -8,7 +8,7 @@ the readout carries the latent the item was built around — the inferred user a
 composed two-hop relation, the plan the model is about to act on — without echoing the
 prompt. The evals fall into six groups (Basic, Safety, Association, Bag of words, Precision,
 Logical processing) and share one judge layer: Gemini 3.8 Flash via OpenRouter by default, with
-three documented pins (see [Judges](#judges)). This repo owns judging only; readout generation
+two documented pins (see [Judges](#judges)). This repo owns judging only; readout generation
 stays with the lens producer, which hands over one JSONL file per (family, arm).
 
 ## Quickstart
@@ -139,7 +139,7 @@ The in-house `<gen_dir>/<label>/L###.jsonl` layout converts with
 |---|---|---|---|
 | agentic_misalignment | claude-sonnet-5 | am-narrative-v1 | pinned: judge of record for this family; no Gemini agreement data |
 | jailbreak_recognition | claude-sonnet-5 | jb-v1 | pinned: Gemini 3.8 Flash refuses to judge a share of jailbreak cells, which would leave them unjudged; Sonnet 5 judges them all |
-| jlens_concept_pr | google/gemini-3.8-flash (Stage A: deepseek/deepseek-v4-flash) | jlens-pr-v1 | default judge; Stage A pinned to DeepSeek V4 Flash because the concept lists it extracts are frozen with the reference |
+| jlens_concept_pr | google/gemini-3.8-flash | jlens-pr-v2 | default judge for all three stages (the source ran Stage A on DeepSeek V4 Flash; changed here 2026-09-16, see the family README) |
 | user_modeling | google/gemini-3.8-flash | um-v2 | default |
 | conjunctive_association | google/gemini-3.8-flash | comp-v1 | default |
 | role_bound_association | google/gemini-3.8-flash | oa-v1 | default |
@@ -156,8 +156,8 @@ The in-house `<gen_dir>/<label>/L###.jsonl` layout converts with
 - Override precedence: `judge_model=` flag > `WSBENCH_JUDGE_MODEL` env > the family pin.
 - `pinned_instrument` is true only when the resolved model equals the family pin; a result
   judged by an override is never a number of record and can never be `complete`.
-- Aux models (the summarizer for token readouts, jlens Stage A) come from the family's
-  `JudgeConfig.aux_models` and are not affected by the override.
+- Aux models (the summarizer for token readouts) come from the family's `JudgeConfig.aux_models`
+  and are not affected by the override.
 
 Five families (user_modeling and the four in-house MC families) were judged with
 `claude-opus-5` in their source scripts and moved to Gemini 3.8 Flash in this repo.
@@ -193,8 +193,8 @@ verdicts in `<out>/<family>/cells.jsonl`, so a re-run only pays for what is miss
 - **Qwen3.6-27B** (Alibaba) — the model being read; every bank's rollouts and responses are its
   outputs (see the model card for its licence).
 - **Judge models** — Gemini 3.8 Flash via OpenRouter (default judge), Claude Sonnet 5 (Anthropic;
-  agentic_misalignment and jailbreak_recognition), DeepSeek V4 Flash via OpenRouter
-  (jlens_concept_pr Stage A). API terms only; no model outputs are redistributed as data.
+  agentic_misalignment and jailbreak_recognition). API terms only; no model outputs are
+  redistributed as data.
 - **Agentic misalignment** — Lynch et al. 2025, *Agentic Misalignment: How LLMs Could Be Insider
   Threats* (Anthropic, arXiv:2510.05179); code and prompt templates from
   `anthropic-experimental/agentic-misalignment` (MIT). 18 of the 32 scenarios are that repo's
