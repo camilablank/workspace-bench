@@ -1,12 +1,5 @@
-"""``wsbench <command> key=value ...``: list | judge | run | report | convert-gen-dir.
-
-Every command is a ``pydra.Config``: fields are declared in ``__init__`` and normalised in
-``finalize()``. Overrides are ``key=value`` with typed literals (``limit=5``, ``rpm=10``,
-``dry_run=True``); ``layers=20,36``, ``items=a,b``, ``families=a,b`` and ``opts=k=v,k2=v2``
-are comma lists. ``--show`` prints the resolved config; ``--help`` prints a command's keys.
-"""
-
-from __future__ import annotations
+"""``wsbench <command> key=value ...``; every command is a ``pydra.Config`` (fields in
+``__init__``, normalised in ``finalize()``); ``--show`` prints the resolved config."""
 
 import json
 import os
@@ -20,7 +13,7 @@ import pydra
 from wsbench import registry, runner
 from wsbench.judge_config import resolve
 from wsbench.llm import JudgeConfigError
-from wsbench.readouts import convert_gen_dir
+from wsbench.readouts import convert_gen_dir, convert_read_json
 from wsbench.registry import EvalSpec
 from wsbench.results import FamilyResult, macro, markdown_table, read_results
 from wsbench.runner import FamilyOutcome, parse_opts
@@ -285,12 +278,34 @@ class ConvertGenDir(Command):
         return 0
 
 
+class ConvertReadJson(Command):
+    """The write-cell ``read.json`` of multi_concept_directed_modulation -> a contract file."""
+
+    def __init__(self) -> None:
+        super().__init__()
+        self.read = pydra.REQUIRED
+        self.out = pydra.REQUIRED
+
+    def finalize(self) -> None:
+        self.read = _path(self.read)
+        self.out = _path(self.out)
+
+    def execute(self) -> int:
+        rep = convert_read_json(self.read, self.out)
+        print(
+            f"wrote {self.out}: kind={rep.kind} rows={rep.n_rows} layers={rep.layers} "
+            f"empty={rep.n_empty} skipped={rep.skipped}"
+        )
+        return 0
+
+
 COMMANDS: dict[str, type[Command]] = {
     "list": ListFamilies,
     "judge": JudgeFamily,
     "run": RunFamilies,
     "report": ReportRuns,
     "convert-gen-dir": ConvertGenDir,
+    "convert-read-json": ConvertReadJson,
 }
 
 

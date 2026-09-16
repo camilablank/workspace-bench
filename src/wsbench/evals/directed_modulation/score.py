@@ -1,7 +1,5 @@
 """directed_modulation: item-level rates over every judged (layer, position, sample) row."""
 
-from __future__ import annotations
-
 from collections.abc import Callable
 from typing import Any
 

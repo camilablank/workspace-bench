@@ -1,11 +1,4 @@
-"""Option lists for the multi-token judge: one five-way question per judged unit of an item,
-plus the escape. Frozen ``mc`` blocks from the bank where they exist (concept, bridge and
-readout units); the source instrument's fixed confusable set for languages; and, for the typo
-corrections (no frozen block in the banks), four other items' corrections drawn with the same
-seeded rule. Option order is a seeded shuffle keyed by item name and role, so every arm sees
-the same instrument."""
-
-from __future__ import annotations
+"""Frozen option lists per item and judged unit, seeded over the whole bank (family READMEs)."""
 
 import hashlib
 import random

@@ -1,7 +1,5 @@
 """directed_modulation: options, prompt rendering, decode/evidence gate, summary, CLI run."""
 
-from __future__ import annotations
-
 import json
 from pathlib import Path
 from types import SimpleNamespace

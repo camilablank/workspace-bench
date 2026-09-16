@@ -1,7 +1,5 @@
 """The single-token basic families: the bank judge with the any-layer item rule."""
 
-from __future__ import annotations
-
 import sys
 from collections import defaultdict
 from pathlib import Path

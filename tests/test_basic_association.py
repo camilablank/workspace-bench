@@ -1,7 +1,5 @@
 """The association family end to end, offline: bank, judge with a fake client, cache, rules."""
 
-from __future__ import annotations
-
 import json
 from pathlib import Path
 from types import SimpleNamespace

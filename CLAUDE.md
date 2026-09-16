@@ -62,6 +62,12 @@ cell). `wsbench convert-gen-dir gen_dir=GEN out=F.jsonl kind=prose|tokens` conve
   judged unit is correct, item pass at any layer; the language unit is judged for every L2 item
   and a native-script quote of the passage counts. No regex rate anywhere; the floors are the
   lucky-guessing and prompt-only baselines.
+- multi_concept_directed_modulation (`group="basic_mt"`, own judge): rows are write cells
+  (`pos` = offset from the last completion token, `token` required); only in-sentence cells
+  (`regions.py`) are judged, one multi-select call each over six frozen candidates (own concepts +
+  binding partner's + seeded draws, golden in `tests/golden/`); a selection needs a verbatim quote;
+  item passes when any cell names a dictated concept; controls/off-task items leave the
+  denominator; `wsbench convert-read-json` converts the source `read.json`.
 - Cell shapes: moral = tail-5 positions, 1-2 calls/cell; relational = max-pos row per (item,
   layer); role-bound = every row, 3 MCs/call; conjunctive = one call per item over the
   `[L<layer>]` blob (`opts=char_cap=N`); user_modeling = k samples -> k calls, item key `name`
