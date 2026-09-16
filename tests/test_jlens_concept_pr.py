@@ -76,7 +76,7 @@ def test_stage_user_bodies_and_schemas() -> None:
     assert body == "Tokens: ' x', 'y'\n\nConcepts:\n1. a\n2. b"
     assert "Walt Disney" in pp.STAGE_P_SYSTEM and pp.STAGE_P_CHUNK == 60
     assert pp.GRADE_VALUE == {"in": 1.0, "partial": 0.5, "out": 0.0}
-    assert pp.PROMPT_VERSION == "jlens-pr-v1"
+    assert pp.PROMPT_VERSION == "jlens-pr-v2"
     # placeholders are substituted in one pass: a value containing a placeholder survives
     assert pp.render_stage_a("{listing}") == "Text:\n{listing}"
     assert set(pp.PROMPTS) == {
@@ -393,11 +393,12 @@ def test_stage_sequencing_models_and_numbers(tmp_path, fake_llm, jargs):
     # A -> B/foil -> P, in that order; preflight once per (model, reasoning)
     stage_of = {pp.STAGE_A_SYSTEM: "A", pp.STAGE_B_SYSTEM: "B", pp.STAGE_P_SYSTEM: "P"}
     kinds = ["pre" if u.startswith("Return") else stage_of[s] for s, u in fake.calls]
-    assert kinds == ["pre"] + ["A"] * 3 + ["pre"] + ["B"] * 60 + ["P"] * 3
-    assert {kw["model"] for kw in st["A"]} == {"deepseek/deepseek-v4-flash"}
-    assert all(kw["extra_body"]["reasoning"] == {"enabled": False} for kw in st["A"])
-    assert {kw["model"] for kw in st["B"] + st["P"]} == {"google/gemini-3.8-flash"}
-    assert all(kw["extra_body"]["reasoning"] == {"effort": "minimal"} for kw in st["B"] + st["P"])
+    # one judge for every stage -> a single preflight
+    assert kinds == ["pre"] + ["A"] * 3 + ["B"] * 60 + ["P"] * 3
+    assert {kw["model"] for kw in st["A"] + st["B"] + st["P"]} == {"google/gemini-3.8-flash"}
+    assert all(
+        kw["extra_body"]["reasoning"] == {"effort": "minimal"} for kw in st["A"] + st["B"] + st["P"]
+    )
     assert all("temperature" not in kw for kw in st["A"] + st["B"])
     assert all(kw["temperature"] == 0.0 for kw in st["P"])
     assert all(kw["max_tokens"] == 16000 for kw in st["A"] + st["B"] + st["P"])
@@ -434,7 +435,7 @@ def test_stage_sequencing_models_and_numbers(tmp_path, fake_llm, jargs):
     assert row["passed"] is True and row["foil_status"] == "missing_p"
     assert row["foil_precision"] is None and row["foil_recall_at_10"] == 0.0
     assert row["n_content_tokens"] == 10 and row["n_tokens"] == 10 and row["family"] == "chat"
-    assert res.config["extract_model"] == "deepseek/deepseek-v4-flash"
+    assert res.config["extract_model"] == "google/gemini-3.8-flash"
     assert res.config["stage_p_temperature"] == 0.0 and res.config["stage_p_foil"] is False
     # resume: everything cached, no calls
     fake2 = fake_llm(_responder)

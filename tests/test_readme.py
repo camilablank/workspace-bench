@@ -75,7 +75,7 @@ def test_credits_cover_every_source_and_no_in_house_family():
             assert s.sources in notice, (s.name, s.sources)
         else:
             assert s.name not in credits and s.title not in credits, s.name
-    assert "DeepSeek V4 Flash" in credits
+    assert "DeepSeek" not in credits
     for banned in ("CC-CEDICT", "nocot-bench", "Feng"):
         assert banned not in credits and banned not in notice, banned
 
@@ -86,7 +86,10 @@ def test_judges_table_pins():
         assert s.name in judges and s.judge.prompt_version in judges, s.name
     assert "| agentic_misalignment | claude-sonnet-5 |" in judges
     assert "| jailbreak_recognition | claude-sonnet-5 |" in judges
-    assert "deepseek-v4-flash" in judges and "refuses" in judges
+    assert (
+        "deepseek" not in judges.lower().replace("deepseek v4 flash; changed", "")
+        and "refuses" in judges
+    )
 
 
 def test_citation_cff_required_keys():
