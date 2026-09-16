@@ -1,7 +1,7 @@
 [project]
 name = "workspace-bench"
 version = "0.1.0"
-description = "workspace-bench: nine evals of whether an activation-reading lens surfaces what a model computes but never writes"
+description = "workspace-bench: evals of whether an activation-reading lens surfaces what a model computes but never writes"
 readme = "README.md"
 license = "MIT"
 requires-python = ">=3.12"

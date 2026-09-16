@@ -7,7 +7,7 @@ import re
 from wsbench import registry
 from wsbench.registry import REPO_ROOT
 
-GROUPS = ["Safety", "Association", "Bag of words", "Precision", "Logical processing"]
+GROUPS = ["Basic", "Safety", "Association", "Bag of words", "Precision", "Logical processing"]
 LABELS = ("*What it is:*", "*Example:*", "*Judged by:*")
 
 
@@ -26,9 +26,9 @@ def _section(text: str, heading: str) -> str:
     return m.group(1)
 
 
-def test_nine_entries_with_three_labelled_lines():
+def test_every_family_has_an_entry_with_three_labelled_lines():
     specs = _specs()
-    assert len(specs) == 9
+    assert len(specs) >= 9
     text = _readme()
     lines = text.splitlines()
     for s in specs:
@@ -53,7 +53,8 @@ def test_nine_entries_with_three_labelled_lines():
 
 def test_group_membership_matches_registry():
     text = _readme()
-    by_group = {"safety": "Safety", "association": "Association", "bag_of_words": "Bag of words"}
+    by_group = {"basic": "Basic", "safety": "Safety", "association": "Association"}
+    by_group |= {"bag_of_words": "Bag of words"}
     by_group |= {"precision": "Precision", "logic": "Logical processing"}
     starts = {g: text.index(f"### {g}") for g in GROUPS}
     ends = [*sorted(starts.values()), len(text)]
