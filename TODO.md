@@ -40,8 +40,8 @@ full-grid numbers first); buggy code Gemini judge only, no deterministic checker
 pick, chance 0.5, plus net_S2); arithmetic gets a Gemini judge too (the numeric matcher caught
 too many false positives); prompt-only is not shown for multi_concept_directed_modulation.
 - [x] chain_intermediates (#23)
-- [~] brew_intermediates (multi-select colour judge; emission + stir cells, regions=all option). Branch: agam/brew-intermediates.
-- [ ] buggy_code
+- [x] brew_intermediates (#24)
+- [~] buggy_code (consequence-ladder Gemini judge; net_S2 vs clean twins; no pairwise pick, the bank has no twin map). Branch: agam/buggy-code.
 - [ ] arithmetic_intermediates — Gemini judge; variants (Agam, 2026-09-16): KEEP absval, addmul,
       floordiv, frac, fracadd, fraccomp, fracint, fracsmall, muladd, mulmid, sign, signpair, subsub,
       subsubx; REMOVE addmulx, dec16, halflead, halftrail, halves, maxsel, mulmul, negdec, negdiv8,

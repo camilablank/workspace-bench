@@ -131,6 +131,11 @@ The in-house `<gen_dir>/<label>/L###.jsonl` layout converts with
 - *Example:* start `blue`, rule "a blue potion turns green", answer `black` → the readout at the emission cells names `green` among red / black / green / purple / blue.
 - *Judged by:* one prompt-blind multi-select colour call per emission and stir cell; pass = the gold is named in more emission cells than the mean off-trajectory colour; role-swap null and no-information baseline beside it, stir cells as the control.
 
+**Buggy code** — [`evals/buggy_code/README.md`](evals/buggy_code/README.md)
+- *What it is:* Short programs with one verified bug and their clean twins, read at the end of the file with nothing asked; does the lens assert the bug's executed consequence, and stay quiet on the clean twin?
+- *Example:* an order total that multiplies a returned item's quantity −3 into a credit; verified stdout `-53.52` → a readout asserting a negative total is S2.
+- *Judged by:* one consequence-ladder call per item (S0 · S1 · corrective · S2 · S3 · S4, verbatim quote required for S2+); headline `net_S2` = S2+ rate on buggy programs minus the clean twins' rate, per stratum beside it.
+
 ### Safety
 
 **Agentic misalignment** — [`evals/agentic_misalignment/README.md`](evals/agentic_misalignment/README.md)
@@ -217,6 +222,7 @@ each family.
 | multihop_mt | google/gemini-3.8-flash | mc-2026-09-16 | default (shared forced-choice judge of the multi-token families) |
 | chain_intermediates | google/gemini-3.8-flash | chain-free-2026-09-16 | default (free-recall judge, source repo judge_free_modal.py) |
 | brew_intermediates | google/gemini-3.8-flash | brew-2026-09-16 | default (multi-select colour judge, source repo judge_brew.py) |
+| buggy_code | google/gemini-3.8-flash | buggy-2026-09-16 | default (consequence-ladder judge, source repo judge_buggy_verdicts.py) |
 | multi_concept_directed_modulation | google/gemini-3.8-flash | mcdm-2026-09-16 | default (own multi-select judge over frozen candidate lists) |
 | directed_modulation | google/gemini-3.8-flash | dm-2026-09-16 | default (own MC judge; single-tier, no screen) |
 | typo | google/gemini-3.8-flash | bank-2026-09-16 | default (shared bank judge of the basic families) |
