@@ -11,6 +11,8 @@ Example: an Arabic sentence ending in الأدريناللين → `the hormone 
 
 Judged units: `correction` (the English form among four other items' corrections, seeded) and `language`.
 
+The bank file is a frozen copy of the source repo's hard-tier bank: its `family` header and `contract` block describe the source's regex contract and are not read by this judge.
+
 ## Scoring
 
 - **Headline: judged pass rate.** One forced-choice call per (item, layer, judged unit). The

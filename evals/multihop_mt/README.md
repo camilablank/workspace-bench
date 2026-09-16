@@ -11,6 +11,8 @@ Example: "Fact: the 1967 Norwegian Computing Center creation that introduced the
 
 Judged units: `bridge1` (and `bridge2` on 3-hop items), each a five-way question from the bank's frozen `mc` block.
 
+The bank file is a frozen copy of the source repo's hard-tier bank: its `family` header and `contract` block describe the source's regex contract and are not read by this judge.
+
 ## Scoring
 
 - **Headline: judged pass rate.** One forced-choice call per (item, layer, judged unit). The

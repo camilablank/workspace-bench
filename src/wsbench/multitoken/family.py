@@ -61,21 +61,29 @@ def fold(s: str) -> str:
     return "".join(c for c in s if not unicodedata.combining(c)).casefold()
 
 
+def pick_index(choice: Any) -> int | None:
+    """The option index named by a judge's ``choice``: a lone letter (``"B"``, ``"b."``), else
+    None. Free text such as ``"cannot tell"`` is NOT read as option C."""
+    s = str(choice or "").strip().rstrip(".").strip().upper()
+    return LETTERS.index(s) if len(s) == 1 and s in LETTERS else None
+
+
 def verdict(res: dict[str, Any] | None, gold_idx: int, n_opts: int, readout: str) -> dict[str, Any]:
     """One judge answer: ``correct`` / ``distractor`` / ``cannot`` / ``invalid``; a correct pick
-    counts only with a verbatim (folded) quote from the readout."""
+    counts only with a verbatim (folded) quote from the readout. ``invalid`` (no lone letter, or
+    a letter past the option list) is judged and negative: the instrument answered, wrongly."""
     if res is None:
         return {"judged": False, "kind": "unavailable", "correct": False}
-    letter = str(res.get("choice", "")).strip().upper()[:1]
-    idx = LETTERS.find(letter) if letter else -1
-    if idx < 0 or idx >= n_opts:
+    idx = pick_index(res.get("choice"))
+    if idx is None or idx >= n_opts:
         return {
             "judged": True,
-            "pick": letter or None,
+            "pick": str(res.get("choice", "")).strip() or None,
             "kind": "invalid",
             "correct": False,
             "quote_ok": False,
         }
+    letter = LETTERS[idx]
     if idx == n_opts - 1:
         return {
             "judged": True,
@@ -129,7 +137,7 @@ def run_family(args: JudgeArgs, *, name: str) -> FamilyResult:
     spend = Spend()
     pre = Preflighter(args.dry_run)
     texts: dict[str, str] = {}
-    n_empty = 0
+    empty: set[tuple[str, int]] = set()  # (item, layer) cells with nothing to judge: negatives
     with Cache(args.out / "cells.jsonl") as cache:
         if rep.kind == "tokens":
             bundles = {c.key: render_bag(c.tokens or (), c.scores) for c in cells if c.tokens}
@@ -145,14 +153,14 @@ def run_family(args: JudgeArgs, *, name: str) -> FamilyResult:
                 preflight=pre.for_judge(sjudge),
             )
             texts = {k: v for k, v in summ.items() if v is not None}
-            n_empty = sum(1 for c in cells if not c.tokens)
+            empty = {(c.id, c.layer) for c in cells if not c.tokens}
         else:
             for c in cells:
                 joined = "\n".join(s for s in (c.samples or ()) if s.strip())
                 if joined:
                     texts[c.key] = joined
                 else:
-                    n_empty += 1
+                    empty.add((c.id, c.layer))
         calls: list[Call] = []
         meta: dict[
             str, tuple[str, int, str, int, int, str]
@@ -199,18 +207,16 @@ def run_family(args: JudgeArgs, *, name: str) -> FamilyResult:
                 **v,
             }
         )
-    unsummarized = {c.id for c in cells if rep.kind == "tokens" and c.tokens and c.key not in texts}
+    unsummarized = {
+        (c.id, c.layer) for c in cells if rep.kind == "tokens" and c.tokens and c.key not in texts
+    }
     rows = [
-        _item_row(i, layers, positions, judged_roles(by_id[i]), verdicts, missing, unsummarized)
-        for i in ids
+        _item_row(i, judged_roles(by_id[i]), verdicts, missing, unsummarized, empty) for i in ids
     ]
     decided = [r for r in rows if r["pass"] is not None]
     passes = [1.0 if r["pass"] else 0.0 for r in decided]
-    n_unjudged = sum(1 for v in verdicts if not v["judged"]) + sum(
-        len(options[c.id])
-        for c in cells
-        if rep.kind == "tokens" and c.tokens and c.key not in texts
-    )
+    n_unjudged_units = sum(1 for v in verdicts if not v["judged"])
+    unjudged_cells = {(v["item"], v["layer"]) for v in verdicts if not v["judged"]} | unsummarized
     kinds: dict[str, int] = defaultdict(int)
     for v in verdicts:
         kinds[v["kind"]] += 1
@@ -234,8 +240,8 @@ def run_family(args: JudgeArgs, *, name: str) -> FamilyResult:
             subset=is_subset(args),
             n_expected=len(ids) * len(layers),
             n_missing=len(missing),
-            n_unjudged=n_unjudged,
-            n_empty=n_empty,
+            n_unjudged=len(unjudged_cells),
+            n_empty=len(empty),
         ),
         pinned_instrument=args.judge.pinned,
         config=base_config(
@@ -249,13 +255,14 @@ def run_family(args: JudgeArgs, *, name: str) -> FamilyResult:
         counts={
             "n_expected_cells": len(ids) * len(layers),
             "n_missing_cells": len(missing),
-            "n_unjudged_cells": n_unjudged,
-            "n_empty_cells": n_empty,
+            "n_unjudged_cells": len(unjudged_cells),
+            "n_empty_cells": len(empty),
             "skipped_rows": sum(rep.skipped.values()),
             "spend_usd": spend.usd,
         },
         extras={
             "n_calls": len(calls),
+            "n_unjudged_units": n_unjudged_units,
             "n_items_decided": len(decided),
             "n_items_undecided": len(ids) - len(decided),
             "unit_any_layer": role_any,
@@ -273,26 +280,32 @@ def _rate(flags: list[bool]) -> float | None:
 
 def _item_row(
     item_id: str,
-    layers: list[int],
-    positions: dict[tuple[str, int], list[Cell]],
     roles: list[str],
     verdicts: list[dict[str, Any]],
     missing: list[tuple[str, int]],
-    unsummarized: set[str],
+    unsummarized: set[tuple[str, int]],
+    empty: set[tuple[str, int]],
 ) -> dict[str, Any]:
     """``pass`` = some layer where every judged unit is correct; None (undecided) when no layer
-    passes and a unit verdict is unjudged, a summary failed or a layer is missing."""
+    passes and a unit verdict is unjudged, a summary failed or a layer is missing. An empty cell
+    is a judged negative at that layer (nothing was read), never a reason to be undecided."""
     mine = [v for v in verdicts if v["item"] == item_id]
     by_layer: dict[int, dict[str, dict[str, Any]]] = defaultdict(dict)
     for v in mine:
         by_layer[v["layer"]][v["role"]] = v
+    for i, layer in sorted(empty):
+        if i == item_id:
+            by_layer[layer] = {
+                r: {"judged": True, "kind": "empty", "correct": False, "quote_ok": False}
+                for r in roles
+            }
     passing = sorted(
         layer for layer, vs in by_layer.items() if all(vs.get(r, {}).get("correct") for r in roles)
     )
     unjudged = any(not v["judged"] for v in mine)
     incomplete = (
         unjudged
-        or item_id in unsummarized
+        or any(i == item_id for i, _l in unsummarized)
         or any(i == item_id for i, _l in missing)
         or not by_layer
     )

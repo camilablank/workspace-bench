@@ -11,6 +11,8 @@ Example: a Polish sentence about a concept → the concept's English name among 
 
 Judged units: `concept` (frozen `mc` block) and `language` (the fixed confusable set for the prompt's language).
 
+The bank file is a frozen copy of the source repo's hard-tier bank: its `family` header and `contract` block describe the source's regex contract and are not read by this judge.
+
 ## Scoring
 
 - **Headline: judged pass rate.** One forced-choice call per (item, layer, judged unit). The

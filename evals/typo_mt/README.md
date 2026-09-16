@@ -11,6 +11,8 @@ Example: a sentence ending in a misspelling → the corrected phrase among four 
 
 Judged units: `correction`: the corrected form among four other items' corrections (seeded).
 
+The bank file is a frozen copy of the source repo's hard-tier bank: its `family` header and `contract` block describe the source's regex contract and are not read by this judge.
+
 ## Scoring
 
 - **Headline: judged pass rate.** One forced-choice call per (item, layer, judged unit). The

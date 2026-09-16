@@ -31,6 +31,9 @@ LANG_CONFUSABLES: dict[str, tuple[str, list[str]]] = {
 }
 
 
+# The seed scheme is the source instrument's (``mc_judge.seeded_shuffle``: the full sha256 hex of
+# ``"<MC_SEED>|<key>"`` as the Random seed), NOT ``wsbench.mc.seed_int`` (first 8 bytes), so the
+# option order here is byte-identical to the order every arm was judged with in the source repo.
 def _rng(key: str) -> random.Random:
     return random.Random(int(hashlib.sha256(f"{MC_SEED}|{key}".encode()).hexdigest(), 16))
 
