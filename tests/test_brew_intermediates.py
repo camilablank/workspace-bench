@@ -190,3 +190,62 @@ def test_registered_readme_and_dry_run(tmp_path, capsys, monkeypatch):
     r = read_results(out)
     assert r.value is None and r.extras["n_items_without_readouts"] == 98
     assert "Candidate colours:" in capsys.readouterr().out
+
+
+def test_blank_emission_cell_counts_and_failed_call_undecides(tmp_path, monkeypatch):
+    _h, items = load_bank(BANK)
+    it = items[0]
+    emit_pos = [int(p) for p, r in it["regions"].items() if r.startswith("emit")]
+    stir_pos = [int(p) for p, r in it["regions"].items() if r == "stir"]
+    rows = []
+    for layer in range(20, 61, 4):
+        for p in emit_pos + stir_pos:
+            text = "" if (layer == 20 and p == emit_pos[0]) else f"- the potion is {it['start']}"
+            rows.append({"id": it["id"], "layer": layer, "pos": p, "samples": [text]})
+    path = tmp_path / "r.jsonl"
+    path.write_text("".join(json.dumps(r) + "\n" for r in rows))
+    calls_seen = []
+
+    def fake_run_calls(calls, **kw):
+        calls_seen.extend(calls)
+        out = {
+            c.key: {"named": [it["start"]], "primary": it["start"], "basis": "explicit"}
+            for c in calls
+        }
+        emit_calls = [c for c in calls if c.meta["pos"] in emit_pos]
+        first = min(emit_calls, key=lambda c: (c.meta["layer"], c.meta["pos"]))
+        out[first.key] = None  # one emission call failed
+        return out
+
+    monkeypatch.setattr(judge, "run_calls", fake_run_calls)
+    args = JudgeArgs(
+        readouts=path,
+        out=tmp_path / "out",
+        judge=resolve(JudgeConfig(prompt_version=PROMPT_VERSION)),
+        layers=None,
+        items=[it["id"]],
+        limit=0,
+        allow_missing=False,
+        concurrency=1,
+        rpm=1.0,
+        dry_run=False,
+    )
+    r = judge.run(args)
+    row = r.rows[0]
+    assert r.counts["n_empty_cells"] == 1 and row["emit"]["n_cells"] == 33  # the blank counts
+    assert row["pass"] is None and r.counts["n_unjudged_cells"] == 1  # a failed emission call
+    assert row["stir"]["G"] == 0 and r.value is None
+    # allow_missing scores what is there when a layer is absent
+    short = [x for x in rows if x["layer"] != 60]
+    path.write_text("".join(json.dumps(x) + "\n" for x in short))
+    monkeypatch.setattr(
+        judge,
+        "run_calls",
+        lambda calls, **kw: {
+            c.key: {"named": [], "primary": "none", "basis": "none"} for c in calls
+        },
+    )
+    with pytest.raises(SystemExit):
+        judge.run(args)
+    r = judge.run(JudgeArgs(**{**args.__dict__, "allow_missing": True}))
+    assert r.counts["n_missing_cells"] == 9 and r.rows[0]["pass"] is None

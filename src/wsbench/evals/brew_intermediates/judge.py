@@ -72,7 +72,8 @@ def rule(cells: list[dict[str, Any]]) -> dict[str, Any] | None:
     cells naming off colour j. ``pass`` iff K*G > sum(O) (gold named in more cells than the mean
     off colour; ties fail). ``null`` = the same rule with each off colour in the gold's role,
     averaged; ``baseline`` = the fraction of the K+1 colours that clear the rule (what a lens
-    with no idea which colour is the intermediate scores)."""
+    with no idea which colour is the intermediate scores). Pass and null share the same K+1
+    counts, so a gold pass mechanically lowers that item's null: compare against ``baseline``."""
     if not cells:
         return None
     g = sum(c["gold"] for c in cells)

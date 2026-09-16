@@ -27,10 +27,11 @@ Every item has 24 pinned prompt positions, each labelled by region:
 
 By default (`opts=regions=headline`) the judge reads the emission and stir cells: 9 cells × 11
 layers ≈ 10k calls per arm. `opts=regions=all` adds the start and question cells (24 cells,
-≈ 26k calls). In the source repo's full-grid run the emission cells carried the signal (s3d:
-gold named in 38% of emission cells vs 20% for an off colour, lift 0.18) while the compute
-region's lift was 0.03 and the stir region's 0.02, so the cut keeps the headline and its
-control and drops only cells with no lift; the option keeps the full grid one flag away.
+≈ 26k calls). In the source repo's committed full-grid run (`results/brew_intermediates/metrics.json`,
+uncorrected per-cell lifts) the emission cells carried the signal (s3d: gold named in 38% of
+emission cells vs 20% for an off colour, lift 0.18) while the compute region's lift was 0.03
+and the stir region's 0.02, so the cut keeps the headline and its control and drops only cells
+with no lift; the option keeps the full grid one flag away.
 
 ## Scoring
 
@@ -52,8 +53,9 @@ control and drops only cells with no lift; the option keeps the full grid one fl
   `cell_off_rate` the per-region cell rates, and the lucky-guessing baseline covers the option
   lists. The source repo's caveat stands: the intermediate is usually the model's runner-up
   answer colour, so this bank cannot separate a held step from a runner-up output.
-- An item whose emission cells are all judged is decided (an empty cell names nothing); an
-  unjudged or missing emission cell with no pass leaves it undecided. Missing cells are fatal
+- An item whose emission cells are all judged is decided (an empty cell names nothing); any
+  unjudged or missing emission cell leaves it undecided, because a missing cell can flip the rule
+  either way. Missing cells are fatal
   (exit 2) unless `allow_missing=True`.
 
 ## Readouts
