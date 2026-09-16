@@ -39,7 +39,7 @@ last. Confirmed 2026-09-16: brew judged on emission + stir cells only (check the
 full-grid numbers first); buggy code Gemini judge only, no deterministic checker (pairwise blind
 pick, chance 0.5, plus net_S2); arithmetic gets a Gemini judge too (the numeric matcher caught
 too many false positives); prompt-only is not shown for multi_concept_directed_modulation.
-- [ ] chained_intermediates
+- [~] chain_intermediates (free-recall Gemini judge; decoy null). Branch: agam/chain-intermediates.
 - [ ] brew_intermediates
 - [ ] buggy_code
 - [ ] arithmetic_intermediates — Gemini judge; variants (Agam, 2026-09-16): KEEP absval, addmul,

@@ -10,6 +10,7 @@ from wsbench.registry import REPO_ROOT
 GROUPS = [
     "Basic (single token)",
     "Basic (multi-token)",
+    "Computational",
     "Safety",
     "Association",
     "Bag of words",
@@ -62,6 +63,7 @@ def test_every_family_has_an_entry_with_three_labelled_lines():
 def test_group_membership_matches_registry():
     text = _readme()
     by_group = {"basic": "Basic (single token)", "basic_mt": "Basic (multi-token)"}
+    by_group |= {"computational": "Computational"}
     by_group |= {"safety": "Safety", "association": "Association"}
     by_group |= {"bag_of_words": "Bag of words"}
     by_group |= {"precision": "Precision", "logic": "Logical processing"}
