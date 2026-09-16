@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pytest
 
-from wsbench import registry
+from wsbench import llm, registry
 from wsbench.cli import main
 from wsbench.judge_config import JudgeConfig
 from wsbench.readouts import load_readouts
@@ -65,6 +65,8 @@ def _stub_run(args: JudgeArgs) -> FamilyResult:
 @pytest.fixture
 def stub(monkeypatch):
     monkeypatch.delenv("WSBENCH_JUDGE_MODEL", raising=False)
+    # ``run`` preflights every judge model up front (phase 6); tests make no network calls
+    monkeypatch.setattr(llm, "preflight", lambda model, reasoning: None)
     return register(
         EvalSpec(
             name="stub",

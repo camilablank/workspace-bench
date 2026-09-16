@@ -15,6 +15,7 @@ from wsbench.mcjudge import (
     item_scope,
     load_bank,
     run_calls,
+    with_readout_count,
 )
 from wsbench.readouts import load_readouts
 from wsbench.registry import JudgeArgs
@@ -131,11 +132,15 @@ def run(args: JudgeArgs) -> FamilyResult:
         skipped_rows=sum(rep.skipped.values()),
         spend=spend,
     )
-    return score.score(
-        args,
+    return with_readout_count(
+        score.score(
+            args,
+            scope,
+            rows,
+            counts=counts,
+            config=base_config(args, PROMPT_VERSION),
+            n_api_failed=n_api_failed + n_summary_failed,
+        ),
         scope,
-        rows,
-        counts=counts,
-        config=base_config(args, PROMPT_VERSION),
-        n_api_failed=n_api_failed + n_summary_failed,
+        cells,
     )

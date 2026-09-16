@@ -44,6 +44,8 @@ class EvalSpec:
     metric: str
     higher_is_better: bool
     run: Callable[[JudgeArgs], FamilyResult]  # returns a FamilyResult; writes nothing
+    calls_per_arm: str = ""  # human string for `wsbench list`, e.g. "≈ 7k" (judge calls per arm)
+    sources: str = ""  # credit substring that appears verbatim in README §Credits and NOTICE.md
 
 
 def register(spec: EvalSpec) -> EvalSpec:

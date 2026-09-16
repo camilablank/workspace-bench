@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import threading
 from collections.abc import Callable
 from dataclasses import dataclass, field
 from typing import Any
@@ -11,7 +12,9 @@ from wsbench import llm, registry
 from wsbench.cache import Cache, fingerprint
 from wsbench.judge_config import ResolvedJudge
 from wsbench.llm import Spend
+from wsbench.readouts import Cell
 from wsbench.registry import JudgeArgs
+from wsbench.results import FamilyResult
 
 
 @dataclass
@@ -102,21 +105,32 @@ def run_calls(
     return out
 
 
+# Process-global "already preflighted" set, shared by every family's Preflighter and seeded by
+# ``runner.run_families`` so ``run --all`` preflights each judge model once, not once per family.
+_PREFLIGHT_LOCK = threading.Lock()
+_PREFLIGHTED: set[str] = set()
+
+
+def preflight_key(model: str, reasoning: dict | None) -> str:
+    return json.dumps([model, reasoning], sort_keys=True)
+
+
 class Preflighter:
-    """Runs :func:`llm.preflight` at most once per (model, reasoning) per family run."""
+    """Runs :func:`llm.preflight` at most once per (model, reasoning) per process (the set is
+    module-global and lock-guarded; the lock is held across the call so "once" is exact)."""
 
     def __init__(self, dry_run: bool = False):
-        self._done: set[str] = set()
         self._dry_run = dry_run
 
     def ensure(self, judge: ResolvedJudge) -> None:
         if self._dry_run:
             return
-        k = json.dumps([judge.model, judge.reasoning], sort_keys=True)
-        if k in self._done:
-            return
-        llm.preflight(judge.model, judge.reasoning)
-        self._done.add(k)
+        k = preflight_key(judge.model, judge.reasoning)
+        with _PREFLIGHT_LOCK:
+            if k in _PREFLIGHTED:
+                return
+            llm.preflight(judge.model, judge.reasoning)
+            _PREFLIGHTED.add(k)
 
     def for_judge(self, judge: ResolvedJudge) -> Callable[[], None]:
         return lambda: self.ensure(judge)
@@ -139,6 +153,21 @@ def item_scope(bank: list[dict], args: JudgeArgs) -> list[dict]:
     if args.limit > 0:
         items = items[: args.limit]
     return items
+
+
+def items_without_readouts(scope: list[dict], cells: list[Cell]) -> int:
+    """In-scope items with zero rows in the readouts file (item id = ``id``, or ``name`` for the
+    user_modeling bank). ``complete`` cannot see a truncated file for families whose bank has no
+    position list; this can."""
+    present = {c.id for c in cells}
+    return sum(1 for it in scope if it.get("id", it.get("name")) not in present)
+
+
+def with_readout_count(result: FamilyResult, scope: list[dict], cells: list[Cell]) -> FamilyResult:
+    """Attach ``extras["n_items_without_readouts"]`` to a family's result (rendered by
+    ``report`` as ``n (k no readouts)``)."""
+    result.extras["n_items_without_readouts"] = items_without_readouts(scope, cells)
+    return result
 
 
 def is_subset(args: JudgeArgs) -> bool:

@@ -5,6 +5,7 @@ from pathlib import Path
 
 import pytest
 
+from wsbench import mcjudge
 from wsbench.cache import Cache
 from wsbench.judge_config import JudgeConfig, resolve
 from wsbench.llm import Spend, schema_block
@@ -64,7 +65,9 @@ def test_run_calls_caches_results_and_failures(tmp_path: Path, fake_llm):
     # preflight ran exactly once (the extra call), then the two judge calls
     assert len(fake.calls) == 3 and fake.calls[0][1] == 'Return {"a":1}'
 
-    # resume: the cached success is reused, the failure retried; preflight again (new run)
+    # resume: the cached success is reused, the failure retried; preflight again (new run —
+    # the "already preflighted" set is process-global since phase 6, so model a fresh process)
+    mcjudge._PREFLIGHTED.clear()
     fake2 = fake_llm(lambda s, u: {"a": 1} if u.startswith("Return") else {"choice": 9})
     with Cache(tmp_path / "cells.jsonl") as cache:
         got = run_calls(

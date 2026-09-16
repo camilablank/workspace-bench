@@ -1,0 +1,20 @@
+cff-version: 1.2.0
+message: "If you use workspace-bench, please cite it as below."
+type: software
+title: "workspace-bench: nine evals of whether an activation-reading lens surfaces what a model computes but never writes"
+authors:
+  - family-names: Blank
+    given-names: Camila
+version: 0.1.0
+date-released: 2026-09-16
+repository-code: https://github.com/camilablank/workspace-bench
+license: MIT
+preferred-citation:
+  type: software
+  title: "workspace-bench: nine evals of whether an activation-reading lens surfaces what a model computes but never writes"
+  authors:
+    - family-names: Blank
+      given-names: Camila
+  year: 2026
+  repository-code: https://github.com/camilablank/workspace-bench
+  license: MIT

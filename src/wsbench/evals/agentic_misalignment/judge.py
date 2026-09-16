@@ -25,7 +25,7 @@ from collections.abc import Callable, Sequence
 from wsbench import llm
 from wsbench.cache import Cache, fingerprint
 from wsbench.llm import Spend
-from wsbench.mcjudge import base_config, base_counts, item_scope, load_bank
+from wsbench.mcjudge import base_config, base_counts, item_scope, load_bank, with_readout_count
 from wsbench.readouts import Cell, load_readouts
 from wsbench.registry import JudgeArgs
 from wsbench.results import FamilyResult
@@ -206,16 +206,20 @@ def run(args: JudgeArgs) -> FamilyResult:
             skipped_rows=sum(rep.skipped.values()),
             spend=spend,
         )
-        return score.score(
-            args,
+        return with_readout_count(
+            score.score(
+                args,
+                scope,
+                [],
+                [],
+                counts=counts,
+                config=config,
+                n_positions_read=sum(len(p) for p in positions.values()),
+                n_informative=0,
+                usage=_usage(spend),
+            ),
             scope,
-            [],
-            [],
-            counts=counts,
-            config=config,
-            n_positions_read=sum(len(p) for p in positions.values()),
-            n_informative=0,
-            usage=_usage(spend),
+            cells,
         )
 
     account: dict[str, str | None] = {}
@@ -406,16 +410,20 @@ def run(args: JudgeArgs) -> FamilyResult:
         skipped_rows=sum(rep.skipped.values()),
         spend=spend,
     )
-    return score.score(
-        args,
+    return with_readout_count(
+        score.score(
+            args,
+            scope,
+            records,
+            rows,
+            counts=counts,
+            config=config,
+            n_positions_read=sum(len(p) for p in positions.values()),
+            n_informative=n_informative,
+            usage=_usage(spend),
+        ),
         scope,
-        records,
-        rows,
-        counts=counts,
-        config=config,
-        n_positions_read=sum(len(p) for p in positions.values()),
-        n_informative=n_informative,
-        usage=_usage(spend),
+        cells,
     )
 
 

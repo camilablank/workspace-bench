@@ -21,5 +21,7 @@ SPEC = register(
         metric="design_score",
         higher_is_better=True,
         run=judge.run,
+        calls_per_arm="≈ 51k",
+        sources="Lynch et al. 2025",
     )
 )

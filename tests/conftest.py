@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import pytest
 
-from wsbench import llm, registry
+from wsbench import llm, mcjudge, registry
 
 
 @pytest.fixture(autouse=True)
@@ -13,6 +13,13 @@ def _isolate_registry():
     yield
     registry.FAMILIES.clear()
     registry.FAMILIES.update(saved)
+
+
+@pytest.fixture(autouse=True)
+def _reset_preflighted():
+    mcjudge._PREFLIGHTED.clear()  # process-global "already preflighted" set (phase 6)
+    yield
+    mcjudge._PREFLIGHTED.clear()
 
 
 @pytest.fixture(autouse=True)
