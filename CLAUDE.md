@@ -82,6 +82,11 @@ cell). `wsbench convert-gen-dir gen_dir=GEN out=F.jsonl kind=prose|tokens` conve
   judged as their bag, no summarizer; a top value needs the digits in the readout or a verbatim
   quote; pass = top value is an intermediate at any layer; `extras.null_top1_near` is the ±3
   decoy null. No analytic floor.
+- brew_intermediates (`group="computational"`, own judge): rows at the bank's 24 pinned positions
+  per item (`regions`); `opts=regions=headline` (default: emission + stir cells) or `all`; one
+  multi-select colour call per non-empty, non-screened cell over the item's `options_adjacent`;
+  pass = K·G > ΣO over the emission cells (source bundle rule), `null`/`baseline` per item, stir
+  cells the control. No analytic floor.
 - Cell shapes: moral = tail-5 positions, 1-2 calls/cell; relational = max-pos row per (item,
   layer); role-bound = every row, 3 MCs/call; conjunctive = one call per item over the
   `[L<layer>]` blob (`opts=char_cap=N`); user_modeling = k samples -> k calls, item key `name`
