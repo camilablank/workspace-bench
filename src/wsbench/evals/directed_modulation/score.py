@@ -3,6 +3,7 @@
 from collections.abc import Callable
 from typing import Any
 
+from wsbench.family import rate
 from wsbench.llm import Spend
 from wsbench.mcjudge import base_config, is_subset
 from wsbench.registry import JudgeArgs
@@ -40,11 +41,6 @@ def _by_item(
     return out
 
 
-def _rate(flags: dict[str, bool | None]) -> float | None:
-    decided = [f for f in flags.values() if f is not None]
-    return sum(decided) / len(decided) if decided else None
-
-
 STRICT: Pred = lambda v: v["pick"] == "gold" and v["basis"] == "content_bound"  # noqa: E731
 
 
@@ -78,7 +74,7 @@ def summarize(
         keep = set(ids)
         out: dict[str, Any] = {"n_items": len(keep)}
         for name, f in flags.items():
-            out[name] = _rate({k: v for k, v in f.items() if k in keep})
+            out[name] = rate(v for k, v in f.items() if k in keep and v is not None)
         return out
 
     out: dict[str, Any] = {"overall": block(list(sub_of))}

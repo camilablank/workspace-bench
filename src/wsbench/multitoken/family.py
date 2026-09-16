@@ -1,31 +1,33 @@
 """Multi-token basic families: one forced-choice judge call per (item, layer, unit); a layer
 passes when every unit is picked correctly with a verbatim quote, an item at any layer."""
 
-import sys
 from collections import defaultdict
 from pathlib import Path
 from typing import Any
 
 from wsbench.banks import load_bank
 from wsbench.cache import Cache
+from wsbench.family import (
+    cell_text,
+    fail,
+    pass_rate_result,
+    quote_in,
+    rate,
+    require_cells,
+    tri_state,
+)
 from wsbench.judge_config import JudgeConfig
 from wsbench.llm import Spend
-from wsbench.mc import fold, letter_index
-from wsbench.mcjudge import (
-    Call,
-    Preflighter,
-    base_config,
-    is_subset,
-    item_scope,
-    run_calls,
-    with_readout_count,
-)
+from wsbench.mc import fold, letter_index  # fold is part of this module's public surface
+from wsbench.mcjudge import Call, Preflighter, item_scope, run_calls, with_readout_count
 from wsbench.multitoken.options import judged_roles, option_sets
 from wsbench.multitoken.prompts import LETTERS, PROMPT_VERSION, SCHEMA, SYSTEM, render_user
 from wsbench.readouts import Cell, load_readouts
 from wsbench.registry import REPO_ROOT, EvalSpec, JudgeArgs
-from wsbench.results import FamilyResult, bootstrap_ci, completeness
+from wsbench.results import FamilyResult
 from wsbench.summarizer import SUMMARIZER_PROMPT_VERSION, aux_judge, render_bag, summarize
+
+__all__ = ["fold", "letter_index", "mt_family", "run_family", "verdict"]
 
 GROUP = "basic_mt"
 CHANCE_LABEL = (
@@ -76,7 +78,7 @@ def verdict(
             "quote_ok": False,
         }
     quote = str(res.get("quote", ""))
-    ok = bool(fold(quote.strip())) and fold(quote.strip()) in fold(readout)
+    ok = quote_in(quote, readout)
     kind = "correct" if idx == gold_idx else "distractor"
     return {
         "judged": True,
@@ -86,11 +88,6 @@ def verdict(
         "quote": quote,
         "quote_ok": ok,
     }
-
-
-def _fail(msg: str) -> None:
-    print(msg, file=sys.stderr)
-    raise SystemExit(2)
 
 
 def run_family(args: JudgeArgs, *, name: str) -> FamilyResult:
@@ -106,16 +103,12 @@ def run_family(args: JudgeArgs, *, name: str) -> FamilyResult:
         positions[(c.id, c.layer)].append(c)
     multi = sorted(k for k, cs in positions.items() if len({c.pos for c in cs}) > 1)
     if multi:
-        _fail(
+        fail(
             f"{name}: {len(multi)} (item, layer) cells carry more than one read position "
             f"(first: {multi[0]}); this family reads the final prompt token only"
         )
     missing = [(i, layer) for i in ids for layer in layers if (i, layer) not in positions]
-    if missing and not args.allow_missing and not args.dry_run:
-        _fail(
-            f"{name}: {len(missing)} of {len(ids) * len(layers)} (item, layer) cells have no "
-            "readout; pass allow_missing=True to score the rest"
-        )
+    require_cells(name, missing, len(ids) * len(layers), args)
 
     spend = Spend()
     pre = Preflighter(args.dry_run)
@@ -139,9 +132,9 @@ def run_family(args: JudgeArgs, *, name: str) -> FamilyResult:
             empty = {(c.id, c.layer) for c in cells if not c.tokens}
         else:
             for c in cells:
-                joined = "\n".join(s for s in (c.samples or ()) if s.strip())
-                if joined:
-                    texts[c.key] = joined
+                text, _plain = cell_text(c)
+                if text.strip():
+                    texts[c.key] = text
                 else:
                     empty.add((c.id, c.layer))
         calls: list[Call] = []
@@ -197,68 +190,41 @@ def run_family(args: JudgeArgs, *, name: str) -> FamilyResult:
         _item_row(i, judged_roles(by_id[i]), verdicts, missing, unsummarized, empty) for i in ids
     ]
     decided = [r for r in rows if r["pass"] is not None]
-    passes = [1.0 if r["pass"] else 0.0 for r in decided]
-    n_unjudged_units = sum(1 for v in verdicts if not v["judged"])
     unjudged_cells = {(v["item"], v["layer"]) for v in verdicts if not v["judged"]} | unsummarized
     kinds: dict[str, int] = defaultdict(int)
     for v in verdicts:
         kinds[v["kind"]] += 1
     roles = sorted({r for i in ids for r in judged_roles(by_id[i])})
-    role_any = {
-        r: _rate([row["unit_correct"][r] for row in decided if r in row["unit_correct"]])
-        for r in roles
-    }
-    result = FamilyResult(
-        family=name,
-        metric="pass_rate",
-        value=sum(passes) / len(passes) if passes else None,
-        ci95=bootstrap_ci(passes) if passes else None,
-        n_items=len(ids),
-        higher_is_better=True,
-        chance=None,
-        chance_label=CHANCE_LABEL,
-        complete=bool(cells)
-        and completeness(
-            pinned=args.judge.pinned,
-            subset=is_subset(args),
-            n_expected=len(ids) * len(layers),
-            n_missing=len(missing),
-            n_unjudged=len(unjudged_cells),
-            n_empty=len(empty),
-        ),
-        pinned_instrument=args.judge.pinned,
-        config=base_config(
-            args,
-            PROMPT_VERSION,
-            kind=rep.kind or "prose",
-            layers_judged=layers,
-            summarizer=SUMMARIZER_PROMPT_VERSION if rep.kind == "tokens" else None,
-        ),
+    result = pass_rate_result(
+        name=name,
+        args=args,
+        prompt_version=PROMPT_VERSION,
+        rows=rows,
+        cells=cells,
+        rep=rep,
         # a cell is one (item, layer) readout at the single read position; a call is one unit
-        counts={
-            "n_expected_cells": len(ids) * len(layers),
-            "n_missing_cells": len(missing),
-            "n_unjudged_cells": len(unjudged_cells),
-            "n_empty_cells": len(empty),
-            "skipped_rows": sum(rep.skipped.values()),
-            "spend_usd": spend.usd,
+        n_expected=len(ids) * len(layers),
+        n_missing=len(missing),
+        n_unjudged=len(unjudged_cells),
+        n_empty=len(empty),
+        spend=spend,
+        chance_label=CHANCE_LABEL,
+        config_extra={
+            "layers_judged": layers,
+            "summarizer": SUMMARIZER_PROMPT_VERSION if rep.kind == "tokens" else None,
         },
         extras={
             "n_calls": len(calls),
-            "n_unjudged_units": n_unjudged_units,
-            "n_items_decided": len(decided),
-            "n_items_undecided": len(ids) - len(decided),
-            "unit_any_layer": role_any,
+            "n_unjudged_units": sum(1 for v in verdicts if not v["judged"]),
+            "unit_any_layer": {
+                r: rate(row["unit_correct"][r] for row in decided if r in row["unit_correct"])
+                for r in roles
+            },
             "kinds": dict(kinds),
-            "abstain_rate": _rate([v["kind"] == "cannot" for v in verdicts if v["judged"]]),
+            "abstain_rate": rate(v["kind"] == "cannot" for v in verdicts if v["judged"]),
         },
-        rows=rows,
     )
     return with_readout_count(result, scope, cells)
-
-
-def _rate(flags: list[bool]) -> float | None:
-    return sum(flags) / len(flags) if flags else None
 
 
 def _item_row(
@@ -285,18 +251,16 @@ def _item_row(
     passing = sorted(
         layer for layer, vs in by_layer.items() if all(vs.get(r, {}).get("correct") for r in roles)
     )
-    unjudged = any(not v["judged"] for v in mine)
     incomplete = (
-        unjudged
+        any(not v["judged"] for v in mine)
         or any(i == item_id for i, _l in unsummarized)
         or any(i == item_id for i, _l in missing)
         or not by_layer
     )
-    passed: bool | None = True if passing else (None if incomplete else False)
     return {
         "id": item_id,
         "roles": roles,
-        "pass": passed,
+        "pass": tri_state(bool(passing), incomplete),
         "earliest_layer": passing[0] if passing else None,
         "passing_layers": passing,
         "unit_correct": {
