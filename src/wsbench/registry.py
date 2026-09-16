@@ -1,7 +1,5 @@
 """Family registry: each ``wsbench.evals.<family>`` package registers one ``EvalSpec`` on import."""
 
-from __future__ import annotations
-
 import importlib
 import pkgutil
 from collections.abc import Callable, Mapping
@@ -13,7 +11,7 @@ from wsbench.results import FamilyResult
 
 # src layout (uv-managed checkout); a wheel install would resolve to site-packages.
 REPO_ROOT = Path(__file__).resolve().parents[2]
-FAMILIES: dict[str, EvalSpec] = {}
+FAMILIES: dict[str, "EvalSpec"] = {}  # filled by register(); EvalSpec is defined below
 
 
 @dataclass

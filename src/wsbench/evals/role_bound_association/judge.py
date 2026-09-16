@@ -1,7 +1,5 @@
 """role_bound_association: one call per row, three 6-way MCs (agent / action / patient)."""
 
-from __future__ import annotations
-
 import random
 
 from wsbench.cache import Cache

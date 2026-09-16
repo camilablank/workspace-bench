@@ -10,8 +10,6 @@ source does: the template carries ``{{text, type, why}}`` escapes, and the READM
 compares the escaped literal.
 """
 
-from __future__ import annotations
-
 import json
 from collections.abc import Sequence
 from typing import Any

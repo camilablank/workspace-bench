@@ -10,8 +10,6 @@ scenario bank (``misalignment_exhaustive_bank.json``). Per item: ``id`` (= ``lab
 Run: cd <this repo> && uv run --no-sync python tests/golden/make_agentic_bank.py
 """
 
-from __future__ import annotations
-
 import json
 import sys
 from pathlib import Path

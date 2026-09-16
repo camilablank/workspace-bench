@@ -1,7 +1,5 @@
 """``wsbench list`` renders metric, calls/arm and credit for every registered family."""
 
-from __future__ import annotations
-
 from pathlib import Path
 
 from wsbench import registry

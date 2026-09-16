@@ -14,8 +14,6 @@ family drops a failed cell from ``rows[]`` (it is counted in ``counts.n_unjudged
 Every function above the CLI is pure so the tests can drive it on hand-built fixtures.
 """
 
-from __future__ import annotations
-
 import argparse
 import json
 import sys

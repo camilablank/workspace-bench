@@ -1,7 +1,5 @@
 """conjunctive_association scoring: item pass = the judge picks the gold description."""
 
-from __future__ import annotations
-
 from wsbench.mcjudge import is_subset
 from wsbench.registry import JudgeArgs
 from wsbench.results import FamilyResult, bootstrap_ci, completeness

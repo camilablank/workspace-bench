@@ -15,8 +15,6 @@ rendering. ``SCORE_PROMPT`` / ``parse_score`` (the retired "actual" mode) are no
 Every entry of :data:`PROMPTS` is printed verbatim in ``evals/agentic_misalignment/README.md``.
 """
 
-from __future__ import annotations
-
 import json
 import re
 from collections.abc import Mapping, Sequence

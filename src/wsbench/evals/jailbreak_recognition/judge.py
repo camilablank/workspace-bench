@@ -1,8 +1,6 @@
 """jailbreak_recognition: one recognition / echo / topic / noise call per (item, layer, pos) cell
 over the bank's read sites, all K samples classified at once."""
 
-from __future__ import annotations
-
 import sys
 from typing import Any
 

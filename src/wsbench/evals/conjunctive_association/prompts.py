@@ -5,8 +5,6 @@ L190). Templates use ``{name}`` placeholders rendered with ``str.replace``. Ever
 :data:`PROMPTS` is printed verbatim in ``evals/conjunctive_association/README.md``.
 """
 
-from __future__ import annotations
-
 from collections.abc import Sequence
 
 from wsbench.llm import schema_block

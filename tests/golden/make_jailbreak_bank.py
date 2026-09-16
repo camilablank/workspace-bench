@@ -7,8 +7,6 @@ trailing assistant turn) and ``read`` (``positions``, ``turn_end``, ``n_tokens``
 Run: cd <this repo> && uv run --no-sync python tests/golden/make_jailbreak_bank.py
 """
 
-from __future__ import annotations
-
 import json
 import sys
 from pathlib import Path

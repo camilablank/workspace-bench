@@ -8,8 +8,6 @@ substituted values are never re-parsed. Every string entry of :data:`PROMPTS` is
 verbatim in ``evals/user_modeling/README.md``.
 """
 
-from __future__ import annotations
-
 from collections.abc import Sequence
 
 from wsbench.llm import schema_block

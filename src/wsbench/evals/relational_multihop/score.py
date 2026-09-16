@@ -1,7 +1,5 @@
 """relational_multihop scoring: cell pass = X and Y correct; item pass = any layer."""
 
-from __future__ import annotations
-
 from collections import defaultdict
 
 from wsbench.mcjudge import is_subset

@@ -2,8 +2,6 @@
 ``narrative_judge.py``), helpers, parse rules, stage sequencing on a fake streaming client,
 resume behaviour, scoring goldens and dry-run."""
 
-from __future__ import annotations
-
 import json
 import re
 from pathlib import Path

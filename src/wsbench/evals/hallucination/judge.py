@@ -19,8 +19,6 @@ summarised by the shared summarizer and judged as one readout (k = 1). A verdict
 readout parses to ``unjudged`` fails validation and is re-queued by the next run.
 """
 
-from __future__ import annotations
-
 import re
 from collections.abc import Iterable, Sequence
 from dataclasses import dataclass

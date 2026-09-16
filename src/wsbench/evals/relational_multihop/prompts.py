@@ -6,8 +6,6 @@ L95-107, L183-194, L209-214). Templates use ``{name}`` placeholders rendered wit
 ``evals/relational_multihop/README.md``.
 """
 
-from __future__ import annotations
-
 from wsbench.llm import schema_block
 
 REL_SEED = 20260813  # fixes MC option order + distractor draw (reproducible)

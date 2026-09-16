@@ -1,7 +1,5 @@
 """user_modeling: 6-way identification MC per (item, layer, pos, sample) at the assistant onset."""
 
-from __future__ import annotations
-
 import random
 from collections import defaultdict
 from typing import Any

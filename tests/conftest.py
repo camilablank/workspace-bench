@@ -1,7 +1,5 @@
 """Shared fixtures: isolate the family registry and the RPM pacer between tests."""
 
-from __future__ import annotations
-
 import pytest
 
 from wsbench import llm, mcjudge, registry

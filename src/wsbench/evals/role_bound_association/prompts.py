@@ -7,8 +7,6 @@ contains literal ``{person A} -> {action} -> {person B}`` which must survive. Ev
 :data:`PROMPTS` is printed verbatim in ``evals/role_bound_association/README.md``.
 """
 
-from __future__ import annotations
-
 from collections.abc import Sequence
 
 from wsbench.llm import schema_block

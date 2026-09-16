@@ -20,8 +20,6 @@ partially scored. Keys are ``f"{cell.key}:A"``, ``:B{ti:02d}`` / ``:F{ti:02d}``,
 ``:P{ci:03d}`` / ``:Q{ci:03d}``.
 """
 
-from __future__ import annotations
-
 import json
 import random
 from collections.abc import Callable, Mapping, Sequence

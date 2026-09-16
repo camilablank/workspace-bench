@@ -1,8 +1,6 @@
 """The jlens_concept_pr scoring numerics, ported unchanged from the source repo's
 ``tests/test_concept_pr.py`` (plus a ``token_types`` smoke test for the inlined ``is_cjk``)."""
 
-from __future__ import annotations
-
 import math
 
 import pytest

@@ -9,8 +9,6 @@ Either row may carry an optional ``"token": "<read-site token>"`` string. A file
 all-prose or all-tokens. Malformed lines are counted, never fatal.
 """
 
-from __future__ import annotations
-
 import json
 from collections.abc import Collection, Iterable, Mapping
 from dataclasses import dataclass, field

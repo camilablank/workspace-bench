@@ -6,8 +6,6 @@ the CLI-module tests do not port. Keys carry no arm here: ``<cell key>:A`` / ``:
 / ``:Pnnn`` / ``:Qnnn``.
 """
 
-from __future__ import annotations
-
 import json
 import math
 import re

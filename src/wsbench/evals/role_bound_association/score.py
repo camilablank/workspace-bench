@@ -1,7 +1,5 @@
 """role_bound_association scoring: site pass = all three MCs correct; item pass = any site."""
 
-from __future__ import annotations
-
 from collections import defaultdict
 from statistics import mean, median
 

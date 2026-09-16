@@ -7,8 +7,6 @@ source's ``UM_ATTRIBUTE_USER.format(...)`` for the pinned example cell (item 1, 
 Run: cd <this repo> && uv run --no-sync python tests/golden/make_user_modeling.py
 """
 
-from __future__ import annotations
-
 import importlib
 import sys
 from pathlib import Path

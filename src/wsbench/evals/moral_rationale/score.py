@@ -1,7 +1,5 @@
 """moral_rationale scoring: item pass = any correct cell (committed) / both sides (deliberative)."""
 
-from __future__ import annotations
-
 from collections import defaultdict
 from statistics import mean
 
