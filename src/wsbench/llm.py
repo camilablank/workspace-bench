@@ -420,3 +420,182 @@ def preflight(model: str, reasoning: dict[str, Any] | None) -> None:
             "preflight called inside a running event loop; await preflight_async"
         )
     asyncio.run(preflight_async(model, reasoning))
+
+
+# ---------------------------------------------------------------- free-text primitive
+# Used by agentic_misalignment (three free-text stages, no schema). Anthropic route only:
+# streaming (the SDK refuses non-streaming requests whose max_tokens implies a >10 min
+# operation), per-call thinking on/off, and a budget-doubling retry when the text is empty and
+# stop_reason == "max_tokens" (thinking ate the budget), up to _TEXT_BUDGET_CEILING.
+
+_TEXT_BUDGET_CEILING = 64_000
+
+
+async def _anthropic_text_once(
+    client: Any,
+    user: str,
+    *,
+    model: str,
+    thinking: bool,
+    max_tokens: int,
+    timeout: float,
+    spend: Spend,
+) -> str | None:
+    budget = max_tokens
+    while True:
+        async with client.messages.stream(
+            timeout=timeout,
+            model=model,
+            max_tokens=budget,
+            thinking={"type": "adaptive" if thinking else "disabled"},
+            messages=[{"role": "user", "content": user}],
+        ) as stream:
+            resp = await stream.get_final_message()
+        spend.calls += 1
+        usage = getattr(resp, "usage", None)
+        if usage is not None:
+            spend.input_tokens += int(getattr(usage, "input_tokens", 0) or 0)
+            spend.output_tokens += int(getattr(usage, "output_tokens", 0) or 0)
+        stop = getattr(resp, "stop_reason", None)
+        if stop == "refusal":
+            spend.refusals += 1
+            print(f"  llm refusal: {model}")
+            return None
+        txt = "".join(b.text for b in resp.content if getattr(b, "type", None) == "text").strip()
+        if not txt and stop == "max_tokens" and budget < _TEXT_BUDGET_CEILING:
+            budget *= 2
+            continue
+        return txt
+
+
+async def _one_text(
+    client: Any,
+    user: str,
+    *,
+    model: str,
+    thinking: bool,
+    max_tokens: int,
+    timeout: float,
+    rpm: float,
+    spend: Spend,
+) -> str | None:
+    """Same backoff / fatal classification as :func:`_one`, for one free-text call."""
+    user = user.encode("utf-8", "replace").decode("utf-8")
+    for attempt in range(_ATTEMPTS):
+        await _pace(rpm)
+        try:
+            return await _anthropic_text_once(
+                client,
+                user,
+                model=model,
+                thinking=thinking,
+                max_tokens=max_tokens,
+                timeout=timeout,
+                spend=spend,
+            )
+        except Exception as e:
+            name = type(e).__name__
+            status = getattr(e, "status_code", None)
+            if name in _FATAL or status in (401, 402, 403):
+                raise JudgeConfigError(f"{name}: {str(e)[:300]}") from e
+            transient = (
+                status in _TRANSIENT
+                or "Timeout" in name
+                or "Connection" in name
+                or "Deadline" in name
+                or isinstance(e, json.JSONDecodeError | ValueError)
+            )
+            if transient and attempt < _ATTEMPTS - 1:
+                spend.retries += 1
+                await _sleep(_backoff(attempt, status))
+                continue
+            spend.errors += 1
+            print(f"  llm error: {name}: {str(e)[:200]}")
+            return None
+    return None
+
+
+async def stream_text_async(
+    prompts: list[str],
+    *,
+    model: str,
+    on_result: Callable[[int, str | None], None],
+    thinking: bool,
+    max_tokens: int,
+    concurrency: int = 64,
+    rpm: float = 240.0,
+    timeout: float = 600.0,
+    spend: Spend | None = None,
+) -> Spend:
+    """Run user-only free-text prompts concurrently on the Anthropic route (no system block,
+    no schema), handing each stripped text (or ``None`` = exhausted retries / non-transient
+    error / refusal) to ``on_result(index, text)`` as it lands. ``""`` is a valid result (the
+    source returns it after the 64k budget ceiling). Any non-``claude-*`` model raises
+    :class:`JudgeConfigError`. Builds no client when there is nothing to call."""
+    spend = spend or Spend()
+    if not prompts:
+        return spend
+    if concurrency < 1 or rpm <= 0:
+        raise JudgeConfigError(f"concurrency must be >= 1 and rpm > 0 (got {concurrency}, {rpm})")
+    if route(model) != "anthropic":
+        raise JudgeConfigError(f"free-text stage requires a claude-* model (got {model})")
+    client = _make_client("anthropic", api_key(model))
+    sem = asyncio.Semaphore(concurrency)
+
+    async def one(i: int, user: str) -> tuple[int, str | None]:
+        async with sem:
+            res = await _one_text(
+                client,
+                user,
+                model=model,
+                thinking=thinking,
+                max_tokens=max_tokens,
+                timeout=timeout,
+                rpm=rpm,
+                spend=spend,
+            )
+        return i, res
+
+    tasks = [asyncio.ensure_future(one(i, u)) for i, u in enumerate(prompts)]
+    try:
+        for fut in asyncio.as_completed(tasks):
+            i, res = await fut
+            on_result(i, res)
+    finally:
+        for t in tasks:
+            t.cancel()
+        await asyncio.gather(*tasks, return_exceptions=True)
+        await client.close()
+    return spend
+
+
+def stream_text(
+    prompts: list[str],
+    *,
+    model: str,
+    on_result: Callable[[int, str | None], None],
+    thinking: bool,
+    max_tokens: int,
+    concurrency: int = 64,
+    rpm: float = 240.0,
+    timeout: float = 600.0,
+    spend: Spend | None = None,
+) -> Spend:
+    """Synchronous wrapper around :func:`stream_text_async` for the CLI and tests."""
+    if _in_running_loop():
+        raise JudgeConfigError(
+            "stream_text called inside a running event loop; await stream_text_async"
+        )
+    return asyncio.run(
+        stream_text_async(
+            prompts,
+            model=model,
+            on_result=on_result,
+            thinking=thinking,
+            max_tokens=max_tokens,
+            concurrency=concurrency,
+            rpm=rpm,
+            timeout=timeout,
+            spend=spend,
+        )
+    )
