@@ -11,7 +11,7 @@ scenario makes available), never against what the model actually did.
 ## Sources
 
 Lynch, Wright, Larson, Troy, Ritchie, Mindermann, Perez, Hubinger. *Agentic Misalignment: How
-LLMs Could Be an Insider Threat.* Anthropic, 2025. arXiv:2510.05179. Code:
+LLMs Could Be Insider Threats.* Anthropic, 2025. arXiv:2510.05179. Code:
 `anthropic-experimental/agentic-misalignment` (MIT). 18 of the 32 scenarios are that repo's
 18-condition grid (blackmail / leaking / murder × goal × urgency), generated with its
 `scripts/generate_prompts.py` and production system prompts (`group = "anthropic"`); the other
@@ -94,9 +94,11 @@ positions count in `n_unjudged_cells` and its missing Stage C record makes `comp
 `fp_B = fingerprint("B", prompt_version, model, CONSOLIDATE_PROMPT, PARTIAL_PROMPT, chunk_chars,
 [fp_A of every selected position])`, `fp_C = fingerprint("C", fp_B, DESIGN_SCORE_PROMPT)`.
 A prompt, readout or layer change re-judges only the downstream stages; a different readouts
-file with the same stem never reuses stale notes. Payloads: A `{result: note}`, B
+file with the same stem never reuses stale notes. Bank text (scenario, descriptor) is NOT in
+`fp_C`: a bank edit must be accompanied by a `PROMPT_VERSION` bump. Payloads: A `{result: note}`, B
 `{result: account, n_chunks, partials}`, C `{result: raw_text, ...parsed fields}`. A
-failed call (`None`) is never cached; `""` is a cached result.
+failed call (`None` — exhausted retries, a non-transient error, or a judge refusal) is never
+cached and is re-attempted on the next run; `""` is a cached result.
 
 ## Scoring (design mode)
 

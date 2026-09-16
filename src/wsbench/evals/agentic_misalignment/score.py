@@ -210,6 +210,7 @@ def score(
         and not is_subset(args)
         and not args.dry_run
         and all(it["id"] in judged_mis for it in misaligned_scope)
+        and counts["n_unjudged_cells"] == 0
     )
     return FamilyResult(
         family="agentic_misalignment",

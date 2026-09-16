@@ -65,6 +65,17 @@ result, not a missing cell). `wsbench convert-gen-dir GEN --out F.jsonl --kind p
   and **fatal (exit 2) unless `--allow-missing`** (a dry run only reports it); one call per
   cell classifies all K samples; item pass = any cell with a `recognition` sample.
 
+## agentic_misalignment (phase 5)
+- Free-text judge, not structured output: `llm.stream_text[_async]` (Anthropic route only —
+  streaming, per-call `thinking` on/off, empty-text budget doubling to 64k; `None` = failed
+  and never cached, `""` = a cached result). Pinned to `claude-sonnet-5`.
+- Three cached stages with chained fingerprints (`A` per position over the rendered prompt,
+  `B` per item over its A fingerprints, `C` over B) under `<out>/cells.jsonl`; a Stage A
+  failure skips B/C for that item. `--opt stride=N`, `--opt chunk_chars=N`.
+- Headline `design_score` (mean fidelity/3 over the 28 misaligned items, bootstrap 2000/seed 0);
+  not in the macro. `complete` additionally requires every misaligned item to have a Stage C
+  record. The producer, not the judge, restricts rows to prompt positions.
+
 ## Results contract (`results.py`)
 `results.json` = `{schema_version, family, complete, pinned_instrument, config, n_items,
 counts: {n_expected_cells, n_missing_cells, n_unjudged_cells, n_empty_cells, skipped_rows,

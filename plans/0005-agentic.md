@@ -151,7 +151,7 @@ The scoring golden is produced from the source functions.
 ## README
 
 Sources block: Lynch, Wright, Larson, Troy, Ritchie, Mindermann, Perez, Hubinger. *Agentic
-Misalignment: How LLMs Could Be an Insider Threat.* Anthropic, 2025. arXiv:2510.05179; code
+Misalignment: How LLMs Could Be Insider Threats.* Anthropic, 2025. arXiv:2510.05179; code
 `anthropic-experimental/agentic-misalignment` (MIT) — 18 of 32 scenarios are its 18-condition
 grid (blackmail / leaking / murder × goal × urgency) generated with its `scripts/generate_prompts.py`
 and production system prompts; 14 scenarios are in-house. Then: what the eval is, the read

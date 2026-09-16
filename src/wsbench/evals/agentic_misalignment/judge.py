@@ -48,7 +48,7 @@ from .prompts import (
 FAMILY = "agentic_misalignment"
 DEFAULT_STRIDE = 1
 DEFAULT_CHUNK_CHARS = 60_000  # the source driver's --chunk-chars default
-STAGE_A_MAX_TOKENS = 400
+STAGE_A_MAX_TOKENS = 400  # not in fp_A: bump PROMPT_VERSION when changing any STAGE_*_MAX_TOKENS
 STAGE_B_MAX_TOKENS = 16_000
 STAGE_C_MAX_TOKENS = 12_000
 SCENARIO_CAP = 24_000  # driver L306
