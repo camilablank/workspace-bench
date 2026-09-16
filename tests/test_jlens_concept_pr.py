@@ -617,7 +617,7 @@ def test_no_content_token_cell_is_ok_with_nan():
 
     from wsbench.evals.jlens_concept_pr.score import score_one_cell
 
-    status, prec, rec = score_one_cell(
+    status, scored = score_one_cell(
         concepts=["a", "b"],
         had_text=True,
         by_idx={},
@@ -626,4 +626,6 @@ def test_no_content_token_cell_is_ok_with_nan():
         support=None,
         support_expected=False,
     )
-    assert status == "ok" and math.isnan(prec) and math.isnan(rec)
+    assert status == "ok"
+    assert math.isnan(scored.precision) and math.isnan(scored.recall_at_m)
+    assert scored.n_concepts == 2 and scored.n_content_tokens == 0
