@@ -1,48 +1,14 @@
 # TODO
 
-Live checklist for the basic-evals and baselines work (Agam). One PR per line; smoke a few
-items before any scale run. Status: [ ] open · [~] in PR · [x] merged.
+Open work only; merged work is in the git log and the README.
 
-## Foundation
-- [x] pydra CLI (`wsbench <command> key=value`), merged 2026-09-16 (#9).
-
-## Basic evals, single token (desideratum 1) — bank judge; DM has its own judge
-- [x] association (merged 2026-09-16, #16)
-- [x] basic-readout (merged 2026-09-16, #16)
-- [x] multihop (merged 2026-09-16, #16)
-- [x] multilingual (merged 2026-09-16, #16)
-- [x] poetry (merged 2026-09-16, #16)
-- [x] typo (merged 2026-09-16, #16)
-- [x] directed_modulation (#17)
-
-## Basic evals, multi-token (desideratum 2) — forced-choice Gemini judge per unit, conjunctive
-- [x] multihop_mt (#20)
-- [x] multilingual_mt (#20)
-- [x] typo_mt (#20)
-- [x] basic_readout_mt (#20)
-- [x] multilingual_typo (#20)
-- [x] multilingual_multihop (#20)
-- [x] multi_concept_directed_modulation (#21)
-
-## Baselines
-- [x] lucky guessing (judge shown only the option lists; blind / described / uniform), Gemini (#22)
-- [x] prompt-only (stock Qwen summary, scored by each family's own instrument at one layer; 13
-      families, multi_concept_directed_modulation excluded) (#22)
-- [ ] per-family empirical nulls (later)
-
-## Methods (readout files, judged here; generation stays in global-workspace)
-Logit lens · R-Lens · NLA · NLA SFT · J-Lens · OLens · OLens SFT · Template lens.
-
-## Computational / programmatic evals (after the baselines; confirm the plan with Agam first)
-Order (Agam, 2026-09-16): chained intermediates, brew intermediates, then buggy code, arithmetic
-last. Confirmed 2026-09-16: brew judged on emission + stir cells only (check the cut against the
-full-grid numbers first); buggy code Gemini judge only, no deterministic checker (pairwise blind
-pick, chance 0.5, plus net_S2); arithmetic gets a Gemini judge too (the numeric matcher caught
-too many false positives); prompt-only is not shown for multi_concept_directed_modulation.
-- [x] chain_intermediates (#23)
-- [x] brew_intermediates (#24)
-- [x] buggy_code (#25; no pairwise pick, the bank has no twin map)
-- [~] arithmetic_intermediates (free-recall Gemini judge; permutation null). Branch:
-      agam/arithmetic-intermediates. Variants (Agam, 2026-09-16): KEEP absval, addmul, floordiv,
-      frac, fracadd, fraccomp, fracint, fracsmall, muladd, mulmid, sign, signpair, subsub, subsubx;
-      REMOVE addmulx, dec16, halflead, halftrail, halves, maxsel, mulmul, negdec, negdiv8, negdiv8x.
+- [ ] Judge the arms across every family (s3d RL600, s3d SFT251, NLA, NLA SFT, J-lens, R-Lens,
+      logit lens, template lens) with `wsbench run`, read against the frozen floors.
+- [ ] Revisit the multihop_mt and basic_readout_mt option pools: blind lucky guessing picks the
+      gold 0.66 and 0.46 of the time from option shape alone (uniform 0.13 / 0.14).
+- [ ] Decide whether the single-token basics with high prompt-only floors (typo 1.00, multihop
+      0.90, multilingual 0.76, basic_readout 0.72, poetry 0.71) stay headline evals.
+- [ ] buggy_code pairwise blind pick (chance 0.5): needs an authored buggy-to-clean-twin map.
+- [ ] Move `evals/jlens_concept_pr/gen-jlens-pr-jlens/` (4.6 MB, 3.6k files of producer output)
+      out of git.
+- [ ] Per-family empirical nulls where a family has none.
