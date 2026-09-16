@@ -191,11 +191,17 @@ def base_config(args: JudgeArgs, prompt_version: str, **extra: Any) -> dict:
 
 
 def base_counts(
-    *, n_expected: int, n_unjudged: int, n_empty: int, skipped_rows: int, spend: Spend
+    *,
+    n_expected: int,
+    n_unjudged: int,
+    n_empty: int,
+    skipped_rows: int,
+    spend: Spend,
+    n_missing: int = 0,
 ) -> dict:
     return {
         "n_expected_cells": n_expected,
-        "n_missing_cells": 0,
+        "n_missing_cells": n_missing,
         "n_unjudged_cells": n_unjudged,
         "n_empty_cells": n_empty,
         "skipped_rows": skipped_rows,
