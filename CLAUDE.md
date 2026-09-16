@@ -33,7 +33,7 @@ cell). `wsbench convert-gen-dir gen_dir=GEN out=F.jsonl kind=prose|tokens` conve
   free-text Anthropic-only primitive.
 
 ## Family conventions
-- `wsbench/family.py` is the shared skeleton every newer family uses: `require_cells` (missing
+- `wsbench/family.py` holds the helpers the newer families share: `require_cells` (missing
   cells exit 2 unless `allow_missing=True`; a dry run only reports), `cell_text` (a token bag is
   judged scored but verified against bare tokens), `last_pos_rows`, `quote_in` (verbatim after
   `mc.fold`), `tri_state` (pass / fail / undecided), `rate` / `mean`, `pass_rate_result` (the
@@ -114,6 +114,6 @@ and a credit if the items are external. Smoke `limit=3` live before any full run
   config, `--help` a command's keys. Each command is a `pydra.Config` in `cli.py`: declare a
   field in `__init__`, normalise it in `finalize()`; `runner.py` reads the same attribute names.
 - `uv sync --extra dev`; `uv run pytest -q`; `uv run ruff check .`; `uv run ruff format .`. Keys
-in the environment or an untracked `.env`, never committed; tests make no network calls. Work
+in the environment, never committed; tests make no network calls. Work
 in a git worktree (prefix commands with `PYTHONPATH=src` when it shares the main checkout's
 `.venv`); PRs are gated by `.github/workflows/ci.yml` (ruff + pytest).

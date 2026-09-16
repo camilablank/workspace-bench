@@ -32,9 +32,10 @@ def mean(xs: Iterable[float]) -> float | None:
 
 
 def quote_in(quote: str, text: str) -> bool:
-    """A verbatim quote check: non-empty and present after folding case, accents and quotes."""
-    q = quote.strip()
-    return bool(q) and fold(q) in fold(text)
+    """A verbatim quote check: present after folding case, accents and quotes. A quote that is
+    empty after folding (e.g. bare combining marks) never counts."""
+    q = fold(quote.strip())
+    return bool(q) and q in fold(text)
 
 
 def cell_text(cell: Cell) -> tuple[str, str]:
@@ -126,9 +127,9 @@ def pass_rate_result(
             spend=spend,
         ),
         extras={
+            **extras,
             "n_items_decided": len(decided),
             "n_items_undecided": len(rows) - len(decided),
-            **extras,
         },
         rows=rows,
     )

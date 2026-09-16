@@ -17,8 +17,8 @@ uv run pytest -q                 # offline, no key needed
 uv run wsbench list              # every family: group, items, metric, judge, prompt version, cost
 ```
 
-Keys live in the environment or an untracked `.env`: `OPENROUTER_API_KEY=sk-or-...` for every
-Gemini family, `ANTHROPIC_API_KEY` for the two Claude-pinned ones.
+Keys are read from the environment (export them, never commit them): `OPENROUTER_API_KEY=sk-or-...`
+for every Gemini family, `ANTHROPIC_API_KEY` for the two Claude-pinned ones.
 
 ### Score one arm end to end
 
