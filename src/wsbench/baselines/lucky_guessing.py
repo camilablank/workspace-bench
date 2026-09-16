@@ -26,7 +26,7 @@ DEFAULT_DRAWS = 5
 TEMPERATURE = 1.0
 DEFAULT_SEED = 20260908
 VARIANTS = ("blind", "described", "uniform")
-MAX_TOKENS = 64  # the reply is a few integers
+MAX_TOKENS = 1024  # a few integers of JSON after the model's (minimal) reasoning tokens
 MAX_PICKS = 3  # a multi-select item dictates at most three concepts
 FROZEN = REPO_ROOT / "evals" / "baselines" / "lucky_guessing.json"
 
