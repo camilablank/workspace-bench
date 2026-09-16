@@ -76,7 +76,7 @@ def test_report_json(tmp_path, capsys):
     write_results(tmp_path / "hal", _res("hal", metric="hallucination_rate", value=0.2))
     assert main(["report", f"dir={tmp_path}", "json=True"]) == 0
     d = json.loads(capsys.readouterr().out)
-    assert set(d) == {"families", "macro"}
+    assert set(d) == {"families", "macro", "floors"}
     assert [f["family"] for f in d["families"]] == ["a", "hal"]
     assert d["families"][0]["numbers"]["metric"] == "pass_rate"
     assert d["macro"]["value"] == 0.5 and d["macro"]["families"] == ["a"]

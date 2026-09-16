@@ -22,10 +22,10 @@ items before any scale run. Status: [ ] open · [~] in PR · [x] merged.
 - [x] basic_readout_mt (#20)
 - [x] multilingual_typo (#20)
 - [x] multilingual_multihop (#20)
-- [~] multi_concept_directed_modulation (multi-select Gemini judge over write cells; region gate). Branch: agam/multi-concept-dm.
+- [x] multi_concept_directed_modulation (#21)
 
 ## Baselines
-- [ ] lucky guessing (LLM shown only the option lists; blind / described / uniform), Gemini
+- [~] lucky guessing (judge shown only the option lists; blind / described / uniform), Gemini. Branch: agam/lucky-guessing.
 - [ ] prompt-only (stock Qwen summary of what the model is thinking, scored by each family's
       own instrument); readouts generated in global-workspace, scored and frozen here
 - [ ] per-family empirical nulls (later)

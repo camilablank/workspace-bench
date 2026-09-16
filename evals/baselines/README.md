@@ -1,0 +1,59 @@
+# Baselines
+
+Measured floors for the judged families. A family's pass rate means nothing on its own: the
+judge picks from option lists, and a strong model handed only those lists is not a uniform
+guesser (golds tend to be more specific and more answer-shaped than distractors drawn from
+other items). The floors here are what a real arm has to clear.
+
+## Lucky guessing (`lucky_guessing.json`)
+
+A model is shown NOTHING but a family's option lists (no question, no passage, no readout) and
+asked to guess. The lists come from the judges' own builders, so option text, order and gold
+positions are byte-identical to what the judge sees; the trailing "cannot tell" escape is
+dropped (a guesser with no readout has an honest reason to abstain that a judge does not, and
+the gold is never the escape). Ported from the source repo's `lucky_guessing_baseline.py`.
+
+Variants, five draws per item at temperature 1.0 with the repo judge (`google/gemini-3.8-flash`):
+
+- **blind**: the lists and nothing else.
+- **described**: one honest sentence saying what the family tests (the option domain, never the
+  judge's question) plus three OTHER items of the family with their gold marked: the
+  informed-guesser ceiling.
+- **uniform**: seeded uniform picks over the same lists, no model; lands on the analytic floor
+  (`mean over items of prod(1/n)`) and catches option sets that are not what the floor assumes.
+
+Pass rule per draw = the family's own: every list right (role-bound's three questions,
+relational's two hops, a multilingual family's concept and language). `mean` is the pass rate
+averaged over draws with its std, `majority` the per-item plurality vote. Families and lists:
+
+| family | lists per item | options | notes |
+|---|---|---|---|
+| conjunctive_association | 1 | 10 | |
+| role_bound_association | 3 | 5 | agent / action / patient; a people list may repeat a label (the judge's list does) |
+| relational_multihop | 2 | 10 | one pooled list asked twice (outer, inner) |
+| moral_rationale | 1 or 2 | 5 | committed items one list, deliberative items one per side |
+| user_modeling | 1 | 5 | |
+| directed_modulation | 1 | 5 | |
+| multihop_mt, typo_mt | 1-2 | 5 | one list per judged unit |
+| multilingual_mt, multilingual_multihop, multilingual_typo, basic_readout_mt | 1-2 | 5 | concept/correction/readout plus the language list for L2 items |
+| multi_concept_directed_modulation | 1 (multi-select) | 6 | pass = some pick is a dictated concept (the family's rule); `exact` = picks equal the dictated set; controls dropped |
+
+Every entry is stamped with the family's judge `prompt_version` (`instrument`); `wsbench report`
+draws a floor only while it matches the family's current instrument, so a changed judge drops
+its floor until re-measured.
+
+```
+wsbench baseline variant=uniform                       # no API key; every family
+wsbench baseline families=typo_mt variant=blind limit=3  # pilot
+wsbench baseline                                       # blind, described, uniform; every family
+wsbench freeze                                         # outputs/baselines/lucky_guessing -> this file
+wsbench report dir=outputs/<arm>                       # lucky guess column beside each family
+```
+
+Runs write `outputs/baselines/lucky_guessing/<family>/<variant>.json` (per-item prompts, picks,
+aggregate); `freeze` refuses a `limit` pilot and merges per family into the tracked file.
+
+## Prompt-only (next)
+
+Stock Qwen3.6-27B given the prompt text and asked what the model is thinking, no activation;
+its summaries are judged by each family's own instrument. Lands as `prompt_only.json`.

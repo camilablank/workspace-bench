@@ -11,7 +11,8 @@ from pathlib import Path
 import pydra
 
 from wsbench import registry, runner
-from wsbench.judge_config import resolve
+from wsbench.baselines import lucky_guessing
+from wsbench.judge_config import JudgeConfig, resolve
 from wsbench.llm import JudgeConfigError
 from wsbench.readouts import convert_gen_dir, convert_read_json
 from wsbench.registry import EvalSpec
@@ -228,10 +229,12 @@ class ReportRuns(Command):
         super().__init__()
         self.dir = pydra.REQUIRED
         self.json = False
+        self.floors = True  # the frozen lucky-guessing floors (evals/baselines) beside each family
 
     def finalize(self) -> None:
         self.dir = _path(self.dir)
         self.json = _bool(self.json)
+        self.floors = _bool(self.floors)
 
     def execute(self) -> int:
         if not self.dir.is_dir():
@@ -243,10 +246,12 @@ class ReportRuns(Command):
             print(f"unreadable results: {e}", file=sys.stderr)
             return EXIT_USAGE
         m = macro(results)
-        table = markdown_table(results, m)
+        floors = lucky_guessing.floors() if self.floors else {}
+        table = markdown_table(results, m, floors=floors)
         (self.dir / "summary.md").write_text(table, encoding="utf-8")
         if self.json:
-            print(json.dumps({"families": [r.to_json() for r in results], "macro": m}))
+            out = {"families": [r.to_json() for r in results], "macro": m, "floors": floors}
+            print(json.dumps(out))
             return 0
         print(table, end="")
         print(f"macro: value={m['value']} families={m['families']} excluded={m['excluded']}")
@@ -299,11 +304,114 @@ class ConvertReadJson(Command):
         return 0
 
 
+class Baseline(Command):
+    """Measure a floor. ``kind=lucky_guessing``: a model shown only each family's option lists."""
+
+    def __init__(self) -> None:
+        super().__init__()
+        self.kind = "lucky_guessing"
+        self.families = "all"
+        self.variant = "blind,described,uniform"
+        self.draws = lucky_guessing.DEFAULT_DRAWS
+        self.seed = lucky_guessing.DEFAULT_SEED
+        self.limit = 0
+        self.judge_model = ""
+        self.concurrency = 64
+        self.rpm = 240.0
+        self.dry_run = False
+        self.out = "outputs/baselines/lucky_guessing"
+
+    def finalize(self) -> None:
+        self.kind = str(self.kind)
+        self.families = _strs(self.families) or ["all"]
+        self.variant = _strs(self.variant) or []
+        self.draws = _int(self.draws)
+        self.seed = _int(self.seed)
+        self.limit = _int(self.limit)
+        self.judge_model = str(self.judge_model or "") or None
+        self.concurrency = _int(self.concurrency)
+        self.rpm = float(self.rpm)
+        self.dry_run = _bool(self.dry_run)
+        self.out = _path(self.out)
+
+    def execute(self) -> int:
+        if self.kind != "lucky_guessing":
+            print(f"unknown baseline kind {self.kind!r}; known: lucky_guessing", file=sys.stderr)
+            return EXIT_USAGE
+        names = list(lucky_guessing.BUILDERS) if self.families == ["all"] else self.families
+        unknown = [f for f in names if f not in lucky_guessing.BUILDERS]
+        bad = [v for v in self.variant if v not in lucky_guessing.VARIANTS]
+        if unknown or bad or not self.variant or self.draws < 1:
+            print(
+                f"unknown families {unknown} / variants {bad}; known families "
+                f"{sorted(lucky_guessing.BUILDERS)}, variants {lucky_guessing.VARIANTS}, "
+                "draws >= 1",
+                file=sys.stderr,
+            )
+            return EXIT_USAGE
+        registry.load_all()
+        try:
+            judge = resolve(
+                JudgeConfig(prompt_version=lucky_guessing.PROMPT_VERSION),
+                flag=self.judge_model,
+                env=os.environ,
+            )
+            for name in names:
+                for variant in self.variant:
+                    r = lucky_guessing.run_family(
+                        name,
+                        variant,
+                        judge=judge,
+                        out=self.out / name,
+                        draws=self.draws,
+                        seed=self.seed,
+                        limit=self.limit,
+                        concurrency=self.concurrency,
+                        rpm=self.rpm,
+                        dry_run=self.dry_run,
+                    )
+                    if not self.dry_run:
+                        path = self.out / name / f"{variant}.json"
+                        path.parent.mkdir(parents=True, exist_ok=True)
+                        path.write_text(json.dumps(r, indent=1, ensure_ascii=False), "utf-8")
+                    print(lucky_guessing.report_line(r))
+        except JudgeConfigError as e:
+            print(f"judge config error: {e}", file=sys.stderr)
+            return EXIT_JUDGE_CONFIG
+        return 0
+
+
+class Freeze(Command):
+    """Fold a finished baseline run into the tracked ``evals/baselines/<kind>.json``."""
+
+    def __init__(self) -> None:
+        super().__init__()
+        self.kind = "lucky_guessing"
+        self.src = "outputs/baselines/lucky_guessing"
+        self.dst = ""
+
+    def finalize(self) -> None:
+        self.kind = str(self.kind)
+        self.src = _path(self.src)
+        self.dst = _path(self.dst) if self.dst else None
+
+    def execute(self) -> int:
+        if self.kind != "lucky_guessing":
+            print(f"unknown baseline kind {self.kind!r}; known: lucky_guessing", file=sys.stderr)
+            return EXIT_USAGE
+        dst = self.dst or lucky_guessing.FROZEN
+        frozen = lucky_guessing.freeze(self.src, dst)
+        print(f"froze {sorted(frozen)} -> {dst}")
+        return 0
+
+
 COMMANDS: dict[str, type[Command]] = {
     "list": ListFamilies,
     "judge": JudgeFamily,
     "run": RunFamilies,
     "report": ReportRuns,
+    "baseline": Baseline,
+    "freeze": Freeze,
     "convert-gen-dir": ConvertGenDir,
     "convert-read-json": ConvertReadJson,
 }

@@ -4,9 +4,10 @@ from __future__ import annotations
 
 import json
 import random
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, field
 from pathlib import Path
+from typing import Any
 
 SCHEMA_VERSION = 1
 _COUNT_KEYS = (
@@ -154,28 +155,45 @@ def _yn(b: bool) -> str:
     return "yes" if b else "no"
 
 
-def markdown_table(results: Sequence[FamilyResult], macro_row: dict | None) -> str:
+def _floor(entry: Mapping[str, Any] | None) -> str:
+    """``blind / described`` lucky-guessing means for one family, ``—`` when not frozen."""
+    if not entry:
+        return "—"
+    return " / ".join(_fmt(entry.get(v, {}).get("mean")) for v in ("blind", "described"))
+
+
+def markdown_table(
+    results: Sequence[FamilyResult],
+    macro_row: dict | None,
+    *,
+    floors: Mapping[str, Mapping[str, Any]] | None = None,
+) -> str:
+    """One row per family; ``floors`` (family -> variant -> frozen lucky-guessing entry) adds a
+    ``lucky guess`` column, blind / described."""
+    extra = " lucky guess (blind / described) |" if floors is not None else ""
     lines = [
-        "| family | metric | value | 95% CI | n | chance | judge | pinned | complete |",
-        "|---|---|---|---|---|---|---|---|---|",
+        f"| family | metric | value | 95% CI | n | chance |{extra} judge | pinned | complete |",
+        "|---|---|---|---|---|---|" + ("---|" if floors is not None else "") + "---|---|---|",
     ]
     for r in results:
         chance = _fmt(r.chance) + (f" ({r.chance_label})" if r.chance_label else "")
+        lucky = f" {_floor(floors.get(r.family))} |" if floors is not None else ""
         judge = str(r.config.get("judge_model", "?"))
         metric = r.metric if r.higher_is_better else f"{r.metric} (lower is better)"
         k = r.extras.get("n_items_without_readouts")
         n = f"{r.n_items}" + (f" ({k} no readouts)" if isinstance(k, int) and k > 0 else "")
         lines.append(
             f"| {r.family} | {metric} | {_fmt(r.value)} | {_fmt_ci(r.ci95)} | {n} | "
-            f"{chance} | {judge} | {_yn(r.pinned_instrument)} | {_yn(r.complete)} |"
+            f"{chance} |{lucky} {judge} | {_yn(r.pinned_instrument)} | {_yn(r.complete)} |"
         )
     if macro_row is not None:
         n_fam = len(macro_row.get("families", []))
         excluded = macro_row.get("excluded", [])
         excl = ", ".join(f"{e['family']} ({e['reason']})" for e in excluded)
+        pad = " — |" if floors is not None else ""
         lines.append(
             f"| **macro** | pass_rate | {_fmt(macro_row.get('value'))} | — | {n_fam} families "
-            f"| — | — | — | excluded: {excl or 'none'} |"
+            f"| — |{pad} — | — | excluded: {excl or 'none'} |"
         )
         if excluded:
             by_family = {r.family: r for r in results}
