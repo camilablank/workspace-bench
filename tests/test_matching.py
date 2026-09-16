@@ -15,7 +15,7 @@ from wsbench.matching import (
 
 
 def test_fold():
-    assert fold("México") == "mexico" and fold("Rubik’s") == "rubik's"
+    assert fold("México") == "mexico" and fold("Rubik’s") == "rubik's"  # noqa: RUF001
 
 
 @pytest.mark.parametrize(
