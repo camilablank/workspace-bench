@@ -19,14 +19,14 @@ intermediates [11, 5], answer 2.
 - **Headline: pass rate, free recall.** One prompt-blind call per (item, layer) on the readout
   at the LAST prompt token. The judge names the number(s) the readout presents as a computed
   value, ranked, at most three, or none. An item passes when the top-named value is one of its
-  intermediates at any layer. The top value is credited only when it appears in the readout as
-  digits or the judge's quote is verbatim in it (a Chinese numeral is credited through the
-  quote).
+  intermediates at any layer. The top value is credited only when it appears in the readout as a
+  whole number (5 does not match 15) or the judge's quote is verbatim in it (a Chinese numeral is
+  credited through the quote); a token bag is verified against its tokens, never its scores.
 - **Token lenses** are judged as their top-k bag (the prompt's "bag of loose numerals" rule);
   no summarizer.
 - **Floors.** No analytic floor for free recall. `extras.null_top1_near` is the magnitude-matched
   decoy null: how often the top value lands within ±3 of an intermediate without being
-  one, weighted by (number of intermediates) / (size of the decoy set), so it is on the same
+  one (the item's start and answer are not decoys), weighted by (number of intermediates) / (size of the decoy set), so it is on the same
   scale as the pass rate per layer. The prompt-only baseline is reported beside it but is not
   item-blind here (the stock model can compute the chain). `extras.any_of_3_rate` (some named
   value is an intermediate) and `extras.committed_rate` (calls naming anything) are diagnostics;
@@ -39,7 +39,8 @@ intermediates [11, 5], answer 2.
 ## Readouts
 
 `{"id": "<item name>", "layer": L, "pos": P, "samples": [...]}` rows at the last prompt token
-(the source gen dirs label the seed-last prompts `<name>-last`; strip the suffix when converting,
+(prompt positions only; the max-pos row per (item, layer) is taken as the last token. The source
+gen dirs label the seed-last prompts `<name>-last`; strip the suffix when converting,
 `sed 's/-last"/"/'`). `examples/readouts/chain_intermediates.jsonl` is a toy file.
 
 ```

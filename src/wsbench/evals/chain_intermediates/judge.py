@@ -2,6 +2,7 @@
 computed; an item passes when the top-named value is one of its never-written intermediates at
 some layer. Floors and the decoy null are explained in the family README."""
 
+import re
 import sys
 from collections import defaultdict
 from typing import Any
@@ -34,19 +35,32 @@ CHANCE_LABEL = (
 )
 
 
-def near_set(gold: list[int]) -> list[int]:
-    """Decoys within +-NEAR of an intermediate, excluding the intermediates themselves."""
+def near_set(gold: list[int], exclude: tuple[int, ...] = ()) -> list[int]:
+    """Decoys within +-NEAR of an intermediate, excluding the intermediates themselves and
+    ``exclude`` (the item's start and answer, which a lens may echo for other reasons)."""
     out: list[int] = []
     for v in gold:
-        out += [x for x in range(max(1, v - NEAR), v + NEAR + 1) if x not in gold and x not in out]
+        out += [
+            x
+            for x in range(max(1, v - NEAR), v + NEAR + 1)
+            if x not in gold and x not in exclude and x not in out
+        ]
     return out
+
+
+def names_number(n: int, text: str) -> bool:
+    """``n`` appears in ``text`` as a whole number (not inside 10, 2019 or 10.83)."""
+    return re.search(rf"(?<!\d)(?<!\d\.){n}(?!\d)(?!\.\d)", text) is not None
 
 
 def verdict(
     res: dict[str, Any] | None, gold: list[int], near: list[int], readout: str
 ) -> dict[str, Any]:
     """One judge answer. ``values`` are the judge's ranked integers capped at three; the top value
-    is credited only when it appears in the readout as digits or the quote is verbatim in it."""
+    is credited only when it appears in ``readout`` as a whole number or the quote is verbatim in
+    it (a digit-only quote must also be a whole number there). ``readout`` is the plain text (a
+    token bag without its scores). ``any_of_3`` checks the ranked values against the gold without
+    verifying the lower ranks: a diagnostic, not a pass rule."""
     if res is None:
         return {"judged": False, "kind": "unavailable", "values": [], "hit": False}
     raw = res.get("values")
@@ -65,8 +79,11 @@ def verdict(
         }
     top = values[0]
     quote = str(res.get("quote", "")).strip()
-    folded = fold(readout)
-    verified = str(top) in readout or (bool(quote) and fold(quote) in folded)
+    if quote.isdigit():
+        quote_ok = names_number(int(quote), readout)
+    else:
+        quote_ok = bool(quote) and fold(quote) in fold(readout)
+    verified = names_number(top, readout) or quote_ok
     if not verified:
         kind = "unverified"
     elif top in gold:
@@ -120,22 +137,25 @@ def run(args: JudgeArgs) -> FamilyResult:
             "readout; pass allow_missing=True to score the rest"
         )
 
-    # a token lens is judged as its bag: the prompt handles loose numerals
+    # a token lens is judged as its scored bag (the prompt handles loose numerals) but verified
+    # against the score-free token text, so a score like 10.83 can never vouch for a value
     texts: dict[tuple[str, int], str] = {}
+    plain: dict[tuple[str, int], str] = {}
     empty: set[tuple[str, int]] = set()
     for k, c in chosen.items():
-        text = (
-            render_bag(c.tokens or (), c.scores)
-            if c.tokens is not None
-            else "\n".join(s for s in (c.samples or ()) if s.strip())
-        )
+        if c.tokens is not None:
+            text, bare = render_bag(c.tokens, c.scores), " | ".join(c.tokens)
+        else:
+            text = bare = "\n".join(s for s in (c.samples or ()) if s.strip())
         if text.strip():
-            texts[k] = text
+            texts[k], plain[k] = text, bare
         else:
             empty.add(k)
 
     gold = {it["id"]: [int(v) for v in it["intermediates"]] for it in scope}
-    near = {i: near_set(g) for i, g in gold.items()}
+    near = {
+        i: near_set(g, (int(by_id[i]["start"]), int(by_id[i]["answer"]))) for i, g in gold.items()
+    }
     spend = Spend()
     pre = Preflighter(args.dry_run)
     with Cache(args.out / "cells.jsonl") as cache:
@@ -165,7 +185,7 @@ def run(args: JudgeArgs) -> FamilyResult:
     verdicts: list[dict[str, Any]] = []
     for call in calls:
         i, layer = call.meta["item"], call.meta["layer"]
-        v = verdict(results.get(call.key), gold[i], near[i], texts[(i, layer)])
+        v = verdict(results.get(call.key), gold[i], near[i], plain[(i, layer)])
         verdicts.append({"item": i, "layer": layer, **v})
     rows = [_item_row(by_id[i], gold[i], near[i], verdicts, missing, empty) for i in ids]
     decided = [r for r in rows if r["pass"] is not None]
@@ -211,6 +231,7 @@ def run(args: JudgeArgs) -> FamilyResult:
             "n_rows_not_last_token": n_extra_rows,
             "n_items_decided": len(decided),
             "n_items_undecided": len(ids) - len(decided),
+            # mean over decided items (the source averaged every item with a null)
             "null_top1_near": _mean(
                 [r["null_top1_near"] for r in decided if r["null_top1_near"] is not None]
             ),

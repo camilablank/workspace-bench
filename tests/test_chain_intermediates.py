@@ -34,13 +34,16 @@ def test_bank():
         gold = it["intermediates"]
         assert len(gold) == it["depth"] - 1
         # the leak rule: no intermediate is a numeral literal of the prompt
-        assert all(str(v) not in it["literals"] for v in gold)
+        assert all(v not in it["literals"] for v in gold)
         assert it["start"] not in gold and it["answer"] not in gold
 
 
 def test_near_set_excludes_gold_and_stays_positive():
     assert judge.near_set([11, 5]) == [8, 9, 10, 12, 13, 14, 2, 3, 4, 6, 7]
+    assert judge.near_set([11, 5], exclude=(23, 2)) == [8, 9, 10, 12, 13, 14, 3, 4, 6, 7]
     assert judge.near_set([2]) == [1, 3, 4, 5]
+    assert judge.names_number(5, "then 5.") and not judge.names_number(5, "was 15 or 5.0")
+    assert judge.names_number(11, "Ġ11 | Ġthe") and not judge.names_number(83, "Ġ11 (10.83)")
     assert 5 not in judge.near_set([5, 6]) and 6 not in judge.near_set([5, 6])
 
 
@@ -69,6 +72,9 @@ def test_verdict_kinds():
         {"values": [11], "basis": "numeral_bag", "quote": "十一"}, gold, near, "结果是 十一"
     )
     assert cjk["kind"] == "hit"
+    # a digit-only quote inside a longer number does not verify
+    sub = judge.verdict({"values": [5], "basis": "stated_result", "quote": "5"}, gold, near, "15")
+    assert sub["kind"] == "unverified"
     none = judge.verdict(
         {"values": [], "states_value": False, "basis": "none", "quote": ""}, gold, near, readout
     )
