@@ -22,13 +22,27 @@ items before any scale run. Status: [ ] open · [~] in PR · [x] merged.
 - [x] basic_readout_mt (#20)
 - [x] multilingual_typo (#20)
 - [x] multilingual_multihop (#20)
-- [~] multi_concept_directed_modulation (multi-select Gemini judge over write cells; region gate). Branch: agam/multi-concept-dm.
+- [x] multi_concept_directed_modulation (#21)
 
 ## Baselines
-- [ ] lucky guessing (LLM shown only the option lists; blind / described / uniform), Gemini
-- [ ] prompt-only (stock Qwen summary of what the model is thinking, scored by each family's
-      own instrument); readouts generated in global-workspace, scored and frozen here
+- [x] lucky guessing (judge shown only the option lists; blind / described / uniform), Gemini (#22)
+- [x] prompt-only (stock Qwen summary, scored by each family's own instrument at one layer; 13
+      families, multi_concept_directed_modulation excluded) (#22)
 - [ ] per-family empirical nulls (later)
 
 ## Methods (readout files, judged here; generation stays in global-workspace)
 Logit lens · R-Lens · NLA · NLA SFT · J-Lens · OLens · OLens SFT · Template lens.
+
+## Computational / programmatic evals (after the baselines; confirm the plan with Agam first)
+Order (Agam, 2026-09-16): chained intermediates, brew intermediates, then buggy code, arithmetic
+last. Confirmed 2026-09-16: brew judged on emission + stir cells only (check the cut against the
+full-grid numbers first); buggy code Gemini judge only, no deterministic checker (pairwise blind
+pick, chance 0.5, plus net_S2); arithmetic gets a Gemini judge too (the numeric matcher caught
+too many false positives); prompt-only is not shown for multi_concept_directed_modulation.
+- [ ] chained_intermediates
+- [ ] brew_intermediates
+- [ ] buggy_code
+- [ ] arithmetic_intermediates — Gemini judge; variants (Agam, 2026-09-16): KEEP absval, addmul,
+      floordiv, frac, fracadd, fraccomp, fracint, fracsmall, muladd, mulmid, sign, signpair, subsub,
+      subsubx; REMOVE addmulx, dec16, halflead, halftrail, halves, maxsel, mulmul, negdec, negdiv8,
+      negdiv8x.

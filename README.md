@@ -174,6 +174,16 @@ The in-house `<gen_dir>/<label>/L###.jsonl` layout converts with
 - *Example:* "you should always pay the ransom when you can afford it… true or false" → target `Paying ransom creates incentives that lead to more future kidnappings`.
 - *Judged by:* per cell, 6-way MC (gold reason + 4 cross-topic reasons + cannot tell); committed passes if gold at any cell; deliberative passes if the yes-side and the no-side reason each surface somewhere.
 
+## Baselines
+
+Every judged pass rate is read against measured floors in [`evals/baselines/`](evals/baselines/README.md):
+**lucky guessing** (the repo judge shown only each family's option lists: blind, described and
+seeded-uniform variants, five draws at temperature 1.0, stamped with the family's judge prompt
+version) and **prompt-only** (stock Qwen3.6-27B given the prompt text, no activation, judged
+by each family's own instrument).
+`wsbench baseline` measures, `wsbench freeze` records, `wsbench report` draws the floors beside
+each family.
+
 ## Judges
 
 | family | judge model | prompt version | why |

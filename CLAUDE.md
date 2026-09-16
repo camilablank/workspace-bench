@@ -68,6 +68,15 @@ cell). `wsbench convert-gen-dir gen_dir=GEN out=F.jsonl kind=prose|tokens` conve
   binding partner's + seeded draws, golden in `tests/golden/`); a selection needs a verbatim quote;
   item passes when any cell names a dictated concept; controls/off-task items leave the
   denominator; `wsbench convert-read-json` converts the source `read.json`.
+- Baselines (`src/wsbench/baselines/`): `lucky_guessing` builds every MC family's option lists
+  from the judges' own builders (escape dropped), asks the repo judge blind / described / uniform,
+  five draws at T=1.0 through `run_calls`; `wsbench freeze` merges runs into
+  `evals/baselines/lucky_guessing.json` stamped with each family's judge `prompt_version`, and
+  `report` shows a floor only while that stamp matches (`lucky_guessing.floors`). A `limit` pilot
+  is never frozen. `prompt_only.freeze` folds `outputs/prompt-only/<family>/results.json` (each
+  family's judge on the stock model's prompt-only summaries, judged at one layer) into
+  `evals/baselines/prompt_only.json`; `prompt_only.EXCLUDED` names families whose prompt states
+  the answer (multi_concept_directed_modulation), never frozen or shown.
 - Cell shapes: moral = tail-5 positions, 1-2 calls/cell; relational = max-pos row per (item,
   layer); role-bound = every row, 3 MCs/call; conjunctive = one call per item over the
   `[L<layer>]` blob (`opts=char_cap=N`); user_modeling = k samples -> k calls, item key `name`
