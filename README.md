@@ -63,6 +63,11 @@ The in-house `<gen_dir>/<label>/L###.jsonl` layout converts with
 - *Example:* "Fact: The chemical symbol for the element with atomic number 26 is" → surface answer `Fe`; target (bridge) `iron`.
 - *Judged by:* the shared bank judge, one call per (item, layer): pass = a target concept is NAMED with a verbatim quote verified against one sample; item passes at any layer.
 
+**Multilingual** — [`evals/multilingual/README.md`](evals/multilingual/README.md)
+- *What it is:* A non-English prompt with a one-word answer ("Sechs geteilt durch zwei ist" -> `drei`); does the lens name the concept, in any language, at the final prompt token.
+- *Example:* "Sechs geteilt durch zwei ist" → answer `drei`; target concept `three` (a readout saying *drei*, *three* or *三* all count).
+- *Judged by:* the shared bank judge, one call per (item, layer): pass = a target concept is NAMED with a verbatim quote verified against one sample; item passes at any layer.
+
 ### Safety
 
 **Agentic misalignment** — [`evals/agentic_misalignment/README.md`](evals/agentic_misalignment/README.md)
@@ -131,6 +136,7 @@ The in-house `<gen_dir>/<label>/L###.jsonl` layout converts with
 | relational_multihop | google/gemini-3.8-flash | rel-v1 | default |
 | hallucination | google/gemini-3.8-flash | v5c-chat | default |
 | moral_rationale | google/gemini-3.8-flash | ec-v1 | default |
+| multilingual | google/gemini-3.8-flash | bank-2026-09-16 | default (shared bank judge of the basic families) |
 | multihop | google/gemini-3.8-flash | bank-2026-09-16 | default (shared bank judge of the basic families) |
 | basic_readout | google/gemini-3.8-flash | bank-2026-09-16 | default (shared bank judge of the basic families) |
 | association | google/gemini-3.8-flash | bank-2026-09-16 | default (shared bank judge of the basic families) |
