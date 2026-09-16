@@ -68,7 +68,8 @@ cell). `wsbench convert-gen-dir GEN --out F.jsonl --kind prose|tokens` converts 
   error?, results_path, value, complete, pinned_instrument, spend_usd, n_calls?}},
   judge_overrides: {flag, env}, readouts_root}`.
 - `report DIR [--json]`: table with `(lower is better)`, `n (k no readouts)`, macro row (in-row
-  `excluded:` + "Not in macro:" footnotes); rewrites `summary.md`. Exit 2 = unknown family.
+  `excluded:` + "Not in macro:" footnotes); rewrites `summary.md`. Exit 2 = not a directory /
+  unreadable results.
 
 ## Results contract (`results.py`)
 `results.json` = `{schema_version, family, complete, pinned_instrument, config, n_items,

@@ -175,6 +175,11 @@ def run_families(
                 outcomes[name] = fut.result()
         for s, _readouts in runnable:
             outcomes.setdefault(s.name, FamilyOutcome(s.name, "skipped", error="interrupted"))
+    except BaseException:
+        # an unexpected worker exception propagates (plan), but must not leave the other
+        # families spending in the background
+        executor.shutdown(wait=False, cancel_futures=True)
+        raise
     else:
         executor.shutdown(wait=True)
 

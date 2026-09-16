@@ -130,10 +130,10 @@ def macro(results: Sequence[FamilyResult]) -> dict:
     included: list[FamilyResult] = []
     excluded: list[dict[str, str]] = []
     for r in results:
-        if not r.complete:
-            excluded.append({"family": r.family, "reason": "incomplete"})
-        elif r.metric != "pass_rate":
+        if r.metric != "pass_rate":
             excluded.append({"family": r.family, "reason": "metric"})
+        elif not r.complete:
+            excluded.append({"family": r.family, "reason": "incomplete"})
         elif r.value is None:
             excluded.append({"family": r.family, "reason": "no value"})
         else:

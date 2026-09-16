@@ -218,7 +218,7 @@ def run(args: JudgeArgs) -> FamilyResult:
                 n_informative=0,
                 usage=_usage(spend),
             ),
-            scope,
+            [it for it in scope if it["arm"] == "misaligned"],
             cells,
         )
 
@@ -422,7 +422,7 @@ def run(args: JudgeArgs) -> FamilyResult:
             n_informative=n_informative,
             usage=_usage(spend),
         ),
-        scope,
+        [it for it in scope if it["arm"] == "misaligned"],
         cells,
     )
 

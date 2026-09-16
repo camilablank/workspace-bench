@@ -5,7 +5,8 @@ The code in this repository and the in-house item banks (`conjunctive_associatio
 `agentic_misalignment` scenarios) are released under the MIT licence in `LICENSE`. The items
 listed below mirror third-party data or derive from third-party code; their terms apply to those
 items and are restated here. Item files that mirror external data keep `source` / `source_id`
-fields so every row can be traced back.
+fields where the bank carries them (jailbreak and hallucination); the jlens seeds are
+identified by label prefix.
 
 ## Qwen3.6-27B (Alibaba)
 
@@ -39,8 +40,7 @@ fields so every row can be traced back.
 - Source: Zhao, Ren, Hessel, Cardie, Choi, Deng. *WildChat: 1M ChatGPT Interaction Logs in the
   Wild.* ICLR 2024. arXiv:2405.01470. https://huggingface.co/datasets/allenai/WildChat-1M
 - Included: all 86 `jailbreak_recognition` items are verbatim WildChat conversations
-  (`source: wildchat`; `source_id` is the WildChat conversation hash). Only non-explicit
-  conversations are mirrored.
+  (`source: wildchat`; `source_id` is the WildChat conversation hash).
 - Licence: ODC-BY (Open Data Commons Attribution License v1.0). Attribution is required when
   redistributing or building on these items; this file and the family README provide it.
 
@@ -70,8 +70,7 @@ fields so every row can be traced back.
 - Included: the J-lens method and the frozen reference top-10 tokens under
   `evals/jlens_concept_pr/gen-jlens-pr-jlens/` that the family scores against. The numeric
   helpers in `src/wsbench/evals/jlens_concept_pr/{concept_pr,token_types}.py` are this repo's
-  own code (copied from the author's source repo); no `anthropics/jacobian-lens` source is
-  vendored.
+  own code (MIT); no `anthropics/jacobian-lens` source is vendored.
 - Licence of the referenced code: Apache License, Version 2.0
   (http://www.apache.org/licenses/LICENSE-2.0). Copyright Anthropic. Licensed under the Apache
   License, Version 2.0 (the "License"); you may not use that code except in compliance with the
@@ -84,7 +83,7 @@ fields so every row can be traced back.
 
 - Source: https://huggingface.co/datasets/lmsys/lmsys-chat-1m
 - Included: 74 verbatim first user turns in `evals/hallucination/items.json` and 75 seed prompts
-  in `evals/jlens_concept_pr/manifest.json` (`source: lmsys`).
+  in `evals/jlens_concept_pr/manifest.json` (labels `chat-lmsys-*`).
 - Licence: the **LMSYS-Chat-1M Dataset License Agreement** (on the dataset page) applies to
   those turns; the agreement text controls. In summary it grants a non-exclusive,
   non-transferable licence to use the data, prohibits attempts to identify the individuals
@@ -96,7 +95,7 @@ fields so every row can be traced back.
 - Source: Li, Su, Shen, Li, Cao, Niu. *DailyDialog: A Manually Labelled Multi-turn Dialogue
   Dataset.* IJCNLP 2017. https://huggingface.co/datasets/ConvLab/dailydialog
 - Included: 75 verbatim first user turns in `evals/hallucination/items.json` and 75 seed prompts
-  in `evals/jlens_concept_pr/manifest.json` (`source: dailydialog`).
+  in `evals/jlens_concept_pr/manifest.json` (labels `chat-dailydialog-*`).
 - Licence: **CC BY-NC-SA 4.0** (https://creativecommons.org/licenses/by-nc-sa/4.0/). These
   items are **non-commercial**: attribution is required, they may not be used for commercial
   purposes, and any adaptation must be shared under the same licence.
@@ -105,6 +104,6 @@ fields so every row can be traced back.
 
 - Sources: https://huggingface.co/datasets/NeelNanda/pile-10k;
   https://huggingface.co/datasets/HuggingFaceFW/fineweb-edu (sample-10BT).
-- Included: 75 + 75 verbatim 128-token prefixes as `jlens_concept_pr` seeds (`source: pile`,
-  `source: fineweb`).
+- Included: 74 pile-10k + 75 fineweb-edu verbatim 128-token prefixes as `jlens_concept_pr`
+  seeds (labels `pt-pile-*`, `pt-fineweb-*`; the manifest carries no source ids).
 - Licence: ODC-BY (attribution required); the underlying web text retains its own copyright.
