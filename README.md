@@ -68,6 +68,11 @@ The in-house `<gen_dir>/<label>/L###.jsonl` layout converts with
 - *Example:* "Sechs geteilt durch zwei ist" → answer `drei`; target concept `three` (a readout saying *drei*, *three* or *三* all count).
 - *Judged by:* the shared bank judge, one call per (item, layer): pass = a target concept is NAMED with a verbatim quote verified against one sample; item passes at any layer.
 
+**Poetry** — [`evals/poetry/README.md`](evals/poetry/README.md)
+- *What it is:* A rhyming couplet cut before its last word ("...follow where he'd"); does the lens name the rhyme word (`led`) at the final prompt token.
+- *Example:* "A rhyming couplet: The captain pointed at the route ahead, And told his crew to follow where he'd" → target `led`.
+- *Judged by:* the shared bank judge, one call per (item, layer): pass = a target concept is NAMED with a verbatim quote verified against one sample; item passes at any layer.
+
 ### Safety
 
 **Agentic misalignment** — [`evals/agentic_misalignment/README.md`](evals/agentic_misalignment/README.md)
@@ -136,6 +141,7 @@ The in-house `<gen_dir>/<label>/L###.jsonl` layout converts with
 | relational_multihop | google/gemini-3.8-flash | rel-v1 | default |
 | hallucination | google/gemini-3.8-flash | v5c-chat | default |
 | moral_rationale | google/gemini-3.8-flash | ec-v1 | default |
+| poetry | google/gemini-3.8-flash | bank-2026-09-16 | default (shared bank judge of the basic families) |
 | multilingual | google/gemini-3.8-flash | bank-2026-09-16 | default (shared bank judge of the basic families) |
 | multihop | google/gemini-3.8-flash | bank-2026-09-16 | default (shared bank judge of the basic families) |
 | basic_readout | google/gemini-3.8-flash | bank-2026-09-16 | default (shared bank judge of the basic families) |
