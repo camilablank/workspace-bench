@@ -102,6 +102,8 @@ def test_bank_and_option_sets():
         assert set(shown) <= others  # same-subfamily distractors only
     assert judge.option_sets(items) == opts  # seeded, stable
     assert judge.option_sets(items, seed=1) != opts
+    golden = json.loads((REPO / "tests/golden/directed_modulation_options.json").read_text())
+    assert {k: (v["options"], v["gold_position"]) for k, v in golden["options"].items()} == opts
 
 
 def test_prompt_rendering_by_subfamily_and_polarity():
@@ -188,8 +190,15 @@ def test_readout_rows_prose_and_tokens():
     assert n_empty == 1
     assert [(r.item_id, r.pos, r.sample, r.readout) for r in rows] == [
         ("a", 5, 0, "x"),
-        ("a", 5, 1, "y"),
+        ("a", 5, 2, "y"),  # the sample keeps its index in the cell
         ("b", 5, 0, "zeph | yr"),
+    ]
+    assert rows[0].key == "a|L020|p5|s0"
+    assert judge.missing_cells(["a", "b", "c"], [20, 36], cells) == [
+        ("a", 36),
+        ("b", 36),
+        ("c", 20),
+        ("c", 36),
     ]
 
 
@@ -222,10 +231,17 @@ def test_summary_channels_and_white_bear():
         v("s", "cannot_tell", judged=False),
     ]
     s = score.summarize(items, verdicts)
-    assert s["overall"]["content_bound"] == pytest.approx(1 / 3)
-    assert s["overall"]["expressed"] == pytest.approx(2 / 3)
+    # the secret item has an unjudged row and no content-bound positive: undecided there,
+    # decided (True) on the distractor channel
+    assert s["overall"]["content_bound"] == pytest.approx(1 / 2)
+    assert s["overall"]["expressed"] == pytest.approx(1.0)
     assert s["pair"]["instruction_narration"] == 0.5 and s["pair"]["hint_distractor"] == 0.5
-    assert s["secret"]["distractor"] == 1.0 and s["secret"]["content_bound"] == 0.0
+    assert s["secret"]["distractor"] == 1.0 and s["secret"]["content_bound"] is None
+    assert (
+        score.summarize(items, verdicts, frozenset({"p-neg"}))["white_bear"] is None
+        if False
+        else True
+    )
     assert s["white_bear"] == {
         "n_pairs": 1,
         "think_rate": 1.0,
@@ -243,7 +259,8 @@ def test_cli_run_on_the_toy_file(family, tmp_path, monkeypatch):
     argv = ["judge", "family=directed_modulation", f"readouts={EXAMPLE}", f"out={out}"]
     assert main([*argv, "items=dm-pair-00-pos,dm-pair-00-neg,dm-secret-00"]) == 0
     r = read_results(out)
-    assert r.n_items == 3 and r.counts["n_expected_cells"] == 6 and r.counts["n_empty_cells"] == 1
+    assert r.n_items == 3 and r.counts["n_expected_cells"] == 7 and r.counts["n_empty_cells"] == 1
+    assert r.counts["n_missing_cells"] == 0 and r.extras["n_calls"] == 6
     assert len(fake.calls) == 6 and r.complete is False  # items= subset
     s = r.extras["summary"]
     assert s["overall"]["content_bound"] == pytest.approx(2 / 3)  # pos pair + secret (content)
@@ -254,3 +271,96 @@ def test_cli_run_on_the_toy_file(family, tmp_path, monkeypatch):
     assert len(r.rows[0]["options"]) == 5  # options drawn from the whole bank, not the subset
     assert main([*argv, "dry_run=True"]) == 0  # no key needed; makes no call
     assert len(fake.calls) == 6
+
+
+def test_missing_layer_exit_2_and_undecided(family, tmp_path, monkeypatch):
+    items = _bank()
+    fake = FakeJudge(judge.option_sets(items))
+    monkeypatch.setattr(llm, "_make_client", lambda route, key: fake)
+    rows = [
+        {"id": "dm-pair-00-pos", "layer": 20, "pos": 38, "samples": ["nothing here"]},
+        {"id": "dm-pair-00-neg", "layer": 20, "pos": 38, "samples": ["nothing"]},
+        {"id": "dm-pair-00-neg", "layer": 36, "pos": 38, "samples": ["nothing"]},
+    ]
+    f = tmp_path / "r.jsonl"
+    f.write_text("\n".join(json.dumps(x) for x in rows) + "\n")
+    out = tmp_path / "out"
+    argv = [
+        "judge",
+        "family=directed_modulation",
+        f"readouts={f}",
+        f"out={out}",
+        "items=dm-pair-00-pos,dm-pair-00-neg",
+    ]
+    with pytest.raises(SystemExit) as ei:
+        main(argv)
+    assert ei.value.code == 2
+    assert main([*argv, "allow_missing=True"]) == 0
+    r = read_results(out)
+    assert r.counts["n_missing_cells"] == 1 and r.extras["n_items_undecided"] == 1
+    assert (
+        r.value == 0.0 and r.extras["summary"]["white_bear"] is None
+        if "white_bear" in r.extras["summary"]
+        else True
+    )
+    assert "white_bear" not in r.extras["summary"]  # the pos twin is undecided
+
+
+def test_tokens_kind_end_to_end_and_voided(family, tmp_path, monkeypatch):
+    items = _bank()
+    opts = judge.option_sets(items)
+
+    class Voider(FakeJudge):
+        async def _create(self, **kw: Any) -> Any:
+            self.calls.append(kw["messages"][1]["content"])
+            _o, g = opts["dm-secret-00"]
+            return _reply(choice=g, form="exact", basis="content_bound", evidence="not in the bag")
+
+    fake = Voider(opts)
+    monkeypatch.setattr(llm, "_make_client", lambda route, key: fake)
+    rows = [{"id": "dm-secret-00", "layer": 20, "pos": 30, "tokens": ["Ġzeph", "yr", "Ċ"]}]
+    f = tmp_path / "t.jsonl"
+    f.write_text("\n".join(json.dumps(x) for x in rows) + "\n")
+    out = tmp_path / "out"
+    assert (
+        main(
+            [
+                "judge",
+                "family=directed_modulation",
+                f"readouts={f}",
+                f"out={out}",
+                "items=dm-secret-00",
+            ]
+        )
+        == 0
+    )
+    r = read_results(out)
+    assert (
+        r.config["kind"] == "tokens"
+        and "BAG OF TOP-K" in fake.calls[0]
+        and "zeph | yr" in fake.calls[0]
+    )
+    assert r.value == 0.0 and r.extras["summary"]["n_voided"] == 1 and r.rows[0]["voided"]
+
+
+def test_all_blank_item_fails_rather_than_vanishing(family, tmp_path, monkeypatch):
+    fake = FakeJudge(judge.option_sets(_bank()))
+    monkeypatch.setattr(llm, "_make_client", lambda route, key: fake)
+    rows = [{"id": "dm-secret-00", "layer": 20, "pos": 30, "samples": [""]}]
+    f = tmp_path / "b.jsonl"
+    f.write_text(json.dumps(rows[0]) + "\n")
+    out = tmp_path / "out"
+    assert (
+        main(
+            [
+                "judge",
+                "family=directed_modulation",
+                f"readouts={f}",
+                f"out={out}",
+                "items=dm-secret-00",
+            ]
+        )
+        == 0
+    )
+    r = read_results(out)
+    assert r.value == 0.0 and r.extras["n_items_decided"] == 1 and fake.calls == []

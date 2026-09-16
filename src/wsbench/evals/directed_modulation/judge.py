@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import random
 import re
+import sys
 from dataclasses import dataclass
 from typing import Any
 
@@ -35,7 +36,7 @@ class Row:
 
     @property
     def key(self) -> str:
-        return f"{self.item_id}|L{self.layer}|p{self.pos}|s{self.sample}"
+        return f"{self.item_id}|L{self.layer:03d}|p{self.pos}|s{self.sample}"
 
 
 def norm_token(t: str) -> str:
@@ -68,21 +69,28 @@ def option_sets(
 
 
 def readout_rows(cells: list[Cell]) -> tuple[list[Row], int]:
-    """Every non-empty (layer, position, sample) readout; a tokens cell becomes one ``" | "``
-    bag. Returns the rows and the number of empty cells."""
+    """Every non-empty (layer, position, sample) readout, keeping the sample's index in its
+    cell; a tokens cell becomes one ``" | "`` bag. Returns the rows and the number of cells whose
+    every sample is blank (they score as negatives without a call)."""
     rows: list[Row] = []
     n_empty = 0
     for c in sorted(cells, key=lambda c: (c.id, c.layer, c.pos)):
         if c.tokens is not None:
             toks = [norm_token(t) for t in c.tokens]
-            texts = [" | ".join(t for t in toks if t)] if any(toks) else []
+            texts = [(0, " | ".join(t for t in toks if t))] if any(toks) else []
         else:
-            texts = [s for s in (c.samples or ()) if s.strip()]
+            texts = [(k, s) for k, s in enumerate(c.samples or ()) if s.strip()]
         if not texts:
             n_empty += 1
             continue
-        rows.extend(Row(c.id, c.layer, c.pos, k, t) for k, t in enumerate(texts))
+        rows.extend(Row(c.id, c.layer, c.pos, k, t) for k, t in texts)
     return rows, n_empty
+
+
+def missing_cells(ids: list[str], layers: list[int], cells: list[Cell]) -> list[tuple[str, int]]:
+    """(item, layer) pairs with no readout row, over the file's own layer set."""
+    present = {(c.id, c.layer) for c in cells}
+    return [(i, layer) for i in ids for layer in layers if (i, layer) not in present]
 
 
 def _norm_quote(t: str) -> str:
@@ -129,6 +137,16 @@ def run(args: JudgeArgs) -> FamilyResult:
     scope = item_scope(bank, args)
     by_id = {it["id"]: it for it in scope}
     cells, rep = load_readouts(args.readouts, ids=list(by_id), layers=args.layers)
+    layers = args.layers if args.layers is not None else rep.layers
+    missing = missing_cells(list(by_id), layers, cells)
+    if missing and not args.allow_missing and not args.dry_run:
+        n_exp = len(by_id) * len(layers)
+        print(
+            f"directed_modulation: {len(missing)} of {n_exp} (item, layer) cells have no readout; "
+            "pass allow_missing=True to score the rest",
+            file=sys.stderr,
+        )
+        raise SystemExit(2)
     rows, n_empty = readout_rows(cells)
     tokens = rep.kind == "tokens"
     options = option_sets(bank)  # drawn over the whole bank, never the selected subset
@@ -182,7 +200,9 @@ def run(args: JudgeArgs) -> FamilyResult:
         verdicts,
         args=args,
         kind=rep.kind or "prose",
-        layers=args.layers if args.layers is not None else rep.layers,
+        layers=layers,
+        n_cells=len(cells),
+        missing=missing,
         n_empty=n_empty,
         skipped_rows=sum(rep.skipped.values()),
         spend=spend,

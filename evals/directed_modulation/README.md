@@ -33,11 +33,20 @@ concept. Read sites: the assistant's writing positions (one row per position, k 
   the false-alarm channel), `hinted` (gold picked or its domain present), `hint_distractor`
   (a distractor's domain present: the hint channel's built-in null), and `white_bear`, the
   per-pair think vs don't-think contrast on the headline.
-- Token readouts (a J-lens) are judged as one `" | "` bag per row with a note saying so.
-- An item with an unjudged row and no positive is undecided and left out of the denominator.
-- Chance: 1/6 per call over the shown options; the measured floors are the lucky-guessing
-  baseline (an LLM shown only the same option lists) and the prompt-only baseline, both later
-  PRs. No `n_missing_cells`: the bank carries no position list (`allow_missing` is a no-op).
+- Token readouts (a J-lens) are judged as one `" | "` bag per cell with a note saying so.
+- `counts.n_expected_cells` counts (item, layer, position) cells; `extras.n_calls` the judged
+  samples (k per cell).
+- An item with no positive and an unjudged row, or a missing (item, layer) cell, is undecided
+  and left out of the denominator, in the headline and in every summary rate; a cell whose
+  samples are all blank is a negative without a call. Missing (item, layer) cells (over the
+  file's own layer set) are fatal (exit 2) unless `allow_missing=True`.
+- Option lists are drawn over the whole bank, so they are identical for every subset and arm
+  (golden: `tests/golden/directed_modulation_options.json`). The source repo drew them over
+  the items reaching the judge, so its numbers from `--limit` or screened runs are not
+  comparable.
+- Chance: 1/6 per call over the shown options, which is not a floor for an any-row max; the
+  measured floors are the lucky-guessing baseline (an LLM shown only the same option lists)
+  and the prompt-only baseline, both later PRs.
 
 ## Readouts
 
