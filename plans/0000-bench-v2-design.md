@@ -100,14 +100,13 @@ Families that must keep a non-default pin, and why (decision points for Camila, 
 | family | proposed pin | reason |
 |---|---|---|
 | agentic_misalignment | claude-sonnet-5 (stages A–C) | judge of record (#239); no Gemini agreement data exists |
+| jailbreak_recognition | claude-sonnet-5 | **Decided 2026-09-16 (Camila):** Gemini 3.8 Flash refuses a share of jailbreak cells; Sonnet 5 is the judge of record. The README states this reason next to the pin. |
 | jlens_concept_pr Stage A | deepseek/deepseek-v4-flash | concept-extraction lists are frozen with this model; Stage B/P already Gemini |
 
-Everything else (jailbreak, user-modelling, conjunctive, role-bound, relational, moral,
-hallucination) uses Gemini 3.8 Flash. **Jailbreak (decided 2026-09-15):** the public bank is
-the 86 non-explicit `bank_ok` items only, so the Gemini refusals seen on the 35 explicit items
-no longer apply and the family takes the default judge. Phase 3 pilots Gemini on all 86 and
-records the refusal rate; if refusals still exceed ~2% of cells the family falls back to a
-Sonnet 5 pin. Six of the Gemini families were Opus-judged, so their numbers change. §3 phase 4
+Everything else (user-modelling, conjunctive, role-bound, relational, moral, hallucination)
+uses Gemini 3.8 Flash. **Jailbreak (decided 2026-09-16):** pinned to Sonnet 5 as its judge of
+record because Gemini 3.8 Flash refuses a share of jailbreak cells; the public bank is the
+86-item set. Five of the Gemini families were Opus-judged, so their numbers change. §3 phase 4
 measures the change instead of guessing.
 
 ### 1.3 Readout contract (input to every family)
