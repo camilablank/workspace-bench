@@ -28,7 +28,15 @@ from typing import Any
 
 from wsbench.cache import Cache
 from wsbench.llm import Spend
-from wsbench.mcjudge import Call, Preflighter, base_config, item_scope, load_bank, run_calls
+from wsbench.mcjudge import (
+    Call,
+    Preflighter,
+    base_config,
+    item_scope,
+    load_bank,
+    run_calls,
+    with_readout_count,
+)
 from wsbench.readouts import expected_cells, load_readouts, missing_cells
 from wsbench.registry import JudgeArgs
 from wsbench.results import FamilyResult
@@ -327,4 +335,8 @@ def run(args: JudgeArgs) -> FamilyResult:
         summary_prompt_version=SUMMARIZER_PROMPT_VERSION if kind == "tokens" else None,
         judged_layers=layers,
     )
-    return score.score(args, scope, records, rows, counts=counts, config=config, k=k_arm)
+    return with_readout_count(
+        score.score(args, scope, records, rows, counts=counts, config=config, k=k_arm),
+        scope,
+        cells,
+    )

@@ -130,10 +130,10 @@ def macro(results: Sequence[FamilyResult]) -> dict:
     included: list[FamilyResult] = []
     excluded: list[dict[str, str]] = []
     for r in results:
-        if not r.complete:
-            excluded.append({"family": r.family, "reason": "incomplete"})
-        elif r.metric != "pass_rate":
+        if r.metric != "pass_rate":
             excluded.append({"family": r.family, "reason": "metric"})
+        elif not r.complete:
+            excluded.append({"family": r.family, "reason": "incomplete"})
         elif r.value is None:
             excluded.append({"family": r.family, "reason": "no value"})
         else:
@@ -162,15 +162,28 @@ def markdown_table(results: Sequence[FamilyResult], macro_row: dict | None) -> s
     for r in results:
         chance = _fmt(r.chance) + (f" ({r.chance_label})" if r.chance_label else "")
         judge = str(r.config.get("judge_model", "?"))
+        metric = r.metric if r.higher_is_better else f"{r.metric} (lower is better)"
+        k = r.extras.get("n_items_without_readouts")
+        n = f"{r.n_items}" + (f" ({k} no readouts)" if isinstance(k, int) and k > 0 else "")
         lines.append(
-            f"| {r.family} | {r.metric} | {_fmt(r.value)} | {_fmt_ci(r.ci95)} | {r.n_items} | "
+            f"| {r.family} | {metric} | {_fmt(r.value)} | {_fmt_ci(r.ci95)} | {n} | "
             f"{chance} | {judge} | {_yn(r.pinned_instrument)} | {_yn(r.complete)} |"
         )
     if macro_row is not None:
-        n = len(macro_row.get("families", []))
-        excl = ", ".join(f"{e['family']} ({e['reason']})" for e in macro_row.get("excluded", []))
+        n_fam = len(macro_row.get("families", []))
+        excluded = macro_row.get("excluded", [])
+        excl = ", ".join(f"{e['family']} ({e['reason']})" for e in excluded)
         lines.append(
-            f"| **macro** | pass_rate | {_fmt(macro_row.get('value'))} | — | {n} families | — | "
-            f"— | — | excluded: {excl or 'none'} |"
+            f"| **macro** | pass_rate | {_fmt(macro_row.get('value'))} | — | {n_fam} families "
+            f"| — | — | — | excluded: {excl or 'none'} |"
         )
+        if excluded:
+            by_family = {r.family: r for r in results}
+            lines.append("")
+            lines.append("Not in macro:")
+            for e in excluded:
+                reason = e["reason"]
+                if reason == "metric" and e["family"] in by_family:
+                    reason = f"metric ({by_family[e['family']].metric})"
+                lines.append(f"- {e['family']}: {reason}")
     return "\n".join(lines) + "\n"

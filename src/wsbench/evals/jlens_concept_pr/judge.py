@@ -31,7 +31,14 @@ from wsbench import registry
 from wsbench.cache import Cache
 from wsbench.judge_config import ResolvedJudge
 from wsbench.llm import Spend
-from wsbench.mcjudge import Call, Preflighter, base_config, item_scope, run_calls
+from wsbench.mcjudge import (
+    Call,
+    Preflighter,
+    base_config,
+    item_scope,
+    run_calls,
+    with_readout_count,
+)
 from wsbench.readouts import Cell, expected_cells, load_readouts, missing_cells
 from wsbench.registry import JudgeArgs
 from wsbench.results import FamilyResult
@@ -433,13 +440,17 @@ def run(args: JudgeArgs) -> FamilyResult:
         stage_p_foil=pfoil,
         judged_layers=layers,
     )
-    return score.score(
-        args,
-        inputs,
-        layers=layers,
-        grids={s: score.assemble_grids(grade_rows[s]) for s in ("b", "foil")},
-        support={s: score.assemble_support(support_rows[s], concepts) for s in ("p", "pfoil")},
-        reject_rate=reject_rate,
-        counts_base=counts_base,
-        config=config,
+    return with_readout_count(
+        score.score(
+            args,
+            inputs,
+            layers=layers,
+            grids={s: score.assemble_grids(grade_rows[s]) for s in ("b", "foil")},
+            support={s: score.assemble_support(support_rows[s], concepts) for s in ("p", "pfoil")},
+            reject_rate=reject_rate,
+            counts_base=counts_base,
+            config=config,
+        ),
+        scope,
+        cells,
     )

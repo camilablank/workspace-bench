@@ -23,5 +23,7 @@ SPEC = register(
         metric="precision",
         higher_is_better=True,
         run=judge.run,
+        calls_per_arm="≈ 35k",
+        sources="arXiv:2607.15495",
     )
 )

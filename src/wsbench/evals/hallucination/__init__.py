@@ -20,5 +20,7 @@ SPEC = register(
         metric="hallucination_rate",
         higher_is_better=False,
         run=judge.run,
+        calls_per_arm="≈ 5.6k",
+        sources="LMSYS-Chat-1M",
     )
 )

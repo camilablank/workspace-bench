@@ -6,20 +6,16 @@ import argparse
 import json
 import os
 import sys
+from datetime import UTC, datetime
 from pathlib import Path
 
-from wsbench import registry
+from wsbench import registry, runner
 from wsbench.judge_config import resolve
 from wsbench.llm import JudgeConfigError
 from wsbench.readouts import convert_gen_dir
-from wsbench.registry import EvalSpec, JudgeArgs
-from wsbench.results import (
-    FamilyResult,
-    macro,
-    markdown_table,
-    read_results,
-    write_results,
-)
+from wsbench.registry import EvalSpec
+from wsbench.results import FamilyResult, macro, markdown_table, read_results
+from wsbench.runner import FamilyOutcome, parse_opts
 
 
 def _csv_ints(s: str) -> list[int]:
@@ -28,16 +24,6 @@ def _csv_ints(s: str) -> list[int]:
 
 def _csv_strs(s: str) -> list[str]:
     return [x.strip() for x in s.split(",") if x.strip()]
-
-
-def _opts(pairs: list[str]) -> dict[str, str]:
-    out: dict[str, str] = {}
-    for p in pairs:
-        if "=" not in p:
-            raise SystemExit(f"--opt expects KEY=VALUE, got {p!r}")
-        k, v = p.split("=", 1)
-        out[k.strip()] = v
-    return out
 
 
 def _add_judge_flags(p: argparse.ArgumentParser) -> None:
@@ -83,10 +69,18 @@ def build_parser() -> argparse.ArgumentParser:
     sel.add_argument("--families", type=_csv_strs, default=None)
     r.add_argument("--readouts-root", type=Path, required=True)
     r.add_argument("--out", type=Path, required=True)
+    r.add_argument(
+        "--family-workers",
+        type=int,
+        default=3,
+        help="families judged concurrently under one RPM pacer (1 under --dry-run)",
+    )
+    r.add_argument("--json", action="store_true", help="print the summary as one JSON line")
     _add_judge_flags(r)
 
     rp = sub.add_parser("report", help="summarise DIR/*/results.json")
     rp.add_argument("dir", type=Path)
+    rp.add_argument("--json", action="store_true", help="print {families, macro} as JSON")
 
     c = sub.add_parser("convert-gen-dir", help="in-house gen dir -> readout contract")
     c.add_argument("gen_dir", type=Path)
@@ -123,38 +117,23 @@ def _unknown(name: str) -> int:
 def _judge_family(
     spec: EvalSpec, args: argparse.Namespace, readouts: Path, out: Path
 ) -> FamilyResult:
+    """``judge <family>``: resolve the judge and parse ``--opt`` here (``run`` does both once,
+    up front, in :func:`runner.run_families`)."""
     judge = resolve(spec.judge, flag=args.judge_model, env=os.environ)
-    jargs = JudgeArgs(
-        readouts=readouts,
-        out=out,
-        judge=judge,
-        layers=args.layers,
-        items=args.items,
-        limit=args.limit,
-        allow_missing=args.allow_missing,
-        concurrency=args.concurrency,
-        rpm=args.rpm,
-        dry_run=args.dry_run,
-        aux_models=spec.judge.aux_models,
-        extra=_opts(args.opt),
-    )
-    result = spec.run(jargs)
-    path = write_results(out, result)
-    spend = result.counts.get("spend_usd", 0.0) or 0.0
-    print(
-        f"{spec.name}: {result.metric}={result.value} n={result.n_items} "
-        f"spend=${spend:.2f} pinned={result.pinned_instrument} complete={result.complete} "
-        f"-> {path}"
-    )
-    return result
+    return runner.judge_family(spec, args, readouts, out, judge=judge, opts=parse_opts(args.opt))
 
 
-def _write_summary(out: Path, results: list[FamilyResult]) -> str:
+def _write_summary(
+    out: Path, results: list[FamilyResult], notes: list[FamilyOutcome] | None = None
+) -> str:
     m = macro(results)
-    table = markdown_table(results, m)
+    text = markdown_table(results, m)
+    if notes:
+        text += "\n## skipped / failed\n"
+        text += "".join(f"- {o.family}: {o.status} — {o.error}\n" for o in notes)
     out.mkdir(parents=True, exist_ok=True)
-    (out / "summary.md").write_text(table, encoding="utf-8")
-    return table
+    (out / "summary.md").write_text(text, encoding="utf-8")
+    return text
 
 
 # ---------------------------------------------------------------- subcommands
@@ -165,10 +144,20 @@ def cmd_list(args: argparse.Namespace) -> int:
         print("no families registered yet")
         return 0
     rows = [
-        (s.name, s.group, _n_items(s), s.judge.model, s.judge.prompt_version)
+        (
+            s.name,
+            s.group,
+            _n_items(s),
+            s.metric,
+            s.judge.model,
+            s.judge.prompt_version,
+            s.calls_per_arm or "?",
+            s.sources or "—",
+        )
         for s in sorted(registry.FAMILIES.values(), key=lambda s: s.name)
     ]
-    head = ("family", "group", "n items", "judge model", "prompt version")
+    head = ("family", "group", "n items", "metric", "judge model", "prompt version")
+    head += ("calls/arm (approx)", "credit")
     widths = [max(len(str(r[i])) for r in [head, *rows]) for i in range(len(head))]
     for r in [head, *rows]:
         print("  ".join(str(v).ljust(w) for v, w in zip(r, widths, strict=True)).rstrip())
@@ -193,26 +182,36 @@ def cmd_run(args: argparse.Namespace) -> int:
     for n in names:
         if n not in registry.FAMILIES:
             return _unknown(n)
-    results: list[FamilyResult] = []
-    skipped: list[str] = []
-    try:
-        for n in names:
-            spec = registry.get(n)
-            readouts = args.readouts_root / f"{n}.jsonl"
-            if not readouts.exists():
-                skipped.append(n)
-                print(f"{n}: skipped (no readouts at {readouts})")
-                continue
-            results.append(_judge_family(spec, args, readouts, args.out / n))
-    except JudgeConfigError as e:
-        print(f"judge config error: {e}", file=sys.stderr)
-        return 3
-    table = _write_summary(args.out, results)
-    print(table, end="")
-    if skipped:
-        print(f"skipped (no readouts): {', '.join(skipped)}")
-    print(f"wrote {args.out / 'summary.md'}")
-    return 0
+    specs = [registry.get(n) for n in names]
+    started = datetime.now(UTC)
+    outcomes, code = runner.run_families(
+        specs, args, readouts_root=args.readouts_root, out=args.out
+    )
+    if not outcomes:  # aborted before any family started (preflight / bad override)
+        return code
+    results = [o.result for o in outcomes if o.result is not None]
+    notes = [o for o in outcomes if o.status != "ok"]
+    text = _write_summary(args.out, results, notes)
+    manifest = runner.run_manifest(
+        outcomes,
+        started=started,
+        finished=datetime.now(UTC),
+        args=args,
+        out=args.out,
+        readouts_root=args.readouts_root,
+    )
+    (args.out / "run.json").write_text(json.dumps(manifest, indent=1), encoding="utf-8")
+    if args.json:
+        payload = {
+            "families": [r.to_json() for r in results],
+            "macro": macro(results),
+            "statuses": manifest["families"],
+        }
+        print(json.dumps(payload, ensure_ascii=False))
+    else:
+        print(text, end="")
+        print(f"wrote {args.out / 'summary.md'} and {args.out / 'run.json'}")
+    return code
 
 
 def cmd_report(args: argparse.Namespace) -> int:
@@ -226,9 +225,12 @@ def cmd_report(args: argparse.Namespace) -> int:
         return 2
     m = macro(results)
     table = markdown_table(results, m)
+    (args.dir / "summary.md").write_text(table, encoding="utf-8")
+    if args.json:
+        print(json.dumps({"families": [r.to_json() for r in results], "macro": m}))
+        return 0
     print(table, end="")
     print(f"macro: value={m['value']} families={m['families']} excluded={m['excluded']}")
-    (args.dir / "summary.md").write_text(table, encoding="utf-8")
     print(f"wrote {args.dir / 'summary.md'}")
     return 0
 
