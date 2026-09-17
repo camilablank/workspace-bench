@@ -172,6 +172,9 @@ def test_bank_manifest_and_reference() -> None:
     l42 = json.loads((jj.BANK_DIR / "manifest_L42.json").read_text())
     assert l42["layers"] == [42]
     assert [p["label"] for p in l42["prompts"]] == [it["id"] for it in items]
+    # the rollouts (decoded `tokens`) were stripped on 2026-09-17; the read position stays valid
+    for p in man["prompts"] + l42["prompts"]:
+        assert "tokens" not in p and 0 <= p["eval_positions"][0] < p["n_pos"]
     for it in items[:3]:
         for layer in (20, 42, 44, 60):
             assert jj.reference_path(it["id"], layer).exists()

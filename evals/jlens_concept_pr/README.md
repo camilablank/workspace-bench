@@ -17,16 +17,17 @@ Frozen 2026-09-12 from `evals/workspace-bench/jlens_pr/` in the source repo (cop
 
 | file | what |
 |---|---|
-| `manifest.json` | the acts manifest (`acts-jlens-pr/manifest.json`): 299 `prompts` rows with `label`, `family` (`chat` / `pt`), decoded `tokens` and `eval_positions` (exactly ONE read position per label), `layers` 20-60 step 4. `wsbench list` counts its `prompts`. |
+| `manifest.json` | the acts manifest (`acts-jlens-pr/manifest.json`) minus the rollouts: 299 `prompts` rows with `label`, `family` (`chat` / `pt`), `n_pos` (sequence length) and `eval_positions` (exactly ONE read position per label), `layers` 20-60 step 4. `wsbench list` counts its `prompts`. The decoded `tokens` (seed prompt + Qwen rollout) were stripped on 2026-09-17; only the source repo's manifest carries them. |
 | `manifest_L42.json` | `acts-jlens-pr-L42/manifest.json`: the same 299 items and read positions captured at layer 42 only (NLA-RL's training layer). Provenance only — a readouts layer is valid iff its reference file exists. |
 | `gen-jlens-pr-jlens/<label>/L###.jsonl` | the **reference**: J-lens top-10 tokens (neuronpedia n1000 wikitext lens, cosine readout) at every (label, layer) for the 11 layers plus `L042.jsonl`; one row per file at the eval position, `samples` = 10 byte-level-BPE display strings (decoded with `bpe_display_to_text`), `scores` unused. |
 | `items_manifest.json` | counts, rollout sampling (HF `generate`, T 1.0, top-p 1.0, top-k 0, max-new 512), seed screen |
 | `precision_gold_L44.jsonl` / `recall_gold_L44.jsonl` / `recall_gold_L44_cells.jsonl` | the hand-labelled judge-audit gold sets (120 concepts / 60 tokens at L44) that calibrated `STAGE_P_SYSTEM`; provenance only |
 
-Not shipped: the source's `items.json` (792 KB capture rows with the exact `input_ids`) and
-`seeds.json` (the screened seeds). They live in the source repo under
-`evals/workspace-bench/jlens_pr/` and are needed only to recapture the activations
-(`wsbench-acts:/acts-jlens-pr` on Modal); judging needs only the files above.
+Not shipped: the rollout text (the manifests' `tokens`, stripped 2026-09-17), the source's
+`items.json` (792 KB capture rows with the exact `input_ids`) and `seeds.json` (the screened
+seeds). They live in the source repo under `evals/workspace-bench/jlens_pr/` and are needed
+only to recapture the activations (`wsbench-acts:/acts-jlens-pr` on Modal); judging needs only
+the labels, families and read positions plus the reference files above.
 
 ## Instrument
 
