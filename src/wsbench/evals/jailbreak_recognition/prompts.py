@@ -15,7 +15,7 @@ from collections.abc import Sequence
 
 from wsbench.llm import schema_block
 
-PROMPT_VERSION = "jb-v2"  # jb-v1 = the same prompts judged by claude-sonnet-5
+PROMPT_VERSION = "jb-v1"
 MARKER = "⟦HERE⟧"
 
 READOUT_CLASSES: tuple[str, ...] = ("recognition", "echo", "topic", "noise")

@@ -182,113 +182,12 @@ def test_fatal_raises_and_closes(keys, fast, monkeypatch):
     assert fake.closed
 
 
-# ---------------------------------------------------------------- the OpenRouter route
+def test_openrouter_model_raises(keys, fast, monkeypatch):
+    def boom(route, key):
+        raise AssertionError("client must not be built")
 
-
-def completion(text: str, finish_reason: str = "stop", refusal: str | None = None, cost=0.01):
-    return SimpleNamespace(
-        choices=[
-            SimpleNamespace(
-                finish_reason=finish_reason,
-                message=SimpleNamespace(content=text, refusal=refusal),
-            )
-        ],
-        usage=SimpleNamespace(prompt_tokens=7, completion_tokens=3, cost=cost),
-    )
-
-
-class FakeOpenRouterText:
-    """``outcomes``: a response object, a str (-> a stop completion) or an exception."""
-
-    def __init__(self, outcomes: list[Any]):
-        self.outcomes = list(outcomes)
-        self.calls: list[dict[str, Any]] = []
-        self.closed = False
-        self.chat = SimpleNamespace(completions=SimpleNamespace(create=self._create))
-
-    async def _create(self, **kw: Any) -> Any:
-        self.calls.append(kw)
-        out = self.outcomes.pop(0)
-        if isinstance(out, BaseException):
-            raise out
-        return completion(out) if isinstance(out, str) else out
-
-    async def close(self) -> None:
-        self.closed = True
-
-
-def _collect_or(prompts, fake, monkeypatch, *, thinking=False, max_tokens=400):
-    routes: list[str] = []
-    monkeypatch.setattr(llm, "_make_client", lambda route, key: (routes.append(route), fake)[1])
-    got: dict[int, str | None] = {}
-    spend = stream_text(
-        prompts,
-        model=GEMINI,
-        on_result=lambda i, r: got.__setitem__(i, r),
-        thinking=thinking,
-        max_tokens=max_tokens,
-    )
-    assert routes == ["openrouter"]
-    return got, spend
-
-
-def test_openrouter_success_shape_thinking_off(keys, fast, monkeypatch):
-    fake = FakeOpenRouterText(["  a note  "])
-    got, spend = _collect_or(["usr"], fake, monkeypatch, thinking=False, max_tokens=400)
-    assert got == {0: "a note"}
-    assert spend.calls == 1 and spend.input_tokens == 7 and spend.output_tokens == 3
-    assert spend.usd == pytest.approx(0.01) and spend.errors == 0 and spend.refusals == 0
-    kw = fake.calls[0]
-    assert kw["model"] == GEMINI and kw["max_tokens"] == 400 and kw["timeout"] == 600.0
-    assert kw["messages"] == [{"role": "user", "content": "usr"}]  # no system block
-    assert "response_format" not in kw and "thinking" not in kw
-    assert kw["extra_body"]["reasoning"] == {"effort": "minimal"}
-    assert kw["extra_body"]["usage"] == {"include": True}
-    assert fake.closed
-
-
-def test_openrouter_thinking_on_is_high_effort(keys, fast, monkeypatch):
-    fake = FakeOpenRouterText(["x"])
-    _collect_or(["u"], fake, monkeypatch, thinking=True, max_tokens=16000)
-    assert fake.calls[0]["extra_body"]["reasoning"] == {"effort": "high"}
-    assert fake.calls[0]["max_tokens"] == 16000
-
-
-def test_openrouter_budget_doubling_and_ceiling(keys, fast, monkeypatch):
-    fake = FakeOpenRouterText([completion("", "length"), "done"])
-    got, spend = _collect_or(["u"], fake, monkeypatch, thinking=True, max_tokens=3000)
-    assert got == {0: "done"} and [c["max_tokens"] for c in fake.calls] == [3000, 6000]
-    assert spend.calls == 2 and spend.retries == 0 and spend.errors == 0
-    fake = FakeOpenRouterText([completion("", "length")] * 3)
-    got, spend = _collect_or(["u"], fake, monkeypatch, thinking=True, max_tokens=32000)
-    assert got == {0: ""} and [c["max_tokens"] for c in fake.calls] == [32000, 64000]
-    fake = FakeOpenRouterText([completion("", "stop")])
-    got, _ = _collect_or(["u"], fake, monkeypatch)
-    assert got == {0: ""} and len(fake.calls) == 1  # an empty stop reply is a valid ""
-
-
-def test_openrouter_refusal_is_none_without_retry(keys, fast, monkeypatch):
-    for resp in (completion("", "content_filter"), completion("", refusal="no")):
-        fake = FakeOpenRouterText([resp])
-        got, spend = _collect_or(["u"], fake, monkeypatch)
-        assert got == {0: None} and len(fake.calls) == 1
-        assert spend.refusals == 1 and spend.errors == 0 and spend.retries == 0
-
-
-def test_openrouter_transient_then_success_and_fatal(keys, fast, monkeypatch):
-    fake = FakeOpenRouterText([RateLimitError("slow"), "ok"])
-    got, spend = _collect_or(["u"], fake, monkeypatch)
-    assert got == {0: "ok"} and spend.retries == 1 and spend.calls == 1
-    fake = FakeOpenRouterText([AuthenticationError("bad key")])
-    monkeypatch.setattr(llm, "_make_client", lambda route, key: fake)
-    with pytest.raises(JudgeConfigError):
-        stream_text(["u"], model=GEMINI, on_result=lambda i, r: None, thinking=False, max_tokens=1)
-    assert fake.closed
-
-
-def test_openrouter_missing_key_raises(monkeypatch):
-    monkeypatch.delenv("OPENROUTER_API_KEY", raising=False)
-    with pytest.raises(JudgeConfigError):
+    monkeypatch.setattr(llm, "_make_client", boom)
+    with pytest.raises(JudgeConfigError, match="claude-"):
         stream_text(["u"], model=GEMINI, on_result=lambda i, r: None, thinking=False, max_tokens=1)
 
 

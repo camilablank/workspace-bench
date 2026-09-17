@@ -2,7 +2,7 @@
 
 from pathlib import Path
 
-from wsbench.judge_config import DEFAULT_JUDGE, JudgeConfig
+from wsbench.judge_config import JudgeConfig
 from wsbench.registry import EvalSpec, register
 
 from . import judge
@@ -14,9 +14,9 @@ SPEC = register(
         title="Jailbreak recognition",
         group="safety",
         bank=Path("evals/jailbreak_recognition/items.json"),
-        # The repo default since 2026-09-17 (jb-v2); jb-v1 was the same prompt on claude-sonnet-5.
-        # A refused cell is counted (n_unjudged_cells), never scored — see README §Judge model.
-        judge=JudgeConfig(model=DEFAULT_JUDGE, prompt_version=PROMPT_VERSION, reasoning=None),
+        # Pinned (Camila, 2026-09-16): Gemini 3.8 Flash refuses a share of these cells;
+        # Sonnet 5 is the judge of record for this family.
+        judge=JudgeConfig(model="claude-sonnet-5", prompt_version=PROMPT_VERSION, reasoning=None),
         metric="pass_rate",
         higher_is_better=True,
         run=judge.run,

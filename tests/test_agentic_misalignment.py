@@ -27,7 +27,8 @@ from wsbench.evals.agentic_misalignment.prompts import (
     format_readouts,
     parse_design_score,
 )
-from wsbench.judge_config import DEFAULT_JUDGE, resolve
+from wsbench.judge_config import resolve
+from wsbench.llm import JudgeConfigError
 from wsbench.mcjudge import load_bank
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -90,15 +91,13 @@ def test_bank_shape():
 
 
 def test_spec_and_list(capsys):
-    assert SPEC.judge.model == DEFAULT_JUDGE == "google/gemini-3.8-flash"
-    assert SPEC.judge.reasoning is None  # the family passes per-stage thinking itself
-    assert SPEC.judge.prompt_version == "am-narrative-v2" == prompts.PROMPT_VERSION
+    assert SPEC.judge.model == "claude-sonnet-5" and SPEC.judge.reasoning is None
+    assert SPEC.judge.prompt_version == "am-narrative-v1" == prompts.PROMPT_VERSION
     assert SPEC.metric == "design_score" and SPEC.higher_is_better
-    r = resolve(SPEC.judge, env={})
-    assert r.pinned and r.reasoning == {"effort": "minimal"}
+    assert resolve(SPEC.judge, env={}).pinned and resolve(SPEC.judge, env={}).reasoning is None
     assert main(["list"]) == 0
     line = next(ln for ln in capsys.readouterr().out.splitlines() if "agentic_misalignment" in ln)
-    assert re.search(r"\b32\b", line) and DEFAULT_JUDGE in line and "am-narrative-v2" in line
+    assert re.search(r"\b32\b", line) and "claude-sonnet-5" in line and "am-narrative-v1" in line
 
 
 # ---------------------------------------------------------------- prompts / helpers
@@ -232,41 +231,45 @@ def test_aggregate_design_matches_source_golden():
     assert not score.item_passed({"arm": "control", "asserts_misaligned_plan": True})
 
 
-# ---------------------------------------------------------------- fake OpenRouter client
+# ---------------------------------------------------------------- fake streaming client
+
+
+class _Stream:
+    def __init__(self, text: str | BaseException):
+        self.text = text
+
+    async def __aenter__(self):
+        return self
+
+    async def __aexit__(self, *exc: object) -> bool:
+        return False
+
+    async def get_final_message(self) -> Any:
+        if isinstance(self.text, BaseException):
+            raise self.text
+        return SimpleNamespace(
+            stop_reason="end_turn",
+            content=[SimpleNamespace(type="text", text=self.text)],
+            usage=SimpleNamespace(input_tokens=5, output_tokens=2),
+        )
 
 
 class BadRequestError(Exception):
     status_code = 400
 
 
-def _completion(text: str, finish_reason: str = "stop", refusal: str | None = None) -> Any:
-    return SimpleNamespace(
-        choices=[
-            SimpleNamespace(
-                finish_reason=finish_reason,
-                message=SimpleNamespace(content=text, refusal=refusal),
-            )
-        ],
-        usage=SimpleNamespace(prompt_tokens=5, completion_tokens=2, cost=0.0),
-    )
-
-
 class FakeText:
-    """``responder(user, kw) -> str | None`` (None = a non-transient failure). ``kw`` is the
-    ``chat.completions.create`` kwargs (user-only ``messages``, ``max_tokens``,
-    ``extra_body["reasoning"]``)."""
+    """``responder(user, kw) -> str | None`` (None = a non-transient failure)."""
 
     def __init__(self, responder):
         self.responder = responder
         self.calls: list[dict] = []
-        self.chat = SimpleNamespace(completions=SimpleNamespace(create=self._create))
+        self.messages = SimpleNamespace(stream=self._stream)
 
-    async def _create(self, **kw):
+    def _stream(self, **kw):
         self.calls.append(kw)
         r = self.responder(kw["messages"][0]["content"], kw)
-        if r is None:
-            raise BadRequestError("fake failure")
-        return _completion(r)
+        return _Stream(BadRequestError("fake failure") if r is None else r)
 
     async def close(self):
         return None
@@ -298,7 +301,7 @@ def tag_of(user: str) -> str:
 
 @pytest.fixture
 def fake_text(monkeypatch):
-    monkeypatch.setenv("OPENROUTER_API_KEY", "sk-or-test")
+    monkeypatch.setenv("ANTHROPIC_API_KEY", "sk-ant-test")
     monkeypatch.delenv("WSBENCH_JUDGE_MODEL", raising=False)
     monkeypatch.setattr(llm, "_backoff", lambda attempt, status: 0.0)
 
@@ -350,7 +353,7 @@ def _label_in(text: str) -> str:
 def _responder(user, kw):
     stage = stage_of(user)
     if stage == "A":
-        assert kw["extra_body"]["reasoning"] == {"effort": "minimal"} and kw["max_tokens"] == 400
+        assert kw["thinking"] == {"type": "disabled"} and kw["max_tokens"] == 400
         tag = tag_of(user)
         if tag == f"{EX}:L20:p1":
             return None  # api failure -> EX skips B and C
@@ -359,7 +362,7 @@ def _responder(user, kw):
         if tag == f"{CTL}:L20:p2":
             return "Uninformative."
         return f"note {tag} voice: own intention"
-    assert kw["extra_body"]["reasoning"] == {"effort": "high"}
+    assert kw["thinking"] == {"type": "adaptive"}
     if stage == "B":
         assert kw["max_tokens"] == 16000
         return f"ACCOUNT {_label_in(user)}"
@@ -435,7 +438,7 @@ def test_stage_sequencing_numbers_and_rows(tmp_path, fake_text, am_args):
     assert e["usage"] == {"calls": 14, "input_tokens": 70, "output_tokens": 28}
     assert res.config["stride"] == 1 and res.config["chunk_chars"] == 60000
     assert (
-        res.config["layers_read"] == [20, 36] and res.config["prompt_version"] == "am-narrative-v2"
+        res.config["layers_read"] == [20, 36] and res.config["prompt_version"] == "am-narrative-v1"
     )
 
     # cache: A/B/C keys, the "" Stage A result is cached, the failed call is not
@@ -502,7 +505,7 @@ def test_three_chunks_use_partials(tmp_path, fake_text, am_args):
             m = re.search(r"positions (\d+)-(\d+) of a longer document", user)
             assert m
             partial_seen.append((user, int(m.group(1))))
-            assert kw["extra_body"]["reasoning"] == {"effort": "high"} and kw["max_tokens"] == 16000
+            assert kw["thinking"] == {"type": "adaptive"} and kw["max_tokens"] == 16000
             return f"PARTIAL {m.group(1)}-{m.group(2)} {_label_in(user)}"
         return _responder(user, kw)
 
@@ -614,20 +617,13 @@ def test_stride_and_layers(tmp_path, fake_text, am_args):
         judge.run(am_args(_scripted(tmp_path), extra={"chunk_chars": "0"}))
 
 
-def test_claude_override_routes_to_anthropic(tmp_path, fake_text, mk_args, monkeypatch):
-    """A ``claude-*`` override still builds the Anthropic client (the fake here is
-    OpenRouter-shaped, so the run fails soft: every Stage A call is an API failure)."""
-    monkeypatch.setenv("ANTHROPIC_API_KEY", "sk-ant-test")
-    fake = fake_text(_responder)
-    routes: list[str] = []
-    monkeypatch.setattr(llm, "_make_client", lambda route, key: (routes.append(route), fake)[1])
-    args = mk_args(
-        _scripted(tmp_path), items=[RH], judge=resolve(SPEC.judge, flag="claude-sonnet-5")
-    )
-    assert not args.judge.pinned
-    res = judge.run(args)
-    assert routes == ["anthropic"] and res.pinned_instrument is False
-    assert res.counts["n_unjudged_cells"] == 3 and res.complete is False  # p3 is all-empty
+def test_non_claude_judge_raises(tmp_path, fake_text, am_args, mk_args, monkeypatch):
+    fake_text(_responder)
+    monkeypatch.setenv("OPENROUTER_API_KEY", "sk-or-test")
+    args = mk_args(_scripted(tmp_path), items=[RH])  # the repo default judge (Gemini)
+    assert args.judge.model != SPEC.judge.model
+    with pytest.raises(JudgeConfigError, match="claude-"):
+        judge.run(args)
 
 
 def test_complete_when_every_misaligned_item_has_a_record(tmp_path, fake_text, am_args):
