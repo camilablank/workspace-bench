@@ -17,6 +17,14 @@ fatal (exit 2) unless ``--allow-missing`` (a dry run only reports it). A prose c
 its first :data:`HAL_K` non-empty readouts; a ``tokens`` cell is decoded (:func:`decode_token`),
 summarised by the shared summarizer and judged as one readout (k = 1). A verdict in which any
 readout parses to ``unjudged`` fails validation and is re-queued by the next run.
+
+Stage 2 (claim verification, ``v5c-chat-verify-v1``; ``opts=verify=0`` skips it): one more call
+per span-judged cell, the judge GIVEN each readout's verified wrong spans as established false,
+listing every other specific claim as true / unverifiable / disputed / off_topic. Every quote is
+verified against its own readout; a quote overlapping an established-false span is never
+counted twice; ``disputed`` (the judge thinks the response rules it out but the span judge did
+not flag it) is folded into ``unverifiable`` and reported beside it. The headline is untouched:
+the tallies live in ``extras`` (``n_claims_*``, ``verifiable_share``, ...).
 """
 
 import re
@@ -40,7 +48,14 @@ from wsbench.registry import JudgeArgs
 from wsbench.results import FamilyResult
 from wsbench.summarizer import SUMMARIZER_PROMPT_VERSION, aux_judge, render_bag, summarize
 
-from .prompts import JUDGE_SCHEMA, PROMPT_VERSION, judge_prompt
+from .prompts import (
+    JUDGE_SCHEMA,
+    PROMPT_VERSION,
+    VERIFY_PROMPT_VERSION,
+    VERIFY_SCHEMA,
+    judge_prompt,
+    verify_prompt,
+)
 
 FAMILY = "hallucination"
 HAL_K = 3  # readouts per cell (a maximum); k = 1 for a summarised top-k token lens
@@ -108,6 +123,7 @@ class ReadoutVerdict:
     n_unverified: int  # spans dropped because they are not verbatim in this readout
     cls: str  # hallucinated | off_topic | generic | consistent | unjudged
     revoked: bool = False  # every wrong span is also a verified wrong span of another readout
+    claims: dict[str, int] | None = None  # stage-2 tally (see tally_claims); None = not verified
 
 
 def _readout_class(kind: str, wrong: Sequence[str], off_topic: Sequence[str]) -> str:
@@ -165,6 +181,67 @@ def parse_verdict(
     return out
 
 
+CLAIM_KEYS: tuple[str, ...] = (
+    "false",
+    "true",
+    "unverifiable",
+    "disputed",
+    "off_topic",
+    "n_unverified",
+)
+
+
+def tally_claims(
+    raw: dict[str, Any] | None, samples: Sequence[str], wrong: Sequence[Sequence[str]]
+) -> list[dict[str, int]] | None:
+    """Stage-2 output -> one tally per readout, or None for an unjudged cell (re-queued).
+
+    Port of the source pass's ``tally``: ``false`` = the established wrong spans given to the
+    judge; a quote must be verbatim in ITS OWN readout (``verify_quote``) or it is dropped and
+    counted in ``n_unverified``; a verified quote overlapping an established-false span is
+    skipped (already false, never double counted); ``disputed`` counts as ``disputed`` AND
+    ``unverifiable``; any other or unknown status is ``unverifiable`` (never inflates ``true``).
+    Every readout must be present with a ``claims`` list, else the whole cell is unjudged."""
+    if not isinstance(raw, dict) or not isinstance(raw.get("samples"), list):
+        return None
+    by_idx: dict[int, dict[str, Any]] = {}
+    for s in raw["samples"]:
+        if isinstance(s, dict) and isinstance(s.get("idx"), int) and not isinstance(s["idx"], bool):
+            by_idx[s["idx"]] = s
+    if any(
+        i not in by_idx or not isinstance(by_idx[i].get("claims"), list)
+        for i in range(len(samples))
+    ):
+        return None
+    out: list[dict[str, int]] = []
+    for i, readout in enumerate(samples):
+        w = [normalize_ws(x) for x in wrong[i]]
+        c = dict.fromkeys(CLAIM_KEYS, 0)
+        c["false"] = len(wrong[i])
+        for cl in by_idx[i]["claims"]:
+            if not isinstance(cl, dict):
+                continue
+            q = str(cl.get("quote") or "")
+            if not q or not verify_quote(q, [readout]):
+                c["n_unverified"] += 1
+                continue
+            nq = normalize_ws(q)
+            if any(x in nq or nq in x for x in w):
+                continue  # already counted as false
+            st = str(cl.get("status") or "").strip().lower()
+            if st == "true":
+                c["true"] += 1
+            elif st == "off_topic":
+                c["off_topic"] += 1
+            elif st == "disputed":
+                c["disputed"] += 1
+                c["unverifiable"] += 1
+            else:  # unverifiable, or anything unexpected -- never inflates true
+                c["unverifiable"] += 1
+        out.append(c)
+    return out
+
+
 def fully_judged(raw: dict[str, Any] | None, samples: Sequence[str]) -> bool:
     """A verdict counts only if it judged EVERY readout (a partly judged cell is re-judged, never
     scored partially) — the ``validate`` hook of :func:`run_calls`."""
@@ -215,6 +292,7 @@ def run(args: JudgeArgs) -> FamilyResult:
             raise SystemExit(2)
     kind = rep.kind or "prose"
     k_arm = 1 if kind == "tokens" else HAL_K
+    verify = args.extra.get("verify", "1") != "0"  # opts=verify=0 skips stage 2
     nonempty = [c for c in cells if not c.empty]
     spend = Spend()
     pre = Preflighter(args.dry_run)
@@ -281,14 +359,68 @@ def run(args: JudgeArgs) -> FamilyResult:
             if calls
             else {}
         )
+        verdicts_of: dict[str, list[ReadoutVerdict] | None] = {}
+        for c in nonempty:
+            samples = samples_of.get(c.key)
+            raw = results.get(c.key) if samples is not None else None
+            verdicts_of[c.key] = parse_verdict(raw, samples or []) if raw is not None else None
+        # ---- stage 2: claim verification, one call per span-judged cell
+        vcalls: list[Call] = []
+        if verify:
+            for c in nonempty:
+                verdicts = verdicts_of.get(c.key)
+                if verdicts is None:
+                    continue
+                site = sites[c.id][c.pos]
+                wrong = [list(v.wrong) for v in verdicts]
+                system, user = verify_prompt(by_id[c.id], site, samples_of[c.key], wrong)
+                vcalls.append(
+                    Call(
+                        f"{c.key}:V",
+                        system,
+                        user,
+                        {
+                            "id": c.id,
+                            "layer": c.layer,
+                            "pos": c.pos,
+                            "site_kind": site["kind"],
+                            "samples": samples_of[c.key],
+                            "wrong": wrong,
+                        },
+                    )
+                )
+        vresults = (
+            run_calls(
+                vcalls,
+                schema=VERIFY_SCHEMA,
+                judge=args.judge,
+                prompt_version=VERIFY_PROMPT_VERSION,
+                cache=cache,
+                spend=spend,
+                concurrency=args.concurrency,
+                rpm=args.rpm,
+                dry_run=args.dry_run,
+                preflight=pre.for_judge(args.judge),
+                validate=lambda call, r: (
+                    tally_claims(r, call.meta["samples"], call.meta["wrong"]) is not None
+                ),
+            )
+            if vcalls
+            else {}
+        )
+        for vc in vcalls:
+            verdicts = verdicts_of[vc.key.removesuffix(":V")]
+            tallies = tally_claims(vresults.get(vc.key), vc.meta["samples"], vc.meta["wrong"])
+            if verdicts is not None and tallies is not None:
+                for v, t in zip(verdicts, tallies, strict=True):
+                    v.claims = t
     records: list[CellRecord] = []
     rows: list[dict[str, Any]] = []
     n_unjudged = 0
     for c in nonempty:
         site = sites[c.id][c.pos]
         samples = samples_of.get(c.key)
-        raw = results.get(c.key) if samples is not None else None
-        verdicts = parse_verdict(raw, samples or []) if raw is not None else None
+        verdicts = verdicts_of.get(c.key)
         n_unjudged += verdicts is None
         n_samples = 1 if kind == "tokens" else len(samples or [])
         records.append(CellRecord(c.id, c.layer, c.pos, site["kind"], n_samples, verdicts))
@@ -310,6 +442,7 @@ def run(args: JudgeArgs) -> FamilyResult:
                     "wrong": v.wrong,
                     "off_topic": v.off_topic,
                     "n_unverified": v.n_unverified,
+                    "claims": v.claims,
                 }
                 for v in verdicts
             ],
@@ -332,6 +465,8 @@ def run(args: JudgeArgs) -> FamilyResult:
         k=k_arm,
         summary_prompt_version=SUMMARIZER_PROMPT_VERSION if kind == "tokens" else None,
         judged_layers=layers,
+        verify=verify,
+        verify_prompt_version=VERIFY_PROMPT_VERSION if verify else None,
     )
     return with_readout_count(
         score.score(args, scope, records, rows, counts=counts, config=config, k=k_arm),
