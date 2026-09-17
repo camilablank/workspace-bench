@@ -88,8 +88,8 @@ macro averages only complete `pass_rate` families and lists every exclusion with
 
 ## Invariants
 - Every judge prompt lives in the family's `prompts.py` (`PROMPTS`; `{name}` placeholders
-  rendered by `str.replace`, never `str.format` — hallucination's `JUDGE_USER` is the one
-  exception) AND verbatim in a fenced block of the family README under "Judge prompts";
+  rendered by `str.replace`, never `str.format` — hallucination's `JUDGE_USER` and
+  `VERIFY_USER` are the exceptions) AND verbatim in a fenced block of the family README under "Judge prompts";
   `tests/test_prompts_in_readme.py` asserts equality. Bump `prompt_version` on any edit.
 - Failures never score; they are counted. Frozen banks are never edited in place. `spec.run`
   returns a `FamilyResult` and writes nothing. `counts` has a fixed key set (other tallies go
