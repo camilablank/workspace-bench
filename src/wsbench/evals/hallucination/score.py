@@ -7,6 +7,12 @@ the UNREVOKED rate, read beside ``assert_share``; ``hallucination_rate_revoked``
 the source's item-level percentile bootstrap of the ratio of per-item sums (2,000 draws, seed 0),
 not ``results.bootstrap_ci``. ``n_items`` is the number of items in scope; the value itself is a
 readout-level ratio.
+
+Stage-2 claim tallies (``ReadoutVerdict.claims``) add the ``n_claims_*`` counts and the
+``verifiable_share`` / ``false_share_of_verifiable`` / ``unverifiable_claims_per_readout`` rates
+to every block; they never touch the headline or ``complete``. ``n_claims_false`` is span-level
+(the established wrong spans per tallied readout, revoked or not), unlike the readout-level
+headline.
 """
 
 import random
@@ -38,6 +44,15 @@ def _counts(cells: Sequence[CellRecord], k: int = HAL_K) -> dict[str, int]:
         "n_off_topic": 0,
         "n_revoked": 0,
         "n_unverified_spans": 0,
+        # stage 2 (claim verification) over the readouts that carry a tally
+        "n_readouts_claims_judged": 0,
+        "n_cells_claims_unjudged": 0,  # span-judged cells without a tally (failed or verify=0)
+        "n_claims_false": 0,
+        "n_claims_true": 0,
+        "n_claims_unverifiable": 0,
+        "n_claims_disputed": 0,
+        "n_claims_off_topic": 0,
+        "n_unverified_claim_quotes": 0,
     }
     for cell in cells:
         if cell.n_samples < k:
@@ -45,11 +60,21 @@ def _counts(cells: Sequence[CellRecord], k: int = HAL_K) -> dict[str, int]:
         if cell.verdicts is None:
             c["n_unjudged_cells"] += 1
             continue
+        if any(v.claims is None for v in cell.verdicts if v.cls != "unjudged"):
+            c["n_cells_claims_unjudged"] += 1
         for v in cell.verdicts:
             if v.cls == "unjudged":
                 continue
             c["n_readouts"] += 1
             c["n_unverified_spans"] += v.n_unverified
+            if v.claims is not None:
+                c["n_readouts_claims_judged"] += 1
+                c["n_claims_false"] += v.claims["false"]
+                c["n_claims_true"] += v.claims["true"]
+                c["n_claims_unverifiable"] += v.claims["unverifiable"]
+                c["n_claims_disputed"] += v.claims["disputed"]
+                c["n_claims_off_topic"] += v.claims["off_topic"]
+                c["n_unverified_claim_quotes"] += v.claims["n_unverified"]
             if v.cls in SPECIFIC_CLASSES:
                 c["n_specific"] += 1
             if v.cls == "hallucinated":
@@ -66,6 +91,17 @@ def _rates(c: dict[str, int]) -> dict[str, float | None]:
         "hallucination_rate_revoked": _ratio(c["n_hallucinated"] - c["n_revoked"], c["n_specific"]),
         "off_topic_rate": _ratio(c["n_off_topic"], c["n_specific"]),
         "assert_share": _ratio(c["n_specific"], c["n_readouts"]),
+        # stage 2: verifiable = true + false; specific claims = verifiable + unverifiable
+        "verifiable_share": _ratio(
+            c["n_claims_true"] + c["n_claims_false"],
+            c["n_claims_true"] + c["n_claims_false"] + c["n_claims_unverifiable"],
+        ),
+        "false_share_of_verifiable": _ratio(
+            c["n_claims_false"], c["n_claims_true"] + c["n_claims_false"]
+        ),
+        "unverifiable_claims_per_readout": _ratio(
+            c["n_claims_unverifiable"], c["n_readouts_claims_judged"]
+        ),
     }
 
 

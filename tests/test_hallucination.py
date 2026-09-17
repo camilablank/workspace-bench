@@ -254,17 +254,48 @@ def test_bootstrap_is_deterministic_and_brackets_the_rate() -> None:
 # ------------------------------------------------------------------ the family run
 
 
+def _readout_texts(user: str) -> list[str]:
+    return [
+        r.split("\n", 1)[1].rsplit("\n</readout>", 1)[0] for r in user.split('<readout idx="')[1:]
+    ]
+
+
+def _verify_answer(texts: list[str]) -> dict[str, Any]:
+    """Stage-2 answer per readout: idx 0 -> a true claim, an unverifiable one and a paraphrase
+    (not verbatim, dropped); idx 1 -> one claim inside its established-false span (skipped);
+    idx 2 -> a disputed claim and an off-topic one."""
+
+    def claims(j: int, t: str) -> list[tuple[str, str]]:
+        if j == 0:
+            return [(t[:12], "true"), (t[-8:], "unverifiable"), ("not in the readout", "true")]
+        if j == 1:
+            return [(t[:12], "true")]
+        return [(t[:12], "disputed"), (t[-8:], "off_topic")]
+
+    return {
+        "samples": [
+            {
+                "idx": j,
+                "kind": "specific",
+                "claims": [{"quote": q, "status": st, "why": "toy"} for q, st in claims(j, t)],
+                "rationale": "",
+            }
+            for j, t in enumerate(texts)
+        ]
+    }
+
+
 def _responder(system: str, user: str) -> dict[str, Any] | None:
-    """Judge calls: flags readout 1's full text as wrong in every cell. Summary calls: a fixed
-    readout. Preflight: {"a": 1}."""
+    """Judge calls: flags readout 1's full text as wrong in every cell. Verify calls: see
+    ``_verify_answer``. Summary calls: a fixed readout. Preflight: {"a": 1}."""
     if user.startswith("Return"):
         return {"a": 1}
     if user.startswith("TOKEN READOUTS:"):
         return {"interpretation": "The model is about to say it is an AI with no spouse."}
+    texts = _readout_texts(user)
+    if system == hp.VERIFY_SYSTEM:
+        return _verify_answer(texts)
     assert system == hp.JUDGE_SYSTEM
-    texts = [
-        r.split("\n", 1)[1].rsplit("\n</readout>", 1)[0] for r in user.split('<readout idx="')[1:]
-    ]
     return {
         "samples": [
             {
@@ -279,7 +310,11 @@ def _responder(system: str, user: str) -> dict[str, Any] | None:
 
 
 def _judge_calls(fake) -> list[str]:
-    return [u for _s, u in fake.calls if not u.startswith(("Return", "TOKEN READOUTS:"))]
+    return [u for s, u in fake.calls if s == hp.JUDGE_SYSTEM]
+
+
+def _verify_calls(fake) -> list[str]:
+    return [u for s, u in fake.calls if s == hp.VERIFY_SYSTEM]
 
 
 def test_missing_cells_stop_the_run_unless_allowed(tmp_path, fake_llm, mk_args):
@@ -316,12 +351,61 @@ def test_end_to_end_and_resume(tmp_path, fake_llm, mk_args):
     assert "hallucination_rate" not in e and set(e["by_layer"]) == {"36"}
     assert res.n_items == 2
     assert res.config["prompt_version"] == "v5c-chat" and res.config["kind"] == "prose"
+    # stage 2: one verify call per span-judged cell, its wrong spans given as established false
+    vc = _verify_calls(fake)
+    assert len(vc) == 4 and all(hp.READ_MARK in u for u in vc)
+    assert all("Established FALSE spans of readout 1:\n  - " in u for u in vc)
+    assert all("Established FALSE spans of readout 0:\n  (none)" in u for u in vc)
+    assert (
+        res.config["verify"] is True and res.config["verify_prompt_version"] == "v5c-chat-verify-v1"
+    )
+    assert e["n_cells_claims_unjudged"] == 0 and e["n_readouts_claims_judged"] == 12
+    # per cell: idx0 -> 1 true + 1 unverifiable (+1 dropped paraphrase); idx1 -> its claim
+    # overlaps the false span (skipped, false = 1); idx2 -> 1 disputed (= unverifiable) + 1 off
+    assert e["n_claims_true"] == 4 and e["n_claims_false"] == 4
+    assert e["n_claims_unverifiable"] == 8 and e["n_claims_disputed"] == 4
+    assert e["n_claims_off_topic"] == 4 and e["n_unverified_claim_quotes"] == 4
+    assert e["verifiable_share"] == pytest.approx(8 / 16)
+    assert e["false_share_of_verifiable"] == pytest.approx(4 / 8)
+    assert e["unverifiable_claims_per_readout"] == pytest.approx(8 / 12)
+    assert e["by_layer"]["36"]["n_claims_unverifiable"] == 8
+    assert sum(b["n_claims_true"] for b in e["by_site_kind"].values()) == 4
+    cached = [json.loads(line) for line in (args.out / "cells.jsonl").read_text().splitlines()]
+    assert sorted(r["key"] for r in cached if r["key"].endswith(":V")) == sorted(
+        r["key"] + ":V" for r in cached if not r["key"].endswith(":V")
+    )
     assert res.config["k"] == 3 and res.config["reasoning"] == {"effort": "minimal"}
     assert res.config["judge_model"] == "google/gemini-3.8-flash"
     row = next(r for r in res.rows if r["pos"] == 23)
     assert set(row) == {"key", "id", "layer", "pos", "site_kind", "samples", "verdict"}
     assert row["key"] == "chat-dailydialog-0000__L036__p23" and len(row["samples"]) == 3
     assert [v["class"] for v in row["verdict"]] == ["consistent", "hallucinated", "consistent"]
+    assert [v["claims"] for v in row["verdict"]] == [
+        {
+            "false": 0,
+            "true": 1,
+            "unverifiable": 1,
+            "disputed": 0,
+            "off_topic": 0,
+            "n_unverified": 1,
+        },
+        {
+            "false": 1,
+            "true": 0,
+            "unverifiable": 0,
+            "disputed": 0,
+            "off_topic": 0,
+            "n_unverified": 0,
+        },
+        {
+            "false": 0,
+            "true": 0,
+            "unverifiable": 1,
+            "disputed": 1,
+            "off_topic": 1,
+            "n_unverified": 0,
+        },
+    ]
     # resume: every cell cached, no calls, same numbers
     fake2 = fake_llm(_responder)
     again = hc.run(args)
@@ -368,8 +452,9 @@ def test_partly_judged_cell_is_unjudged_and_retried(tmp_path, fake_llm, mk_args)
 def test_topk_rows_are_summarised_then_judged_k1(tmp_path, fake_llm, mk_args):
     fake = fake_llm(_responder)
     res = hc.run(mk_args(TOPK, items=["chat-dailydialog-0000"], allow_missing=True))
-    users = [u for _s, u in fake.calls if not u.startswith("Return")]
+    users = [u for s, u in fake.calls if s != hp.VERIFY_SYSTEM and not u.startswith("Return")]
     assert len(users) == 2 and users[0].startswith("TOKEN READOUTS:\n AI (9.10) |  spouse (8.40)")
+    assert len(_verify_calls(fake)) == 1  # the summary is verified as one readout
     assert res.config["kind"] == "tokens" and res.config["k"] == 1
     assert res.config["summary_prompt_version"] == "interp-v1"
     row = res.rows[0]
@@ -488,6 +573,7 @@ def test_dry_run_prints_the_prompt_and_makes_no_calls(tmp_path, mk_args, capsys,
     res = hc.run(mk_args(TOY, dry_run=True))  # missing cells are reported, not fatal, on a dry run
     out = capsys.readouterr().out
     assert hp.READ_MARK in out and hp.JUDGE_SYSTEM in out and "missing cells" in out
+    assert hp.VERIFY_SYSTEM not in out  # no verdict exists on a dry run, so no verify prompt
     assert res.value is None and res.ci95 is None and res.rows == []
     assert res.config["dry_run"] is True and res.complete is False and res.n_items == 149
     assert res.counts["n_missing_cells"] == 1123 - 4 and res.counts["spend_usd"] == 0.0
@@ -495,3 +581,164 @@ def test_dry_run_prints_the_prompt_and_makes_no_calls(tmp_path, mk_args, capsys,
     hc.run(mk_args(TOPK, dry_run=True))
     out = capsys.readouterr().out
     assert "TOKEN READOUTS:" in out and hp.JUDGE_SYSTEM not in out
+
+
+# ------------------------------------------------------------------ stage 2: claim verification
+
+
+def _vraw(*per_readout: list[tuple[str, str]]) -> dict[str, Any]:
+    return {
+        "samples": [
+            {
+                "idx": i,
+                "kind": "specific",
+                "claims": [{"quote": q, "status": st, "why": "x"} for q, st in claims],
+                "rationale": "",
+            }
+            for i, claims in enumerate(per_readout)
+        ]
+    }
+
+
+def test_tally_claims_rules() -> None:
+    samples = ["The assistant names its wife, Sarah.", "A friendly exclamation."]
+    wrong = [["its wife, Sarah"], []]
+    t = hc.tally_claims(
+        _vraw(
+            [
+                ("names its wife", "true"),  # overlaps the established-false span -> skipped
+                ("The assistant", "true"),
+                ("the assistant", "TRUE "),  # case / whitespace normalised, still verbatim
+                ("Sarah is her wife", "true"),  # paraphrase: not verbatim -> dropped, counted
+                ("names", "bogus"),  # unknown status never inflates true
+            ],
+            [
+                ("friendly", "disputed"),
+                ("exclamation", "off_topic"),
+                ("A friendly", "unverifiable"),
+            ],
+        ),
+        samples,
+        wrong,
+    )
+    assert t == [
+        {
+            "false": 1,
+            "true": 3,
+            "unverifiable": 1,
+            "disputed": 0,
+            "off_topic": 0,
+            "n_unverified": 1,
+        },
+        {
+            "false": 0,
+            "true": 0,
+            "unverifiable": 2,
+            "disputed": 1,
+            "off_topic": 1,
+            "n_unverified": 0,
+        },
+    ]
+
+
+def test_tally_claims_rejects_partial_or_wrong_shaped_answers() -> None:
+    samples = ["one readout", "another readout"]
+    assert hc.tally_claims(None, samples, [[], []]) is None
+    assert hc.tally_claims({"samples": "x"}, samples, [[], []]) is None
+    assert hc.tally_claims(_vraw([]), samples, [[], []]) is None  # idx 1 missing
+    span_shaped = _raw(("specific", []), ("specific", []))  # a stage-1 answer: no `claims`
+    assert hc.tally_claims(span_shaped, samples, [[], []]) is None
+    assert hc.tally_claims(_vraw([], []), samples, [["x"], []]) == [
+        {
+            "false": 1,
+            "true": 0,
+            "unverifiable": 0,
+            "disputed": 0,
+            "off_topic": 0,
+            "n_unverified": 0,
+        },
+        {
+            "false": 0,
+            "true": 0,
+            "unverifiable": 0,
+            "disputed": 0,
+            "off_topic": 0,
+            "n_unverified": 0,
+        },
+    ]
+
+
+def test_claims_numbers_arithmetic() -> None:
+    def rv(cls, claims):
+        return hc.ReadoutVerdict(0, "specific", [], [], 0, cls, False, claims)
+
+    tallied = {
+        "false": 2,
+        "true": 3,
+        "unverifiable": 4,
+        "disputed": 1,
+        "off_topic": 0,
+        "n_unverified": 1,
+    }
+    cells = [
+        hc.CellRecord(
+            "a", 36, 1, "clause", 3, [rv("consistent", tallied), rv("hallucinated", None)]
+        ),
+        hc.CellRecord("a", 36, 2, "clause", 3, [rv("consistent", tallied)]),
+        hc.CellRecord("b", 36, 1, "clause", 3, None),
+    ]
+    n = hs.numbers(cells)
+    assert n["n_readouts_claims_judged"] == 2 and n["n_cells_claims_unjudged"] == 1
+    assert n["n_claims_true"] == 6 and n["n_claims_false"] == 4 and n["n_claims_unverifiable"] == 8
+    assert n["n_claims_disputed"] == 2 and n["n_unverified_claim_quotes"] == 2
+    assert n["verifiable_share"] == pytest.approx(10 / 18)
+    assert n["false_share_of_verifiable"] == pytest.approx(4 / 10)
+    assert n["unverifiable_claims_per_readout"] == pytest.approx(8 / 2)
+    empty = hs.numbers([hc.CellRecord("a", 36, 1, "clause", 3, [rv("consistent", None)])])
+    assert empty["verifiable_share"] is None and empty["n_cells_claims_unjudged"] == 1
+
+
+def test_verify_can_be_switched_off(tmp_path, fake_llm, mk_args):
+    fake = fake_llm(_responder)
+    res = hc.run(mk_args(TOY, items=TOY_ITEMS, allow_missing=True, extra={"verify": "0"}))
+    assert len(_judge_calls(fake)) == 4 and _verify_calls(fake) == []
+    assert res.config["verify"] is False and res.config["verify_prompt_version"] is None
+    assert res.value == pytest.approx(4 / 12)  # the headline is the same instrument
+    e = res.extras
+    assert e["n_cells_claims_unjudged"] == 4 and e["n_readouts_claims_judged"] == 0
+    assert e["n_claims_true"] == 0 and e["verifiable_share"] is None
+    assert all(v["claims"] is None for r in res.rows for v in r["verdict"])
+
+
+def test_failed_verify_never_scores_and_is_retried(tmp_path, fake_llm, mk_args):
+    def no_verify(system, user):
+        return None if system == hp.VERIFY_SYSTEM else _responder(system, user)
+
+    fake = fake_llm(no_verify)
+    args = mk_args(TOY, items=TOY_ITEMS, allow_missing=True)
+    res = hc.run(args)
+    assert len(_verify_calls(fake)) == 4 and res.value == pytest.approx(4 / 12)
+    assert res.counts["n_unjudged_cells"] == 0  # the headline's coverage is untouched
+    assert res.extras["n_cells_claims_unjudged"] == 4 and res.extras["n_claims_true"] == 0
+
+    # a wrong-shaped verify answer is cached as a failure with the raw answer, then re-queued
+    def span_shaped(system, user):
+        if system == hp.VERIFY_SYSTEM:
+            return _raw(*[("specific", [])] * len(_readout_texts(user)))
+        return _responder(system, user)
+
+    fake2 = fake_llm(span_shaped)
+    hc.run(args)
+    assert len(_verify_calls(fake2)) == 4 and _judge_calls(fake2) == []
+    cached = [json.loads(line) for line in (args.out / "cells.jsonl").read_text().splitlines()]
+    vrows = [r for r in cached if r["key"].endswith(":V")]  # 4 API failures + 4 rejects
+    assert len(vrows) == 8 and all(r["result"] is None for r in vrows)
+    assert all("raw" in r["meta"] for r in vrows[4:])
+    assert not any("raw" in r["meta"] for r in vrows[:4])
+    fake3 = fake_llm(_responder)
+    res3 = hc.run(args)
+    assert len(_verify_calls(fake3)) == 4 and _judge_calls(fake3) == []
+    assert res3.extras["n_cells_claims_unjudged"] == 0 and res3.extras["n_claims_true"] == 4
+    fake4 = fake_llm(_responder)
+    hc.run(args)
+    assert fake4.calls == []

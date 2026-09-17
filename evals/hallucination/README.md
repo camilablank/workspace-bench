@@ -51,16 +51,47 @@ shared client and cache without changing the instrument.
 - **`extras`** = the source `numbers` block minus the headline: `hallucination_rate_revoked`,
   `assert_share`, `off_topic_rate`, `n_specific`, `n_readouts`, `n_unverified_spans`,
   `n_cells`, `n_unjudged_cells`, `n_short_cells` (cells with fewer than k readouts),
-  `n_hallucinated`, `n_off_topic`, `n_revoked`, and every block repeated `by_layer` and
-  `by_site_kind` (each with its own `ci95`). `config` adds `kind`, `k`,
-  `summary_prompt_version` and `judged_layers`.
+  `n_hallucinated`, `n_off_topic`, `n_revoked`, plus the stage-2 claim counts
+  `n_readouts_claims_judged`, `n_cells_claims_unjudged`, `n_claims_false`, `n_claims_true`,
+  `n_claims_unverifiable`, `n_claims_disputed`, `n_claims_off_topic`,
+  `n_unverified_claim_quotes` and rates `verifiable_share` = (true + false) / (true + false +
+  unverifiable), `false_share_of_verifiable` = false / (true + false),
+  `unverifiable_claims_per_readout` = unverifiable / readouts with a tally (`null` on a zero
+  denominator), and every block repeated `by_layer` and `by_site_kind` (each with its own
+  `ci95`). `config` adds `kind`, `k`, `summary_prompt_version`, `judged_layers`, `verify` and
+  `verify_prompt_version`.
 - **Complete** = pinned judge, no `items=` / `limit=` subset, zero missing and unjudged cells,
   empty cells <= 5% of expected. Deviation from the shared rule: **`layers=` is not a subset
   here** — a single-layer lens judged at its one layer is complete, as in the source.
 - **Judge:** `google/gemini-3.8-flash`, reasoning `{"effort": "minimal"}`,
   `PROMPT_VERSION = "v5c-chat"` — identical to the source pin, so `pinned_instrument` is true
-  under the default. Cost: a full multilayer arm is 1,123 x 5 = 5,615 judge calls (a token-lens
-  arm adds one summary call per cell).
+  under the default. Cost: a full multilayer arm is 1,123 x 5 = 5,615 span-judge calls plus the
+  same number of claim-verification calls (below); a token-lens arm adds one summary call per
+  cell.
+- **Claim verification (stage 2, `VERIFY_PROMPT_VERSION = "v5c-chat-verify-v1"`):** the span
+  judge finds the FALSE claims but never counts the TRUE ones, so `hallucination_rate`'s
+  denominator is a per-readout "says something concrete" flag, not a claim count. A second call
+  per span-judged cell (same judge, same context rendering) is GIVEN each readout's verified
+  wrong spans as established false and lists every OTHER specific claim as `true` (the response
+  states or entails it; a fulfilled prediction counts), `unverifiable` (neither stated nor ruled
+  out — "compatible is not stated"), `disputed` (the judge thinks the response rules it out but
+  the span judge did not flag it; counted as unverifiable and reported separately — the span
+  judge is authoritative for false) or `off_topic` (junk, dropped). Tallies are derived in code
+  (`tally_claims`): every quote must be verbatim in its own readout or it is dropped and counted
+  in `n_unverified_claim_quotes`; a quote overlapping an established-false span is skipped (never
+  counted twice); an unknown status is `unverifiable` (never inflates `true`); an answer missing
+  a readout or its `claims` list is a reject (cached as a failure, re-queued by the next run).
+  Ported verbatim from the source repo's `scripts/oracle_lens_evals/hallucination/chat_verify.py`
+  (2026-09-16), which was designed as a separate pass because a single enumerate-and-classify
+  prompt that also decided falsity agreed with v5c on which readouts contain an error at only
+  κ ≈ 0.44. `opts=verify=0` skips the stage. **The headline, its bootstrap and `complete` are
+  untouched**; `n_cells_claims_unjudged` (span-judged cells without a tally: a failed call or
+  `verify=0`) is the stage's coverage signal. Each `rows[].verdict[i]` carries its tally as
+  `claims` (`{false, true, unverifiable, disputed, off_topic, n_unverified}`, `null` when not
+  verified). Caveats: `n_claims_false` is span-level (the established wrong spans per tallied
+  readout, revoked or not) whereas the headline is readout-level; on a token-lens arm the quotes
+  are verified against the summarizer's interpretation, not the raw bag. A `judge_model=`
+  override re-verifies every cell (the fingerprint embeds the model).
 
 ## Example
 
@@ -69,7 +100,7 @@ shared client and cache without changing the instrument.
 uv run wsbench judge family=hallucination readouts=examples/readouts/hallucination.jsonl out=/tmp/h dry_run=True
 # a token lens: the summarizer prompt is printed instead
 uv run wsbench judge family=hallucination readouts=examples/readouts/hallucination.tokens.jsonl out=/tmp/h dry_run=True
-# judge a full arm
+# judge a full arm (span judge + claim verification; add opts=verify=0 to skip stage 2)
 OPENROUTER_API_KEY=sk-or-... uv run wsbench judge family=hallucination readouts=my_lens.jsonl layers=20,36,44,48,60 out=outputs/my_lens/hallucination
 ```
 
@@ -188,6 +219,131 @@ Report, as JSON: samples = one entry per readout in order, each with idx, kind, 
           "type": "string",
           "enum": [
            "wrong",
+           "off_topic"
+          ]
+         },
+         "why": {
+          "type": "string"
+         }
+        }
+       }
+      },
+      "rationale": {
+       "type": "string"
+      }
+     }
+    }
+   }
+  }
+ }
+}
+```
+
+### Stage 2 — `VERIFY_SYSTEM`
+
+Source: the source repo's `scripts/oracle_lens_evals/hallucination/chat_verify.py`
+(`SYSTEM`, `USER`, `SCHEMA`, `samples_block`; `v5c-chat-verify-v1`), copied verbatim. Rendered
+with `str.format` like `JUDGE_USER` (the `{{quote, status, why}}` escapes are shown as the
+escaped literal); `{samples_block}` = each readout block followed by
+`Established FALSE spans of readout i:` and one `- "<span>"` line per verified wrong span of
+the span judge, or `  (none)`. No `{facts_block}`.
+
+```text
+You audit an interpretability lens that reads a language model's internal activation while the model writes a response. You are shown the model's full response and the lens's raw readouts of one activation inside it. Some spans of each readout have ALREADY been established as false by a separate audit; those are given to you and are not yours to re-judge. Your job is to list every OTHER specific claim each readout makes about this conversation and say whether the response settles it as true, or cannot settle it. You quote the readout's own words for every claim and never paraphrase. Output only the JSON verdict.
+```
+
+### Stage 2 — `VERIFY_USER`
+
+```text
+A language model was asked:
+
+<prompt>
+{prompt}
+</prompt>
+
+and wrote the response below. The lens read the model's activation at the token immediately before the marker {mark}; everything before it is what the model had already written, everything after it is what it went on to write. The WHOLE response is the context — a readout may legitimately refer to any part of it.
+
+<response>
+{marked_response}
+</response>
+
+Below are {k} independent readouts of that one activation. Under each readout is the list of its spans already established as FALSE (possibly empty).
+
+{samples_block}
+
+For EACH readout, report:
+
+- kind: "specific" if it says anything concrete; "generic" if it only says generic things ("a narrative about a character", "an account of a historical event"); "empty" for noise, fragments, formatting, a bare restatement of the prompt, or a garbled string that asserts nothing.
+- claims: EVERY separate specific claim the readout makes about this conversation that is NOT one of its already-established false spans. A claim is a specific assertion the readout commits to — a fact, entity, quantity, name, place, quotation, heading, structure, intent, or a prediction of what the response says next. Generic phrases, task descriptions, hedging, repetition, formatting and broken fragments are NOT claims; a readout may have zero claims. Do not list the established-false spans again. For each:
+
+  - quote: the readout's own words for this claim, copied character-for-character from THIS readout (never your own words, never a span of the response). Quote the shortest span that carries the claim.
+  - status, exactly one of:
+    "true" — the response states this claim or clearly entails it. A prediction of what comes next counts as true when the response after the marker does say it.
+    "unverifiable" — the response neither states it nor rules it out: an unstated detail, a plausible inference, a claim about what the model is thinking or intending, or a prediction the response does not go on to make but that nothing in the text excludes. Absence is not confirmation: if the response simply does not mention it, it is unverifiable, not true.
+    "disputed" — you believe the response actually RULES THIS OUT, but it was not in the established-false list. Use this rather than inventing a false verdict; it is reported separately.
+    "off_topic" — junk: garbled or broken tokens, stray code or programming terms, or content with no connection at all to this conversation.
+  - why: one short clause.
+
+Rules:
+  - Use ONLY this conversation to settle a claim, never world knowledge. A claim that is true in the world but unmentioned here is unverifiable.
+  - "true" requires the response to actually say or entail it. Compatible is not the same as stated: a claim that merely fits the response is unverifiable.
+
+Report, as JSON: samples = one entry per readout in order, each with idx, kind, claims (list of {{quote, status, why}}), and a one-sentence rationale.
+```
+
+### Stage 2 — output schema
+
+`VERIFY_SCHEMA` (`hallucination_chat_verify`; `status` is one of `true, unverifiable, disputed, off_topic`):
+
+```json
+{
+ "name": "hallucination_chat_verify",
+ "strict": true,
+ "schema": {
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+   "samples"
+  ],
+  "properties": {
+   "samples": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "additionalProperties": false,
+     "required": [
+      "idx",
+      "kind",
+      "claims",
+      "rationale"
+     ],
+     "properties": {
+      "idx": {
+       "type": "integer"
+      },
+      "kind": {
+       "type": "string"
+      },
+      "claims": {
+       "type": "array",
+       "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+         "quote",
+         "status",
+         "why"
+        ],
+        "properties": {
+         "quote": {
+          "type": "string"
+         },
+         "status": {
+          "type": "string",
+          "enum": [
+           "true",
+           "unverifiable",
+           "disputed",
            "off_topic"
           ]
          },

@@ -196,7 +196,7 @@ Working in a git worktree that shares the main checkout's `.venv`: prefix comman
 **Hallucination (chat)** — [`evals/hallucination/README.md`](evals/hallucination/README.md)
 - *What it is:* Qwen answers real chat prompts; the lens reads the model's own summary positions; does the readout say anything the response rules out.
 - *Example:* prompt "qual idioma estou escrevendo?", response "Você está escrevendo em português", readout claims "the user writes in Spanish" → hallucinated.
-- *Judged by:* the judge copies verbatim spans from each readout and types them wrong / off-topic; any verified wrong span = hallucinated; headline = hallucination rate over specific readouts (lower is better).
+- *Judged by:* the judge copies verbatim spans from each readout and types them wrong / off-topic; any verified wrong span = hallucinated; headline = hallucination rate over specific readouts (lower is better). A second call per cell, given those wrong spans as established false, counts the readout's other claims as true / unverifiable against the transcript (`extras`, not the headline).
 
 **J-lens concept precision** — [`evals/jlens_concept_pr/README.md`](evals/jlens_concept_pr/README.md)
 - *What it is:* Do the lens's stated concepts agree with the J-lens top-10 tokens at the same activation (precision, the headline), and does it cover them (recall@10, reported in `extras`).

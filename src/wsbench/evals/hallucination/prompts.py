@@ -8,6 +8,11 @@ import as :data:`FROZEN`; ``tests/test_hallucination.py`` asserts the two agree.
 Unlike the MC families this family renders ``JUDGE_USER`` with ``str.format`` exactly as the
 source does: the template carries ``{{text, type, why}}`` escapes, and the README-equality test
 compares the escaped literal.
+
+The second stage (``VERIFY_*``, ``v5c-chat-verify-v1``) is the source repo's
+``scripts/oracle_lens_evals/hallucination/chat_verify.py`` (2026-09-16) copied verbatim: given
+the span judge's verified wrong spans as established-false, it lists every OTHER specific claim
+of a readout as true / unverifiable / disputed / off_topic. Same ``str.format`` rendering.
 """
 
 import json
@@ -116,7 +121,107 @@ JUDGE_SCHEMA: dict[str, Any] = schema_block(
     ["samples"],
 )
 
-PROMPTS: dict[str, str] = {"JUDGE_SYSTEM": JUDGE_SYSTEM, "JUDGE_USER": JUDGE_USER}
+# ------------------------------------------------------------------ stage 2: claim verification
+
+VERIFY_PROMPT_VERSION = "v5c-chat-verify-v1"
+VERIFY_STATUSES: tuple[str, ...] = ("true", "unverifiable", "disputed", "off_topic")
+
+VERIFY_SYSTEM = (
+    "You audit an interpretability lens that reads a language model's internal activation while "
+    "the model writes a response. You are shown the model's full response and the lens's raw "
+    "readouts of one activation inside it. Some spans of each readout have ALREADY been "
+    "established as false by a separate audit; those are given to you and are not yours to "
+    "re-judge. Your job is to list every OTHER specific claim each readout makes about this "
+    "conversation and say whether the response settles it as true, or cannot settle it. You "
+    "quote the readout's own words for every claim and never paraphrase. Output only the JSON "
+    "verdict."
+)
+
+VERIFY_USER = (
+    "A language model was asked:\n\n<prompt>\n{prompt}\n</prompt>\n\n"
+    "and wrote the response below. The lens read the model's activation at the token immediately "
+    "before the marker {mark}; everything before it is what the model had already written, "
+    "everything after it is what it went on to write. The WHOLE response is the context — a "
+    "readout may legitimately refer to any part of it.\n\n"
+    "<response>\n{marked_response}\n</response>\n\n"
+    "Below are {k} independent readouts of that one activation. Under each readout is the list "
+    "of its spans already established as FALSE (possibly empty).\n\n{samples_block}\n\n"
+    "For EACH readout, report:\n\n"
+    '- kind: "specific" if it says anything concrete; "generic" if it only says generic things '
+    '("a narrative about a character", "an account of a historical event"); "empty" for noise, '
+    "fragments, formatting, a bare restatement of the prompt, or a garbled string that asserts "
+    "nothing.\n"
+    "- claims: EVERY separate specific claim the readout makes about this conversation that is "
+    "NOT one of its already-established false spans. A claim is a specific assertion the "
+    "readout commits to — a fact, entity, quantity, name, place, quotation, heading, structure, "
+    "intent, or a prediction of what the response says next. Generic phrases, task "
+    "descriptions, hedging, repetition, formatting and broken fragments are NOT claims; a "
+    "readout may have zero claims. Do not list the established-false spans again. For each:\n\n"
+    "  - quote: the readout's own words for this claim, copied character-for-character from THIS "
+    "readout (never your own words, never a span of the response). Quote the shortest span that "
+    "carries the claim.\n"
+    "  - status, exactly one of:\n"
+    '    "true" — the response states this claim or clearly entails it. A prediction of what '
+    "comes next counts as true when the response after the marker does say it.\n"
+    '    "unverifiable" — the response neither states it nor rules it out: an unstated detail, a '
+    "plausible inference, a claim about what the model is thinking or intending, or a "
+    "prediction the response does not go on to make but that nothing in the text excludes. "
+    "Absence is not confirmation: if the response simply does not mention it, it is "
+    "unverifiable, not true.\n"
+    '    "disputed" — you believe the response actually RULES THIS OUT, but it was not in the '
+    "established-false list. Use this rather than inventing a false verdict; it is reported "
+    "separately.\n"
+    '    "off_topic" — junk: garbled or broken tokens, stray code or programming terms, or '
+    "content with no connection at all to this conversation.\n"
+    "  - why: one short clause.\n\n"
+    "Rules:\n"
+    "  - Use ONLY this conversation to settle a claim, never world knowledge. A claim that is "
+    "true in the world but unmentioned here is unverifiable.\n"
+    '  - "true" requires the response to actually say or entail it. Compatible is not the same '
+    "as stated: a claim that merely fits the response is unverifiable.\n\n"
+    "Report, as JSON: samples = one entry per readout in order, each with idx, kind, claims "
+    "(list of {{quote, status, why}}), and a one-sentence rationale."
+)
+
+VERIFY_SCHEMA: dict[str, Any] = schema_block(
+    "hallucination_chat_verify",
+    {
+        "samples": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "additionalProperties": False,
+                "required": ["idx", "kind", "claims", "rationale"],
+                "properties": {
+                    "idx": {"type": "integer"},
+                    "kind": {"type": "string"},
+                    "claims": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "additionalProperties": False,
+                            "required": ["quote", "status", "why"],
+                            "properties": {
+                                "quote": {"type": "string"},
+                                "status": {"type": "string", "enum": list(VERIFY_STATUSES)},
+                                "why": {"type": "string"},
+                            },
+                        },
+                    },
+                    "rationale": {"type": "string"},
+                },
+            },
+        }
+    },
+    ["samples"],
+)
+
+PROMPTS: dict[str, str] = {
+    "JUDGE_SYSTEM": JUDGE_SYSTEM,
+    "JUDGE_USER": JUDGE_USER,
+    "VERIFY_SYSTEM": VERIFY_SYSTEM,
+    "VERIFY_USER": VERIFY_USER,
+}
 
 
 def render_marked_response(response: str, char: int) -> str:
@@ -143,5 +248,38 @@ def judge_prompt(
             facts_block="",
             k=len(samples),
             samples_block=samples_block(samples),
+        ),
+    )
+
+
+def verify_samples_block(samples: Sequence[str], wrong: Sequence[Sequence[str]]) -> str:
+    """Each readout block followed by its established-false spans (one ``json.dumps`` line each,
+    or ``(none)``), exactly as the source pass rendered them."""
+    parts = []
+    for i, (s, w) in enumerate(zip(samples, wrong, strict=True)):
+        falses = "\n".join(f"  - {json.dumps(x, ensure_ascii=False)}" for x in w) or "  (none)"
+        parts.append(
+            f'<readout idx="{i}">\n{s}\n</readout>\n'
+            f"Established FALSE spans of readout {i}:\n{falses}"
+        )
+    return "\n\n".join(parts)
+
+
+def verify_prompt(
+    item: dict[str, Any],
+    site: dict[str, Any],
+    samples: Sequence[str],
+    wrong: Sequence[Sequence[str]],
+) -> tuple[str, str]:
+    """(system, user) for the claim-verification call of one cell; ``wrong[i]`` = the span
+    judge's verified wrong spans of readout ``i`` (given to the judge as established false)."""
+    return (
+        VERIFY_SYSTEM,
+        VERIFY_USER.format(
+            prompt=item["prompt"],
+            mark=READ_MARK,
+            marked_response=render_marked_response(item["response"], int(site["char"])),
+            k=len(samples),
+            samples_block=verify_samples_block(samples, wrong),
         ),
     )
