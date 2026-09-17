@@ -5,7 +5,7 @@ writes. A lens reads the model's residual stream at a token position and produce
 (an "O-lens": sampled sentences) or a top-10 token bag (a "J-lens": tokens with scores). Each eval
 pairs a frozen item bank with a judge that checks whether the readout carries the latent the item
 was built around, without echoing the prompt. Every judge is Gemini 3.8 Flash via OpenRouter
-except two pinned families (see [Judges](#judges)). This repo owns judging only: a lens producer
+(see [Judges](#judges)). This repo owns judging only: a lens producer
 hands over one JSONL readout file per (family, arm), and `wsbench` scores it.
 
 ## Quickstart
