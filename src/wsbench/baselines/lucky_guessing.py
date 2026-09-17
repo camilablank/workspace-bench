@@ -224,10 +224,7 @@ def _multitoken(name: str) -> Callable[[], list[Item]]:
 
 
 def _brew() -> list[Item]:
-    """Brew's five candidate colours per item (gold, start, answer, two off-trajectory), in the
-    family's own seeded order. The judge shuffles per cell, so no cell order is canonical: the
-    key is the item's, and the floor is per guess — compare it with ``extras.cell_gold_rate``,
-    not with the headline (an item's rule aggregates its emission cells)."""
+    """Brew's five candidate colours per item, in the family's own seeded order."""
     from wsbench.evals.brew_intermediates.judge import shuffled
 
     _h, items = load_bank_file(REPO_ROOT / "evals/brew_intermediates/items.json")

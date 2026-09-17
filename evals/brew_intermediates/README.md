@@ -50,9 +50,12 @@ with no lift; the option keeps the full grid one flag away.
   what a lens with no idea which colour is the intermediate scores. `pass − null =
   (K+1)/K · (pass − baseline)`; compare the headline against the baseline. `extras.stir_pass_rate`
   is the same rule on the stir cells (should sit at the null), `extras.cell_gold_rate` /
-  `cell_off_rate` the per-region cell rates, and the lucky-guessing baseline covers the option
-  lists. The source repo's caveat stands: the intermediate is usually the model's runner-up
-  answer colour, so this bank cannot separate a held step from a runner-up output.
+  `cell_off_rate` the per-region cell rates, `cell_primary_gold_rate` the judge's single
+  `primary` pick per cell, and the lucky-guessing baseline covers the option lists (it asks
+  whether the five colours themselves give the intermediate away; its scale is one guess per
+  cell, so `cell_primary_gold_rate` is what it compares with). The source repo's caveat stands:
+  the intermediate is usually the model's runner-up answer colour, so this bank cannot separate
+  a held step from a runner-up output.
 - An item whose emission cells are all judged is decided (an empty cell names nothing); any
   unjudged or missing emission cell leaves it undecided, because a missing cell can flip the rule
   either way. Missing cells are fatal

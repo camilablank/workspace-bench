@@ -193,6 +193,16 @@ def run(args: JudgeArgs) -> FamilyResult:
                 reg: mean(float(v["gold"]) for v in verdicts if v["judged"] and v["region"] == reg)
                 for reg in sorted(wanted)
             },
+            # the judge's single-colour "primary" pick: the one cell rate on the lucky-guessing
+            # floor's scale (one guess per cell over the same five candidates)
+            "cell_primary_gold_rate": {
+                reg: mean(
+                    float(v["primary"] == gold[v["item"]])
+                    for v in verdicts
+                    if v["judged"] and v["region"] == reg
+                )
+                for reg in sorted(wanted)
+            },
             "cell_off_rate": {
                 reg: mean(
                     sum(v["offs"]) / len(v["offs"])
