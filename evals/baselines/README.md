@@ -38,6 +38,7 @@ averaged over draws with its std, `majority` the per-item plurality vote. Famili
 | multihop_mt | 1-2 | 5 | one list per bridge |
 | multilingual_mt, multilingual_multihop, multilingual_typo, basic_readout_mt | 1-2 | 5 | concept/correction/readout plus the language list for L2 items |
 | multi_concept_directed_modulation | 1 (multi-select, one to three picks) | 6 | pass = the FIRST pick is a dictated concept (one guess per draw, like every family); `any_hit` = some pick is, `exact` = the picks equal the dictated set, `mean_picks` beside them; controls dropped |
+| brew_intermediates | 1 | 5 | the gold, the start, the answer and two off-trajectory colours; one guess per item, so read it against `extras.cell_gold_rate`, not the item headline (an item's rule aggregates its emission cells). The judge shuffles per cell, so the order here is the item's own seeded one |
 
 **Reading a floor against a headline.** A family headline is a max over the read grid (any
 layer, any position), while the floor is one guess per item per draw. The two are comparable
