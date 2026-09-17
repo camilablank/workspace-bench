@@ -187,12 +187,28 @@ async def _openrouter_once(
     spend.calls += 1
     if not getattr(resp, "choices", None):  # an error delivered in a 200 body
         raise ValueError("response has no choices")
+    spend.usd += _openrouter_cost(resp)
+    if _openrouter_refused(resp.choices[0]):
+        spend.refusals += 1
+        print(f"  llm refusal: {model}")
+        return None
+    return _parse_object(resp.choices[0].message.content or "")
+
+
+def _openrouter_cost(resp: Any) -> float:
     usage = getattr(resp, "usage", None)
     cost = getattr(usage, "cost", None) if usage is not None else None
     if cost is None and usage is not None:
         cost = (getattr(usage, "model_extra", None) or {}).get("cost")
-    spend.usd += float(cost or 0.0)
-    return _parse_object(resp.choices[0].message.content or "")
+    return float(cost or 0.0)
+
+
+def _openrouter_refused(choice: Any) -> bool:
+    """A provider content filter (``finish_reason == "content_filter"``) or an OpenAI-style
+    ``message.refusal`` body. Both are absent from ordinary replies (``getattr`` defaults)."""
+    if getattr(choice, "finish_reason", None) == "content_filter":
+        return True
+    return bool(getattr(getattr(choice, "message", None), "refusal", None))
 
 
 async def _anthropic_once(
@@ -437,10 +453,11 @@ def preflight(model: str, reasoning: dict[str, Any] | None) -> None:
 
 
 # ---------------------------------------------------------------- free-text primitive
-# Used by agentic_misalignment (three free-text stages, no schema). Anthropic route only:
-# streaming (the SDK refuses non-streaming requests whose max_tokens implies a >10 min
-# operation), per-call thinking on/off, and a budget-doubling retry when the text is empty and
-# stop_reason == "max_tokens" (thinking ate the budget), up to _TEXT_BUDGET_CEILING.
+# Used by agentic_misalignment (three free-text stages, no schema). Routed by model id like the
+# JSON primitive. Anthropic: streaming (the SDK refuses non-streaming requests whose max_tokens
+# implies a >10 min operation), per-call thinking on/off. OpenRouter: one chat completion,
+# reasoning effort high/minimal. Both: a budget-doubling retry when the text is empty and the
+# reply was cut off by max_tokens (thinking ate the budget), up to _TEXT_BUDGET_CEILING.
 
 _TEXT_BUDGET_CEILING = 64_000
 
@@ -482,12 +499,64 @@ async def _anthropic_text_once(
         return txt
 
 
+async def _openrouter_text_once(
+    client: Any,
+    user: str,
+    *,
+    model: str,
+    reasoning: dict[str, Any] | None,
+    max_tokens: int,
+    timeout: float,
+    spend: Spend,
+) -> str | None:
+    """The OpenRouter twin of :func:`_anthropic_text_once`: user-only messages, no schema, the
+    same budget doubling on an empty reply cut off by ``max_tokens`` (``finish_reason ==
+    "length"``), a content filter -> refusal -> ``None``. Tallies ``usage.cost`` and the
+    prompt / completion token counts."""
+    extra_body: dict[str, Any] = {
+        "usage": {"include": True},
+        "provider": {"require_parameters": True},
+    }
+    if reasoning is not None:
+        extra_body["reasoning"] = reasoning
+    budget = max_tokens
+    while True:
+        resp = await client.chat.completions.create(
+            timeout=timeout,
+            model=model,
+            max_tokens=budget,
+            messages=[{"role": "user", "content": user}],
+            extra_body=extra_body,
+        )
+        spend.calls += 1
+        if not getattr(resp, "choices", None):  # an error delivered in a 200 body
+            raise ValueError("response has no choices")
+        spend.usd += _openrouter_cost(resp)
+        usage = getattr(resp, "usage", None)
+        if usage is not None:
+            spend.input_tokens += int(getattr(usage, "prompt_tokens", 0) or 0)
+            spend.output_tokens += int(getattr(usage, "completion_tokens", 0) or 0)
+        choice = resp.choices[0]
+        if _openrouter_refused(choice):
+            spend.refusals += 1
+            print(f"  llm refusal: {model}")
+            return None
+        txt = (getattr(choice.message, "content", None) or "").strip()
+        finish = getattr(choice, "finish_reason", None)
+        if not txt and finish == "length" and budget < _TEXT_BUDGET_CEILING:
+            budget *= 2
+            continue
+        return txt
+
+
 async def _one_text(
+    route_: Route,
     client: Any,
     user: str,
     *,
     model: str,
     thinking: bool,
+    reasoning: dict[str, Any] | None,
     max_tokens: int,
     timeout: float,
     rpm: float,
@@ -498,11 +567,21 @@ async def _one_text(
     for attempt in range(_ATTEMPTS):
         await _pace(rpm)
         try:
-            return await _anthropic_text_once(
+            if route_ == "anthropic":
+                return await _anthropic_text_once(
+                    client,
+                    user,
+                    model=model,
+                    thinking=thinking,
+                    max_tokens=max_tokens,
+                    timeout=timeout,
+                    spend=spend,
+                )
+            return await _openrouter_text_once(
                 client,
                 user,
                 model=model,
-                thinking=thinking,
+                reasoning=reasoning,
                 max_tokens=max_tokens,
                 timeout=timeout,
                 spend=spend,
@@ -541,28 +620,32 @@ async def stream_text_async(
     timeout: float = 600.0,
     spend: Spend | None = None,
 ) -> Spend:
-    """Run user-only free-text prompts concurrently on the Anthropic route (no system block,
-    no schema), handing each stripped text (or ``None`` = exhausted retries / non-transient
-    error / refusal) to ``on_result(index, text)`` as it lands. ``""`` is a valid result (the
-    source returns it after the 64k budget ceiling). Any non-``claude-*`` model raises
-    :class:`JudgeConfigError`. Builds no client when there is nothing to call."""
+    """Run user-only free-text prompts concurrently (no system block, no schema), handing each
+    stripped text (or ``None`` = exhausted retries / non-transient error / refusal) to
+    ``on_result(index, text)`` as it lands. ``""`` is a valid result (the source returns it
+    after the 64k budget ceiling). Routed by model id like :func:`stream_json_async`: on the
+    Anthropic route ``thinking`` is adaptive / disabled; on OpenRouter it is reasoning effort
+    ``high`` / ``minimal`` (Gemini cannot turn reasoning off). Builds no client when there is
+    nothing to call."""
     spend = spend or Spend()
     if not prompts:
         return spend
     if concurrency < 1 or rpm <= 0:
         raise JudgeConfigError(f"concurrency must be >= 1 and rpm > 0 (got {concurrency}, {rpm})")
-    if route(model) != "anthropic":
-        raise JudgeConfigError(f"free-text stage requires a claude-* model (got {model})")
-    client = _make_client("anthropic", api_key(model))
+    route_ = route(model)
+    reasoning = None if route_ == "anthropic" else {"effort": "high" if thinking else "minimal"}
+    client = _make_client(route_, api_key(model))
     sem = asyncio.Semaphore(concurrency)
 
     async def one(i: int, user: str) -> tuple[int, str | None]:
         async with sem:
             res = await _one_text(
+                route_,
                 client,
                 user,
                 model=model,
                 thinking=thinking,
+                reasoning=reasoning,
                 max_tokens=max_tokens,
                 timeout=timeout,
                 rpm=rpm,

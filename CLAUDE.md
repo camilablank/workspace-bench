@@ -18,9 +18,9 @@ cell). `wsbench convert-gen-dir gen_dir=GEN out=F.jsonl kind=prose|tokens` conve
 `<gen_dir>/<label>/L###.jsonl` layout (id = directory name, layer = filename).
 
 ## Judge layer (`llm.py`, `judge_config.py`)
-- Default judge `google/gemini-3.8-flash` via OpenRouter, reasoning `{"effort": "minimal"}`.
-  Pins: agentic_misalignment + jailbreak_recognition -> `claude-sonnet-5` (reasons: README
-  §Judges and the family READMEs). jlens runs all three stages on the default judge.
+- Default judge `google/gemini-3.8-flash` via OpenRouter, reasoning `{"effort": "minimal"}`;
+  every family runs on it (no pins since 2026-09-17; the two former Sonnet pins are noted in
+  README §Judges). jlens runs all three stages on the default judge.
 - Override precedence: `judge_model=` flag > `WSBENCH_JUDGE_MODEL` env > family pin.
   `pinned_instrument` is true only when the resolved model equals the pin; unpinned numbers
   are never numbers of record. Aux models are not overridden.
@@ -30,7 +30,9 @@ cell). `wsbench convert-gen-dir gen_dir=GEN out=F.jsonl kind=prose|tokens` conve
   thread-safe RPM pacer (`rpm=`, default 240), `preflight` fail-fast, `Spend` tally. A failed
   call returns `None` and never scores. `stream_json_async` is the primitive, `stream_json`
   wraps it (`temperature` dropped on the Anthropic route); `stream_text[_async]` is agentic's
-  free-text Anthropic-only primitive.
+  free-text primitive, routed the same way (`thinking` -> adaptive/disabled on Anthropic,
+  reasoning effort high/minimal on OpenRouter; budget doubling on an empty cut-off reply). On
+  OpenRouter a `content_filter` finish or a `message.refusal` is a refusal -> `None`, no retry.
 
 ## Family conventions
 - `wsbench/family.py` holds the helpers the newer families share: `require_cells` (missing
