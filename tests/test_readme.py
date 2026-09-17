@@ -93,12 +93,10 @@ def test_judges_table_pins():
     judges = _section(_readme(), "Judges")
     for s in _specs():
         assert s.name in judges and s.judge.prompt_version in judges, s.name
-    assert "| agentic_misalignment | claude-sonnet-5 |" in judges
-    assert "| jailbreak_recognition | claude-sonnet-5 |" in judges
-    assert (
-        "deepseek" not in judges.lower().replace("deepseek v4 flash; changed", "")
-        and "refuses" in judges
-    )
+    for s in _specs():  # every family on the default judge since 2026-09-17 (no pins)
+        assert f"| {s.name} | google/gemini-3.8-flash |" in judges, s.name
+    assert "claude-sonnet-5 |" not in judges and "override" in judges
+    assert "deepseek" not in judges.lower().replace("deepseek v4 flash; changed", "")
 
 
 def test_citation_cff_required_keys():
