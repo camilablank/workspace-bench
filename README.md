@@ -317,7 +317,8 @@ verdicts in `<out>/<family>/cells.jsonl`, so a re-run only pays for what is miss
 - **Chat and text corpora** — LMSYS-Chat-1M (Zheng et al. 2023, HF `lmsys/lmsys-chat-1m`; the
   LMSYS-Chat-1M Dataset License Agreement), DailyDialog (Li et al. 2017, HF `ConvLab/dailydialog`;
   CC BY-NC-SA 4.0), `NeelNanda/pile-10k` and `HuggingFaceFW/fineweb-edu` sample-10BT (ODC-BY):
-  verbatim first user turns / 128-token prefixes in the hallucination and jlens_concept_pr banks.
+  verbatim first user turns in the hallucination bank; the jlens_concept_pr items were seeded
+  from the same corpora (the seed text is no longer shipped, only labels and read positions).
 
 ## License
 

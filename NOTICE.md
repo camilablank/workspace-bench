@@ -81,8 +81,10 @@ identified by label prefix.
 ## LMSYS-Chat-1M — Zheng et al. 2023
 
 - Source: https://huggingface.co/datasets/lmsys/lmsys-chat-1m
-- Included: 74 verbatim first user turns in `evals/hallucination/items.json` and 75 seed prompts
-  in `evals/jlens_concept_pr/manifest.json` (labels `chat-lmsys-*`).
+- Included: 74 verbatim first user turns in `evals/hallucination/items.json`. 75 further first
+  turns seeded the `jlens_concept_pr` items (labels `chat-lmsys-*`); their text was carried in
+  `evals/jlens_concept_pr/manifest.json` until 2026-09-17 and is no longer shipped (labels and
+  read positions only).
 - Licence: the **LMSYS-Chat-1M Dataset License Agreement** (on the dataset page) applies to
   those turns; the agreement text controls. In summary it grants a non-exclusive,
   non-transferable licence to use the data, prohibits attempts to identify the individuals
@@ -93,8 +95,10 @@ identified by label prefix.
 
 - Source: Li, Su, Shen, Li, Cao, Niu. *DailyDialog: A Manually Labelled Multi-turn Dialogue
   Dataset.* IJCNLP 2017. https://huggingface.co/datasets/ConvLab/dailydialog
-- Included: 75 verbatim first user turns in `evals/hallucination/items.json` and 75 seed prompts
-  in `evals/jlens_concept_pr/manifest.json` (labels `chat-dailydialog-*`).
+- Included: 75 verbatim first user turns in `evals/hallucination/items.json`. 75 further first
+  turns seeded the `jlens_concept_pr` items (labels `chat-dailydialog-*`); their text was carried
+  in `evals/jlens_concept_pr/manifest.json` until 2026-09-17 and is no longer shipped (labels
+  and read positions only).
 - Licence: **CC BY-NC-SA 4.0** (https://creativecommons.org/licenses/by-nc-sa/4.0/). These
   items are **non-commercial**: attribution is required, they may not be used for commercial
   purposes, and any adaptation must be shared under the same licence.
@@ -103,6 +107,7 @@ identified by label prefix.
 
 - Sources: https://huggingface.co/datasets/NeelNanda/pile-10k;
   https://huggingface.co/datasets/HuggingFaceFW/fineweb-edu (sample-10BT).
-- Included: 74 pile-10k + 75 fineweb-edu verbatim 128-token prefixes as `jlens_concept_pr`
-  seeds (labels `pt-pile-*`, `pt-fineweb-*`; the manifest carries no source ids).
+- Included: 74 pile-10k + 75 fineweb-edu 128-token prefixes seeded the `jlens_concept_pr`
+  items (labels `pt-pile-*`, `pt-fineweb-*`; the manifest carries no source ids). Their text was
+  carried in `evals/jlens_concept_pr/manifest.json` until 2026-09-17 and is no longer shipped.
 - Licence: ODC-BY (attribution required); the underlying web text retains its own copyright.
