@@ -21,7 +21,7 @@ from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from typing import Any
 
-PROMPT_VERSION = "am-narrative-v2"  # v1 = the same prompts judged by claude-sonnet-5
+PROMPT_VERSION = "am-narrative-v1"
 
 FAMILIES: tuple[str, ...] = (
     "blackmail",

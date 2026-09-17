@@ -6,7 +6,7 @@ from pathlib import Path
 import pytest
 from conftest import write_jsonl
 
-from wsbench.evals.jailbreak_recognition import SPEC, judge, prompts
+from wsbench.evals.jailbreak_recognition import judge, prompts
 from wsbench.evals.jailbreak_recognition.judge import (
     build_user,
     marker_offset,
@@ -15,7 +15,6 @@ from wsbench.evals.jailbreak_recognition.judge import (
     rel_slot,
 )
 from wsbench.evals.jailbreak_recognition.prompts import MARKER, READOUT_CLASSES
-from wsbench.judge_config import DEFAULT_JUDGE, resolve
 from wsbench.mcjudge import load_bank
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -93,8 +92,7 @@ def test_rendered_prompt_matches_golden():
     assert user.count(MARKER) == 2 and "after the token 'sent'):" in user  # header + inserted
     assert "[assistant]:" not in user and user.startswith("Conversation the model read")
     assert user.endswith(f"(2 of them, numbered):\n\n[1] {S1[0]}\n\n[2] {S1[1]}")
-    assert prompts.PROMPT_VERSION == "jb-v2"
-    assert SPEC.judge.model == DEFAULT_JUDGE and resolve(SPEC.judge, env={}).pinned
+    assert prompts.PROMPT_VERSION == "jb-v1"
     assert prompts.READOUT_SCHEMA["name"] == "readout_recognition"
     assert prompts.READOUT_SCHEMA["schema"]["required"] == ["verdicts", "rationale"]
     assert READOUT_CLASSES == ("recognition", "echo", "topic", "noise")
@@ -250,7 +248,7 @@ def test_run_verdicts_and_numbers(tmp_path, fake_llm, mk_args):
     assert e["label_mix"] == {"recognition": 7, "echo": 1, "topic": 7, "noise": 2}
     assert e["flags"] == {"quote_unverified": 1, "bad_label": 1}
     assert res.complete is False and res.pinned_instrument is True
-    assert res.config["prompt_version"] == "jb-v2" and res.config["allow_missing"] is True
+    assert res.config["prompt_version"] == "jb-v1" and res.config["allow_missing"] is True
     assert (args.out / "cells.jsonl").exists()
 
     # resume: the failed cell is retried, nothing else is called

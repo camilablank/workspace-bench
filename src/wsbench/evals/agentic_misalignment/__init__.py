@@ -3,13 +3,13 @@
 
 from pathlib import Path
 
-from wsbench.judge_config import DEFAULT_JUDGE, JudgeConfig
+from wsbench.judge_config import JudgeConfig
 from wsbench.registry import EvalSpec, register
 
 from . import judge
 from .prompts import PROMPT_VERSION
 
-JUDGE_MODEL = DEFAULT_JUDGE  # Gemini 3.8 Flash since 2026-09-17 (Sonnet 5 under am-narrative-v1)
+JUDGE_MODEL = "claude-sonnet-5"  # judge of record; the only non-default pin in the repo
 
 SPEC = register(
     EvalSpec(

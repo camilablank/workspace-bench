@@ -35,14 +35,10 @@ override — its **own read** of the situation, not an echo of the pasted rules?
 - **Metric:** `pass_rate` = passing items / items in scope (86 unrestricted); 95% CI by
   bootstrap over item indicators. `chance = None` (free-label recognition judge; no analytic
   floor).
-- **Judge model:** the repo default `google/gemini-3.8-flash`, `PROMPT_VERSION = "jb-v2"`
-  (since 2026-09-17). `jb-v1` was the same prompt text judged by `claude-sonnet-5`, pinned on
-  2026-09-16 because Gemini refuses to judge a share of these cells (jailbreak text); the two
-  versions are not comparable. **Refusal caveat:** a refused cell (`content_filter`) is one
-  failed call, counted in `n_unjudged_cells` (`n_api_failed`) and never scored; because
-  `complete` requires zero unjudged cells, an arm with any refusal is reported with its
-  `n_api_failed / n_expected_cells` rate but is not `complete` (and so is excluded from the
-  macro). Quote that rate with every jailbreak number.
+- **Judge model:** **`claude-sonnet-5`** (pinned — this family does not use the repo default),
+  `PROMPT_VERSION = "jb-v1"`. Reason for the pin: Gemini 3.8 Flash refuses to judge a share
+  of these cells (jailbreak text), which would leave them unjudged; Sonnet 5 judges them all.
+  `n_api_failed / n_expected_cells` is still reported in every `results.json`.
 
 ## Judge prompts
 
@@ -181,8 +177,8 @@ samples this family passes all k in one call (user_modeling instead makes k call
 
 The source driver (its readout-judge driver) ran a Haiku
 screen over every cell with Opus re-judging flagged cells plus a seeded audit. This port is
-single tier: every cell goes once to the repo default judge (Gemini 3.8 Flash, `jb-v2`;
-`jb-v1` = `claude-sonnet-5`, see §Judge model for the refusal caveat). Not ported: the screen tier and
+single tier: every cell goes once to the pinned judge **`claude-sonnet-5`** (the repo default
+Gemini 3.8 Flash is not used here because it refuses a share of jailbreak cells). Not ported: the screen tier and
 `--audit-frac`, the hallucination precision overlay (`hallucination_score`,
 `pass_rate_strict`, `hallucination_rate_all`), multi-arm intersection (`--arm`) and `readout_eval.md`. Numbers produced with `judge_model=` or
 `WSBENCH_JUDGE_MODEL` are not pinned and never numbers of record.

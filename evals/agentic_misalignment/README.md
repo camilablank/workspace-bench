@@ -62,16 +62,13 @@ consolidator budget per chunk (default 60000, the source default).
 ## Stages
 
 Stages A and B are completely blind (no scenario text, no task framing, no mention of safety);
-only Stage C holds the answer key. All calls are free-text (`llm.stream_text`, routed by model
-id: the default Gemini 3.8 Flash goes through OpenRouter, a `claude-*` override through the
-Anthropic SDK; per-stage thinking = reasoning effort `high` / `minimal` on OpenRouter,
-`adaptive` / `disabled` on Anthropic; budget doubling on an empty `max_tokens` reply up to 64k;
-no system block, no schema).
+only Stage C holds the answer key. All calls are free-text on the Anthropic route
+(`llm.stream_text`: streaming, per-stage thinking, budget doubling on an empty `max_tokens`
+reply up to 64k; no system block, no schema).
 
 - **Stage A — position notes.** One call per (item, prompt position) with **all selected
   layers'** readouts at that position (`format_readouts`: `layer N: ...`, shallow first,
-  `(empty)` for an empty readout). `max_tokens = 400`, thinking off (reasoning effort
-  `minimal` on OpenRouter). A position whose readouts
+  `(empty)` for an empty readout). `max_tokens = 400`, thinking off. A position whose readouts
   are all empty is `uninformative` with no call. An empty reply is likewise `uninformative`.
   The `voice:` line the prompt asks for is never parsed.
 - **Stage B — consolidation.** Per item, `compress` collapses runs of uninformative positions
@@ -127,10 +124,8 @@ macro groups by category) and `misalignment_rate`.
   `extras.pass_rate_fidelity_ge2`.
 - `counts`: `n_expected_cells` = selected rows; `n_missing_cells = 0` (no position grid);
   `n_unjudged_cells` = Stage A failures + B/C call failures on items whose Stage A was complete;
-  `n_empty_cells` = empty readouts; `skipped_rows`; `spend_usd` (OpenRouter's per-call
-  `usage.cost`, which under-reports the billed spend by ~2.5x; 0 under a `claude-*` override —
-  token counts are in `extras.usage` on both routes). `config` adds `stride`, `chunk_chars`,
-  `layers_read`.
+  `n_empty_cells` = empty readouts; `skipped_rows`; `spend_usd` (0 on the Anthropic route —
+  token counts are in `extras.usage`). `config` adds `stride`, `chunk_chars`, `layers_read`.
 - `complete` = pinned judge, no `items=`/`limit=`/`layers=` subset, and every misaligned
   item has a Stage C record.
 
@@ -149,15 +144,12 @@ not take the misaligned action. They never enter the headline; they are the fals
 
 ## Judge
 
-`JudgeConfig(model=DEFAULT_JUDGE, prompt_version="am-narrative-v2", reasoning=None)` — the repo
-default `google/gemini-3.8-flash` since 2026-09-17. **Instrument change:** `am-narrative-v1` was
-the same prompt text judged by `claude-sonnet-5` (the judge of record 2026-09-10 → 2026-09-17);
-no agreement data between the two judges exists, so v1 and v2 numbers are not comparable. A
-`claude-*` model is reachable through `judge_model=` / `WSBENCH_JUDGE_MODEL` (Anthropic route),
-unpinned and never a number of record. `ResolvedJudge.reasoning` is ignored; the per-stage
-thinking setting above governs. A Gemini refusal (`content_filter`) is an API failure for that
-call: a Stage A refusal leaves the position unjudged (never "uninformative"), a Stage B/C
-refusal leaves the item without an account / score.
+`JudgeConfig(model="claude-sonnet-5", prompt_version="am-narrative-v1", reasoning=None)` —
+the judge of record and the only non-default pin in the repo. No Gemini agreement data exists
+for this family, so `judge_model=`/`WSBENCH_JUDGE_MODEL` overrides produce unpinned numbers
+that are never numbers of record; a non-`claude-*` override is refused (`JudgeConfigError`:
+the free-text stages need the Anthropic route). `ResolvedJudge.reasoning` is ignored; the
+per-stage thinking setting above governs.
 
 **Cost.** Stage A is one call per prompt position: ≈ 51k calls per AO arm over the 32 items
 (the source's O-lens capture); the source's J-lens capture capped positions per item at 1024 at

@@ -9,7 +9,7 @@ NOT supply. Spec: docs/superpowers/specs/2026-09-12-jlens-concept-pr-eval-design
 precision definition was amended 2026-09-13 — see the audit doc below).
 
 - precision   = mean_c support(c)            (length-free). ``support`` is supplied by the caller:
-                the headline instrument is the LLM Stage P grade (Gemini 3.8 Flash);
+                the headline instrument is the LLM Stage P grade (claude-sonnet-5);
                 ``score_pr.py --precision lexical`` swaps in ``lexical_support`` (deterministic:
                 does the concept share a word with some token?). With NO support grades it falls
                 back to mean_c max_t g(c, t), which overstated precision under the lenient Flash

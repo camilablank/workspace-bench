@@ -5,7 +5,7 @@ writes. A lens reads the model's residual stream at a token position and produce
 (an "O-lens": sampled sentences) or a top-10 token bag (a "J-lens": tokens with scores). Each eval
 pairs a frozen item bank with a judge that checks whether the readout carries the latent the item
 was built around, without echoing the prompt. Every judge is Gemini 3.8 Flash via OpenRouter
-(see [Judges](#judges)). This repo owns judging only: a lens producer
+except two pinned families (see [Judges](#judges)). This repo owns judging only: a lens producer
 hands over one JSONL readout file per (family, arm), and `wsbench` scores it.
 
 ## Quickstart
@@ -18,7 +18,7 @@ uv run wsbench list              # every family: group, items, metric, judge, pr
 ```
 
 Keys are read from the environment (export them, never commit them): `OPENROUTER_API_KEY=sk-or-...`
-for every family (all run on Gemini), `ANTHROPIC_API_KEY` only for a `claude-*` `judge_model=` override.
+for every Gemini family, `ANTHROPIC_API_KEY` for the two Claude-pinned ones.
 
 ### Score one arm end to end
 
@@ -222,17 +222,15 @@ each family.
 
 ## Judges
 
-Every family runs on `google/gemini-3.8-flash` via OpenRouter (reasoning `{"effort": "minimal"}`);
-there are no pins. Until 2026-09-17 **agentic_misalignment** (`am-narrative-v1`) and
-**jailbreak_recognition** (`jb-v1`) were judged by `claude-sonnet-5`; both moved to Gemini with a
-version bump (`am-narrative-v2`, `jb-v2`, prompt text unchanged), so their earlier numbers are not
-comparable. A `claude-*` model is reachable only through the `judge_model=` override (Anthropic
-route), and an override is never a number of record. The prompt version is the instrument: bump
-it on any prompt edit, and a frozen baseline only applies to a matching version.
+Every family runs on `google/gemini-3.8-flash` except two pins: **agentic_misalignment** stays on
+`claude-sonnet-5` (its judge of record, no Gemini agreement data) and **jailbreak_recognition**
+on `claude-sonnet-5` (Gemini refuses to judge a share of jailbreak cells). The prompt version is
+the instrument: bump it on any prompt edit, and a frozen baseline only applies to a matching
+version.
 
 | family | judge model | prompt version |
 |---|---|---|
-| agentic_misalignment | google/gemini-3.8-flash | am-narrative-v2 |
+| agentic_misalignment | claude-sonnet-5 | am-narrative-v1 |
 | arithmetic_intermediates | google/gemini-3.8-flash | arith-free-2026-09-16 |
 | association | google/gemini-3.8-flash | bank-2026-09-16 |
 | basic_readout | google/gemini-3.8-flash | bank-2026-09-16 |
@@ -243,7 +241,7 @@ it on any prompt edit, and a frozen baseline only applies to a matching version.
 | conjunctive_association | google/gemini-3.8-flash | comp-v1 |
 | directed_modulation | google/gemini-3.8-flash | dm-2026-09-16 |
 | hallucination | google/gemini-3.8-flash | v5c-chat |
-| jailbreak_recognition | google/gemini-3.8-flash | jb-v2 |
+| jailbreak_recognition | claude-sonnet-5 | jb-v1 |
 | jlens_concept_pr | google/gemini-3.8-flash | jlens-pr-v2 |
 | moral_rationale | google/gemini-3.8-flash | ec-v1 |
 | multi_concept_directed_modulation | google/gemini-3.8-flash | mcdm-2026-09-16 |
@@ -298,9 +296,9 @@ verdicts in `<out>/<family>/cells.jsonl`, so a re-run only pays for what is miss
 
 - **Qwen3.6-27B** (Alibaba) — the model being read; every bank's rollouts and responses are its
   outputs (see the model card for its licence).
-- **Judge models** — Gemini 3.8 Flash via OpenRouter (every family); Claude Sonnet 5 (Anthropic)
-  only through the `judge_model=` override. API terms only; no model outputs are redistributed
-  as data.
+- **Judge models** — Gemini 3.8 Flash via OpenRouter (default judge), Claude Sonnet 5 (Anthropic;
+  agentic_misalignment and jailbreak_recognition). API terms only; no model outputs are
+  redistributed as data.
 - **Agentic misalignment** — Lynch et al. 2025, *Agentic Misalignment: How LLMs Could Be Insider
   Threats* (Anthropic, arXiv:2510.05179); code and prompt templates from
   `anthropic-experimental/agentic-misalignment` (MIT). 18 of the 32 scenarios are that repo's
