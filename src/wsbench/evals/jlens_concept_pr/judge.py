@@ -1,5 +1,4 @@
-"""jlens_concept_pr: an AO arm's prose readouts scored against the frozen J-lens reference:
-precision (Stage P) against the top-50 content tokens, recall@10 (Stage B) against the top-10.
+"""jlens_concept_pr: an AO arm's prose readouts scored against the frozen J-lens top-10.
 
 Port of ``scripts/oracle_lens_evals/jlens_pr/{judge_openrouter,judge_pr,items}.py`` (the judge
 of record) onto the shared client and cache. Three judged stages, one ``run_calls`` batch each:
@@ -7,14 +6,11 @@ of record) onto the shared client and cache. Three judged stages, one ``run_call
 * Stage A (concept split) on the family judge (Gemini 3.8 Flash in this repo; the source ran
   it on DeepSeek-V4-Flash, see the README's instrument note): one call per cell with text,
   ``text = concat_samples(samples)``;
-* Stage B (per-token recall grades) on the judge: one call per CONTENT token of the reference
-  top-``RECALL_K`` (10) per cell with concepts; the ``foil`` pass grades the same concepts
-  against a seeded within-family derangement partner's tokens (keys ``:F..``) and runs by
-  default;
+* Stage B (per-token recall grades) on the judge: one call per CONTENT reference token per cell
+  with concepts; the ``foil`` pass grades the same concepts against a seeded within-family
+  derangement partner's tokens (keys ``:F..``) and runs by default;
 * Stage P (per-concept precision, T = 0) on the judge: one call per 60-concept chunk with the
-  content tokens of the cell's reference top-``PRECISION_K`` (50; ``jlens-pr-v3``, 2026-09-18 —
-  the top-10 under-credited every arm); ``pfoil`` (keys ``:Q..``) only with
-  ``--opt stage_p_foil=1``.
+  cell's full content-token set; ``pfoil`` (keys ``:Q..``) only with ``--opt stage_p_foil=1``.
 
 A cell is (label, layer, eval position) — exactly one eval position per label per the manifest.
 An ABSENT cell is missing (fatal without ``--allow-missing``); a PRESENT-but-empty cell scores
@@ -49,7 +45,6 @@ from wsbench.results import FamilyResult
 from . import score
 from .concept_pr import is_content_token
 from .prompts import (
-    AB_CACHE_VERSION,
     PROMPT_VERSION,
     STAGE_A_SCHEMA,
     STAGE_A_SYSTEM,
@@ -73,12 +68,7 @@ FOIL_SEED = 0
 MAX_TOKENS = 16000  # every stage: a 60-concept response echoes every concept back
 STAGE_P_TEMPERATURE = 0.0
 BANK_DIR = registry.REPO_ROOT / "evals" / FAMILY
-# The top-50 reference (jlens-pr-v3). The frozen top-10 ``gen-jlens-pr-jlens/`` is kept
-# byte-for-byte as the v1/v2 record; its rows equal ``samples[:10]`` of these (tests pin it for
-# every file).
-REF_DIR = BANK_DIR / "gen-jlens-pr-jlens-k50"
-RECALL_K = 10  # Stage B / foil / recall@10 / raw_recall / punct_frac read the top-10
-PRECISION_K = 50  # Stage P / pfoil read the top-50
+REF_DIR = BANK_DIR / "gen-jlens-pr-jlens"
 STAGES = ("a", "b", "foil", "p", "pfoil")
 STAGE_TAG = {"a": "A", "b": "B", "foil": "F", "p": "P", "pfoil": "Q"}
 
@@ -153,8 +143,9 @@ def reference_path(label: str, layer: int) -> Path:
     return REF_DIR / label / f"L{layer:03d}.jsonl"
 
 
-def _reference_row(label: str, layer: int, pos: int) -> list[str]:
-    """The decoded reference tokens at (label, layer, pos) as stored; ``[]`` when absent."""
+def reference_tokens(label: str, layer: int, pos: int) -> list[str]:
+    """The J-lens top-10 display strings at (label, layer, pos), decoded, unstripped
+    (punctuation tokens must survive to be classified). ``[]`` when the row is absent."""
     path = reference_path(label, layer)
     for line in path.read_bytes().decode("utf-8", "replace").splitlines():
         if not line.strip():
@@ -163,22 +154,6 @@ def _reference_row(label: str, layer: int, pos: int) -> list[str]:
         if row.get("pos") == pos:
             return [bpe_display_to_text(t) for t in row["samples"]]
     return []
-
-
-def reference_tokens(label: str, layer: int, pos: int) -> list[str]:
-    """The J-lens top-``PRECISION_K`` display strings at (label, layer, pos), decoded, unstripped
-    (punctuation tokens must survive to be classified), rank order. ``[]`` when the row is
-    absent. Recall reads ``[:RECALL_K]`` of this list, precision ``[:PRECISION_K]``."""
-    toks = _reference_row(label, layer, pos)
-    if toks and len(toks) < PRECISION_K:
-        # a top-10 file here would silently score precision against the top-10 (``run`` checks
-        # every row it will read before any call; this is the backstop for other callers)
-        print(
-            f"[{FAMILY}] {reference_path(label, layer)}: {len(toks)} reference tokens, "
-            f"expected {PRECISION_K}"
-        )
-        raise SystemExit(2)
-    return toks[:PRECISION_K]
 
 
 def foil_map(items: Sequence[dict[str, Any]]) -> dict[str, str]:
@@ -240,26 +215,9 @@ def run(args: JudgeArgs) -> FamilyResult:
         print(f"[{FAMILY}] judges prose readouts only (the J-lens is the reference, not an arm)")
         raise SystemExit(2)
     layers = sorted(args.layers) if args.layers else rep.layers
-    fmap = foil_map(items)
-    # every row the run will read: the in-scope items and their foil partners (a partner can sit
-    # outside an ``items=`` / ``limit=`` scope)
-    in_scope = {it["id"] for it in scope}
-    to_read = sorted(in_scope | {fmap[i] for i in in_scope if i in fmap})
-    bad = sorted({L for L in layers for lab in to_read if not reference_path(lab, L).exists()})
+    bad = sorted({L for L in layers for it in scope if not reference_path(it["id"], L).exists()})
     if bad:
         print(f"[{FAMILY}] no reference J-lens file for layers {bad} under {REF_DIR}")
-        raise SystemExit(2)
-    short = [
-        f"{lab}/L{L:03d}"
-        for L in layers
-        for lab in to_read
-        if 0 < len(_reference_row(lab, L, pos_of[lab])) < PRECISION_K
-    ]
-    if short:  # before any call: a top-10 row would grade precision against the top-10
-        print(
-            f"[{FAMILY}] {len(short)} reference rows under {REF_DIR} have fewer than "
-            f"{PRECISION_K} tokens (first 5: {short[:5]})"
-        )
         raise SystemExit(2)
     expected = expected_cells(positions, layers)
     missing = missing_cells(cells, expected)
@@ -275,6 +233,7 @@ def run(args: JudgeArgs) -> FamilyResult:
         )
         if not args.allow_missing and not args.dry_run:
             raise SystemExit(2)
+    fmap = foil_map(items)
     pfoil = args.extra.get("stage_p_foil") == "1"
     ref_cache: dict[tuple[str, int], list[str]] = {}
 
@@ -321,7 +280,7 @@ def run(args: JudgeArgs) -> FamilyResult:
             calls["a"],
             schema=STAGE_A_SCHEMA,
             judge=a_judge,
-            prompt_version=AB_CACHE_VERSION,
+            prompt_version=PROMPT_VERSION,
             preflight=pre.for_judge(a_judge),
             validate=lambda call, r: _valid(parse_stage_a, r),
             max_tokens=MAX_TOKENS,
@@ -340,7 +299,7 @@ def run(args: JudgeArgs) -> FamilyResult:
                 src = c.id if stage == "b" else partner(c)
                 if src is None:
                     continue
-                for ti, tok in enumerate(ref(src, c.layer)[:RECALL_K]):
+                for ti, tok in enumerate(ref(src, c.layer)):
                     if not is_content_token(tok):
                         continue
                     calls[stage].append(
@@ -357,7 +316,7 @@ def run(args: JudgeArgs) -> FamilyResult:
                 b_all,
                 schema=STAGE_B_SCHEMA,
                 judge=args.judge,
-                prompt_version=AB_CACHE_VERSION,
+                prompt_version=PROMPT_VERSION,
                 preflight=pre.for_judge(args.judge),
                 validate=lambda call, r: _valid(parse_stage_b, r, concepts[call.meta["cell"]]),
                 max_tokens=MAX_TOKENS,
@@ -365,7 +324,7 @@ def run(args: JudgeArgs) -> FamilyResult:
             )
             for stage in ("b", "foil"):
                 results[stage] = {call.key: got.get(call.key) for call in calls[stage]}
-        # ---- Stage P (+ pfoil): one call per 60-concept chunk with the top-50 content tokens
+        # ---- Stage P (+ pfoil): one call per 60-concept chunk with the full token set
         for c in cells:
             cs = concepts.get(c.key)
             if not cs:
@@ -376,7 +335,7 @@ def run(args: JudgeArgs) -> FamilyResult:
                 src = c.id if stage == "p" else partner(c)
                 if src is None:
                     continue
-                toks = [t for t in ref(src, c.layer)[:PRECISION_K] if is_content_token(t)]
+                toks = [t for t in ref(src, c.layer) if is_content_token(t)]
                 if not toks:
                     continue
                 for ci, (offset, part) in enumerate(stage_p_chunks(cs)):
@@ -460,10 +419,8 @@ def run(args: JudgeArgs) -> FamilyResult:
                 has_text=not c.empty,
                 n_text_tokens=n_text_tokens(texts.get(c.key, "")),
                 concepts=concepts.get(c.key),
-                tokens=ref(c.id, c.layer)[:RECALL_K],
-                foil_tokens=ref(p, c.layer)[:RECALL_K] if p is not None else None,
-                precision_tokens=ref(c.id, c.layer)[:PRECISION_K],
-                foil_precision_tokens=ref(p, c.layer)[:PRECISION_K] if p is not None else None,
+                tokens=ref(c.id, c.layer),
+                foil_tokens=ref(p, c.layer) if p is not None else None,
             )
         )
     counts_base = {
@@ -480,8 +437,6 @@ def run(args: JudgeArgs) -> FamilyResult:
         stage_p_temperature=STAGE_P_TEMPERATURE,
         stage_p_foil=pfoil,
         judged_layers=layers,
-        precision_k=PRECISION_K,
-        recall_k=RECALL_K,
     )
     return with_readout_count(
         score.score(
