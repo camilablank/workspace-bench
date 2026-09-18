@@ -12,6 +12,8 @@ import pydra
 
 from wsbench import registry, runner
 from wsbench.baselines import lucky_guessing, prompt_only
+from wsbench.capable import questions as capable_questions
+from wsbench.capable import run as capable_run
 from wsbench.judge_config import JudgeConfig, resolve
 from wsbench.llm import JudgeConfigError
 from wsbench.readouts import convert_gen_dir, convert_read_json
@@ -404,6 +406,81 @@ class Baseline(Command):
         return 0
 
 
+class Capable(Command):
+    """Ask a model the banks' own questions and grade its answers: the gate a bank was built
+    with, re-run on another model. A family whose rate drops has to be re-gated before its
+    readouts mean anything on that model (AGENTS.md)."""
+
+    def __init__(self) -> None:
+        super().__init__()
+        self.model = pydra.REQUIRED
+        self.families = "all"
+        self.draws = capable_run.DEFAULT_DRAWS
+        self.temperature = capable_run.DEFAULT_TEMPERATURE
+        self.threshold = capable_run.DEFAULT_THRESHOLD
+        self.limit = 0
+        self.judge_model = ""
+        self.concurrency = 64
+        self.rpm = 240.0
+        self.dry_run = False
+        self.out = ""
+
+    def finalize(self) -> None:
+        self.model = str(self.model)
+        self.families = _strs(self.families) or ["all"]
+        self.draws = _int(self.draws)
+        self.temperature = float(self.temperature)
+        self.threshold = float(self.threshold)
+        self.limit = _int(self.limit)
+        self.judge_model = str(self.judge_model or "") or None
+        self.concurrency = _int(self.concurrency)
+        self.rpm = float(self.rpm)
+        self.dry_run = _bool(self.dry_run)
+        self.out = _path(self.out) if self.out else None
+
+    def execute(self) -> int:
+        names = sorted(capable_questions.BUILDERS) if self.families == ["all"] else self.families
+        unknown = [f for f in names if f not in capable_questions.BUILDERS]
+        if unknown:
+            for f in unknown:
+                why = capable_questions.NO_QUESTION.get(f, "unknown family")
+                print(f"{f}: no capability question — {why}", file=sys.stderr)
+            print(f"known: {sorted(capable_questions.BUILDERS)}", file=sys.stderr)
+            return EXIT_USAGE
+        out = self.out or Path("outputs/capable") / self.model.replace("/", "_")
+        try:
+            judge = resolve(
+                JudgeConfig(prompt_version=capable_run.PROMPT_VERSION),
+                flag=self.judge_model,
+                env=os.environ,
+            )
+            for name in names:
+                r = capable_run.run_family(
+                    name,
+                    model=self.model,
+                    judge=judge,
+                    out=out / name,
+                    draws=self.draws,
+                    temperature=self.temperature,
+                    threshold=self.threshold,
+                    limit=self.limit,
+                    concurrency=self.concurrency,
+                    rpm=self.rpm,
+                    dry_run=self.dry_run,
+                )
+                if self.dry_run:
+                    print(f"{name}: {r['n_items']} questions, no calls made")
+                    continue
+                path = out / name / "capable.json"
+                path.parent.mkdir(parents=True, exist_ok=True)
+                path.write_text(json.dumps(r, indent=1, ensure_ascii=False), "utf-8")
+                print(capable_run.report_line(r))
+        except JudgeConfigError as e:
+            print(f"judge config error: {e}", file=sys.stderr)
+            return EXIT_JUDGE_CONFIG
+        return 0
+
+
 class Freeze(Command):
     """Fold a finished baseline run into the tracked ``evals/baselines/<kind>.json``.
     ``kind=lucky_guessing``: ``src`` holds ``<family>/<variant>.json`` from ``wsbench baseline``.
@@ -452,6 +529,7 @@ COMMANDS: dict[str, type[Command]] = {
     "run": RunFamilies,
     "report": ReportRuns,
     "baseline": Baseline,
+    "capable": Capable,
     "freeze": Freeze,
     "convert-gen-dir": ConvertGenDir,
     "convert-read-json": ConvertReadJson,
