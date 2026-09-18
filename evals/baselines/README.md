@@ -8,10 +8,12 @@ other items). The floors here are what a real arm has to clear.
 ## Lucky guessing (`lucky_guessing.json`)
 
 A model is shown NOTHING but a family's option lists (no question, no passage, no readout) and
-asked to guess. The lists come from the judges' own builders, so option text, order and gold
-positions are byte-identical to what the judge sees; the trailing "cannot tell" escape is
-dropped (a guesser with no readout has an honest reason to abstain that a judge does not, and
-the gold is never the escape). Ported from the source repo's `lucky_guessing_baseline.py`.
+asked to guess. The lists come from the judges' own builders, so option text and gold
+positions are byte-identical to what the judge sees, and so is the order wherever the judge
+fixes one (brew reshuffles per cell, so its order is a seeded one of its own); the trailing
+"cannot tell" escape is dropped (a guesser with no readout has an honest reason to abstain that
+a judge does not, and the gold is never the escape). Ported from the source repo's
+`lucky_guessing_baseline.py`.
 
 Variants, five draws per item at temperature 1.0 with the repo judge (`google/gemini-3.8-flash`):
 
@@ -38,6 +40,7 @@ averaged over draws with its std, `majority` the per-item plurality vote. Famili
 | multihop_mt | 1-2 | 5 | one list per bridge |
 | multilingual_mt, multilingual_multihop, multilingual_typo, basic_readout_mt | 1-2 | 5 | concept/correction/readout plus the language list for L2 items |
 | multi_concept_directed_modulation | 1 (multi-select, one to three picks) | 6 | pass = the FIRST pick is a dictated concept (one guess per draw, like every family); `any_hit` = some pick is, `exact` = the picks equal the dictated set, `mean_picks` beside them; controls dropped |
+| brew_intermediates | 1 | 5 | the gold, the start, the answer and two off-trajectory colours. It answers one question: does the colour list itself give the intermediate away (the gold colours are not uniform over the palette). Its like-for-like arm number is `extras.cell_primary_gold_rate`, the judge's single `primary` pick per cell; the lens comparison is `extras.baseline` / `extras.null`, not this floor, because the headline rule aggregates emission cells and the judge's multi-select names as many colours as the readout mentions. `described` is weak here: brew's judge is deliberately told not to guess the task, so only `blind` has a story |
 
 **Reading a floor against a headline.** A family headline is a max over the read grid (any
 layer, any position), while the floor is one guess per item per draw. The two are comparable

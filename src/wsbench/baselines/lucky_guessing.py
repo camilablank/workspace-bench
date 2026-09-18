@@ -89,6 +89,10 @@ DESCRIPTIONS: dict[str, str] = {
         "which one to three concepts a model was told to hold in mind while writing an "
         "unrelated dictated sentence"
     ),
+    "brew_intermediates": (
+        "which colour a potion passed through part-way along a stirring puzzle, among colours "
+        "on and off its trajectory"
+    ),
 }
 
 
@@ -219,6 +223,18 @@ def _multitoken(name: str) -> Callable[[], list[Item]]:
     return build
 
 
+def _brew() -> list[Item]:
+    """Brew's five candidate colours per item, in the family's own seeded order."""
+    from wsbench.evals.brew_intermediates.judge import shuffled
+
+    _h, items = load_bank_file(REPO_ROOT / "evals/brew_intermediates/items.json")
+    out = []
+    for it in items:
+        opts = shuffled([str(c) for c in it["options_adjacent"][0]], f"{it['id']}|lucky")
+        out.append(Item(it["id"], [opts], [opts.index(str(it["intermediates"][0])) + 1]))
+    return out
+
+
 def _multi_concept() -> list[Item]:
     from wsbench.evals.multi_concept_directed_modulation.options import option_sets
 
@@ -245,6 +261,7 @@ BUILDERS: dict[str, Callable[[], list[Item]]] = {
     "multilingual_multihop": _multitoken("multilingual_multihop"),
     "multilingual_typo": _multitoken("multilingual_typo"),
     "multi_concept_directed_modulation": _multi_concept,
+    "brew_intermediates": _brew,
 }
 
 
