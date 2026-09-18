@@ -14,7 +14,9 @@ FROZEN = REPO_ROOT / "evals" / "baselines" / "prompt_only.json"
 # Families where the prompt states the answer outright, so the stock model's summary names it
 # every time (multi-concept DM scored 1.0): not a floor, never frozen or shown (Agam, 2026-09-16).
 EXCLUDED: dict[str, str] = {
-    "multi_concept_directed_modulation": "the prompt dictates the concepts; prompt-only is 1.0"
+    "multi_concept_directed_modulation": "the prompt dictates the concepts; prompt-only is 1.0",
+    "hallucination": "an invention rate, not a bar a lens clears",
+    "jlens_concept_pr": "precision against the J-lens top-10, not a bar a lens clears",
 }
 SOURCE_KEYS = (
     "model",
