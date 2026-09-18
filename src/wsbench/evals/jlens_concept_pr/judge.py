@@ -153,24 +153,30 @@ def reference_path(label: str, layer: int) -> Path:
     return REF_DIR / label / f"L{layer:03d}.jsonl"
 
 
-def reference_tokens(label: str, layer: int, pos: int) -> list[str]:
-    """The J-lens top-``PRECISION_K`` display strings at (label, layer, pos), decoded, unstripped
-    (punctuation tokens must survive to be classified), rank order. ``[]`` when the row is
-    absent. Recall reads ``[:RECALL_K]`` of this list, precision ``[:PRECISION_K]``."""
+def _reference_row(label: str, layer: int, pos: int) -> list[str]:
+    """The decoded reference tokens at (label, layer, pos) as stored; ``[]`` when absent."""
     path = reference_path(label, layer)
     for line in path.read_bytes().decode("utf-8", "replace").splitlines():
         if not line.strip():
             continue
         row = json.loads(line)
         if row.get("pos") == pos:
-            toks = [bpe_display_to_text(t) for t in row["samples"]]
-            if len(toks) < PRECISION_K:
-                # a top-10 file here would silently score precision against the top-10
-                raise SystemExit(
-                    f"[{FAMILY}] {path}: {len(toks)} reference tokens, expected {PRECISION_K}"
-                )
-            return toks[:PRECISION_K]
+            return [bpe_display_to_text(t) for t in row["samples"]]
     return []
+
+
+def reference_tokens(label: str, layer: int, pos: int) -> list[str]:
+    """The J-lens top-``PRECISION_K`` display strings at (label, layer, pos), decoded, unstripped
+    (punctuation tokens must survive to be classified), rank order. ``[]`` when the row is
+    absent. Recall reads ``[:RECALL_K]`` of this list, precision ``[:PRECISION_K]``."""
+    toks = _reference_row(label, layer, pos)
+    if toks and len(toks) < PRECISION_K:
+        # a top-10 file here would silently score precision against the top-10
+        raise SystemExit(
+            f"[{FAMILY}] {reference_path(label, layer)}: {len(toks)} reference tokens, "
+            f"expected {PRECISION_K}"
+        )
+    return toks[:PRECISION_K]
 
 
 def foil_map(items: Sequence[dict[str, Any]]) -> dict[str, str]:
@@ -235,6 +241,18 @@ def run(args: JudgeArgs) -> FamilyResult:
     bad = sorted({L for L in layers for it in scope if not reference_path(it["id"], L).exists()})
     if bad:
         print(f"[{FAMILY}] no reference J-lens file for layers {bad} under {REF_DIR}")
+        raise SystemExit(2)
+    short = [
+        f"{it['id']}/L{L:03d}"
+        for L in layers
+        for it in scope
+        if 0 < len(_reference_row(it["id"], L, it["pos"])) < PRECISION_K
+    ]
+    if short:  # before any call: a top-10 row would grade precision against the top-10
+        print(
+            f"[{FAMILY}] {len(short)} reference rows under {REF_DIR} have fewer than "
+            f"{PRECISION_K} tokens (first 5: {short[:5]})"
+        )
         raise SystemExit(2)
     expected = expected_cells(positions, layers)
     missing = missing_cells(cells, expected)

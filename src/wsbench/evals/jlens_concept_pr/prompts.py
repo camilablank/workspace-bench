@@ -134,7 +134,8 @@ STAGE_P_SCHEMA = schema_block(
 )
 # One Stage P call grades at most this many concepts. Cells reach 279 concepts, which would both
 # risk the judge's context window (every concept is echoed back verbatim) and dilute the grading;
-# chunking keeps each call short. The cell's FULL token set goes into every chunk.
+# chunking keeps each call short. The cell's whole precision token set (the content tokens of the
+# reference top-50 since jlens-pr-v3) goes into every chunk.
 STAGE_P_CHUNK = 60
 
 

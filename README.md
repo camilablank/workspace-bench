@@ -200,7 +200,7 @@ Working in a git worktree that shares the main checkout's `.venv`: prefix comman
 
 **J-lens concept precision** — [`evals/jlens_concept_pr/README.md`](evals/jlens_concept_pr/README.md)
 - *What it is:* Do the lens's stated concepts agree with the J-lens top-50 tokens at the same activation (precision, the headline), and does it cover the top-10 (recall@10, reported in `extras`).
-- *Example:* item `chat-lmsys-0000`, read at the `,` after "French" in "covering widely spoken languages such as Chinese, English, French,"; J-lens top-10 at L44 = ` languages`, `languages`, `日本語`, `多国`, ` Chinese`, ` Languages`, `Languages`, `语种`, `中国的`, `language` → a readout whose concepts are {languages, Chinese, Japanese, multilingual} scores high precision; "AI assistant" or "help" in the same readout count against it.
+- *Example:* item `chat-lmsys-0000`, read at the `,` after "French" in "covering widely spoken languages such as Chinese, English, French,"; J-lens top-50 at L44 begins ` languages`, `languages`, `日本語`, `多国`, ` Chinese`, ` Languages`, `Languages`, `语种`, `中国的`, `language` (these ten are the recall set) → a readout whose concepts are {languages, Chinese, Japanese, multilingual} scores high precision; "AI assistant" or "help" in the same readout count against it.
 - *Judged by:* Stage A splits samples into concepts; Stage P grades each concept against the token set in / partial / out; precision = mean grade over all concepts; recall@10 = expected best grade over a 10-concept subset.
 
 ### Logical processing

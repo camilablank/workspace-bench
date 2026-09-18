@@ -722,3 +722,40 @@ def test_precision_only_cell_scores_precision_from_the_top50() -> None:
         concepts=["a"], support_expected=False, n_precision_content=0, **kw
     )
     assert status == "ok" and math.isnan(s.precision) and math.isnan(s.recall_at_m)
+
+
+def test_short_reference_row_exits_2_before_any_call(tmp_path, monkeypatch, jargs):
+    monkeypatch.setattr("wsbench.llm._make_client", lambda r, k: pytest.fail("no client"))
+    ref = tmp_path / "ref"
+    for lab in LABELS:
+        for layer in (44, 48):
+            src = jj.REF_DIR / lab / f"L{layer:03d}.jsonl"
+            row = json.loads(src.read_text(encoding="utf-8").splitlines()[0])
+            if lab == LABELS[1] and layer == 44:
+                row["samples"] = row["samples"][:10]  # a stale top-10 row
+            (ref / lab).mkdir(parents=True, exist_ok=True)
+            (ref / lab / f"L{layer:03d}.jsonl").write_text(json.dumps(row) + "\n")
+    monkeypatch.setattr(jj, "REF_DIR", ref)
+    with pytest.raises(SystemExit) as exc:
+        jj.run(jargs(EXAMPLE, items=LABELS))
+    assert exc.value.code == 2
+
+
+def test_stage_a_and_b_cache_rows_carry_the_v2_fingerprint(tmp_path, fake_llm, jargs):
+    """Re-judging a v2 cells.jsonl reuses Stages A / B only if they are cached under the v2
+    version string; Stage P is cached under v3."""
+    from wsbench.cache import fingerprint
+
+    fake = fake_llm(_responder)
+    args = jargs(EXAMPLE, items=LABELS)
+    jj.run(args)
+    fps = {json.loads(line)["fp"] for line in (args.out / "cells.jsonl").read_text().splitlines()}
+    model, reasoning = "google/gemini-3.8-flash", {"effort": "minimal"}
+    st = _stage_calls(fake)
+    for stage, version, temp in (("A", "jlens-pr-v2", None), ("B", "jlens-pr-v2", None)):
+        for kw in st[stage]:
+            system, user = kw["messages"][0]["content"], kw["messages"][1]["content"]
+            assert fingerprint(version, model, reasoning, temp, system, user) in fps, stage
+    for kw in st["P"]:
+        system, user = kw["messages"][0]["content"], kw["messages"][1]["content"]
+        assert fingerprint("jlens-pr-v3", model, reasoning, 0.0, system, user) in fps
