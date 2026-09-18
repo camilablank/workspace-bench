@@ -449,52 +449,6 @@
   "complete": false,
   "written": "2026-09-18T07:39:55+00:00"
  },
- "hallucination": {
-  "rate": 0.5340572556762093,
-  "saturated": false,
-  "ci95": [
-   0.501980198019802,
-   0.5648780487804878
-  ],
-  "metric": "hallucination_rate",
-  "higher_is_better": false,
-  "n_items": 149,
-  "n_items_decided": null,
-  "counts": {
-   "n_expected_cells": 1123,
-   "n_missing_cells": 0,
-   "n_unjudged_cells": 19,
-   "n_empty_cells": 12
-  },
-  "judge_model": "google/gemini-3.8-flash",
-  "instrument": "v5c-chat",
-  "layers_judged": null,
-  "complete": false,
-  "written": "2026-09-18T07:39:55+00:00"
- },
- "jlens_concept_pr": {
-  "rate": 0.18950135298508042,
-  "saturated": false,
-  "ci95": [
-   0.17513962021481352,
-   0.20511814463571404
-  ],
-  "metric": "precision",
-  "higher_is_better": true,
-  "n_items": 289,
-  "n_items_decided": null,
-  "counts": {
-   "n_expected_cells": 299,
-   "n_missing_cells": 0,
-   "n_unjudged_cells": 10,
-   "n_empty_cells": 7
-  },
-  "judge_model": "google/gemini-3.8-flash",
-  "instrument": "jlens-pr-v2",
-  "layers_judged": null,
-  "complete": false,
-  "written": "2026-09-18T07:39:55+00:00"
- },
  "moral_rationale": {
   "rate": 0.495,
   "saturated": false,

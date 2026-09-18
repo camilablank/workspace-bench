@@ -75,9 +75,10 @@ judged by each family's own instrument at ONE layer (identical rows across layer
 equal per-layer), and `wsbench freeze kind=prompt_only` records the rate with the judge model
 and prompt version. Not item-blind: a floor, never a competitor lens.
 
-Covered: 24 of the 27 families. Not measured: `jailbreak_recognition` and
-`agentic_misalignment`, whose judges are pinned to Claude Sonnet 5, and the exclusion at the
-bottom. Entries carry `complete: false` by construction, because judging one layer is a layer
+Covered: 22 of the 27 families — every family whose headline is a pass rate, plus
+`buggy_code`'s net difference. Not measured: `jailbreak_recognition` and
+`agentic_misalignment`, whose judges are pinned to Claude Sonnet 5, and the three exclusions at
+the bottom. Entries carry `complete: false` by construction, because judging one layer is a layer
 subset of the family's grid.
 
 **The judged layer differs by vintage** and is recorded per entry in `layers_judged` for the
@@ -111,9 +112,8 @@ have: `arithmetic_intermediates` 0.15, `buggy_code` 0.04 `net_S2` (which also ca
 floor in the clean twins), `chain_intermediates` 0.03.
 
 The remaining new entries behave as intended floors: `user_modeling` 0.07,
-`conjunctive_association` 0.07, `moral_rationale` 0.50, `hallucination` 0.53 (a rate, **lower is
-better**: what a prompt-only description invents about the conversation) and `jlens_concept_pr`
-0.19 precision against the J-lens top-10. The 13 entries frozen 2026-09-16 are pass rates, some
+`conjunctive_association` 0.07 and `moral_rationale` 0.50. The 13 entries frozen 2026-09-16 are
+pass rates, some
 of them high for the same text-leakage reason (`multihop` 0.90, `multilingual` 0.76,
 `basic_readout` 0.72, `poetry` 0.71): the two groups above are the flagged cases, not a claim
 that every other entry is a clean bar.
@@ -124,8 +124,7 @@ that every other entry is a clean bar.
   analytic chance line (`user_modeling` 0.07 against 1/6, `conjunctive_association` 0.07 against
   1/11), because a prompt-only summary commits to a wrong option rather than abstaining. Read a
   lens against both.
-- **Not every column is a pass rate.** `hallucination` is lower-is-better, `jlens_concept_pr` is
-  a precision and `buggy_code` is a net difference. `report` labels those.
+- **Not every column is a pass rate.** `buggy_code` is a net difference, which `report` labels.
 - **The summaries are capped at 256 new tokens** (the sampling of the first vintage, kept so the
   two vintages are one instrument), and 40-73% of them are cut mid-sentence, most often on the
   long prompts (scenes, whole programs, rule tables). That biases every rate here DOWN.
@@ -135,6 +134,13 @@ that every other entry is a clean bar.
   sampling). The per-entry `instrument`, `judge_model` and `layers_judged` are what a given rate
   belongs to.
 
-Excluded: multi_concept_directed_modulation. Its prompt dictates the concepts ("Think about the
-plumber's blue ladder ..."), so the stock model names them every time (measured 1.0) and the
-number says nothing about the lens; it is neither frozen nor shown.
+Excluded, neither frozen nor shown:
+
+- **multi_concept_directed_modulation.** Its prompt dictates the concepts ("Think about the
+  plumber's blue ladder ..."), so the stock model names them every time (measured 1.0) and the
+  number says nothing about the lens.
+- **hallucination** and **jlens_concept_pr.** Neither headline is a bar a lens clears: one is
+  the rate at which a readout invents things about the conversation (lower is better), the other
+  is precision against the J-lens top-10. A prompt-only description has its own invention rate
+  (measured 0.53) and its own precision (0.19), but neither bounds a lens, and putting them in
+  the floor column invites reading them in the wrong direction.
