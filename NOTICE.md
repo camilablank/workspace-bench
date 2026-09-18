@@ -66,8 +66,9 @@ identified by label prefix.
   Transformer Circuits, 2026. arXiv:2607.15495. Code: https://github.com/anthropics/jacobian-lens
   (Apache-2.0). Reference lens artifact: https://huggingface.co/neuronpedia/jacobian-lens
   (n1000 wikitext fit).
-- Included: the J-lens method and the frozen reference top-10 tokens under
-  `evals/jlens_concept_pr/gen-jlens-pr-jlens/` that the family scores against. The numeric
+- Included: the J-lens method and the frozen reference tokens the family scores against: the
+  top-50 under `evals/jlens_concept_pr/gen-jlens-pr-jlens-k50/` (`jlens-pr-v3`) and the earlier
+  top-10 under `evals/jlens_concept_pr/gen-jlens-pr-jlens/`. The numeric
   helpers in `src/wsbench/evals/jlens_concept_pr/{concept_pr,token_types}.py` are this repo's
   own code (MIT); no `anthropics/jacobian-lens` source is vendored.
 - Licence of the referenced code: Apache License, Version 2.0

@@ -1,5 +1,6 @@
-"""Verbatim prompts of the jlens_concept_pr judge (``jlens-pr-v2``: prompts unchanged from
-the source; v2 marks Stage A moving from DeepSeek-V4-Flash to Gemini 3.8 Flash).
+"""Verbatim prompts of the jlens_concept_pr judge (``jlens-pr-v3``: prompts unchanged from
+the source; v2 marked Stage A moving from DeepSeek-V4-Flash to Gemini 3.8 Flash, v3 marks
+Stage P grading against the J-lens top-50 instead of the top-10).
 
 Source: ``scripts/oracle_lens_evals/jlens_pr/judge_prompts.py`` in the source repo — the
 system prompts (L17-30, L32-47, L182-209), schemas (L51-73, L211-228), ``GRADE_VALUE`` (L75),
@@ -18,7 +19,11 @@ from typing import Any
 
 from wsbench.llm import schema_block
 
-PROMPT_VERSION = "jlens-pr-v2"
+PROMPT_VERSION = "jlens-pr-v3"
+# Stages A / B / foil send byte-identical system + user text under v3, so their cache
+# fingerprints keep the v2 string: re-judging an arm with a v2 ``cells.jsonl`` re-runs Stage P
+# only. A hit still needs the identical (model, reasoning, temperature, system, user) tuple.
+AB_CACHE_VERSION = "jlens-pr-v2"
 
 STAGE_A_SYSTEM = """You are given text produced by an interpretability lens that verbalizes \
 a language model's internal state. Break the text into its UNIQUE concepts: short noun \

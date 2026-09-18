@@ -74,7 +74,8 @@ def test_stage_user_bodies_and_schemas() -> None:
     assert body == "Tokens: ' x', 'y'\n\nConcepts:\n1. a\n2. b"
     assert "Walt Disney" in pp.STAGE_P_SYSTEM and pp.STAGE_P_CHUNK == 60
     assert pp.GRADE_VALUE == {"in": 1.0, "partial": 0.5, "out": 0.0}
-    assert pp.PROMPT_VERSION == "jlens-pr-v2"
+    assert pp.PROMPT_VERSION == "jlens-pr-v3"
+    assert pp.AB_CACHE_VERSION == "jlens-pr-v2"
     # placeholders are substituted in one pass: a value containing a placeholder survives
     assert pp.render_stage_a("{listing}") == "Text:\n{listing}"
     assert set(pp.PROMPTS) == {
@@ -179,7 +180,7 @@ def test_bank_manifest_and_reference() -> None:
         for layer in (20, 42, 44, 60):
             assert jj.reference_path(it["id"], layer).exists()
     toks = jj.reference_tokens("chat-lmsys-0000", 44, items[0]["pos"])
-    assert len(toks) == 10 and toks[0] == " languages" and "日本語" in toks
+    assert len(toks) == 50 and toks[0] == " languages" and "日本語" in toks
     fm = jj.foil_map(items)
     assert set(fm) == {it["id"] for it in items}
     fam = {it["id"]: it["family"] for it in items}
@@ -611,7 +612,7 @@ def test_content_token_filter_matches_reference_tokens() -> None:
         if items[0]["id"] == LABELS[0]
         else next(it["pos"] for it in items if it["id"] == LABELS[0]),
     )
-    assert [is_content_token(t) for t in toks] == [True] * 10
+    assert [is_content_token(t) for t in toks[:10]] == [True] * 10
 
 
 def test_no_content_token_cell_is_ok_with_nan():
@@ -631,3 +632,93 @@ def test_no_content_token_cell_is_ok_with_nan():
     assert status == "ok"
     assert math.isnan(scored.precision) and math.isnan(scored.recall_at_m)
     assert scored.n_concepts == 2 and scored.n_content_tokens == 0
+
+
+# ------------------------------------------------------------------ v3: precision vs the top-50
+
+
+def test_k50_reference_rows_extend_the_frozen_top10_byte_for_byte() -> None:
+    """Every (label, layer) has a 50-token k50 row whose first 10 tokens / scores and every
+    other field equal the frozen top-10 row: recall cannot move between v2 and v3."""
+    top10 = jj.BANK_DIR / "gen-jlens-pr-jlens"
+    files = sorted(top10.glob("*/L*.jsonl"))
+    assert len(files) == 299 * 12
+    for f in files:
+        old = json.loads(f.read_text(encoding="utf-8").splitlines()[0])
+        new_path = jj.REF_DIR / f.parent.name / f.name
+        new = json.loads(new_path.read_text(encoding="utf-8").splitlines()[0])
+        assert len(new["samples"]) == jj.PRECISION_K == 50 and len(new["scores"]) == 50, new_path
+        assert new["samples"][:10] == old["samples"] and new["scores"][:10] == old["scores"]
+        assert {k: v for k, v in new.items() if k not in ("samples", "scores")} == {
+            k: v for k, v in old.items() if k not in ("samples", "scores")
+        }
+
+
+def test_reference_row_shorter_than_precision_k_is_refused(tmp_path, monkeypatch) -> None:
+    (tmp_path / "x").mkdir()
+    row = {"label": "x", "layer": 44, "pos": 3, "samples": [" a"] * 10, "scores": [1.0] * 10}
+    (tmp_path / "x" / "L044.jsonl").write_text(json.dumps(row) + "\n", encoding="utf-8")
+    monkeypatch.setattr(jj, "REF_DIR", tmp_path)
+    with pytest.raises(SystemExit, match="expected 50"):
+        jj.reference_tokens("x", 44, 3)
+
+
+def test_stage_b_reads_the_top10_and_stage_p_the_top50(tmp_path, fake_llm, jargs):
+    fake = fake_llm(_responder)
+    res = jj.run(jargs(EXAMPLE, items=LABELS))
+    st = _stage_calls(fake)
+    items = {it["id"]: it for it in jj.manifest_items(jj.load_manifest())}
+    top10 = {lab: jj.reference_tokens(lab, 44, items[lab]["pos"])[:10] for lab in items}
+    b_tokens = [kw["messages"][1]["content"].split("\n", 1)[0] for kw in st["B"]]
+    allowed = {f"Token: {t!r}" for toks in top10.values() for t in toks}
+    assert b_tokens and set(b_tokens) <= allowed
+    for kw in st["P"]:
+        user = kw["messages"][1]["content"]
+        tok_line = user.split("\n\n", 1)[0]
+        n_tok = tok_line.count("', ") + tok_line.count('", ') + 1
+        assert n_tok > 10, tok_line
+    lab = LABELS[0]
+    want = [t for t in jj.reference_tokens(lab, 44, items[lab]["pos"]) if is_content_token(t)]
+    assert st["P"][0]["messages"][1]["content"].startswith(
+        "Tokens: " + ", ".join(repr(t) for t in want) + "\n\n"
+    )
+    assert res.extras["precision_k"] == 50 and res.extras["recall_k"] == 10
+    assert res.config["precision_k"] == 50 and res.config["prompt_version"] == "jlens-pr-v3"
+    assert "top-50" in res.chance_label
+    row = next(r for r in res.rows if r["id"] == lab and r["layer"] == 44)
+    assert row["n_content_tokens"] == 10 and row["n_precision_content_tokens"] == len(want)
+
+
+def test_changing_the_precision_set_re_runs_stage_p_only(tmp_path, fake_llm, jargs, monkeypatch):
+    """Stages A / B keep their v2 cache fingerprints: only Stage P depends on the precision set."""
+    args = jargs(EXAMPLE, items=LABELS)
+    fake_llm(_responder)
+    jj.run(args)
+    monkeypatch.setattr(jj, "PRECISION_K", 20)
+    fake2 = fake_llm(_responder)
+    jj.run(args)
+    st = _stage_calls(fake2)
+    assert st["A"] == [] and st["B"] == [] and len(st["P"]) == 3
+
+
+def test_precision_only_cell_scores_precision_from_the_top50() -> None:
+    """No content token in the top-10 but some in ranks 11-50: precision real, recall NaN."""
+    kw = {"had_text": True, "by_idx": {}, "content_idx": [], "n_tokens_total": 10}
+    status, s = ss.score_one_cell(
+        concepts=["a", "b"], support=[1.0, 0.5], support_expected=True, n_precision_content=7, **kw
+    )
+    assert status == "ok" and s.precision == pytest.approx(0.75)
+    assert math.isnan(s.recall_at_m) and math.isnan(s.raw_recall) and s.n_content_tokens == 0
+    status, s = ss.score_one_cell(
+        concepts=["a"], support=None, support_expected=True, n_precision_content=7, **kw
+    )
+    assert status == "missing_p" and math.isnan(s.precision) and math.isnan(s.recall_at_m)
+    status, s = ss.score_one_cell(concepts=[], n_precision_content=7, **kw)
+    assert status == "ok" and s.precision == 0.0 and math.isnan(s.recall_at_m)
+    status, s = ss.score_one_cell(concepts=None, **{**kw, "had_text": False}, n_precision_content=7)
+    assert status == "ok" and s.precision == 0.0
+    # no content in the top-50 either: no information on either axis
+    status, s = ss.score_one_cell(
+        concepts=["a"], support_expected=False, n_precision_content=0, **kw
+    )
+    assert status == "ok" and math.isnan(s.precision) and math.isnan(s.recall_at_m)

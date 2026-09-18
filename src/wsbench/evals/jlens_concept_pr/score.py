@@ -5,10 +5,14 @@ Ported from ``scripts/oracle_lens_evals/jlens_pr/score_pr.py`` (``assemble_grids
 unchanged numerics of :mod:`.concept_pr`. Every present cell gets a ``status``:
 
 - ``ok``            judged; an empty text or an empty concept list scores P = 0 / R = 0 (a lens
-                    fact, never dropped); a cell whose J-lens top-10 has no content token is
-                    ``ok`` with NaN on both axes (no information) and is dropped from the means
+                    fact, never dropped). The two axes read different reference sets
+                    (``jlens-pr-v3``): recall the top-10, precision the top-50. Recall is NaN
+                    when the top-10 has no content token, precision when the top-50 has none
+                    (no information; dropped from that axis's mean). A cell with content only
+                    in ranks 11-50 is ``ok`` with a real precision and NaN recall
 - ``missing_a``     the cell HAD text but Stage A never returned
-- ``incomplete_b``  some content token has no Stage B grade row
+- ``incomplete_b``  some content token has no Stage B grade row (NaN on BOTH axes, as before:
+                    a judge failure is excluded from every mean)
 - ``missing_p``     Stage P is missing for this cell: PRECISION is NaN (dropped from the
                     precision mean) but the recall numbers are kept
 
@@ -33,7 +37,9 @@ from .concept_pr import ItemScore, bootstrap_ci, is_content_token, score_item
 M = 10
 HEADLINE_LAYER = 44
 MAX_REJECT_RATE = 0.05  # JLENS_PR_MAX_REJECT_RATE of the source stage script
-CHANCE_LABEL = "shuffled-partner foil precision (measured, see extras.foil)"
+CHANCE_LABEL = (
+    "shuffled-partner foil precision (measured, see extras.foil); reference = J-lens top-50"
+)
 FAILURE_STATUSES = ("missing_a", "incomplete_b", "missing_p")
 
 
@@ -53,8 +59,11 @@ class CellInput:
     has_text: bool
     n_text_tokens: int
     concepts: list[str] | None  # None = no Stage A result (empty text, or a judge failure)
-    tokens: list[str]  # the cell's reference J-lens tokens (decoded, unstripped)
-    foil_tokens: list[str] | None  # the derangement partner's tokens (None = no partner)
+    tokens: list[str]  # the cell's reference top-10 (recall set; decoded, unstripped)
+    foil_tokens: list[str] | None  # the derangement partner's top-10 (None = no partner)
+    # the precision set (top-50); None = the same list as ``tokens`` / ``foil_tokens``
+    precision_tokens: list[str] | None = None
+    foil_precision_tokens: list[str] | None = None
 
 
 # ------------------------------------------------------------------ joins (ported)
@@ -108,13 +117,21 @@ def score_one_cell(
     n_tokens_total: int,
     support: Sequence[float] | None = None,
     support_expected: bool = False,
+    n_precision_content: int | None = None,
 ) -> tuple[str, ItemScore]:
     """``(status, ItemScore)`` for one (item, layer) cell — see the module docstring.
 
-    Judge failures never reach ``score_item`` (a partial grid would raise there): they get a
-    NaN placeholder that carries only the lens facts (n_concepts, token counts).
+    ``content_idx`` indexes the recall set (top-10); ``n_precision_content`` counts the content
+    tokens of the precision set (top-50; ``None`` = the recall set). ``ItemScore``'s token
+    counts stay recall-set counts (``punct_frac`` is a top-10 statistic). Judge failures never
+    reach ``score_item`` (a partial grid would raise there): they get a NaN placeholder that
+    carries only the lens facts (n_concepts, token counts).
     """
     n_content = len(content_idx)
+    n_p = n_content if n_precision_content is None else n_precision_content
+    # ``score_item`` NaNs precision on an empty recall grid; a cell whose content sits only in
+    # ranks 11-50 still has a precision set, so that axis is filled in here
+    precision_only = n_content == 0 and n_p > 0
     missing_p = bool(concepts) and support_expected and support is None
     if concepts is None:
         if had_text:  # Stage A never returned for a cell that had text
@@ -122,9 +139,11 @@ def score_one_cell(
                 math.nan, math.nan, math.nan, 0, n_content, n_tokens_total
             )
         # no verbalizer text at all -> zero concepts, a lens fact
-        return "ok", score_cell(zero_grid(n_content), n_concepts=0, n_tokens_total=n_tokens_total)
+        s = score_cell(zero_grid(n_content), n_concepts=0, n_tokens_total=n_tokens_total)
+        return "ok", replace(s, precision=0.0) if precision_only else s
     if not concepts:  # judged, zero concepts -> P=0, R=0
-        return "ok", score_cell(zero_grid(n_content), n_concepts=0, n_tokens_total=n_tokens_total)
+        s = score_cell(zero_grid(n_content), n_concepts=0, n_tokens_total=n_tokens_total)
+        return "ok", replace(s, precision=0.0) if precision_only else s
     grid = full_grid(by_idx, content_idx)
     if grid is None:
         return "incomplete_b", ItemScore(
@@ -133,6 +152,8 @@ def score_one_cell(
     scored = score_cell(
         grid, n_concepts=len(concepts), n_tokens_total=n_tokens_total, support=support
     )
+    if precision_only and support is not None:
+        scored = replace(scored, precision=float(np.mean(support)))
     if missing_p:
         # The precision judge failed for this cell, but the Stage B grid did not: keep the recall
         # numbers and NaN only precision.
@@ -267,6 +288,8 @@ def score(
     statuses: Counter[str] = Counter()
     for ci in inputs:
         content_idx = [i for i, t in enumerate(ci.tokens) if is_content_token(t)]
+        p_toks = ci.tokens if ci.precision_tokens is None else ci.precision_tokens
+        n_p = sum(1 for t in p_toks if is_content_token(t))
         status, s = score_one_cell(
             concepts=ci.concepts,
             had_text=ci.has_text,
@@ -274,7 +297,8 @@ def score(
             content_idx=content_idx,
             n_tokens_total=len(ci.tokens),
             support=support["p"].get(ci.key),
-            support_expected=bool(content_idx),  # no content token -> no Stage P call -> ok/NaN
+            support_expected=n_p > 0,  # no content in the top-50 -> no Stage P call -> ok/NaN
+            n_precision_content=n_p,
         )
         meta = {"status": status, "has_text": ci.has_text, "n_text_tokens": ci.n_text_tokens}
         real[ci.layer].append((meta, s))
@@ -291,6 +315,7 @@ def score(
             "n_concepts": s.n_concepts,
             "n_content_tokens": s.n_content_tokens,
             "n_tokens": s.n_tokens,
+            "n_precision_content_tokens": n_p,
             "precision": _num(s.precision),
             "recall_at_10": _num(s.recall_at_m),
             "raw_recall": _num(s.raw_recall),
@@ -301,6 +326,10 @@ def score(
         }
         if ci.foil_tokens is not None:
             f_idx = [i for i, t in enumerate(ci.foil_tokens) if is_content_token(t)]
+            fp_toks = (
+                ci.foil_tokens if ci.foil_precision_tokens is None else ci.foil_precision_tokens
+            )
+            f_np = sum(1 for t in fp_toks if is_content_token(t))
             f_status, fs = score_one_cell(
                 concepts=ci.concepts,
                 had_text=ci.has_text,
@@ -308,7 +337,8 @@ def score(
                 content_idx=f_idx,
                 n_tokens_total=len(ci.foil_tokens),
                 support=support["pfoil"].get(ci.key),
-                support_expected=bool(f_idx),
+                support_expected=f_np > 0,
+                n_precision_content=f_np,
             )
             foil[ci.layer].append(({**meta, "status": f_status}, fs))
             row["foil_status"] = f_status
@@ -341,6 +371,8 @@ def score(
     )
     extras = {
         "headline_layer": hl,
+        "precision_k": config.get("precision_k"),
+        "recall_k": config.get("recall_k"),
         "recall_at_10": blk["recall_at_10"] if blk else None,
         "recall_at_10_ci": blk["recall_at_10_ci"] if blk else None,
         "raw_recall": blk["raw_recall"] if blk else None,

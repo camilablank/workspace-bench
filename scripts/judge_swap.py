@@ -609,7 +609,18 @@ def compare(
     res = FamilyResult.from_json(results)
     port_model = res.config.get("judge_model")
     if family in PARITY:
-        value, model, extras = PARITY[family](_read_json(baseline_path))
+        baseline = _read_json(baseline_path)
+        if family == "jlens_concept_pr":
+            # jlens-pr-v3 grades precision against the J-lens top-50; v1 / v2 and the source's
+            # summaries before 2026-09-18 against the top-10 (no key = 10). Never compare across.
+            port_k = res.extras.get("precision_k") or 10
+            base_k = baseline.get("precision_k") or 10
+            if port_k != base_k:
+                raise ValueError(
+                    f"jlens_concept_pr parity across reference sets: port precision_k={port_k}, "
+                    f"baseline precision_k={base_k} (re-score one side at the other's k)"
+                )
+        value, model, extras = PARITY[family](baseline)
         return {
             "family": family,
             "parity": True,
