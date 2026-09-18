@@ -829,3 +829,56 @@ def test_score_books_missing_p_for_a_precision_only_cell_without_support(jargs):
     assert with_p.rows[0]["recall_at_10"] is None
     without = ss.score(args, [ci], support={"p": {}, "pfoil": {}}, **kw)
     assert without.rows[0]["status"] == "missing_p" and without.rows[0]["precision"] is None
+
+
+def test_pfoil_grades_the_partner_top50(tmp_path, fake_llm, jargs):
+    fake = fake_llm(_responder)
+    jj.run(jargs(EXAMPLE, items=LABELS, extra={"stage_p_foil": "1"}))
+    items = {it["id"]: it for it in jj.manifest_items(jj.load_manifest())}
+    fmap = jj.foil_map(list(items.values()))
+    want = set()
+    for lab in LABELS:
+        part = fmap[lab]
+        toks = jj.reference_tokens(part, 44, items[part]["pos"])
+        content = [t for t in toks if is_content_token(t)]
+        assert len(content) > 10
+        want.add("Tokens: " + ", ".join(repr(t) for t in content))
+    users = [kw["messages"][1]["content"].split("\n\n", 1)[0] for kw in _stage_calls(fake)["P"]]
+    assert want <= set(users)  # 3 pfoil calls, each the partner's full top-50 content set
+
+
+def test_score_foil_precision_follows_the_partner_top50(jargs):
+    ci = ss.CellInput(
+        key="x__L044__p3",
+        id="x",
+        layer=44,
+        pos=3,
+        family="chat",
+        has_text=True,
+        n_text_tokens=3,
+        concepts=["a", "b"],
+        tokens=[" real"] * 10,
+        foil_tokens=[";"] * 10,
+        precision_tokens=[" real"] * 50,
+        foil_precision_tokens=[";"] * 10 + [" word"] * 40,
+    )
+    kw = {
+        "layers": [44],
+        "grids": {"b": {ci.key: {i: [1.0, 0.0] for i in range(10)}}, "foil": {}},
+        "reject_rate": {},
+        "counts_base": {
+            "n_expected_cells": 1,
+            "n_missing_cells": 0,
+            "n_empty_cells": 0,
+            "skipped_rows": 0,
+            "spend_usd": 0.0,
+        },
+        "config": {"precision_k": 50, "recall_k": 10},
+    }
+    args = jargs(EXAMPLE)
+    sup = {"p": {ci.key: [1.0, 1.0]}, "pfoil": {ci.key: [0.0, 0.5]}}
+    row = ss.score(args, [ci], support=sup, **kw).rows[0]
+    assert row["foil_status"] == "ok" and row["foil_precision"] == pytest.approx(0.25)
+    assert row["foil_recall_at_10"] is None
+    row = ss.score(args, [ci], support={**sup, "pfoil": {}}, **kw).rows[0]
+    assert row["foil_status"] == "missing_p" and row["foil_precision"] is None

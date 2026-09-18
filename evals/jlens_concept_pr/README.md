@@ -39,8 +39,8 @@ the labels, families and read positions plus the reference files above.
 - **Grid:** 299 labels x the selected layers (`layers=`, else every layer in the file) at
   `pos == eval_positions[0]`. Any selected layer without a reference file
   `gen-jlens-pr-jlens-k50/<label>/L{layer:03d}.jsonl` is fatal (exit 2) before any call, and so
-  is an in-scope reference row with fewer than 50 samples (a top-10 file would silently grade
-  precision against the top-10). An
+  is a reference row with fewer than 50 samples for an in-scope item or its foil partner (a
+  top-10 file would silently grade precision against the top-10). An
   ABSENT row is a missing cell (fatal without `allow_missing=True`; the source scored it silently as
   zero); a PRESENT-but-empty row is scored as zero concepts ("lens silent"), carries
   `has_text = false` and counts in `n_empty_cells` — so the shared "empty cells <= 5% of
