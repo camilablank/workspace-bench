@@ -68,14 +68,36 @@ guesser's shape heuristics are anti-correlated with the gold there, not a bug.
 Stock Qwen3.6-27B given the exact prompt text up to the read token and asked what a language
 model would be thinking there, no activation (the source repo's `prompt_only_summary`, k=1,
 T=1.0, one generation per prompt position replicated into every layer file). The summaries are
-judged by each family's own instrument at one layer (`wsbench run ... layers=20`; identical rows
+judged by each family's own instrument at one layer (`wsbench run ... layers=44`; identical rows
 across layers make any-layer equal per-layer), and `wsbench freeze kind=prompt_only` records the
 rate with the judge model and prompt version. Not item-blind: a floor, never a competitor lens.
 Whatever a lens scores above it needed the activation.
 
-Covered: the six single-token basics, directed_modulation and the six multi-token families (13);
-the prompt-only readouts exist for those banks only. Entries carry `complete: false` by
-construction, because judging one layer is a layer subset of the family's grid.
+Covered: every family except the two whose judge is pinned to Claude (`jailbreak_recognition`,
+`agentic_misalignment`) and the one exclusion below — 24 of the 27. Entries carry
+`complete: false` by construction, because judging one layer is a layer subset of the family's
+grid. The nominal layer is 44, except `buggy_code` and `arithmetic_intermediates`, whose
+activations were captured at layers 56/60, so their readouts are labelled 56 and judged there.
+`role_bound_association` reads the top-up capture, which holds all 100 items (the set the lens
+arms read holds 20), so its floor covers the whole bank while an arm's rate may not.
+
+**Some families answer themselves from the prompt text**, so their number is a ceiling on what
+the text gives away, not a floor a lens must clear. Read those rates as "how much of this is in
+the text" and use the family's own null instead; their READMEs say so too.
+
+| family | prompt-only | why it saturates |
+|---|---|---|
+| role_bound_association | 1.00 | the scene states who did what to whom, so a summary of the text answers all three questions |
+| brew_intermediates | 0.96 | the rule table and the start colour are both in the prompt |
+| relational_multihop | 0.82 | the cloze states both hops |
+| buggy_code | 0.04 `net_S2` | the program IS the prompt; `net_S2` carries its own floor in the clean twins |
+| arithmetic_intermediates | 0.15 | the stock model can evaluate the expression |
+| chain_intermediates | 0.03 | computable in principle, but the summaries rarely state an intermediate |
+
+The rest are floors in the intended sense: `user_modeling` 0.07, `conjunctive_association` 0.07,
+`moral_rationale` 0.50, `hallucination` 0.53 (a rate, lower is better: what a prompt-only
+description invents about the conversation) and `jlens_concept_pr` 0.19 precision against the
+J-lens top-10.
 
 Excluded: multi_concept_directed_modulation. Its prompt dictates the concepts ("Think about the
 plumber's blue ladder ..."), so the stock model names them every time (measured 1.0) and the
