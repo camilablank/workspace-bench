@@ -199,8 +199,8 @@ Working in a git worktree that shares the main checkout's `.venv`: prefix comman
 - *Judged by:* the judge copies verbatim spans from each readout and types them wrong / off-topic; any verified wrong span = hallucinated; headline = hallucination rate over specific readouts (lower is better). A second call per cell, given those wrong spans as established false, counts the readout's other claims as true / unverifiable against the transcript (`extras`, not the headline).
 
 **J-lens concept precision** — [`evals/jlens_concept_pr/README.md`](evals/jlens_concept_pr/README.md)
-- *What it is:* Do the lens's stated concepts agree with the J-lens top-10 tokens at the same activation (precision, the headline), and does it cover them (recall@10, reported in `extras`).
-- *Example:* item `chat-lmsys-0000`, read at the `,` after "French" in "covering widely spoken languages such as Chinese, English, French,"; J-lens top-10 at L44 = ` languages`, `languages`, `日本語`, `多国`, ` Chinese`, ` Languages`, `Languages`, `语种`, `中国的`, `language` → a readout whose concepts are {languages, Chinese, Japanese, multilingual} scores high precision; "AI assistant" or "help" in the same readout count against it.
+- *What it is:* Do the lens's stated concepts agree with the J-lens top-50 tokens at the same activation (precision, the headline), and does it cover the top-10 (recall@10, reported in `extras`).
+- *Example:* item `chat-lmsys-0000`, read at the `,` after "French" in "covering widely spoken languages such as Chinese, English, French,"; J-lens top-50 at L44 begins ` languages`, `languages`, `日本語`, `多国`, ` Chinese`, ` Languages`, `Languages`, `语种`, `中国的`, `language` (these ten are the recall set) → a readout whose concepts are {languages, Chinese, Japanese, multilingual} scores high precision; "AI assistant" or "help" in the same readout count against it.
 - *Judged by:* Stage A splits samples into concepts; Stage P grades each concept against the token set in / partial / out; precision = mean grade over all concepts; recall@10 = expected best grade over a 10-concept subset.
 
 ### Logical processing
@@ -242,7 +242,7 @@ version.
 | directed_modulation | google/gemini-3.8-flash | dm-2026-09-16 |
 | hallucination | google/gemini-3.8-flash | v5c-chat |
 | jailbreak_recognition | claude-sonnet-5 | jb-v1 |
-| jlens_concept_pr | google/gemini-3.8-flash | jlens-pr-v2 |
+| jlens_concept_pr | google/gemini-3.8-flash | jlens-pr-v3 |
 | moral_rationale | google/gemini-3.8-flash | ec-v1 |
 | multi_concept_directed_modulation | google/gemini-3.8-flash | mcdm-2026-09-16 |
 | multihop | google/gemini-3.8-flash | bank-2026-09-16 |
@@ -312,8 +312,8 @@ verdicts in `<out>/<family>/cells.jsonl`, so a re-run only pays for what is miss
   SynthSysPre system prompts from their release; see that release for its data terms.
 - **J-lens** — *Verbalizable Representations Form a Global Workspace in Language Models*
   (Anthropic / Transformer Circuits, 2026, arXiv:2607.15495); code `anthropics/jacobian-lens`
-  (Apache-2.0); reference top-10 tokens from the `neuronpedia/jacobian-lens` n1000 wikitext
-  artifact.
+  (Apache-2.0); reference top-50 tokens (top-10 until `jlens-pr-v3`) from the
+  `neuronpedia/jacobian-lens` n1000 wikitext artifact.
 - **Chat and text corpora** — LMSYS-Chat-1M (Zheng et al. 2023, HF `lmsys/lmsys-chat-1m`; the
   LMSYS-Chat-1M Dataset License Agreement), DailyDialog (Li et al. 2017, HF `ConvLab/dailydialog`;
   CC BY-NC-SA 4.0), `NeelNanda/pile-10k` and `HuggingFaceFW/fineweb-edu` sample-10BT (ODC-BY):

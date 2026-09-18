@@ -1,4 +1,4 @@
-"""J-lens concept precision: how much of an AO arm's prose is supported by the J-lens top-10."""
+"""J-lens concept precision: how much of an AO arm's prose is supported by the J-lens top-50."""
 
 from pathlib import Path
 

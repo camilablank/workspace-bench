@@ -523,6 +523,16 @@ def test_compare_parity_families(tmp_path):
         "recall_at_10": 0.51
     }
 
+    # jlens-pr-v3 (top-50 precision) never compares against a top-10 summary
+    v3 = _results("jlens_concept_pr", [], 0.45, {"recall_at_10": 0.51, "precision_k": 50})
+    with pytest.raises(ValueError, match="precision_k"):
+        js.compare("jlens_concept_pr", v3, jl)
+    jl50 = _write_json(
+        tmp_path / "jl50.json",
+        {"precision_k": 50, "arms": {"s3d": {"by_layer": {"44": {"precision": 0.44}}}}},
+    )
+    assert js.compare("jlens_concept_pr", v3, jl50)["headline"]["baseline"] == pytest.approx(0.44)
+
     am = _write_json(tmp_path / "am.json", {"headline": {"design_score": 0.57}})
     out = js.compare("agentic_misalignment", _results("agentic_misalignment", [], 0.6), am)
     assert out["baseline_model"] == "claude-sonnet-5"
