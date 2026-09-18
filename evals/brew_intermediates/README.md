@@ -53,7 +53,10 @@ with no lift; the option keeps the full grid one flag away.
   `cell_off_rate` the per-region cell rates, `cell_primary_gold_rate` the judge's single
   `primary` pick per cell, and the lucky-guessing baseline covers the option lists (it asks
   whether the five colours themselves give the intermediate away; its scale is one guess per
-  cell, so `cell_primary_gold_rate` is what it compares with). The source repo's caveat stands:
+  cell, so `cell_primary_gold_rate` is what it compares with). The prompt-only baseline is NOT a
+  floor here: the table and the start colour are in the prompt, so the stock model computes the
+  intermediate (measured 0.96) — read it as what the text gives away and use `baseline` / `null`
+  instead. The source repo's caveat stands:
   the intermediate is usually the model's runner-up answer colour, so this bank cannot separate
   a held step from a runner-up output.
 - An item whose emission cells are all judged is decided (an empty cell names nothing); any
