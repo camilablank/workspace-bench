@@ -71,14 +71,69 @@ guesser's shape heuristics are anti-correlated with the gold there, not a bug.
 Stock Qwen3.6-27B given the exact prompt text up to the read token and asked what a language
 model would be thinking there, no activation (the source repo's `prompt_only_summary`, k=1,
 T=1.0, one generation per prompt position replicated into every layer file). The summaries are
-judged by each family's own instrument at one layer (`wsbench run ... layers=20`; identical rows
-across layers make any-layer equal per-layer), and `wsbench freeze kind=prompt_only` records the
-rate with the judge model and prompt version. Not item-blind: a floor, never a competitor lens.
-Whatever a lens scores above it needed the activation.
+judged by each family's own instrument at ONE layer (identical rows across layers make any-layer
+equal per-layer), and `wsbench freeze kind=prompt_only` records the rate with the judge model
+and prompt version. Not item-blind: a floor, never a competitor lens.
 
-Covered: the six single-token basics, directed_modulation and the six multi-token families (13);
-the prompt-only readouts exist for those banks only. Entries carry `complete: false` by
-construction, because judging one layer is a layer subset of the family's grid.
+Covered: 24 of the 27 families. Not measured: `jailbreak_recognition` and
+`agentic_misalignment`, whose judges are pinned to Claude Sonnet 5, and the exclusion at the
+bottom. Entries carry `complete: false` by construction, because judging one layer is a layer
+subset of the family's grid.
+
+**The judged layer differs by vintage** and is recorded per entry in `layers_judged` for the
+families that report it (seven do not; for those the run's nominal layer is the only record):
+
+| entry | judged at | why |
+|---|---|---|
+| the 13 frozen 2026-09-16 (basics, directed_modulation, the multi-token six) | 20 | the layer their generation replicated |
+| the nine frozen 2026-09-18 | 44 | the nominal layer of that generation |
+| `buggy_code`, `arithmetic_intermediates` | 56 | their activations were captured at layers 56/60 only |
+
+`role_bound_association` reads the top-up capture, the only one holding all 100 items, so its
+number covers the whole bank while a lens arm reading the 20-item capture does not.
+
+### Two different reasons a prompt-only number is not a bar
+
+*Saturated* — the prompt states or dictates the answer, so the rate is pinned near the ceiling
+and says nothing about a lens. These carry `saturated: true` and `wsbench report` marks them
+instead of drawing them as a floor; compare the family's own null instead.
+
+| family | prompt-only | why |
+|---|---|---|
+| role_bound_association | 1.00 | the scene states who did what to whom, so a summary of it answers all three questions |
+| typo | 1.00 | the correction is recoverable from the misspelling (its README already says so) |
+| brew_intermediates | 0.96 (92 of 96 decided items) | the rule table and the start colour are both in the prompt |
+| relational_multihop | 0.82 | the cloze states both hops |
+
+*Not item-blind but informative* — the answer is derivable from the prompt, yet the stock model
+rarely states it, so the rate IS the family's measured floor and is the only one those families
+have: `arithmetic_intermediates` 0.15, `buggy_code` 0.04 `net_S2` (which also carries its own
+floor in the clean twins), `chain_intermediates` 0.03.
+
+The remaining new entries behave as intended floors: `user_modeling` 0.07,
+`conjunctive_association` 0.07, `moral_rationale` 0.50, `hallucination` 0.53 (a rate, **lower is
+better**: what a prompt-only description invents about the conversation) and `jlens_concept_pr`
+0.19 precision against the J-lens top-10. The 13 entries frozen 2026-09-16 are pass rates, some
+of them high for the same text-leakage reason (`multihop` 0.90, `multilingual` 0.76,
+`basic_readout` 0.72, `poetry` 0.71): the two groups above are the flagged cases, not a claim
+that every other entry is a clean bar.
+
+### Reading one of these numbers
+
+- **Clearing the floor is not the same as clearing chance.** Two floors sit below their family's
+  analytic chance line (`user_modeling` 0.07 against 1/6, `conjunctive_association` 0.07 against
+  1/11), because a prompt-only summary commits to a wrong option rather than abstaining. Read a
+  lens against both.
+- **Not every column is a pass rate.** `hallucination` is lower-is-better, `jlens_concept_pr` is
+  a precision and `buggy_code` is a net difference. `report` labels those.
+- **The summaries are capped at 256 new tokens** (the sampling of the first vintage, kept so the
+  two vintages are one instrument), and 40-73% of them are cut mid-sentence, most often on the
+  long prompts (scenes, whole programs, rule tables). That biases every rate here DOWN.
+- **An empty generation counts as a miss.** `arithmetic_intermediates` has 138 empty cells of
+  596; on non-empty cells its rate is 0.20 rather than 0.153.
+- `_source` describes the LATEST generation (model, adapter, prompt kind and template,
+  sampling). The per-entry `instrument`, `judge_model` and `layers_judged` are what a given rate
+  belongs to.
 
 Excluded: multi_concept_directed_modulation. Its prompt dictates the concepts ("Think about the
 plumber's blue ladder ..."), so the stock model names them every time (measured 1.0) and the

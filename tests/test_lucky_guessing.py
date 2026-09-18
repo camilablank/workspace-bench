@@ -349,10 +349,31 @@ def test_report_floor_columns(tmp_path, monkeypatch):
     monkeypatch.setattr(lg, "floors", lambda: {"typo_mt": {"blind": {"mean": 0.5}}})
     from wsbench.baselines import prompt_only as po
 
-    monkeypatch.setattr(po, "floors", lambda: {"typo_mt": {"rate": 0.25}})
+    monkeypatch.setattr(
+        po,
+        "floors",
+        lambda: {
+            "typo_mt": {"rate": 0.25, "metric": "pass_rate", "higher_is_better": True},
+            "typo": {"rate": 1.0, "metric": "pass_rate", "higher_is_better": True},
+            "hallucination": {
+                "rate": 0.53,
+                "metric": "hallucination_rate",
+                "higher_is_better": False,
+            },
+            "jlens_concept_pr": {
+                "rate": 0.19,
+                "metric": "precision",
+                "higher_is_better": True,
+            },
+        },
+    )
     cols = floor_columns()
     assert cols["lucky guess (blind / described)"]["typo_mt"] == "0.500 / —"
     assert cols["prompt-only"]["typo_mt"] == "0.250"
+    # a family the prompt answers itself is marked, and a metric that is not a pass rate says so
+    assert cols["prompt-only"]["typo"] == "1.000 saturated"
+    assert cols["prompt-only"]["hallucination"] == "0.530 (lower is better)"
+    assert cols["prompt-only"]["jlens_concept_pr"] == "0.190 (precision)"
     table = markdown_table([], {"value": None, "families": [], "excluded": []}, floors=cols)
     head = table.splitlines()[0]
     assert "| lucky guess (blind / described) | prompt-only |" in head

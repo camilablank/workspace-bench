@@ -16,7 +16,24 @@ FROZEN = REPO_ROOT / "evals" / "baselines" / "prompt_only.json"
 EXCLUDED: dict[str, str] = {
     "multi_concept_directed_modulation": "the prompt dictates the concepts; prompt-only is 1.0"
 }
-SOURCE_KEYS = ("model", "adapter", "prompt_kind", "prompt_template", "sampling", "layers")
+SOURCE_KEYS = (
+    "model",
+    "base_model",
+    "adapter",
+    "prompt_kind",
+    "prompt_template",
+    "sampling",
+    "layers",
+)
+# Families whose prompt text states or dictates the answer, so the rate is pinned high and
+# bounds what the text gives away, not what a lens must clear. `report` marks these instead of
+# drawing them as a bar; the comparison there is the family's own null (see the README).
+SATURATED: dict[str, str] = {
+    "role_bound_association": "the scene states who did what to whom",
+    "relational_multihop": "the cloze states both hops",
+    "brew_intermediates": "the rule table and the start colour are in the prompt",
+    "typo": "the correction is recoverable from the misspelling",
+}
 
 
 def instrument_versions() -> dict[str, str]:
@@ -50,6 +67,7 @@ def freeze(run_dir: Path, dst: Path = FROZEN, *, source: Path | None = None) -> 
             )
         frozen[r.family] = {
             "rate": r.value,
+            "saturated": r.family in SATURATED,
             "ci95": list(r.ci95) if r.ci95 else None,
             "metric": r.metric,
             "higher_is_better": r.higher_is_better,

@@ -40,6 +40,9 @@ subset, so `complete` is false for such a run).
   `extras.per_stratum` splits it by consequence class and language group; `anti_rate_buggy`,
   `corrective_rate_buggy` and the rung counts per source are beside it. No regex or numeric
   matcher anywhere (the source's value matcher false-positived on small integers and stays out).
+- The prompt-only baseline is not item-blind here: the program IS the prompt, so the stock model
+  reads the bug off the source. Its `net_S2` bounds what the text gives away, not what a lens
+  must clear; `net_S2` already carries its own floor in the clean twins.
 - The source docs' pairwise blind pick (chance 0.5) is not used: only 10 of the 25 buggy
   programs have an exact clean twin, too few pairs for a usable interval.
 - An item whose cell is empty is S0; an unjudged cell leaves its item out of both rates. Missing

@@ -316,7 +316,14 @@ def floor_columns() -> dict[str, dict[str, str]]:
         fam: f"{f(e.get('blind', {}).get('mean'))} / {f(e.get('described', {}).get('mean'))}"
         for fam, e in lucky_guessing.floors().items()
     }
-    po = {fam: f(e.get("rate")) for fam, e in prompt_only.floors().items()}
+    po = {}
+    for fam, e in prompt_only.floors().items():
+        note = " saturated" if fam in prompt_only.SATURATED else ""
+        if e.get("higher_is_better") is False:
+            note += " (lower is better)"
+        elif e.get("metric") not in (None, "pass_rate"):
+            note += f" ({e['metric']})"
+        po[fam] = f(e.get("rate")) + note
     return {"lucky guess (blind / described)": lucky, "prompt-only": po}
 
 
