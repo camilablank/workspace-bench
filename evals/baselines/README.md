@@ -112,7 +112,8 @@ have: `arithmetic_intermediates` 0.15, `buggy_code` 0.04 `net_S2` (which also ca
 floor in the clean twins), `chain_intermediates` 0.03.
 
 The remaining new entries behave as intended floors: `user_modeling` 0.07,
-`conjunctive_association` 0.07 and `moral_rationale` 0.50. The 13 entries frozen 2026-09-16 are pass rates, some
+`conjunctive_association` 0.07 and `moral_rationale` 0.50. The 13 entries frozen 2026-09-16 are
+pass rates, some
 of them high for the same text-leakage reason (`multihop` 0.90, `multilingual` 0.76,
 `basic_readout` 0.72, `poetry` 0.71): the two groups above are the flagged cases, not a claim
 that every other entry is a clean bar.
