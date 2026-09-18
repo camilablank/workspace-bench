@@ -1,5 +1,6 @@
 {
  "_source": {
+  "base_model": "Qwen/Qwen3.6-27B",
   "adapter": null,
   "prompt_kind": "prompt_only_summary",
   "prompt_template": "Below is a prompt that was given to a language model, cut off at a specific token. The token in question is the final token of the text below: {token!r}.\n\n<prompt>\n{prefix}\n</prompt>\n\nWhat would a language model be thinking about on this token? Please write me a summary for this token.",
@@ -327,6 +328,7 @@
  },
  "arithmetic_intermediates": {
   "rate": 0.1527777777777778,
+  "saturated": false,
   "ci95": [
    0.12152777777777778,
    0.18229166666666666
@@ -347,10 +349,11 @@
    56
   ],
   "complete": false,
-  "written": "2026-09-18T07:26:00+00:00"
+  "written": "2026-09-18T07:39:55+00:00"
  },
  "brew_intermediates": {
   "rate": 0.9583333333333334,
+  "saturated": true,
   "ci95": [
    0.9166666666666666,
    0.9895833333333334
@@ -371,10 +374,11 @@
    44
   ],
   "complete": false,
-  "written": "2026-09-18T07:26:00+00:00"
+  "written": "2026-09-18T07:39:55+00:00"
  },
  "buggy_code": {
   "rate": 0.04,
+  "saturated": false,
   "ci95": [
    0.0,
    0.12
@@ -395,10 +399,11 @@
    56
   ],
   "complete": false,
-  "written": "2026-09-18T07:26:00+00:00"
+  "written": "2026-09-18T07:39:55+00:00"
  },
  "chain_intermediates": {
   "rate": 0.025210084033613446,
+  "saturated": false,
   "ci95": [
    0.0,
    0.058823529411764705
@@ -419,10 +424,11 @@
    44
   ],
   "complete": false,
-  "written": "2026-09-18T07:26:00+00:00"
+  "written": "2026-09-18T07:39:55+00:00"
  },
  "conjunctive_association": {
   "rate": 0.07,
+  "saturated": false,
   "ci95": [
    0.02,
    0.13
@@ -441,10 +447,11 @@
   "instrument": "comp-v1",
   "layers_judged": null,
   "complete": false,
-  "written": "2026-09-18T07:26:00+00:00"
+  "written": "2026-09-18T07:39:55+00:00"
  },
  "hallucination": {
   "rate": 0.5340572556762093,
+  "saturated": false,
   "ci95": [
    0.501980198019802,
    0.5648780487804878
@@ -463,10 +470,11 @@
   "instrument": "v5c-chat",
   "layers_judged": null,
   "complete": false,
-  "written": "2026-09-18T07:26:00+00:00"
+  "written": "2026-09-18T07:39:55+00:00"
  },
  "jlens_concept_pr": {
   "rate": 0.18950135298508042,
+  "saturated": false,
   "ci95": [
    0.17513962021481352,
    0.20511814463571404
@@ -485,10 +493,11 @@
   "instrument": "jlens-pr-v2",
   "layers_judged": null,
   "complete": false,
-  "written": "2026-09-18T07:26:00+00:00"
+  "written": "2026-09-18T07:39:55+00:00"
  },
  "moral_rationale": {
   "rate": 0.495,
+  "saturated": false,
   "ci95": [
    0.43,
    0.565
@@ -507,10 +516,11 @@
   "instrument": "ec-v1",
   "layers_judged": null,
   "complete": false,
-  "written": "2026-09-18T07:26:00+00:00"
+  "written": "2026-09-18T07:39:55+00:00"
  },
  "relational_multihop": {
   "rate": 0.82,
+  "saturated": true,
   "ci95": [
    0.74,
    0.89
@@ -529,10 +539,11 @@
   "instrument": "rel-v1",
   "layers_judged": null,
   "complete": false,
-  "written": "2026-09-18T07:26:00+00:00"
+  "written": "2026-09-18T07:39:55+00:00"
  },
  "role_bound_association": {
   "rate": 1.0,
+  "saturated": true,
   "ci95": [
    1.0,
    1.0
@@ -551,10 +562,11 @@
   "instrument": "oa-v1",
   "layers_judged": null,
   "complete": false,
-  "written": "2026-09-18T07:26:00+00:00"
+  "written": "2026-09-18T07:39:55+00:00"
  },
  "user_modeling": {
   "rate": 0.07,
+  "saturated": false,
   "ci95": [
    0.03,
    0.12
@@ -573,6 +585,6 @@
   "instrument": "um-v2",
   "layers_judged": null,
   "complete": false,
-  "written": "2026-09-18T07:26:00+00:00"
+  "written": "2026-09-18T07:39:55+00:00"
  }
 }

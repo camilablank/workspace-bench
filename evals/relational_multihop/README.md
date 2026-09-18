@@ -16,6 +16,8 @@ Avery's ___") — read at its blank; does the lens hold the composed relation in
 - **Metric:** `pass_rate` = passing items / items in scope; bootstrap CI over items.
   `chance = None`; per cell 1/121; the any-of-layers floor `1-(120/121)^n_layers` is reported in
   `extras.any_of_layers_floor`.
+- **The prompt-only baseline measures 0.82**, because the cloze states both hops in the text;
+  it bounds what the prompt gives away, not what a lens must clear.
 - **Judge:** `google/gemini-3.8-flash`, `PROMPT_VERSION = "rel-v1"`.
 
 ## Judge prompts
