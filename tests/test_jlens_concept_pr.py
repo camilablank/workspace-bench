@@ -654,13 +654,14 @@ def test_k50_reference_rows_extend_the_frozen_top10_byte_for_byte() -> None:
         }
 
 
-def test_reference_row_shorter_than_precision_k_is_refused(tmp_path, monkeypatch) -> None:
+def test_reference_row_shorter_than_precision_k_is_refused(tmp_path, monkeypatch, capsys) -> None:
     (tmp_path / "x").mkdir()
     row = {"label": "x", "layer": 44, "pos": 3, "samples": [" a"] * 10, "scores": [1.0] * 10}
     (tmp_path / "x" / "L044.jsonl").write_text(json.dumps(row) + "\n", encoding="utf-8")
     monkeypatch.setattr(jj, "REF_DIR", tmp_path)
-    with pytest.raises(SystemExit, match="expected 50"):
+    with pytest.raises(SystemExit) as exc:
         jj.reference_tokens("x", 44, 3)
+    assert exc.value.code == 2 and "expected 50" in capsys.readouterr().out
 
 
 def test_stage_b_reads_the_top10_and_stage_p_the_top50(tmp_path, fake_llm, jargs):
@@ -724,21 +725,25 @@ def test_precision_only_cell_scores_precision_from_the_top50() -> None:
     assert status == "ok" and math.isnan(s.precision) and math.isnan(s.recall_at_m)
 
 
-def test_short_reference_row_exits_2_before_any_call(tmp_path, monkeypatch, jargs):
+@pytest.mark.parametrize("stale", ["in_scope", "foil_partner_out_of_scope"])
+def test_short_reference_row_exits_2_before_any_call(tmp_path, monkeypatch, jargs, stale):
     monkeypatch.setattr("wsbench.llm._make_client", lambda r, k: pytest.fail("no client"))
+    fmap = jj.foil_map(jj.manifest_items(jj.load_manifest()))
+    partner = next(fmap[lab] for lab in LABELS if fmap[lab] not in LABELS)
+    target = LABELS[1] if stale == "in_scope" else partner
     ref = tmp_path / "ref"
-    for lab in LABELS:
+    for lab in {*LABELS, *(fmap[x] for x in LABELS)}:
         for layer in (44, 48):
             src = jj.REF_DIR / lab / f"L{layer:03d}.jsonl"
             row = json.loads(src.read_text(encoding="utf-8").splitlines()[0])
-            if lab == LABELS[1] and layer == 44:
+            if lab == target and layer == 44:
                 row["samples"] = row["samples"][:10]  # a stale top-10 row
             (ref / lab).mkdir(parents=True, exist_ok=True)
             (ref / lab / f"L{layer:03d}.jsonl").write_text(json.dumps(row) + "\n")
     monkeypatch.setattr(jj, "REF_DIR", ref)
     with pytest.raises(SystemExit) as exc:
-        jj.run(jargs(EXAMPLE, items=LABELS))
-    assert exc.value.code == 2
+        jj.run(jj_args := jargs(EXAMPLE, items=LABELS))
+    assert exc.value.code == 2 and not (jj_args.out / "cells.jsonl").exists()
 
 
 def test_stage_a_and_b_cache_rows_carry_the_v2_fingerprint(tmp_path, fake_llm, jargs):
@@ -759,3 +764,68 @@ def test_stage_a_and_b_cache_rows_carry_the_v2_fingerprint(tmp_path, fake_llm, j
     for kw in st["P"]:
         system, user = kw["messages"][0]["content"], kw["messages"][1]["content"]
         assert fingerprint("jlens-pr-v3", model, reasoning, 0.0, system, user) in fps
+
+
+PRECISION_ONLY = ("chat-dailydialog-0043", 60, 32)  # no content in the top-10, some in 11-50
+
+
+def test_precision_only_cell_end_to_end(tmp_path, fake_llm, jargs):
+    """A real reference cell with content only in ranks 11-50 gets a Stage P call and a real
+    precision; recall is NaN (null in the row); status ok."""
+    lab, layer, pos = PRECISION_ONLY
+    toks = jj.reference_tokens(lab, layer, pos)
+    assert not any(is_content_token(t) for t in toks[:10])
+    content = [t for t in toks if is_content_token(t)]
+    readouts = write_jsonl(
+        tmp_path / "r.jsonl", [{"id": lab, "layer": layer, "pos": pos, "samples": ["a metaphor"]}]
+    )
+    fake = fake_llm(_responder)
+    res = jj.run(jargs(readouts, items=[lab]))
+    st = _stage_calls(fake)
+    assert len(st["P"]) == 1
+    assert st["P"][0]["messages"][1]["content"].startswith(f"Tokens: {content[0]!r}")
+    b_tokens = {kw["messages"][1]["content"].split("\n", 1)[0] for kw in st["B"]}
+    assert all(f"Token: {t!r}" not in b_tokens for t in toks[:10])  # no real Stage B call
+    row = res.rows[0]
+    assert row["status"] == "ok" and row["n_content_tokens"] == 0
+    assert row["n_precision_content_tokens"] == len(content) > 0
+    assert row["precision"] == pytest.approx(0.5) and row["recall_at_10"] is None
+    assert res.value == pytest.approx(0.5)
+
+
+def test_score_books_missing_p_for_a_precision_only_cell_without_support(jargs):
+    """score(): support_expected follows the precision set, not the recall set."""
+    top10 = [";"] * 10
+    top50 = top10 + [" word"] * 40
+    ci = ss.CellInput(
+        key="x__L044__p3",
+        id="x",
+        layer=44,
+        pos=3,
+        family="chat",
+        has_text=True,
+        n_text_tokens=3,
+        concepts=["a", "b"],
+        tokens=top10,
+        foil_tokens=None,
+        precision_tokens=top50,
+    )
+    kw = {
+        "layers": [44],
+        "grids": {"b": {}, "foil": {}},
+        "reject_rate": {},
+        "counts_base": {
+            "n_expected_cells": 1,
+            "n_missing_cells": 0,
+            "n_empty_cells": 0,
+            "skipped_rows": 0,
+            "spend_usd": 0.0,
+        },
+        "config": {"precision_k": 50, "recall_k": 10},
+    }
+    args = jargs(EXAMPLE)
+    with_p = ss.score(args, [ci], support={"p": {ci.key: [1.0, 0.0]}, "pfoil": {}}, **kw)
+    assert with_p.rows[0]["status"] == "ok" and with_p.rows[0]["precision"] == pytest.approx(0.5)
+    assert with_p.rows[0]["recall_at_10"] is None
+    without = ss.score(args, [ci], support={"p": {}, "pfoil": {}}, **kw)
+    assert without.rows[0]["status"] == "missing_p" and without.rows[0]["precision"] is None

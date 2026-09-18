@@ -171,11 +171,13 @@ def reference_tokens(label: str, layer: int, pos: int) -> list[str]:
     absent. Recall reads ``[:RECALL_K]`` of this list, precision ``[:PRECISION_K]``."""
     toks = _reference_row(label, layer, pos)
     if toks and len(toks) < PRECISION_K:
-        # a top-10 file here would silently score precision against the top-10
-        raise SystemExit(
+        # a top-10 file here would silently score precision against the top-10 (``run`` checks
+        # every row it will read before any call; this is the backstop for other callers)
+        print(
             f"[{FAMILY}] {reference_path(label, layer)}: {len(toks)} reference tokens, "
             f"expected {PRECISION_K}"
         )
+        raise SystemExit(2)
     return toks[:PRECISION_K]
 
 
@@ -238,15 +240,20 @@ def run(args: JudgeArgs) -> FamilyResult:
         print(f"[{FAMILY}] judges prose readouts only (the J-lens is the reference, not an arm)")
         raise SystemExit(2)
     layers = sorted(args.layers) if args.layers else rep.layers
-    bad = sorted({L for L in layers for it in scope if not reference_path(it["id"], L).exists()})
+    fmap = foil_map(items)
+    # every row the run will read: the in-scope items and their foil partners (a partner can sit
+    # outside an ``items=`` / ``limit=`` scope)
+    in_scope = {it["id"] for it in scope}
+    to_read = sorted(in_scope | {fmap[i] for i in in_scope if i in fmap})
+    bad = sorted({L for L in layers for lab in to_read if not reference_path(lab, L).exists()})
     if bad:
         print(f"[{FAMILY}] no reference J-lens file for layers {bad} under {REF_DIR}")
         raise SystemExit(2)
     short = [
-        f"{it['id']}/L{L:03d}"
+        f"{lab}/L{L:03d}"
         for L in layers
-        for it in scope
-        if 0 < len(_reference_row(it["id"], L, it["pos"])) < PRECISION_K
+        for lab in to_read
+        if 0 < len(_reference_row(lab, L, pos_of[lab])) < PRECISION_K
     ]
     if short:  # before any call: a top-10 row would grade precision against the top-10
         print(
@@ -268,7 +275,6 @@ def run(args: JudgeArgs) -> FamilyResult:
         )
         if not args.allow_missing and not args.dry_run:
             raise SystemExit(2)
-    fmap = foil_map(items)
     pfoil = args.extra.get("stage_p_foil") == "1"
     ref_cache: dict[tuple[str, int], list[str]] = {}
 
