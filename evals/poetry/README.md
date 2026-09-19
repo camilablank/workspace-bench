@@ -5,6 +5,12 @@ word. 100 items, plain render, one read position.
 
 Example: "A rhyming couplet: The captain pointed at the route ahead, And told his crew to follow where he'd" -> target `led`.
 
+**Model-specific.** The scored latent is the rhyme word THIS model commits to. Measured with
+`wsbench capable` at 5 draws: Gemini 3.8 Flash and DeepSeek V4 Pro each commit to the bank's word
+on 98 of 100 items, but both answer *June* where Qwen3.6-27B commits *noon* (`b3-po-tune-june`),
+and each drifts to a near-rhyme on one more item. Re-gate before reading this bank on another
+model; AGENTS.md has the procedure.
+
 ## Scoring
 
 - **Headline: judged pass rate.** One judge call per (item, layer) sees every position's

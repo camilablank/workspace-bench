@@ -68,6 +68,27 @@ any re-capture needs the new model's tokenizer. And the prompt-only and lucky-gu
 `evals/baselines/` were measured with Qwen3.6-27B and Gemini 3.8 Flash; re-measure them if you
 change either.
 
+## Measured: two other models on the two model-specific families
+
+`wsbench capable draws=5`, graded by Gemini 3.8 Flash. `bank` is the rate the bank recorded for
+Qwen3.6-27B on the same items.
+
+| family | Gemini 3.8 Flash | DeepSeek V4 Pro | bank (Qwen) |
+|---|---|---|---|
+| poetry | gate 0.98, greedy 0.99 | gate 0.98, greedy 0.98 | 0.94 |
+| moral_rationale (agreement with the side the bank recorded) | gate 0.50, greedy 0.66 | gate 0.66, greedy 0.75 | 0.89 |
+
+**Poetry ports better than expected.** Both models commit to the bank's rhyme on 98 of 100
+items. The exceptions are the interesting part: on `b3-po-tune-june` both answer *June* where
+Qwen commits *noon*, and each model drifts on one more item (`couplet-hold-old` for Gemini,
+`couplet-star-far` for DeepSeek, both answering a near-rhyme). Those items score the wrong target
+on the new model and need their rhyme re-gated; the rest of the bank is usable.
+
+**Moral rationale does not port.** Gemini takes the other side of the ethical question on 68 of
+200 items and DeepSeek on 50. Every one of those items' YES-side and NO-side reasons was written
+for the side Qwen took, so the family cannot be read on either model until the reasons are
+rewritten per item. This is the family to fix first when porting.
+
 ## Sanity checks before you trust a number
 
 1. `wsbench list` — families, item counts, calls per arm.
