@@ -220,6 +220,23 @@ by each family's own instrument).
 `wsbench baseline` measures, `wsbench freeze` records, `wsbench report` draws the floors beside
 each family.
 
+## Porting to another model
+
+Every bank was gated on Qwen3.6-27B: the model does the task before a lens is asked to read it.
+`wsbench capable model=<openrouter-model>` re-runs that gate on any model — it asks each bank's
+own question, grades the answers with the repo judge, and reports the share of items answered
+right in at least 8 of 10 draws:
+
+```
+wsbench capable model=google/gemini-3.8-flash families=poetry,moral_rationale draws=10
+```
+
+Two families are model-specific by construction and must be re-gated rather than re-scored:
+**poetry**, whose scored latent is the rhyme word this model would commit to, and
+**moral_rationale**, whose per-item reasons are written for the side this model takes.
+[AGENTS.md](AGENTS.md) has the per-family table, the sanity checks to run before trusting a
+number, and what has made an item harder so far.
+
 ## Judges
 
 Every family runs on `google/gemini-3.8-flash` except two pins: **agentic_misalignment** stays on

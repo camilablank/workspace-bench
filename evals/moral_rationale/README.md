@@ -16,6 +16,10 @@ or (for deliberative items) both the YES-side and the NO-side reason?
   bootstrap over item pass indicators. `chance = None`; per call 1/6 (committed) and 1/36
   (deliberative). The any-of-grid floors in `extras.any_of_grid_floor` saturate (0.99 at 18-60
   sites per item) and must not be quoted as a floor.
+- **Model-specific, more than any other family.** Each item's YES-side and NO-side reasons are
+  written for the side Qwen3.6-27B took. `wsbench capable` measured the other side being taken on
+  68 of 200 items by Gemini 3.8 Flash and 50 of 200 by DeepSeek V4 Pro, so those items' reasons
+  have to be rewritten before the family means anything on another model.
 - **Judge:** `google/gemini-3.8-flash`, `PROMPT_VERSION = "ec-v1"`.
 
 ## Judge prompts

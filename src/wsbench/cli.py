@@ -12,6 +12,8 @@ import pydra
 
 from wsbench import registry, runner
 from wsbench.baselines import lucky_guessing, prompt_only
+from wsbench.capable import questions as capable_questions
+from wsbench.capable import run as capable_run
 from wsbench.judge_config import JudgeConfig, resolve
 from wsbench.llm import JudgeConfigError
 from wsbench.readouts import convert_gen_dir, convert_read_json
@@ -404,6 +406,100 @@ class Baseline(Command):
         return 0
 
 
+class Capable(Command):
+    """Ask a model the banks' own questions and grade its answers: the gate a bank was built
+    with, re-run on another model. A family whose rate drops has to be re-gated before its
+    readouts mean anything on that model (AGENTS.md)."""
+
+    def __init__(self) -> None:
+        super().__init__()
+        self.model = pydra.REQUIRED
+        self.families = "all"
+        self.draws = capable_run.DEFAULT_DRAWS
+        self.temperature = capable_run.DEFAULT_TEMPERATURE
+        self.threshold = 0.0  # 0 = each family's own gate (10/10 for two of them)
+        self.greedy = True
+        self.reasoning_effort = capable_run.DEFAULT_REASONING_EFFORT
+        self.limit = 0
+        self.judge_model = ""
+        self.concurrency = 64
+        self.rpm = 240.0
+        self.dry_run = False
+        self.out = ""
+
+    def finalize(self) -> None:
+        self.model = str(self.model)
+        self.families = _strs(self.families) or ["all"]
+        self.draws = _int(self.draws)
+        self.temperature = float(self.temperature)
+        self.threshold = float(self.threshold) or None
+        self.greedy = _bool(self.greedy)
+        self.reasoning_effort = str(self.reasoning_effort or "") or None
+        self.limit = _int(self.limit)
+        self.judge_model = str(self.judge_model or "") or None
+        self.concurrency = _int(self.concurrency)
+        self.rpm = float(self.rpm)
+        self.dry_run = _bool(self.dry_run)
+        self.out = _path(self.out) if self.out else None
+
+    def execute(self) -> int:
+        names = sorted(capable_questions.BUILDERS) if self.families == ["all"] else self.families
+        unknown = [f for f in names if f not in capable_questions.BUILDERS]
+        if unknown:
+            for f in unknown:
+                why = capable_questions.NO_QUESTION.get(f, "unknown family")
+                print(f"{f}: no capability question — {why}", file=sys.stderr)
+            print(f"known: {sorted(capable_questions.BUILDERS)}", file=sys.stderr)
+            return EXIT_USAGE
+        out = self.out or Path("outputs/capable") / self.model.replace("/", "_")
+        try:
+            judge = resolve(
+                JudgeConfig(prompt_version=capable_run.PROMPT_VERSION),
+                flag=self.judge_model,
+                env=os.environ,
+            )
+            for name in names:
+                r = capable_run.run_family(
+                    name,
+                    model=self.model,
+                    judge=judge,
+                    out=out / name,
+                    draws=self.draws,
+                    temperature=self.temperature,
+                    threshold=self.threshold,
+                    greedy=self.greedy,
+                    reasoning_effort=self.reasoning_effort,
+                    limit=self.limit,
+                    concurrency=self.concurrency,
+                    rpm=self.rpm,
+                    dry_run=self.dry_run,
+                )
+                if self.dry_run:
+                    n = r["n_items"]
+                    print(
+                        f"{name}: {n} question{'' if n == 1 else 's'}, {r['n_calls']} answer "
+                        "calls plus one grade per distinct answer; nothing sent"
+                    )
+                    continue
+                path = out / name / "capable.json"
+                path.parent.mkdir(parents=True, exist_ok=True)
+                path.write_text(json.dumps(r, indent=1, ensure_ascii=False), "utf-8")
+                print(capable_run.report_line(r))
+                if r.get("partial"):
+                    print(f"  not covered: {r['partial']}")
+                for key in ("subfamily", "leg", "src", "variant"):
+                    split = capable_run.subfamily_rates(r, key)
+                    if len(split) > 1:
+                        print(f"  by {key}: " + "  ".join(f"{k}={v:.3f}" for k, v in split.items()))
+                top = capable_run.answer_histogram(r)
+                if top and top[0][1] > max(3, r["draws"]):
+                    print("  most common answers: " + ", ".join(f"{t!r} x{n}" for t, n in top))
+        except JudgeConfigError as e:
+            print(f"judge config error: {e}", file=sys.stderr)
+            return EXIT_JUDGE_CONFIG
+        return 0
+
+
 class Freeze(Command):
     """Fold a finished baseline run into the tracked ``evals/baselines/<kind>.json``.
     ``kind=lucky_guessing``: ``src`` holds ``<family>/<variant>.json`` from ``wsbench baseline``.
@@ -452,6 +548,7 @@ COMMANDS: dict[str, type[Command]] = {
     "run": RunFamilies,
     "report": ReportRuns,
     "baseline": Baseline,
+    "capable": Capable,
     "freeze": Freeze,
     "convert-gen-dir": ConvertGenDir,
     "convert-read-json": ConvertReadJson,
