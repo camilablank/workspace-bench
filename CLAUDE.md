@@ -107,7 +107,9 @@ and a credit if the items are external. Smoke `limit=3` live before any full run
 ## Workflow
 - CLI (pydra, `wsbench <command> key=value ...`): `wsbench list` | `wsbench judge family=F
   readouts=F.jsonl out=DIR` | `wsbench run all=True readouts_root=DIR out=DIR` |
-  `wsbench report dir=DIR` | `wsbench baseline` / `wsbench freeze` | `wsbench convert-gen-dir
+  `wsbench report dir=DIR` | `wsbench baseline` / `wsbench freeze` |
+  `wsbench capable model=M` (re-run a bank's own gate on another model; porting notes and
+  the pre-run sanity checks live in `AGENTS.md`) | `wsbench convert-gen-dir
   gen_dir=GEN out=F.jsonl kind=prose|tokens` | `wsbench convert-read-json read=R out=F.jsonl`.
   Shared judge keys: `judge_model=`, `layers=20,36`, `items=a,b`, `limit=N`, `allow_missing=True`,
   `concurrency=64`, `rpm=240`, `dry_run=True`, `opts=k=v,k2=v2`; `--show` prints the resolved

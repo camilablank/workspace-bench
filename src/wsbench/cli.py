@@ -417,7 +417,9 @@ class Capable(Command):
         self.families = "all"
         self.draws = capable_run.DEFAULT_DRAWS
         self.temperature = capable_run.DEFAULT_TEMPERATURE
-        self.threshold = capable_run.DEFAULT_THRESHOLD
+        self.threshold = 0.0  # 0 = each family's own gate (10/10 for two of them)
+        self.greedy = True
+        self.reasoning_effort = capable_run.DEFAULT_REASONING_EFFORT
         self.limit = 0
         self.judge_model = ""
         self.concurrency = 64
@@ -430,7 +432,9 @@ class Capable(Command):
         self.families = _strs(self.families) or ["all"]
         self.draws = _int(self.draws)
         self.temperature = float(self.temperature)
-        self.threshold = float(self.threshold)
+        self.threshold = float(self.threshold) or None
+        self.greedy = _bool(self.greedy)
+        self.reasoning_effort = str(self.reasoning_effort or "") or None
         self.limit = _int(self.limit)
         self.judge_model = str(self.judge_model or "") or None
         self.concurrency = _int(self.concurrency)
@@ -463,18 +467,33 @@ class Capable(Command):
                     draws=self.draws,
                     temperature=self.temperature,
                     threshold=self.threshold,
+                    greedy=self.greedy,
+                    reasoning_effort=self.reasoning_effort,
                     limit=self.limit,
                     concurrency=self.concurrency,
                     rpm=self.rpm,
                     dry_run=self.dry_run,
                 )
                 if self.dry_run:
-                    print(f"{name}: {r['n_items']} questions, no calls made")
+                    n = r["n_items"]
+                    print(
+                        f"{name}: {n} question{'' if n == 1 else 's'}, {r['n_calls']} answer "
+                        "calls plus one grade per distinct answer; nothing sent"
+                    )
                     continue
                 path = out / name / "capable.json"
                 path.parent.mkdir(parents=True, exist_ok=True)
                 path.write_text(json.dumps(r, indent=1, ensure_ascii=False), "utf-8")
                 print(capable_run.report_line(r))
+                if r.get("partial"):
+                    print(f"  not covered: {r['partial']}")
+                for key in ("subfamily", "leg", "src", "variant"):
+                    split = capable_run.subfamily_rates(r, key)
+                    if len(split) > 1:
+                        print(f"  by {key}: " + "  ".join(f"{k}={v:.3f}" for k, v in split.items()))
+                top = capable_run.answer_histogram(r)
+                if top and top[0][1] > max(3, r["draws"]):
+                    print("  most common answers: " + ", ".join(f"{t!r} x{n}" for t, n in top))
         except JudgeConfigError as e:
             print(f"judge config error: {e}", file=sys.stderr)
             return EXIT_JUDGE_CONFIG
