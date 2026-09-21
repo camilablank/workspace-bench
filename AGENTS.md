@@ -41,6 +41,23 @@ misses.
 
 ## Which families port, and which need work
 
+Three buckets, then the detail.
+
+**Usable as they are, once `capable` says the model does the task** (no bank edits): association,
+basic_readout (minus its implicit third), multihop, multilingual, typo, the six multi-token
+families, chain_intermediates, brew_intermediates, arithmetic_intermediates, user_modeling,
+conjunctive_association, relational_multihop, role_bound_association, buggy_code.
+
+**The bank itself has to be edited for the new model:** poetry (the rhyme target is whatever word
+that model commits to), moral_rationale (each item's YES/NO reasons are written for the side the
+model takes), and basic_readout's 32 implicit items (the gold is the model's own favourite).
+
+**Nothing to port until you re-run something on the new model:** hallucination (its bank IS the
+model's own responses), agentic_misalignment (the rollouts), jlens_concept_pr (the activations and
+the J-lens reference), directed_modulation and multi_concept_directed_modulation (the compliance
+screen), and jailbreak_recognition, whose items carry over but whose read positions are token
+indices and need re-capturing.
+
 | family | its gate | on a new model |
 |---|---|---|
 | association | names the concept the text never names | check with `capable` (it asks the bank's referent question, not a continuation) |
