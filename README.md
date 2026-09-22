@@ -177,12 +177,12 @@ Working in a git worktree that shares the main checkout's `.venv`: prefix comman
 **Conjunctive association** — [`evals/conjunctive_association/README.md`](evals/conjunctive_association/README.md)
 - *What it is:* A vignette implies a compound state (state × content × relation) without naming it; does the lens state the whole composition.
 - *Example:* Dana types "so happy for you" to Priya's promotion, deletes it, retypes it → target `envy at her closest friend's recent promotion` (contrast: `pride …`).
-- *Judged by:* one 11-way MC per item over all layers × positions (gold + contrast sibling + 8 grid neighbours + cannot tell); pass = gold, only if the readout names it.
+- *Judged by:* one 11-way MC per item over one blob of the 19 summarize-prompt sites × 6 layers (`docs/read_sites.md`; gold + contrast sibling + 8 grid neighbours + cannot tell); pass = gold, only if the readout names it.
 
 **Role-bound association** — [`evals/role_bound_association/README.md`](evals/role_bound_association/README.md)
 - *What it is:* A scene conveys a directed relation with role words blocked; does the lens bind the direction, not just the concepts.
 - *Example:* "Marcus, in a pressed navy uniform… bolted toward the alley. Dmitri sprinted after him" → target `the thief chased the police officer` (contrast: the reverse).
-- *Judged by:* per cell, three MCs (agent / action / patient, 5 options + cannot tell); cell passes only if all three are right; item = any cell.
+- *Judged by:* per cell (19 summarize-prompt sites × 6 layers, `docs/read_sites.md`), three MCs (agent / action / patient, 5 options + cannot tell); cell passes only if all three are right; item = any cell.
 
 ### Bag of words
 
