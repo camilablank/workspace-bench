@@ -7,15 +7,21 @@ and not just the concepts?
 - **Bank:** `items.json`, 100 items (50 `pair_id`s × `direction` ab / ba; strata
   `stereotypicality` ∈ congruent / incongruent / neutral), verbatim copy of the source repo's
   `…/role_bound_association/items.json`.
-- **Cells:** **every row** of the readouts file (all layers × all positions) — the instrument;
-  `layers=` / `items=` restrict. One call per row answers three MCs in one response.
+- **Cells:** **every row** of the readouts file — the instrument; `layers=` / `items=` restrict.
+  One call per row answers three MCs in one response.
+- **Read regime (producer side, since 2026-09-22):** the stimulus is chat-rendered with
+  `"\n\nSummarize the preceding story in one sentence."` appended, and the lens is read at the
+  suffix tokens and the chat-tail specials after them (19 sites: `Sum mar ize the preceding story
+  in one sentence .` + `<|im_end|> \n <|im_start|> assistant \n <think> \n\n </think> \n\n`) at
+  layers 20/28/36/44/52/60. Story positions are never read, so a lens that echoes the current
+  token cannot hand the judge the story. Before this the file held the last 17 positions of the
+  bare render (8 story tokens + the 9-token tail). The live sites are the newlines/punctuation
+  after the specials (`\n` after `<|im_end|>`, `\n` after `assistant`, the final `\n\n`, the
+  suffix `.`); the special tokens themselves read as nothing.
 - **Site pass** = all three correct; **item pass** = any site.
 - **Metric:** `pass_rate` = passing items / items in scope; bootstrap CI over items.
   `chance = None`; per site (1/6)^3; the any-of-grid floor in `extras.any_of_grid_floor`
   saturates at hundreds of sites per item and must not be quoted.
-- **The prompt-only baseline is not a bar here: it measures 1.00.** The scene states who did
-  what to whom, so a summary of the text alone answers all three questions. Use the frozen
-  number as a fairness flag on the bank, never as a floor a lens must clear.
 - **Judge:** `google/gemini-3.8-flash`, `PROMPT_VERSION = "oa-v1"`.
 
 ## Judge prompts
