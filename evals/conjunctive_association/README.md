@@ -9,6 +9,12 @@ relation) without naming it; does the lens *state* the whole composition?
 - **Cells:** one (layer, item) bag per layer present in the readouts file; **one call per item**
   over a blob of every bag. Items missing any selected layer are excluded with a warning
   (`extras.n_items_excluded`, outside the denominator).
+- **Read regime (producer side, since 2026-09-22):** the stimulus is chat-rendered with
+  `"\n\nSummarize the preceding story in one sentence."` appended, and the bag holds only the
+  suffix tokens and the chat-tail specials after them (19 sites per item, layers
+  20/28/36/44/52/60) — not every position of the render as before. Story positions are never
+  read, so a lens that echoes the current token cannot hand the judge the story for it to
+  compose the answer itself.
 - **Blob** (copied from the source's `score_lens_readouts.py` L26-46 as `norm_token` /
   `BPE_JUNK` / `build_bags`): per (layer, item) every row's samples are `norm_token`'d (strip
   `Ġ Ċ ▁`, `_` → space) and joined with `" | "` in **file order** (not sorted by `pos`), rows
