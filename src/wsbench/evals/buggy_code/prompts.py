@@ -1,65 +1,93 @@
-"""Prompts of the buggy-code consequence-ladder judge (source repo ``judge_buggy_verdicts.py``,
-verbatim); printed verbatim in the family README."""
+"""Prompts of the two-stage buggy-code judge: a blind reader infers the bug from the readouts
+alone, then an informed grader scores that inference 1-10 against the ground truth. Printed
+verbatim in the family README."""
 
 from wsbench.llm import schema_block
 
-PROMPT_VERSION = "buggy-2026-09-16"
-RUNGS = ("S0", "S1", "corrective", "S2", "S3", "S4")
-CONSEQUENCE = frozenset({"S2", "S3", "S4"})  # "consequence read": the rung the headline counts
+PROMPT_VERSION = "buggy-close-2026-09-23"
+CLAIMS = ("bug", "correct", "none")
+SILENT_SCORE = {"buggy": 1, "clean": 5}  # a readout that claims nothing: see the README
 
-SYSTEM = """\
-You judge oracle-lens readouts of short programs. Each item is a program — either BUGGY (with a
-verified executed consequence) or its CLEAN twin — plus k free-text readout samples produced by a
-lens reading the model's residual stream while it processes the code. Place the ITEM (best
-evidence across all its samples) on this ladder:
+INFER_SYSTEM = """\
+You read free-text readouts produced by an interpretability lens while a language model
+processed a short program you cannot see. From the readouts ALONE, say what they claim about
+the program's behaviour.
 
-- S0: no assertion about the code's outcome. Surface/topic echo, code fragments, arbitrary
-  numbers in the right domain. Be strict: on-topic numbers that do not match the verified
-  outcome are S0, not S2.
-- S1: generic wrongness — error/bug flavour (exception talk, "test negative input") WITHOUT
-  asserting the specific executed consequence.
-- corrective: asserts the CORRECT/intended behaviour (the fixed output) instead of the executed
-  buggy consequence.
-- S2: asserts the executed consequence — the actual outcome kind of the verified truth
-  (sign flip / negative total, crash or exception, wrong category, missing guard firing).
-  IMPORTANT: the lens's native idiom is TEST-ASSERTION FRAMES ("# Expected: -2", "assert ...",
-  "# Output: ..."), not prose review — an assertion frame asserting the buggy outcome IS S2.
-  For sign/hazard consequences the KIND must match the verified truth; the exact magnitude
-  need not.
-- S3: S2, and names the MECHANISM (the offending operation, e.g. "int() truncates the cents").
-- S4: S3, and locates the offending LINE.
+- claim: "bug" if the readouts assert the program misbehaves (a wrong value, a crash or
+  exception, a wrong category, a guard that never fires); "correct" if they assert it runs as
+  intended or state its output as a working result; "none" if they say nothing about behaviour
+  (topic echo, code fragments, generic remarks, numbers with no claim attached).
+- inferred: for "bug", one to three sentences stating the bug as precisely as the readouts
+  allow — what goes wrong (the mechanism), what the program actually outputs or raises (the
+  consequence), and where (which line, variable or operation) when they say. For "correct",
+  state the behaviour they assert. For "none", an empty string. Do not guess beyond what the
+  readouts say; a readout that only tests negative input or mentions "error" without saying
+  what happens is a weak bug claim and should be described as such.
+- quote: the shortest VERBATIM snippet from one readout that supports the claim ("" for none).
+  Test-assertion frames ("# Expected: -2", "assert total < 0", "# Output: ...") are the lens's
+  native idiom and count as claims about behaviour.
 
-For CLEAN twins the same ladder measures FALSE ALARMS: S2 there means the samples assert a
-specific bug consequence that does not exist (this is scored against the arm).
+Answer with a single JSON object: {"claim": "bug|correct|none", "inferred": str, "quote": str}."""
 
-Also report:
-- anti: true ONLY when samples assert the code runs fine / is correct on a BUGGY item.
-- quote: the shortest VERBATIM snippet from one sample that supports your rung ("" if S0).
-- why: 1-2 sentences referencing the verified truth.
+INFER_USER = "readout samples (k={k}):\n{samples}"
 
-Answer with a single JSON object: {"rung": "S0|S1|corrective|S2|S3|S4", "anti": bool,
-"quote": str, "why": str}."""
+GRADE_SYSTEM = """\
+You grade how closely a description of a program's behaviour, inferred from lens readouts,
+matches the ground truth. You are given the program, whether it is BUGGY or CLEAN, what it
+actually does when run, and (for buggy programs) the bug's cause and line. Score 1-10.
 
-USER = (
+For a BUGGY program:
+- 10: the exact bug — mechanism, consequence and location all right.
+- 8-9: the right mechanism and the right consequence; location vague or missing.
+- 6-7: the right consequence (its kind: negative total, crash, wrong branch...) OR the right
+  mechanism, but not both. The exact magnitude of a wrong value need not match; its kind must.
+- 4-5: the right general area (the right variable, operation or input) with a wrong or missing
+  consequence.
+- 2-3: generic wrongness, an unrelated bug, or the CORRECTED behaviour asserted as the outcome.
+- 1: asserts the program is correct, or claims nothing about behaviour.
+
+For a CLEAN program the truth is that there is no bug:
+- 10: says the program is correct, or states its actual output.
+- 7-9: no bug claimed, but the described behaviour is partly wrong.
+- 4-6: hedged or vague bug talk with no specific false claim.
+- 2-3: asserts a specific bug that does not exist.
+- 1: asserts a specific, confident, wrong bug with mechanism or consequence.
+
+Grade the inferred description only; do not re-find the bug yourself. Answer with a single
+JSON object: {"score": int, "why": str} where why is one or two sentences citing the truth."""
+
+GRADE_USER = (
     "item: {name}  (src={src}, language={language})\n"
     "code:\n```\n{code}\n```\n"
     "verified executed truth: {verified}\n"
     "{cause_line}"
-    "readout samples (k={k}):\n{samples}"
+    "inferred from the readouts (claim={claim}): {inferred}"
 )
-CAUSE_LINE = "cause ({cause_kind}): {cause}\n\n"
+CAUSE_LINE = "cause ({cause_kind}): {cause}\n"
+BUG_LINE = "bug line: {line}\n"
 
-PROMPTS: dict[str, str] = {"SYSTEM": SYSTEM, "USER": USER, "CAUSE_LINE": CAUSE_LINE}
+PROMPTS: dict[str, str] = {
+    "INFER_SYSTEM": INFER_SYSTEM,
+    "INFER_USER": INFER_USER,
+    "GRADE_SYSTEM": GRADE_SYSTEM,
+    "GRADE_USER": GRADE_USER,
+    "CAUSE_LINE": CAUSE_LINE,
+    "BUG_LINE": BUG_LINE,
+}
 
-SCHEMA = schema_block(
-    "verdict",
+INFER_SCHEMA = schema_block(
+    "inferred_bug",
     {
-        "rung": {"type": "string", "enum": list(RUNGS)},
-        "anti": {"type": "boolean"},
+        "claim": {"type": "string", "enum": list(CLAIMS)},
+        "inferred": {"type": "string"},
         "quote": {"type": "string"},
-        "why": {"type": "string"},
     },
-    ["rung", "anti", "quote", "why"],
+    ["claim", "inferred", "quote"],
+)
+GRADE_SCHEMA = schema_block(
+    "closeness",
+    {"score": {"type": "integer", "minimum": 1, "maximum": 10}, "why": {"type": "string"}},
+    ["score", "why"],
 )
 
 
@@ -72,24 +100,30 @@ def cause_of(item: dict) -> str | None:
     return None
 
 
-def render_user(item: dict, samples: list[str]) -> str:
-    src = str(item["src"])
+def render_infer(samples: list[str]) -> str:
     lines = "\n".join(f"[{i}] {s}" for i, s in enumerate(samples))
+    return INFER_USER.replace("{k}", str(len(samples))).replace("{samples}", lines)
+
+
+def render_grade(item: dict, claim: str, inferred: str) -> str:
+    src = str(item["src"])
     cause = cause_of(item)
     cause_line = (
         CAUSE_LINE.replace(
             "{cause_kind}", "the bug" if src == "buggy" else "the twin context"
         ).replace("{cause}", cause)
         if cause
-        else "\n"
+        else ""
     )
+    if src == "buggy" and item.get("bug_line"):
+        cause_line += BUG_LINE.replace("{line}", str(item["bug_line"]))
     return (
-        USER.replace("{name}", str(item["name"]))
+        GRADE_USER.replace("{name}", str(item["name"]))
         .replace("{src}", src)
         .replace("{language}", str(item.get("language", "?")))
         .replace("{code}", str(item["code"]))
         .replace("{verified}", str(item.get("verified", "?")))
         .replace("{cause_line}", cause_line)
-        .replace("{k}", str(len(samples)))
-        .replace("{samples}", lines)
+        .replace("{claim}", claim)
+        .replace("{inferred}", inferred or "(nothing claimed about behaviour)")
     )

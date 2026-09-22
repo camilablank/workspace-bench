@@ -76,7 +76,7 @@ equal per-layer), and `wsbench freeze kind=prompt_only` records the rate with th
 and prompt version. Not item-blind: a floor, never a competitor lens.
 
 Covered: 22 of the 27 families — every family whose headline is a pass rate, plus
-`buggy_code`'s net difference. Not measured: `jailbreak_recognition` and
+`buggy_code`'s closeness score. Not measured: `jailbreak_recognition` and
 `agentic_misalignment`, whose judges are pinned to Claude Sonnet 5, and the three exclusions at
 the bottom. Entries carry `complete: false` by construction, because judging one layer is a layer
 subset of the family's grid.
@@ -108,8 +108,8 @@ instead of drawing them as a floor; compare the family's own null instead.
 
 *Not item-blind but informative* — the answer is derivable from the prompt, yet the stock model
 rarely states it, so the rate IS the family's measured floor and is the only one those families
-have: `arithmetic_intermediates` 0.15, `buggy_code` 0.04 `net_S2` (which also carries its own
-floor in the clean twins), `chain_intermediates` 0.03.
+have: `arithmetic_intermediates` 0.15, `buggy_code` (re-measured under the closeness instrument;
+the stamped entry is dropped from `report` until then), `chain_intermediates` 0.03.
 
 The remaining new entries behave as intended floors: `user_modeling` 0.07,
 `conjunctive_association` 0.07 and `moral_rationale` 0.50. The 13 entries frozen 2026-09-16 are
@@ -124,7 +124,7 @@ that every other entry is a clean bar.
   analytic chance line (`user_modeling` 0.07 against 1/6, `conjunctive_association` 0.07 against
   1/11), because a prompt-only summary commits to a wrong option rather than abstaining. Read a
   lens against both.
-- **Not every column is a pass rate.** `buggy_code` is a net difference, which `report` labels.
+- **Not every column is a pass rate.** `buggy_code` is a 1-10 closeness score rescaled to 0-1, which `report` labels.
 - **The summaries are capped at 256 new tokens** (the sampling of the first vintage, kept so the
   two vintages are one instrument), and 40-73% of them are cut mid-sentence, most often on the
   long prompts (scenes, whole programs, rule tables). That biases every rate here DOWN.
