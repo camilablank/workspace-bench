@@ -10,8 +10,8 @@ Both families used to be judged over *every* position of the bare stimulus rende
 one blob of all positions × layers; role-bound: any-of over a 17-position window). Under that
 regime a lens that merely echoes the current token hands the judge the story itself, and the judge —
 not the lens — does the interpretation. A position sweep on the s3d-rl600 O-lens (Gemini 3.8 Flash
-judge) showed the score did not in fact come from the story positions (conjunctive: story-only blob
-0.06, chat-tail-only 0.10, full 0.15), but the instrument permitted it. Appending a summarize
+judge) showed most of the score came from the chat tail rather than the story positions
+(conjunctive: story-only blob 0.06, chat-tail-only 0.10, full 0.15), but the instrument permitted it. Appending a summarize
 request gives the lens a read site with a fixed semantic job, and reading only there closes the
 loophole.
 
@@ -69,12 +69,12 @@ still restrict.
 | role_bound_association (item = any cell) | 0.40 | 0.63 |
 | conjunctive_association (one blob per item) | 0.15 | 0.14 |
 
-Role-bound gains at every live site (best single cell 11 → 18 / 100; agent/patient accuracy per
-cell 0.06–0.12 → 0.12–0.17); conjunctive is flat, with ~83 % "cannot tell" either way.
+Role-bound gains (best single cell 11 → 18 items passing / 100; agent/patient accuracy per cell
+0.06–0.12 → 0.12–0.17); conjunctive is flat, with ~83 % "cannot tell" either way.
 
 ## Producing a readouts file
 
-One row per (item, layer, site) in the readout contract (`README.md` §Readout contract), `pos`
+One row per (item, layer, site) in the readout contract of the [top-level README](../README.md), `pos`
 indexing the render above, `token` the site's token, e.g.
 
 ```
