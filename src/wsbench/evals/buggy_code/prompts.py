@@ -4,7 +4,7 @@ verbatim in the family README."""
 
 from wsbench.llm import schema_block
 
-PROMPT_VERSION = "buggy-close-2026-09-23"
+PROMPT_VERSION = "buggy-score-2026-09-23"
 CLAIMS = ("bug", "correct", "none")
 SILENT_SCORE = {"buggy": 1, "clean": 5}  # a readout that claims nothing: see the README
 
@@ -23,9 +23,9 @@ the program's behaviour.
   state the behaviour they assert. For "none", an empty string. Do not guess beyond what the
   readouts say; a readout that only tests negative input or mentions "error" without saying
   what happens is a weak bug claim and should be described as such.
-- quote: the shortest VERBATIM snippet from one readout that supports the claim ("" for none).
-  Test-assertion frames ("# Expected: -2", "assert total < 0", "# Output: ...") are the lens's
-  native idiom and count as claims about behaviour.
+- quote: the snippet from one readout that best supports the claim ("" for none). Test-assertion
+  frames ("# Expected: -2", "assert total < 0", "# Output: ...") are the lens's native idiom and
+  count as claims about behaviour.
 
 Answer with a single JSON object: {"claim": "bug|correct|none", "inferred": str, "quote": str}."""
 

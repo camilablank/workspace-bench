@@ -148,7 +148,7 @@ Working in a git worktree that shares the main checkout's `.venv`: prefix comman
 **Buggy code** — [`evals/buggy_code/README.md`](evals/buggy_code/README.md)
 - *What it is:* Short programs with one verified bug and their clean twins, read at the end of the file with nothing asked; does the lens assert the bug's executed consequence, and stay quiet on the clean twin?
 - *Example:* an order total that multiplies a returned item's quantity −3 into a credit; verified stdout `-53.52` → a readout asserting a negative total is S2.
-- *Judged by:* two calls per item: a blind reader infers what the readouts claim about the program (bug, correct, or nothing; verbatim quote required), then a grader holding the program, its executed truth and the bug scores that inference 1-10 for closeness; clean twins are graded against "no bug". Headline `closeness` = mean (score − 1) / 9 over all 49; a silent lens scores about 0.22.
+- *Judged by:* two calls per item: a blind reader infers what the readouts claim about the program (bug, correct, or nothing), then a grader holding the program, its executed truth and the bug scores that inference 1-10 for closeness; clean twins are graded against "no bug". Headline `score` = the mean 1-10 score over all 49; a silent lens scores about 2.96.
 
 **Arithmetic intermediates** — [`evals/arithmetic_intermediates/README.md`](evals/arithmetic_intermediates/README.md)
 - *What it is:* A bare two- or three-operation expression answered with no chain of thought; the intermediate is never written. Fourteen expression shapes, one frozen (layer, position) read cell each.
@@ -253,7 +253,7 @@ version.
 | basic_readout | google/gemini-3.8-flash | bank-2026-09-16 |
 | basic_readout_mt | google/gemini-3.8-flash | mc-2026-09-16 |
 | brew_intermediates | google/gemini-3.8-flash | brew-2026-09-16 |
-| buggy_code | google/gemini-3.8-flash | buggy-close-2026-09-23 |
+| buggy_code | google/gemini-3.8-flash | buggy-score-2026-09-23 |
 | chain_intermediates | google/gemini-3.8-flash | chain-free-2026-09-16 |
 | conjunctive_association | google/gemini-3.8-flash | comp-v1 |
 | directed_modulation | google/gemini-3.8-flash | dm-2026-09-16 |

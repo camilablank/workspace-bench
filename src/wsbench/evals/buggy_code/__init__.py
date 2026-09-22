@@ -17,7 +17,7 @@ SPEC = register(
         group="computational",
         bank=Path("evals/buggy_code/items.json"),
         judge=JudgeConfig(prompt_version=PROMPT_VERSION),
-        metric="closeness",
+        metric="score",
         higher_is_better=True,
         run=judge.run,
         calls_per_arm="49-98",

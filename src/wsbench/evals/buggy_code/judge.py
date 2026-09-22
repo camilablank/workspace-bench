@@ -1,6 +1,6 @@
 """Buggy code: a blind reader infers what the readouts claim about the program, then an informed
 grader scores that inference 1-10 against the ground truth (the bug, or the fact that there is
-none). Headline ``closeness`` = mean (score - 1) / 9 over buggy programs and clean twins alike.
+none). Headline ``score`` = the mean 1-10 score over buggy programs and clean twins alike.
 Stages, scores for silent readouts and strata are explained in the family README."""
 
 from collections import defaultdict
@@ -8,7 +8,7 @@ from typing import Any
 
 from wsbench.banks import load_bank
 from wsbench.cache import Cache
-from wsbench.family import cell_text, fail, mean, quote_in, rate, require_cells
+from wsbench.family import cell_text, fail, mean, rate, require_cells
 from wsbench.llm import Spend
 from wsbench.mcjudge import (
     Call,
@@ -44,29 +44,19 @@ CHANCE_LABEL = (
 )
 
 
-def closeness(score: int) -> float:
-    return (score - 1) / 9
-
-
-def inference(res: dict[str, Any] | None, samples: list[str]) -> dict[str, Any]:
-    """Stage A answer with the quote gate: a bug or correct claim whose quote is not verbatim in
-    a sample is downgraded to no claim (``unverified``)."""
+def inference(res: dict[str, Any] | None) -> dict[str, Any]:
+    """Stage A answer: the claim, the inferred behaviour and the supporting snippet (kept as
+    evidence, not enforced)."""
     if res is None:
-        return {"judged": False, "claim": None, "inferred": "", "quote": "", "unverified": False}
+        return {"judged": False, "claim": None, "inferred": "", "quote": ""}
     claim = str(res.get("claim", "none"))
     if claim not in CLAIMS:
         claim = "none"
-    inferred = str(res.get("inferred", "")).strip()
-    quote = str(res.get("quote", "")).strip()
-    unverified = claim != "none" and not any(quote_in(quote, s) for s in samples)
-    if unverified:
-        claim, inferred = "none", ""
     return {
         "judged": True,
         "claim": claim,
-        "inferred": inferred,
-        "quote": quote,
-        "unverified": unverified,
+        "inferred": str(res.get("inferred", "")).strip(),
+        "quote": str(res.get("quote", "")).strip(),
     }
 
 
@@ -144,9 +134,7 @@ def run(args: JudgeArgs) -> FamilyResult:
         infer_results = run_calls(infer_calls, schema=INFER_SCHEMA, **shared)
         for i in ids:
             if i in samples:
-                inferred[i] = inference(
-                    infer_results.get(f"{i}|L{layer_of[i]:03d}|infer"), samples[i]
-                )
+                inferred[i] = inference(infer_results.get(f"{i}|L{layer_of[i]:03d}|infer"))
         # stage B, informed: how close is the inference to the truth? Silent readouts get the
         # fixed score for their source and make no call.
         grade_calls = [
@@ -173,7 +161,6 @@ def run(args: JudgeArgs) -> FamilyResult:
                 "claim": "none",
                 "inferred": "",
                 "quote": "",
-                "unverified": False,
                 "score": SILENT_SCORE[src],
                 "empty": True,
             }
@@ -187,7 +174,6 @@ def run(args: JudgeArgs) -> FamilyResult:
                 "claim": None,
                 "inferred": "",
                 "quote": "",
-                "unverified": False,
                 "score": None,
                 "missing": i in missing,
             }
@@ -199,15 +185,14 @@ def run(args: JudgeArgs) -> FamilyResult:
                 "consequence_class": it.get("consequence_class"),
                 "layer": layer_of[i],
                 **v,
-                "closeness": closeness(v["score"]) if v["score"] is not None else None,
             }
         )
     judged = [r for r in rows if r["judged"]]
-    values = [r["closeness"] for r in judged]
+    values = [float(r["score"]) for r in judged]
     value = mean(values)
     n_unjudged = sum(1 for r in rows if not r["judged"] and not r.get("missing"))
     by_src = {s: [r for r in judged if r["src"] == s] for s in ("buggy", "clean")}
-    silent_floor = mean(closeness(SILENT_SCORE[str(it["src"])]) for it in scope)
+    silent_floor = mean(float(SILENT_SCORE[str(it["src"])]) for it in scope)
     strata = sorted(
         {(r["consequence_class"] or "none", r["lang_group"]) for r in judged if r["src"] == "buggy"}
     )
@@ -218,8 +203,8 @@ def run(args: JudgeArgs) -> FamilyResult:
                 for r in by_src["buggy"]
                 if (r["consequence_class"] or "none") == cls and r["lang_group"] == lg
             ),
-            "closeness": mean(
-                r["closeness"]
+            "score": mean(
+                float(r["score"])
                 for r in by_src["buggy"]
                 if (r["consequence_class"] or "none") == cls and r["lang_group"] == lg
             ),
@@ -232,7 +217,7 @@ def run(args: JudgeArgs) -> FamilyResult:
     }
     result = FamilyResult(
         family=NAME,
-        metric="closeness",
+        metric="score",
         value=value,
         ci95=bootstrap_ci(values) if values else None,
         n_items=len(ids),
@@ -270,10 +255,8 @@ def run(args: JudgeArgs) -> FamilyResult:
             "n_calls": len(infer_calls) + len(grade_calls),
             "n_rows_not_at_read_cell": n_extra,
             "silent_floor": silent_floor,
-            "closeness_buggy": mean(r["closeness"] for r in by_src["buggy"]),
-            "closeness_clean": mean(r["closeness"] for r in by_src["clean"]),
-            "mean_score_buggy": mean(float(r["score"]) for r in by_src["buggy"]),
-            "mean_score_clean": mean(float(r["score"]) for r in by_src["clean"]),
+            "score_buggy": mean(float(r["score"]) for r in by_src["buggy"]),
+            "score_clean": mean(float(r["score"]) for r in by_src["clean"]),
             "n_buggy_judged": len(by_src["buggy"]),
             "n_clean_judged": len(by_src["clean"]),
             "claims": {
@@ -281,7 +264,6 @@ def run(args: JudgeArgs) -> FamilyResult:
                 for s, rs in by_src.items()
             },
             "false_alarm_rate_clean": rate(r["claim"] == "bug" for r in by_src["clean"]),
-            "unverified_rate": rate(bool(r.get("unverified")) for r in judged),
             "score_hist": hist,
             "per_stratum": per_stratum,
             "rows_claims": [

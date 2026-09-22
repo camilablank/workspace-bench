@@ -3,7 +3,7 @@
 Short programs with ONE verified bug (a silently wrong value, a wrong category, a crash) and
 clean twins matched in length, names and surface structure, rendered bare with nothing asked.
 Read at the end of the file: how closely does the bug a reader infers from the readouts alone
-match the real bug, and does the reader infer none on the clean twin?
+match the real bug, scored 1-10, and does the reader infer none on the clean twin?
 
 49 items (source bank `read_bank.json`, records unchanged, each tagged `src: buggy | clean`):
 25 buggy programs (17 python, 8 rust / go / c) with an executed truth (`verified`: exit code and
@@ -31,9 +31,9 @@ the readouts never knows the answer.
   it runs as intended or state its output as a working result) or `none` (nothing about
   behaviour), and for a bug an `inferred` description as precise as the readouts allow —
   mechanism, consequence and location when they say. Test-assertion frames (`# Expected: -2`,
-  `assert total < 0`) are the lens's native idiom and count as claims.
-- **Quote gate.** A `bug` or `correct` claim needs a verbatim quote from one sample; otherwise it
-  is downgraded to `none` (`extras.unverified_rate`).
+  `assert total < 0`) are the lens's native idiom and count as claims. The reader also returns
+  the snippet that best supports the claim; it is kept as evidence in `rows_claims` and is not a
+  gate.
 - **Stage B, informed grading.** One call per item that claimed something, with the program, its
   source (buggy or clean), the verified executed truth, the bug's cause and line (or a clean
   twin's `why_correct` / `looks_like` when it has one) and Stage A's inference. The grader scores
@@ -48,23 +48,22 @@ the readouts never knows the answer.
 - **Silent readouts.** A `none` claim makes no Stage B call and scores a fixed **1 on a buggy
   program** (nothing inferred) and **5 on a clean twin** (no false alarm, but no positive match
   either). An empty cell is silent.
-- **Headline: `closeness`** = mean of (score − 1) / 9 over every judged item, buggy and clean
-  alike, 95% CI by bootstrap over items. The clean twins are inside the headline rather than
+- **Headline: `score`** = the mean 1-10 score over every judged item, buggy and clean alike,
+  95% CI by bootstrap over items. The clean twins are inside the headline rather than
   subtracted from it: a lens that reads bugs into everything loses on them, a lens that calls
   everything correct loses on the buggy half. `chance` is `extras.silent_floor`, what a lens
-  that claims nothing scores (1 on every buggy program, 5 on every clean twin: about 0.22 on
-  this bank). Beside it: `closeness_buggy` / `closeness_clean`, the 1-10 means per source,
-  `claims` (claim rates per source), `false_alarm_rate_clean` (bug claims on clean twins),
-  `score_hist`, `per_stratum` (buggy closeness by consequence class × language group) and
-  `rows_claims` (each item's claim, score and inferred bug). No regex or numeric matcher
-  anywhere.
+  that claims nothing scores (1 on every buggy program, 5 on every clean twin: about 2.96 on
+  this bank). Beside it: `score_buggy` / `score_clean`, `claims` (claim rates per source),
+  `false_alarm_rate_clean` (bug claims on clean twins), `score_hist`, `per_stratum` (buggy
+  score by consequence class × language group) and `rows_claims` (each item's claim, score,
+  inferred bug and quote). No regex or numeric matcher anywhere.
 - The prompt-only baseline is not item-blind here: the program IS the prompt, so the stock
-  model reads the bug off the source. Its `closeness` bounds what the text gives away, not
-  what a lens must clear.
+  model reads the bug off the source. Its score bounds what the text gives away, not what a
+  lens must clear.
 - The source docs' pairwise blind pick (chance 0.5) is not used: only 10 of the 25 buggy
   programs have an exact clean twin, too few pairs for a usable interval.
 - An unjudged stage leaves its item out of the mean. Missing cells are fatal (exit 2) unless
-  `allow_missing=True`. `closeness` is not a pass rate, so the family is listed but not averaged
+  `allow_missing=True`. A 1-10 mean is not a pass rate, so the family is listed but not averaged
   into the macro.
 
 ## Readouts
@@ -80,7 +79,7 @@ wsbench judge family=buggy_code readouts=<arm>.jsonl out=outputs/<arm>/buggy_cod
 
 ## Judge prompts
 
-`prompt_version`: `buggy-close-2026-09-23`. Judge: the repo default (`google/gemini-3.8-flash`),
+`prompt_version`: `buggy-score-2026-09-23`. Judge: the repo default (`google/gemini-3.8-flash`),
 temperature 0, both stages. Stage A schema: `{"claim": "bug|correct|none", "inferred": str,
 "quote": str}`; Stage B schema: `{"score": int 1-10, "why": str}`. Stage B's user message is
 `GRADE_USER` with `CAUSE_LINE` (and `BUG_LINE` on buggy items) spliced in when the item has a
@@ -103,9 +102,9 @@ the program's behaviour.
   state the behaviour they assert. For "none", an empty string. Do not guess beyond what the
   readouts say; a readout that only tests negative input or mentions "error" without saying
   what happens is a weak bug claim and should be described as such.
-- quote: the shortest VERBATIM snippet from one readout that supports the claim ("" for none).
-  Test-assertion frames ("# Expected: -2", "assert total < 0", "# Output: ...") are the lens's
-  native idiom and count as claims about behaviour.
+- quote: the snippet from one readout that best supports the claim ("" for none). Test-assertion
+  frames ("# Expected: -2", "assert total < 0", "# Output: ...") are the lens's native idiom and
+  count as claims about behaviour.
 
 Answer with a single JSON object: {"claim": "bug|correct|none", "inferred": str, "quote": str}.
 ```

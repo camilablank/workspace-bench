@@ -1,5 +1,5 @@
-"""buggy_code: the bank, the blind inference and its quote gate, the informed 1-10 grade, the
-closeness headline with clean twins inside it, a scripted two-stage run, dry run."""
+"""buggy_code: the bank, the blind inference, the informed 1-10 grade, the mean-score headline
+with clean twins inside it, a scripted two-stage run, dry run."""
 
 import json
 from pathlib import Path
@@ -96,24 +96,19 @@ def test_stage_a_is_blind_and_stage_b_holds_the_truth():
     assert f"cause (the twin context): {told['why_correct']}" in render_grade(told, "bug", "x")
 
 
-def test_inference_quote_gate_and_grade_clamp():
-    samples = ["# Expected output: (50 - 70) = -20", "looks fine"]
-    ok = judge.inference(
-        {"claim": "bug", "inferred": "negative", "quote": "(50 - 70) = -20"}, samples
-    )
-    assert ok["claim"] == "bug" and not ok["unverified"]
-    bad = judge.inference({"claim": "bug", "inferred": "negative", "quote": "never said"}, samples)
-    assert bad["claim"] == "none" and bad["inferred"] == "" and bad["unverified"]
-    corr = judge.inference({"claim": "correct", "inferred": "runs", "quote": "looks fine"}, samples)
+def test_inference_and_grade_clamp():
+    ok = judge.inference({"claim": "bug", "inferred": "negative", "quote": "(50 - 70) = -20"})
+    assert ok["claim"] == "bug" and ok["inferred"] == "negative" and ok["judged"]
+    # the quote is evidence, not a gate: an unmatched quote leaves the claim standing
+    kept = judge.inference({"claim": "bug", "inferred": "negative", "quote": "never said"})
+    assert kept["claim"] == "bug" and kept["inferred"] == "negative"
+    corr = judge.inference({"claim": "correct", "inferred": "runs", "quote": "looks fine"})
     assert corr["claim"] == "correct"
-    assert (
-        judge.inference({"claim": "weird", "inferred": "", "quote": ""}, samples)["claim"] == "none"
-    )
-    assert not judge.inference(None, samples)["judged"]
+    assert judge.inference({"claim": "weird", "inferred": "", "quote": ""})["claim"] == "none"
+    assert not judge.inference(None)["judged"]
     assert judge.grade({"score": 7, "why": ""}) == 7
     assert judge.grade({"score": 14, "why": ""}) == 10 and judge.grade({"score": 0, "why": ""}) == 1
     assert judge.grade({"score": "x", "why": ""}) is None and judge.grade(None) is None
-    assert judge.closeness(1) == 0.0 and judge.closeness(10) == 1.0
 
 
 def test_scripted_two_stage_run(tmp_path, monkeypatch):
@@ -132,8 +127,8 @@ def test_scripted_two_stage_run(tmp_path, monkeypatch):
                         "inferred": "total goes negative",
                         "quote": readout[:20],
                     }
-                elif i == buggy[1]:  # a claim whose quote is not in the readout: silent
-                    out[c.key] = {"claim": "bug", "inferred": "x", "quote": "never said this"}
+                elif i == buggy[1]:  # the readouts say nothing about behaviour
+                    out[c.key] = {"claim": "none", "inferred": "", "quote": ""}
                 else:  # the clean twin: the readout says it works
                     out[c.key] = {
                         "claim": "correct",
@@ -149,18 +144,18 @@ def test_scripted_two_stage_run(tmp_path, monkeypatch):
     r = judge.run(_args(tmp_path, ids))
     rows = {row["id"]: row for row in r.rows}
     assert rows[buggy[0]]["claim"] == "bug" and rows[buggy[0]]["score"] == 8
-    assert rows[buggy[0]]["closeness"] == pytest.approx(7 / 9) and rows[buggy[0]]["layer"] == 60
-    assert rows[buggy[1]]["unverified"] and rows[buggy[1]]["claim"] == "none"
-    assert rows[buggy[1]]["score"] == SILENT_SCORE["buggy"] == 1
+    assert rows[buggy[0]]["layer"] == 60
+    assert (
+        rows[buggy[1]]["claim"] == "none" and rows[buggy[1]]["score"] == SILENT_SCORE["buggy"] == 1
+    )
     assert rows[clean[0]]["claim"] == "correct" and rows[clean[0]]["score"] == 10
-    assert r.metric == "closeness"
-    assert r.value == pytest.approx((7 / 9 + 0.0 + 1.0) / 3)
+    assert r.metric == "score"
+    assert r.value == pytest.approx((8 + 1 + 10) / 3)
     assert r.extras["n_calls"] == 3 + 2  # three blind calls, two graded (the silent one skips)
-    assert r.extras["closeness_buggy"] == pytest.approx(7 / 18)
-    assert r.extras["closeness_clean"] == 1.0 and r.extras["false_alarm_rate_clean"] == 0.0
-    assert r.extras["unverified_rate"] == pytest.approx(1 / 3)
+    assert r.extras["score_buggy"] == pytest.approx(4.5)
+    assert r.extras["score_clean"] == 10.0 and r.extras["false_alarm_rate_clean"] == 0.0
     assert r.extras["claims"]["buggy"] == {"bug": 0.5, "correct": 0.0, "none": 0.5}
-    assert r.chance == pytest.approx((0 + 0 + 4 / 9) / 3) == pytest.approx(r.extras["silent_floor"])
+    assert r.chance == pytest.approx((1 + 1 + 5) / 3) == pytest.approx(r.extras["silent_floor"])
     assert r.counts["n_expected_cells"] == 3 and r.counts["n_missing_cells"] == 0
     assert r.ci95 is not None and r.extras["score_hist"]["buggy"]["8"] == 1
 
@@ -210,7 +205,7 @@ def test_unjudged_stage_leaves_the_item_out(tmp_path, monkeypatch):
     got = {row["id"]: row for row in r.rows}
     assert not got[buggy[0]]["judged"] and got[buggy[0]]["score"] is None
     assert r.counts["n_unjudged_cells"] == 1 and r.n_items == 3
-    assert r.value == pytest.approx((2 / 9 + 2 / 9) / 2)
+    assert r.value == pytest.approx(3.0)
     assert not r.complete
 
 
@@ -229,7 +224,7 @@ def test_missing_read_layer_is_fatal_and_two_layers_refused(tmp_path, monkeypatc
 def test_registered_readme_and_dry_run(tmp_path, capsys, monkeypatch):
     from wsbench.evals.buggy_code import SPEC
 
-    assert SPEC.group == "computational" and SPEC.metric == "closeness"
+    assert SPEC.group == "computational" and SPEC.metric == "score"
     readme = (REPO / "evals/buggy_code/README.md").read_text(encoding="utf-8")
     assert INFER_SYSTEM in readme and GRADE_SYSTEM in readme
     monkeypatch.delenv("WSBENCH_JUDGE_MODEL", raising=False)
