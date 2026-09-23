@@ -20,6 +20,10 @@ readout. The interpreter sees only the tokens: no stimulus, no options, no gold.
 - Per-family bundle text: moral_rationale / role_bound_association = `render_bag` of the row;
   relational_multihop = the `[position …]` bundle line; conjunctive_association = the per
   (layer, item) `" | "` blob. See each family README.
+- The six multi-token families (`*_mt`, `multilingual_multihop`, `multilingual_typo`) hand it
+  `render_bag` of the cell and then apply their regex contract to the interpretation as one more
+  sample beside the raw tokens (since 2026-09-23; `mt-regex-summarized-2026-09-23`). No judge
+  prompt follows: the interpretation is matched, not judged.
 - `dry_run=True` on a `tokens` file prints only the summarizer prompt (no judge prompt exists
   before a summary).
 

@@ -15,8 +15,12 @@ The bank file is a frozen copy of the source repo's hard-tier bank; its `contrac
 
 ## Scoring
 
-- **Headline: regex pass rate** — `scorer_version` `mt-regex-2026-09-23`, deterministic, no judge
-  call, `spend_usd` 0, `judge_model` `regex`. The scorer is `wsbench.multitoken.regex`, a port of
+- **Headline: regex pass rate** — `scorer_version` `mt-regex-2026-09-23` on prose readouts:
+  deterministic, no judge call, `spend_usd` 0, `judge_model` `regex`. Token-bag readouts carry
+  `scorer_version` `mt-regex-summarized-2026-09-23`: each bag is first interpreted by the shared
+  summarizer (below), so for those arms the instrument is the summarizer model (`judge_model` =
+  `google/gemini-3.8-flash`, `pinned_instrument` follows its pin, `spend_usd` counts its calls, a
+  failed summary leaves the item undecided). The scorer is `wsbench.multitoken.regex`, a port of
   the source repo's conjunctive bank scorer (`olens_suite/bank/matching.py`, `contract.py`,
   `conjunctive.py`, `olens_sglang/score_targets.py`); goldens computed by the source code pin it
   (`tests/golden/mt_regex_units.json`, `tests/golden/mt_regex_matching.json`).
@@ -38,12 +42,26 @@ The bank file is a frozen copy of the source repo's hard-tier bank; its `contrac
   of its forms hits any sample at that layer, in any listed language. (5) A layer passes the item
   when EVERY required unit hits there; the item passes at any layer.
 - **Scored units of this family:** `correction` (required; forms in the source language, `en` and `zh`) and `language` (required; the language's English or Chinese name, or the correction in the source script).
-- **Token lenses:** a strictly multi-token form can never equal one vocabulary token, so a top-k
-  token lens (J-lens, R-lens, logit, tuned) cannot satisfy a required multi-token unit by
-  construction — the source's stated asymmetry ("multi-token targets can only be hit by the oracle
-  lens"). A producer whose "tokens" are phrases or labels (the template lens, an SAE's auto-interp
-  labels) can. Token strings are matched as the producer wrote them (`Ġ`/`▁` as a space, byte-level
-  pieces of non-Latin tokens as they are), exactly as the source scorer saw them.
+- **Token lenses — summarized first, then matched** (Camila, 2026-09-23 16:52: "for the token
+  lenses on mt i thought we were doing an llm summarizer step?"). A strictly multi-token form can
+  never equal one vocabulary token, so on the raw bag a required multi-token unit is unreachable
+  by construction (the source's stated asymmetry: "multi-token targets can only be hit by the
+  oracle lens"). The bench therefore keeps its bag -> prose step: every cell's top-k bag is
+  interpreted once by the shared summarizer (`docs/summarizer.md`, `interp-v1`, the same
+  `render_bag` text, cache key `summ:<cell>` and fingerprint the MC judge used, so its cached
+  interpretations are reused), and the contract is applied to the interpretation as ONE more
+  sample beside the raw tokens: a unit hits when a form is found in the summary OR in a single
+  token, never across them. This is the faithful reading of the intent — the summary is the
+  token lens's prose, the bag stays scorable for single-token units (a language name) and for
+  producers whose "tokens" are phrases or labels (the template lens, an SAE's auto-interp
+  labels). The `language` unit of an L2 item is scored on the summary like any unit: it hits
+  when the interpretation names the language in English or Chinese, or writes the answer in the
+  source script (the summarizer is told to translate foreign tokens, so it usually names the
+  language); a bare language-name token in the bag also hits. Per layer, `layers[L].source`
+  records which side carried each unit (`bag` / `summary`); `extras.passing_layers_by_source`
+  splits the passing layers into `bag_only` / `summary_only` / `both` / `mixed` (neither side
+  alone passes), `extras.n_summaries[_cached|_failed]` count the summarizer work. Token strings
+  are matched as the producer wrote them (`Ġ`/`▁` as a space).
 - **Item rule:** an item whose every expected layer is scored and never passes fails; a cell whose
   samples are all blank is a negative at that layer; an item with a MISSING (item, layer) cell and
   no pass is undecided (`extras.n_items_undecided`). Exactly one read position per (item, layer) is
@@ -69,6 +87,8 @@ The bank file is a frozen copy of the source repo's hard-tier bank; its `contrac
   on the same readouts: s3d-rl600 0.78, s3d-sft251 0.63, nla-rl-L42 0.60. The MC judge stays reachable with `opts=judge=mc`
   (its result is never pinned, so never `complete` and never in the macro; its prompts are kept
   verbatim below).
+- 2026-09-23 16:52, Camila: token-bag arms keep the LLM summarizer step (above); on the same
+  readouts, MC / regex-raw / regex-summarized: jlens 0.09 / 0.00 / 0.05; rlens 0.05 / 0.00 / 0.00; template-v3 0.06 / 0.00 / 0.01; logit 0.06 / 0.00 / 0.02; tuned 0.08 / 0.00 / 0.03; sae-l42 0.01 / 0.05 / 0.06.
 
 ## Readouts
 

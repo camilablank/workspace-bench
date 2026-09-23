@@ -1,8 +1,12 @@
-"""Multi-token basic families. Scorer of record (since 2026-09-23): the deterministic regex
-contract in ``wsbench.multitoken.regex`` — no judge call, a layer passes when every required
-unit's form is found in a sample at that layer, an item at any layer. The forced-choice Gemini
-judge that was the instrument from 2026-09-16 stays reachable with ``opts=judge=mc`` (one call
-per (item, layer, unit); its numbers are diagnostics, never pinned)."""
+"""Multi-token basic families. Scorer of record (since 2026-09-23): the regex contract in
+``wsbench.multitoken.regex`` — a layer passes when every required unit's form is found in a
+sample at that layer, an item at any layer. Prose readouts are scored as they are (no call).
+Token-bag readouts are first interpreted by the shared summarizer (``docs/summarizer.md``, one
+cached call per cell, the same fingerprint the MC judge used) and the contract is applied to the
+interpretation as one more sample beside the raw tokens; for those arms the instrument is the
+summarizer model (pinned, spend and a failed summary = undecided item follow it). The
+forced-choice Gemini judge that was the instrument from 2026-09-16 stays reachable with
+``opts=judge=mc`` (one call per (item, layer, unit); its numbers are diagnostics, never pinned)."""
 
 import dataclasses
 import json
@@ -11,7 +15,7 @@ from pathlib import Path
 from typing import Any
 
 from wsbench.banks import load_bank
-from wsbench.cache import Cache
+from wsbench.cache import Cache, fingerprint
 from wsbench.family import (
     cell_text,
     fail,
@@ -28,7 +32,7 @@ from wsbench.mcjudge import Call, Preflighter, item_scope, run_calls, with_reado
 from wsbench.multitoken import regex
 from wsbench.multitoken.options import judged_roles, option_sets
 from wsbench.multitoken.prompts import LETTERS, PROMPT_VERSION, SCHEMA, SYSTEM, render_user
-from wsbench.multitoken.regex import SCORER_VERSION
+from wsbench.multitoken.regex import SCORER_VERSION, SUMMARIZED_SCORER_VERSION
 from wsbench.readouts import Cell, load_readouts
 from wsbench.registry import REPO_ROOT, EvalSpec, JudgeArgs
 from wsbench.results import FamilyResult
@@ -79,11 +83,15 @@ def run_family(args: JudgeArgs, *, name: str) -> FamilyResult:
 # ---------------------------------------------------------------------------------------------
 # the regex contract (scorer of record)
 # ---------------------------------------------------------------------------------------------
-def _cell_samples(cell: Cell) -> list[str]:
-    """One sample per prose sample, or one per top-k token string (as written by the
-    producer); scaffolding stripped; blanks dropped."""
+def _cell_samples(cell: Cell, summary: str | None = None) -> list[str]:
+    """One sample per prose sample, or one per top-k token string (as written by the producer)
+    plus, when given, the summarizer's interpretation of the bag as ONE more sample; scaffolding
+    stripped; blanks dropped. Samples are never joined, so a form found in the summary or in a
+    single token hits, and nothing is assembled across them."""
     raw = cell.tokens if cell.tokens is not None else (cell.samples or ())
     out = [regex.extract_phrase(str(s)) for s in raw]
+    if summary is not None:
+        out.append(regex.extract_phrase(summary))
     return [s for s in out if s]
 
 
@@ -132,45 +140,112 @@ def run_regex(args: JudgeArgs, *, name: str) -> FamilyResult:
     missing = [(i, layer) for i in ids for layer in layers if (i, layer) not in positions]
     require_cells(name, missing, len(ids) * len(layers), args)
     previous_mc = _previous_mc(args.out)
+    tokens = rep.kind == "tokens"
+    spend = Spend()
+    sjudge = aux_judge(args.judge, args.aux_models, "summarizer")
+    bundles = (
+        {c.key: render_bag(c.tokens or (), c.scores) for c in cells if c.tokens} if tokens else {}
+    )
+    summaries: dict[str, str | None] = {}
+    n_cached = 0
+    if bundles:
+        # the shared bag -> prose step, same bundle text / cache key / fingerprint as the MC judge
+        # used, so every interpretation it already paid for is reused
+        pre = Preflighter(args.dry_run)
+        with Cache(args.out / "cells.jsonl") as cache:
+            n_cached = sum(
+                1
+                for key, txt in bundles.items()
+                if cache.get(
+                    f"summ:{key}", fingerprint(SUMMARIZER_PROMPT_VERSION, sjudge.model, txt)
+                )
+                is not None
+            )
+            summaries = summarize(
+                bundles,
+                judge=sjudge,
+                cache=cache,
+                spend=spend,
+                concurrency=args.concurrency,
+                rpm=args.rpm,
+                dry_run=args.dry_run,
+                preflight=pre.for_judge(sjudge),
+            )
 
     if args.dry_run:
         _print_dry_run(name, contract, scope, units_of, positions, layers, missing)
 
     empty: set[tuple[str, int]] = set()
+    unsummarized: set[tuple[str, int]] = set()  # a bag the summarizer failed on: undecided
     hits_by: dict[str, dict[int, dict[str, list[str]]]] = defaultdict(dict)
+    source_by: dict[str, dict[int, dict[str, list[str]]]] = defaultdict(dict)
     for (item_id, layer), cs in sorted(positions.items()):
-        samples = _cell_samples(cs[0])
+        cell = cs[0]
+        summary = summaries.get(cell.key) if (tokens and cell.tokens) else None
+        if tokens and cell.tokens and summary is None and not args.dry_run:
+            unsummarized.add((item_id, layer))
+        samples = _cell_samples(cell, summary)
         if not samples:
             empty.add((item_id, layer))
-        hits_by[item_id][layer] = (
-            regex.layer_unit_hits(samples, units_of[item_id]) if not args.dry_run else {}
-        )
+        if args.dry_run:
+            hits_by[item_id][layer] = {}
+            continue
+        units = units_of[item_id]
+        hits_by[item_id][layer] = regex.layer_unit_hits(samples, units)
+        if tokens:
+            raw_hits = regex.layer_unit_hits(_cell_samples(cell), units)
+            summ_hits = (
+                regex.layer_unit_hits([regex.extract_phrase(summary)], units)
+                if summary is not None
+                else {}
+            )
+            source_by[item_id][layer] = {
+                u.role: [
+                    src for src, h in (("bag", raw_hits), ("summary", summ_hits)) if h.get(u.role)
+                ]
+                for u in units
+            }
 
     rows: list[dict[str, Any]] = []
     for item_id in ids:
         units = units_of[item_id]
         res = regex.item_result(hits_by.get(item_id, {}), units)
         item_missing = [layer for i, layer in missing if i == item_id]
-        incomplete = bool(item_missing) or not hits_by.get(item_id) or args.dry_run
-        rows.append(
-            {
-                "id": item_id,
-                "roles": [u.role for u in units if u.required],
-                "optional_roles": [u.role for u in units if not u.required],
-                "pass": tri_state(res["pass"], incomplete),
-                "earliest_layer": res["earliest_layer"],
-                "passing_layers": res["passing_layers"],
-                "unit_hit": res["unit_hit"],
-                "unit_langs": res["unit_langs"],
-                "first_lang": res["first_lang"],
-                "any_hit": res["any_hit"],
-                "missing_layers": item_missing,
-                "layers": {
-                    str(layer): {"hits": h, "empty": (item_id, layer) in empty}
-                    for layer, h in sorted(hits_by.get(item_id, {}).items())
-                },
-            }
+        item_unsummarized = sorted(layer for i, layer in unsummarized if i == item_id)
+        incomplete = (
+            bool(item_missing)
+            or bool(item_unsummarized)
+            or not hits_by.get(item_id)
+            or args.dry_run
         )
+        row = {
+            "id": item_id,
+            "roles": [u.role for u in units if u.required],
+            "optional_roles": [u.role for u in units if not u.required],
+            "pass": tri_state(res["pass"], incomplete),
+            "earliest_layer": res["earliest_layer"],
+            "passing_layers": res["passing_layers"],
+            "unit_hit": res["unit_hit"],
+            "unit_langs": res["unit_langs"],
+            "first_lang": res["first_lang"],
+            "any_hit": res["any_hit"],
+            "missing_layers": item_missing,
+            "layers": {
+                str(layer): {
+                    "hits": h,
+                    "empty": (item_id, layer) in empty,
+                    **(
+                        {"source": source_by[item_id].get(layer, {})}
+                        if tokens and not args.dry_run
+                        else {}
+                    ),
+                }
+                for layer, h in sorted(hits_by.get(item_id, {}).items())
+            },
+        }
+        if tokens:
+            row["unsummarized_layers"] = item_unsummarized
+        rows.append(row)
     decided = [r for r in rows if r["pass"] is not None]
     roles = sorted({r for row in rows for r in (*row["roles"], *row["optional_roles"])})
     first_lang: dict[str, Counter[str]] = defaultdict(Counter)
@@ -178,33 +253,63 @@ def run_regex(args: JudgeArgs, *, name: str) -> FamilyResult:
         for role, lang in row["first_lang"].items():
             if lang is not None:
                 first_lang[role][lang] += 1
+    # which source carried the passing layers of token arms: bag only / summary only / both
+    pass_source: Counter[str] = Counter()
+    if tokens:
+        for row in decided:
+            for layer in row["passing_layers"]:
+                srcs = source_by[row["id"]].get(layer, {})
+                req = [srcs.get(r, []) for r in row["roles"]]
+                if all("bag" in x for x in req) and all("summary" in x for x in req):
+                    pass_source["both"] += 1
+                elif all("bag" in x for x in req):
+                    pass_source["bag_only"] += 1
+                elif all("summary" in x for x in req):
+                    pass_source["summary_only"] += 1
+                else:
+                    pass_source["mixed"] += 1
+    # the instrument: the contract alone for prose; the summarizer model for token bags
+    judge_used = sjudge if tokens else REGEX_JUDGE
+    version = SUMMARIZED_SCORER_VERSION if tokens else SCORER_VERSION
     result = pass_rate_result(
         name=name,
-        args=dataclasses.replace(args, judge=REGEX_JUDGE),
-        prompt_version=SCORER_VERSION,
+        args=dataclasses.replace(args, judge=judge_used),
+        prompt_version=version,
         rows=rows,
         cells=cells,
         rep=rep,
         n_expected=len(ids) * len(layers),
         n_missing=len(missing),
-        n_unjudged=0,
+        n_unjudged=len(unsummarized),
         n_empty=len(empty),
-        spend=Spend(),
+        spend=spend,
         chance_label=CHANCE_LABEL,
         config_extra={
             "layers_judged": layers,
             "scorer": SCORER,
-            "scorer_version": SCORER_VERSION,
+            "scorer_version": version,
             "contract": dataclasses.asdict(contract),
+            "summarizer": SUMMARIZER_PROMPT_VERSION if tokens else None,
+            "summarizer_model": sjudge.model if tokens else None,
         },
         extras={
-            "n_calls": 0,
+            "n_calls": spend.calls,
             "any_hit_rate": rate(row["any_hit"] for row in decided),
             "unit_any_layer": {
                 r: rate(row["unit_hit"][r] for row in decided if r in row["unit_hit"])
                 for r in roles
             },
             "language_of_readout": {r: dict(c) for r, c in sorted(first_lang.items())},
+            **(
+                {
+                    "n_summaries": len(bundles),
+                    "n_summaries_cached": n_cached,
+                    "n_summaries_failed": len(unsummarized),
+                    "passing_layers_by_source": dict(pass_source),
+                }
+                if tokens
+                else {}
+            ),
             **({"mc": previous_mc} if previous_mc else {}),
         },
     )

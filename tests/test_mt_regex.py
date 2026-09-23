@@ -1,18 +1,19 @@
 """The multi-token regex scorer: the port is pinned to the SOURCE repo's verdicts (the goldens in
 ``tests/golden/mt_regex_*.json``), and ``run_regex`` applies the contract cell by cell."""
 
+import importlib
 import json
 from pathlib import Path
 
 import pytest
 
-from wsbench import registry
+from wsbench import llm, registry
 from wsbench.banks import load_bank
 from wsbench.cli import main
 from wsbench.judge_config import JudgeConfig, resolve
 from wsbench.multitoken import family as fam
 from wsbench.multitoken import regex
-from wsbench.multitoken.regex import SCORER_VERSION, ScoredUnit
+from wsbench.multitoken.regex import SCORER_VERSION, SUMMARIZED_SCORER_VERSION, ScoredUnit
 from wsbench.registry import JudgeArgs
 from wsbench.results import read_results
 
@@ -182,10 +183,13 @@ def test_run_regex_prose(tmp_path):
     assert r.extras["n_calls"] == 0 and r.extras["unit_any_layer"] == {"correction": 1 / 3}
 
 
-def test_run_regex_tokens_and_the_language_unit(tmp_path):
+def test_run_regex_tokens_and_the_language_unit(tmp_path, fake_llm, monkeypatch):
     """multilingual_mt (concept + language, both required): a top-k bag of single tokens hits the
     language name but never the two-word concept -> fail; a label-style token holding the whole
-    phrase passes; the concept alone in a prose cell is any_hit but not a pass."""
+    phrase passes; the concept alone in a prose cell is any_hit but not a pass. The summarizer is
+    stubbed with an unrelated interpretation, so the raw bag alone decides here."""
+    monkeypatch.setattr(llm, "preflight", lambda model, reasoning: None)
+    fake_llm(lambda system, user: {"interpretation": "noise about something else entirely"})
     _h, items = load_bank(REPO / "evals/multilingual_mt/items.json")
     it = next(i for i in items if len(i["units"][0]["forms"]["en"][0].split()) >= 2)
     concept = it["units"][0]["forms"]["en"][0]
@@ -209,7 +213,11 @@ def test_run_regex_tokens_and_the_language_unit(tmp_path):
     r = fam.run_regex(_args(path, tmp_path / "out", items=[it["id"]]), name="multilingual_mt")
     row = r.rows[0]
     assert row["layers"]["20"]["hits"] == {"concept": [], "language": ["en"]}
+    assert row["layers"]["20"]["source"] == {"concept": [], "language": ["bag"]}
     assert row["pass"] is True and row["passing_layers"] == [24]
+    assert r.extras["passing_layers_by_source"] == {"bag_only": 1}
+    assert r.config["prompt_version"] == SUMMARIZED_SCORER_VERSION
+    assert r.config["judge_model"] == "google/gemini-3.8-flash" and r.pinned_instrument
     prose = tmp_path / "p.jsonl"
     prose.write_text(
         json.dumps({"id": it["id"], "layer": 20, "pos": 3, "samples": [concept]}) + "\n"
@@ -261,10 +269,8 @@ def test_dispatch_and_dry_run(tmp_path, capsys):
 
 @pytest.mark.parametrize("name", MT)
 def test_cli_dry_run_on_the_toy_file_makes_no_call(name, tmp_path, capsys, monkeypatch):
-    spec = registry.get(name) if name in registry.FAMILIES else None
-    if spec is None:
-        registry.load_all()
-        spec = registry.get(name)
+    spec = importlib.import_module(f"wsbench.evals.{name}").SPEC
+    registry.FAMILIES.setdefault(spec.name, spec)  # conftest resets the registry per test
     monkeypatch.delenv("WSBENCH_JUDGE_MODEL", raising=False)
     monkeypatch.setenv("OPENROUTER_API_KEY", "")  # no key: a judge call would fail loudly
     out = tmp_path / "out"
@@ -284,8 +290,8 @@ def test_cli_scores_the_toy_file_offline(name, tmp_path, monkeypatch):
     never does and is blank at one layer (a negative) — 0.5, offline, no key needed."""
     monkeypatch.delenv("WSBENCH_JUDGE_MODEL", raising=False)
     monkeypatch.setenv("OPENROUTER_API_KEY", "")
-    if name not in registry.FAMILIES:
-        registry.load_all()
+    spec = importlib.import_module(f"wsbench.evals.{name}").SPEC
+    registry.FAMILIES.setdefault(spec.name, spec)
     out = tmp_path / "out"
     example = REPO / "examples/readouts" / f"{name}.jsonl"
     assert (
@@ -296,3 +302,76 @@ def test_cli_scores_the_toy_file_offline(name, tmp_path, monkeypatch):
     assert r.value == 0.5 and r.counts["spend_usd"] == 0.0 and r.pinned_instrument
     assert [row["pass"] for row in r.rows if row["pass"] is not None] == [True, False]
     assert r.counts["n_empty_cells"] == 1 and r.extras["n_calls"] == 0
+
+
+def _token_rows(item, layers, tokens):
+    return [
+        {"id": item["id"], "layer": layer, "pos": 3, "tokens": list(tokens)} for layer in layers
+    ]
+
+
+def test_tokens_are_summarized_then_matched(tmp_path, fake_llm, monkeypatch):
+    """The summary carries a two-word concept no single token can hold: a pass through the summary
+    (source `summary` for the concept, the bag for the language name); the instrument is the
+    summarizer model, spend counts its calls; a second run is all cache hits and makes no call."""
+    _h, items = load_bank(REPO / "evals/multilingual_mt/items.json")
+    it = next(i for i in items if len(i["units"][0]["forms"]["en"][0].split()) >= 2)
+    concept = it["units"][0]["forms"]["en"][0]
+    lang_name = it["units"][1]["forms"]["en"][0]
+    monkeypatch.setattr(llm, "preflight", lambda model, reasoning: None)
+    fake = fake_llm(
+        lambda system, user: {
+            "interpretation": f"The tokens point to {concept} in a {lang_name} text."
+        }
+    )
+    path = tmp_path / "t.jsonl"
+    rows = _token_rows(it, [20, 24], [f" {lang_name}", " noise", " more"])
+    path.write_text("".join(json.dumps(r, ensure_ascii=False) + "\n" for r in rows))
+    out = tmp_path / "out"
+    r = fam.run_regex(_args(path, out, items=[it["id"]]), name="multilingual_mt")
+    row = r.rows[0]
+    assert row["pass"] is True and row["passing_layers"] == [20, 24]
+    assert row["layers"]["20"]["source"] == {"concept": ["summary"], "language": ["bag", "summary"]}
+    # the summary alone carries both units (the bag alone only the language): "summary_only"
+    assert r.extras["passing_layers_by_source"] == {"summary_only": 2}
+    assert r.extras["n_summaries"] == 2 and r.extras["n_summaries_cached"] == 0
+    assert r.extras["n_calls"] == 2 and len(fake.calls) == 2
+    assert r.config["prompt_version"] == SUMMARIZED_SCORER_VERSION
+    assert r.config["summarizer"] == "interp-v1" and r.config["judge_model"].startswith("google/")
+    assert r.pinned_instrument and r.counts["n_unjudged_cells"] == 0
+    # cached: the same bags in the same out dir -> no call, same verdicts
+    r2 = fam.run_regex(_args(path, out, items=[it["id"]]), name="multilingual_mt")
+    assert len(fake.calls) == 2 and r2.extras["n_calls"] == 0
+    assert r2.extras["n_summaries_cached"] == 2 and r2.rows[0]["pass"] is True
+    assert r2.counts["spend_usd"] == 0.0
+
+
+def test_a_failed_summary_leaves_the_item_undecided(tmp_path, fake_llm, monkeypatch):
+    monkeypatch.setattr(llm, "preflight", lambda model, reasoning: None)
+    fake_llm(lambda system, user: None)  # every summarizer call fails
+    _h, items = load_bank(REPO / "evals/typo_mt/items.json")
+    it = items[0]
+    path = tmp_path / "t.jsonl"
+    path.write_text(json.dumps(_token_rows(it, [20], [" some", " tokens"])[0]) + "\n")
+    r = fam.run_regex(_args(path, tmp_path / "out", items=[it["id"]]), name="typo_mt")
+    assert r.rows[0]["pass"] is None and r.rows[0]["unsummarized_layers"] == [20]
+    assert r.counts["n_unjudged_cells"] == 1 and r.extras["n_summaries_failed"] == 1
+    assert r.value is None and not r.complete
+
+
+def test_an_unpinned_summarizer_unpins_the_token_instrument(tmp_path, fake_llm, monkeypatch):
+    monkeypatch.setattr(llm, "preflight", lambda model, reasoning: None)
+    fake_llm(lambda system, user: {"interpretation": "nothing relevant"})
+    _h, items = load_bank(REPO / "evals/typo_mt/items.json")
+    it = items[0]
+    path = tmp_path / "t.jsonl"
+    path.write_text(json.dumps(_token_rows(it, [20], [" x"])[0]) + "\n")
+    judge = resolve(JudgeConfig(prompt_version=SCORER_VERSION), flag="some/other-model")
+    r = fam.run_regex(_args(path, tmp_path / "out", items=[it["id"]], judge=judge), name="typo_mt")
+    assert r.config["judge_model"] == "some/other-model" and not r.pinned_instrument
+    prose = tmp_path / "p.jsonl"
+    prose.write_text(json.dumps({"id": it["id"], "layer": 20, "pos": 3, "samples": ["x"]}) + "\n")
+    r2 = fam.run_regex(
+        _args(prose, tmp_path / "out2", items=[it["id"]], judge=judge), name="typo_mt"
+    )
+    assert r2.config["judge_model"] == "regex" and r2.pinned_instrument  # prose ignores the flag

@@ -34,10 +34,13 @@ The rules, in the order a cell is scored:
    layer (``item_result``). ``any_hit`` (some unit hit somewhere) is the parent-comparable extra.
 
 What this means for a top-k token lens: a strictly multi-token form can never be one token, so
-required multi-token units are unreachable by construction — the source's stated asymmetry
-("multi-token targets can only be hit by the oracle lens"). Only single-token units (a language
-name) or a producer whose "tokens" are phrases or labels (the template lens, an SAE's
-auto-interp labels) can register.
+on the raw bag required multi-token units are unreachable by construction — the source's stated
+asymmetry ("multi-token targets can only be hit by the oracle lens"). The bench therefore keeps
+its bag -> prose step for token readouts (``wsbench.summarizer``, ``docs/summarizer.md``): each
+cell's bag is interpreted once by the shared summarizer (cached, same fingerprint as the MC judge
+used) and the contract is applied to the interpretation as one more sample beside the raw tokens
+— a unit hits when a form is found in the summary OR in a single token (``run_regex`` in
+``family.py``; ``SUMMARIZED_SCORER_VERSION``).
 """
 
 import re
@@ -48,6 +51,7 @@ from typing import Any, Literal
 
 __all__ = [
     "SCORER_VERSION",
+    "SUMMARIZED_SCORER_VERSION",
     "BankContract",
     "ScoredUnit",
     "contract_for",
@@ -62,7 +66,11 @@ __all__ = [
     "unicode_word_matcher",
 ]
 
-SCORER_VERSION = "mt-regex-2026-09-23"
+SCORER_VERSION = "mt-regex-2026-09-23"  # prose arms: the contract on the samples
+# token arms: the contract on each top-k token AND on the shared summarizer's interpretation of
+# the bag (docs/summarizer.md), as separate samples — Camila 2026-09-23 16:52 ("for the token
+# lenses on mt i thought we were doing an llm summarizer step?")
+SUMMARIZED_SCORER_VERSION = "mt-regex-summarized-2026-09-23"
 
 # ---------------------------------------------------------------------------------------------
 # olens_sglang/common.py — scaffolding stripped from every sample before scoring
