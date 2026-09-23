@@ -4,10 +4,10 @@ A non-English prompt whose answer is a multi-token concept; the lens must write 
 
 100 items (source bank `lens-eval-multilingual-hard.json`, parent `multilingual-mt`,
 frozen 2026-09-10). Plain render, one read position: the final prompt token, immediately
-before the answer word. Every item and every bridge was gated on Qwen3.6-27B (greedy-verified,
+before the answer word. Every item was gated on Qwen3.6-27B (greedy-verified,
 then >= 8/10 at temperature 0.7).
 
-Example: a Polish sentence about a concept → the concept's `en`/`zh` form (`hourglass`, `sand timer`, `沙漏`) and the language (`Polish`, `波兰语`, or the answer in Polish) in one layer.
+Example: an Arabic sentence about a concept (`mlh-ar-hourglass`) → the concept's `en`/`zh` form (`hourglass`, `sand timer`, `沙漏`) and the language (`Arabic`, `阿拉伯语`, or the answer in Arabic) in one layer.
 
 Scored units: `concept` (required; `en` + `zh` forms) and `language` (required; the language's English or Chinese name, or the answer in the source language's own script).
 

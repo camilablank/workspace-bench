@@ -1,4 +1,4 @@
-"""The public docs: README entries for all nine families, Credits, NOTICE.md, CITATION.cff."""
+"""The public docs: README entries for all families, Credits, NOTICE.md, CITATION.cff."""
 
 import re
 

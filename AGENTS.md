@@ -1,8 +1,8 @@
 # Working in this repo
 
-This repo holds the banks, the judges and the baselines of WorkspaceBench. It does **not** hold
-inference code: producing readouts (capturing activations, running a lens) happens elsewhere and
-arrives here as a readouts file. `CLAUDE.md` has the code conventions and how to add a family;
+This repo holds the banks, the judges and the baselines of WorkspaceBench. Judging is the
+contract: readouts arrive as one JSONL file per family, produced by your own lens or by the
+optional `wsbench produce` (the `gpu` extra). `CLAUDE.md` has the code conventions and how to add a family;
 this file is about using the benchmark on a model other than the one it was built for, and about
 the checks to run before you trust a number.
 
@@ -131,16 +131,21 @@ bank is authored, gated and then frozen into `evals/<family>/items.json`. What "
 so far, and what a new item has to satisfy:
 
 - **Multi-token targets.** A top-10 token bag can hold `iron` but not `Simula 67`, so the hard
-  tier moved to multi-token bridges and the judge became a forced choice among five confusables.
+  tier moved to multi-token bridges. Their scorer of record is the regex contract (each
+  required unit hits some sample at the same layer; a form never spans samples); the forced
+  choice among five confusables is `opts=judge=mc`, a diagnostic.
 - **No leak.** The target must not appear in the prompt, in any script or spelling. The
   arithmetic and chain banks check that no intermediate appears as a numeral in the prompt.
 - **A real gate.** Greedy-correct, then at least 8 of 10 samples at temperature 0.7.
 - **Distractors drawn from the same pool.** Same kind, same specificity, seeded per item so every
   arm and every subset sees the same list. Then measure the lucky-guessing floor: blind guessing
-  above chance means the options leak (multihop_mt blind is 0.658 against a measured uniform
-  0.126 and an analytic 0.149).
+  above chance means the options leak (multihop_mt's MC judge guessed 0.658 blind against a
+  measured uniform 0.126 and an analytic 0.149; an MC-only diagnostic, no longer drawn now that
+  the family is regex-scored).
 - **A null you can compute.** A permutation over other items' answers, a decoy set matched in
-  magnitude, a role swap, a derangement foil. Families without one are the weakest here.
+  magnitude, a role swap, a derangement foil. Only arithmetic_intermediates, chain_intermediates,
+  brew_intermediates and jlens_concept_pr carry one; the other families are the weakest here,
+  and adding an empirical null to each is open work (README §Open work).
 - **Controls in the bank, not just baselines.** Clean twins, don't-think twins, ab/ba direction
   pairs, off-trajectory colours: a control that shares the item's surface but not its answer is
   what separates reading from echoing.
@@ -168,9 +173,10 @@ instrument change and the test will say so.
 rule and layers, and `wsbench.readplan.resolve(rule, tokens)` turns a rule into indices for your
 tokenizer. `docs/producing_readouts.md` walks the whole producer side.
 
-## What this repo will not do for you
+## What this repo will and will not do for you
 
-There is no capture code, no lens implementation and no model serving here. A readouts file is
-the contract: `{"id", "layer", "pos", "samples"}` for a prose lens, `tokens` (+ `scores`) for a
-token lens. `wsbench convert-gen-dir` and `wsbench convert-read-json` turn the two common
-producer layouts into it.
+Judging is the contract; the readout file format is stated once in README §Quickstart.
+`wsbench produce` (methods logit_lens | jlens | rlens | olens | nla, one prompt at a time on one
+GPU) can fill it for you; it is not a fan-out harness, and there is no model serving here.
+`wsbench convert-gen-dir` (and the legacy `convert-read-json`) turn the two in-house producer
+layouts into the contract.

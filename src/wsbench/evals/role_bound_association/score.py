@@ -30,15 +30,16 @@ def score(
     # item pass is ANY over the judged read sites; the honest guessing floor is therefore
     # 1-(1-(1/6)^3)^n_sites per item, not the per-site (1/6)^3.
     #
-    # 🚨 DO NOT QUOTE `any_of_grid_floor` AS A FLOOR (2026-09-10). This acts dir carries
-    # no `eval_positions`, so the grid is 204-810 read sites per item and the value below
-    # is 0.9587 (oa) / 0.662 (eb): the baseline AND every arm sit pinned near it, so it
-    # measures the grid, not the model. It assumes a guesser that re-randomises at every
+    # 🚨 DO NOT QUOTE `any_of_grid_floor` AS A FLOOR (2026-09-10). The original acts dir
+    # carried no `eval_positions`, so the grid was 204-810 read sites per item and the value
+    # was 0.9587 (oa) / 0.662 (eb): the baseline AND every arm sat pinned near it, so it
+    # measured the grid, not the model. It assumes a guesser that re-randomises at every
     # site; the measured one picks the same option every draw. Baseline C's role-bound
     # number is withheld for exactly this reason — see the `_excluded` block in
     # evals/workspace-bench/baselines/base_text.json, and workspace_bench.chance
-    # §saturation, which suppresses the line wherever it could be drawn. The fix is a
-    # targeted read-position set, not a different formula.
+    # §saturation, which suppresses the line wherever it could be drawn. The targeted
+    # read-position set is the plan now (19 suffix/tail positions x 6 layers = 114 sites per
+    # item, since 2026-09-22), which still saturates the formula.
     per_site = (1.0 / 6.0) ** 3
     ns = [len(vs) for vs in by_item.values() if vs]
     floor = round(mean(1.0 - (1.0 - per_site) ** n for n in ns), 4) if ns else None

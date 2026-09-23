@@ -1,6 +1,5 @@
 """``wsbench run``: judge several families concurrently, fail-soft, one preflight per model."""
 
-import argparse
 import os
 import sys
 from collections.abc import Mapping, Sequence
@@ -8,9 +7,10 @@ from concurrent.futures import Future, ThreadPoolExecutor, as_completed
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Literal
+from typing import Literal, Protocol
 
 from wsbench import llm, mcjudge
+from wsbench.family import fail
 from wsbench.judge_config import ResolvedJudge, resolve
 from wsbench.llm import JudgeConfigError
 from wsbench.registry import EvalSpec, JudgeArgs
@@ -28,12 +28,32 @@ class FamilyOutcome:
     exit_code: int = 0  # 3 JudgeConfigError, 2 SystemExit
 
 
+class Options(Protocol):
+    """The judge options ``wsbench judge`` passes down (``cli.JudgeOptions``)."""
+
+    judge_model: str | None
+    layers: list[int] | None
+    items: list[str] | None
+    limit: int
+    allow_missing: bool
+    concurrency: int
+    rpm: float
+    dry_run: bool
+    opt: list[str]
+
+
+class RunOptions(Options, Protocol):
+    """``wsbench run``'s options: the judge options plus the thread count."""
+
+    family_workers: int
+
+
 def parse_opts(pairs: Sequence[str]) -> dict[str, str]:
-    """``--opt KEY=VALUE`` (repeatable) -> dict; a malformed pair is a usage error (exit 2)."""
+    """``opts=KEY=VALUE,...`` -> dict; a malformed pair is a usage error (exit 2)."""
     out: dict[str, str] = {}
     for p in pairs:
         if "=" not in p:
-            raise SystemExit(f"--opt expects KEY=VALUE, got {p!r}")
+            fail(f"opts= expects KEY=VALUE pairs, got {p!r}")
         k, v = p.split("=", 1)
         out[k.strip()] = v
     return out
@@ -41,14 +61,14 @@ def parse_opts(pairs: Sequence[str]) -> dict[str, str]:
 
 def judge_family(
     spec: EvalSpec,
-    args: argparse.Namespace,
+    args: Options,
     readouts: Path,
     out: Path,
     *,
     judge: ResolvedJudge,
     opts: Mapping[str, str],
 ) -> FamilyResult:
-    """Run one family with an already-resolved judge and pre-parsed ``--opt``; write its
+    """Run one family with an already-resolved judge and pre-parsed ``opts=``; write its
     ``results.json`` and print the one-line summary."""
     jargs = JudgeArgs(
         readouts=readouts,
@@ -77,7 +97,7 @@ def judge_family(
 
 def _one(
     spec: EvalSpec,
-    args: argparse.Namespace,
+    args: Options,
     readouts: Path,
     out: Path,
     judge: ResolvedJudge,
@@ -113,7 +133,7 @@ def _seed_preflights(judges: Mapping[str, ResolvedJudge]) -> None:
 
 def run_families(
     specs: Sequence[EvalSpec],
-    args: argparse.Namespace,
+    args: RunOptions,
     *,
     readouts_root: Path,
     out: Path,
@@ -121,12 +141,12 @@ def run_families(
 ) -> tuple[list[FamilyOutcome], int]:
     """Judge ``specs`` from ``readouts_root/<family>.jsonl`` into ``out/<family>/``.
 
-    Order of operations: parse ``--opt`` once (a bad pair is one ``SystemExit``, nothing
+    Order of operations: parse ``opts=`` once (a bad pair is one ``SystemExit``, nothing
     started); resolve every judge once; skip families with no readouts file; unless
-    ``--dry-run``, preflight each distinct judge model once (a failure aborts with exit 3
+    ``dry_run=True``, preflight each distinct judge model once (a failure aborts with exit 3
     before any thread starts); then run the rest in a ``ThreadPoolExecutor`` with
-    ``min(len(runnable), --family-workers)`` workers (1 under ``--dry-run`` so printed prompts
-    do not interleave). The process-wide pacer is shared, so ``--rpm`` bounds the whole run.
+    ``min(len(runnable), family_workers)`` workers (1 under ``dry_run`` so printed prompts
+    do not interleave). The process-wide pacer is shared, so ``rpm=`` bounds the whole run.
 
     Returns the outcomes in ``specs`` order and the exit code: 130 if interrupted, else 3 if
     any family hit a ``JudgeConfigError``, else 2 if any raised ``SystemExit``, else 0.
@@ -204,7 +224,7 @@ def run_manifest(
     *,
     started: datetime,
     finished: datetime,
-    args: argparse.Namespace,
+    args: Options,
     out: Path,
     readouts_root: Path,
     env: Mapping[str, str] | None = None,
@@ -225,7 +245,7 @@ def run_manifest(
                 pinned_instrument=r.pinned_instrument,
                 spend_usd=r.counts.get("spend_usd"),
             )
-            if "n_calls" in r.extras:  # no family reports it today; kept for producers that do
+            if "n_calls" in r.extras:
                 d["n_calls"] = r.extras["n_calls"]
         families[o.family] = d
     return {

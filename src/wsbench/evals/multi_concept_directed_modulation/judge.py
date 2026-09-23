@@ -107,7 +107,7 @@ def run(args: JudgeArgs) -> FamilyResult:
     regions: dict[str, dict[int, Region]] = {}
     compliance: dict[str, Any] = {}
     for item_id, toks in window.items():
-        forward = sorted(toks)  # offsets -20 .. -1 read forward
+        forward = sorted(toks)  # offsets -12 .. -1 read forward
         labels, comp = label_cells([toks[p] for p in forward])
         regions[item_id] = dict(zip(forward, labels, strict=True))
         compliance[item_id] = comp

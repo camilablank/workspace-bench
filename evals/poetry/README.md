@@ -5,7 +5,9 @@ word. 100 items, plain render, read at the **newline that ends line one**, one p
 layer. The read moved there on 2026-09-23 from the final prompt token, the space before the
 rhyme word: at the end of line one the model has committed to a rhyme and the O-lens already
 writes line two with it, while at the final token the readout echoes the line just read. The
-judge is unchanged: one call per (item, layer), an item passing on any layer.
+judge is unchanged: one call per (item, layer), an item passing on any layer. The bank header's
+`eval_render_note` ("directed-modulation is the only chat-templated family") predates the
+chat-rendered families and is superseded by `wsbench plan`.
 
 Example: "A rhyming couplet: The captain pointed at the route ahead, And told his crew to follow where he'd" -> target `led`.
 

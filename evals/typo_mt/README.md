@@ -4,7 +4,7 @@ A sentence ending in a misspelled multi-token word or phrase; the lens must writ
 
 100 items (source bank `lens-eval-typo-hard.json`, parent `typo-mt`,
 frozen 2026-09-10). Plain render, one read position: the final prompt token, immediately
-before the answer word. Every item and every bridge was gated on Qwen3.6-27B (greedy-verified,
+before the answer word. Every item was gated on Qwen3.6-27B (greedy-verified,
 then >= 8/10 at temperature 0.7).
 
 Example: a sentence ending in a misspelling → the corrected phrase (`interpretability`) in one sample; 15 items are arithmetic results whose corrected number must sit in answer position.

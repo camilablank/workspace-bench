@@ -13,6 +13,8 @@ items, chat render (source bank `lens-eval-directed-modulation.json`, family key
 
 Every item is gated at >= 8/10 compliance: the model copies the carrier and never mentions the
 concept. Read sites: the assistant's writing positions (one row per position, k samples each).
+The bank header's `eval_render_note` ("directed-modulation is the only chat-templated family")
+predates the chat-rendered families and is superseded by `wsbench plan`.
 
 ## Scoring
 
@@ -45,8 +47,9 @@ concept. Read sites: the assistant's writing positions (one row per position, k 
   the items reaching the judge, so its numbers from `--limit` or screened runs are not
   comparable.
 - Chance: 1/6 per call over the shown options, which is not a floor for an any-row max; the
-  measured floors are the lucky-guessing baseline (an LLM shown only the same option lists)
-  and the prompt-only baseline, both later PRs.
+  measured floors are frozen in `evals/baselines/`: the lucky-guessing baseline (an LLM shown
+  only the same option lists; blind 0.162) and the prompt-only baseline (0.21), both under the
+  `dm-2026-09-16` instrument `report` gates on.
 
 ## Readouts
 

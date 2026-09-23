@@ -59,7 +59,9 @@ the readouts never knows the answer.
   inferred bug and quote). No regex or numeric matcher anywhere.
 - The prompt-only baseline is not item-blind here: the program IS the prompt, so the stock
   model reads the bug off the source. Its score bounds what the text gives away, not what a
-  lens must clear.
+  lens must clear. The frozen entry in `evals/baselines/` is the superseded `net_S2`
+  measurement (stamped `buggy-2026-09-16`), not drawn by `report`; re-measure under the current
+  `score` instrument before comparing.
 - The source docs' pairwise blind pick (chance 0.5) is not used: only 10 of the 25 buggy
   programs have an exact clean twin, too few pairs for a usable interval.
 - An unjudged stage leaves its item out of the mean. Missing cells are fatal (exit 2) unless

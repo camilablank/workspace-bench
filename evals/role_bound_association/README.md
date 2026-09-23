@@ -21,7 +21,8 @@ and not just the concepts?
 - **Site pass** = all three correct; **item pass** = any site.
 - **Metric:** `pass_rate` = passing items / items in scope; bootstrap CI over items.
   `chance = None`; per site (1/6)^3; the any-of-grid floor in `extras.any_of_grid_floor`
-  saturates at hundreds of sites per item and must not be quoted.
+  saturates at 114 sites per item (19 positions × 6 layers; ≈ 11.4k calls per arm) and must not
+  be quoted.
 - **The prompt-only baseline is not a bar here: it measures 1.00.** The scene states who did
   what to whom, so a summary of the text alone answers all three questions. Use the frozen
   number as a fairness flag on the bank, never as a floor a lens must clear (unchanged by the

@@ -173,8 +173,8 @@ def score(
     nums = numbers(records, k=k)
     extras = {name: v for name, v in nums.items() if name not in ("hallucination_rate", "ci95")}
     ci = nums["ci95"]
-    # --layers is NOT a subset for this family: a single-layer lens judged at its one layer is
-    # complete, as in the source; --items / --limit still are.
+    # layers= is NOT a subset for this family: a single-layer lens judged at its one layer is
+    # complete, as in the source; items= / limit= still are.
     subset = args.items is not None or args.limit > 0
     return FamilyResult(
         family="hallucination",

@@ -53,7 +53,8 @@ def test_every_family_plans_and_rows_serialize():
 def test_plans_match_the_bank_specs():
     arith = {s.id: s for s in readplan.plan("arithmetic_intermediates")}
     s = arith["addmul-000"]
-    assert s.positions == {"kind": "offset_from_end", "k": 8} and s.layers == [60]
+    assert s.positions == {"kind": "all_from_end"} and s.layers == [56, 60]
+    assert s.extra["frozen_cell"] == {"layer": 60, "pos": -8}
     buggy = {s.id: s for s in readplan.plan("buggy_code")}
     assert buggy["py-quantity-refund-credit"].layers == [60]
     assert next(s for s in buggy.values() if s.id.startswith("rust")).layers == [56]
@@ -73,6 +74,9 @@ def test_plans_match_the_bank_specs():
     jb = readplan.plan("jailbreak_recognition")[0]
     span = jb.positions["positions"]
     assert jb.render == "chat_context" and jb.messages[-1]["role"] == "user"
+    assert jb.layers == readplan.FIVE
+    implicit = next(s for s in readplan.plan("basic_readout") if s.render == "chat_prefill")
+    assert implicit.prefill == readplan.ANSWER_STEM
     assert span[0] == 3 and span[-1] == 745 and len(span) == 743  # every token of the last turn
 
 
@@ -82,6 +86,7 @@ def test_resolve_each_rule():
     assert r({"kind": "offset_from_end", "k": 2}, POEM) == [-2]
     assert r({"kind": "last_n", "n": 3}, POEM) == [12, 13, 14]
     assert r({"kind": "all"}, POEM) == list(range(15))
+    assert r({"kind": "all_from_end"}, POEM) == list(range(-15, 0))
     assert r({"kind": "positions", "positions": [1, 3, 99]}, POEM) == [1, 3]
     # the newline ending line one is the LAST newline: position 9, not the header's at 4
     assert r({"kind": "line_one_newline"}, POEM) == [9]

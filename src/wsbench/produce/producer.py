@@ -40,7 +40,7 @@ class Row:
 def _positions(rule: Positions, tokens: list[str]) -> list[int]:
     """Indices a positions rule selects. Plain ints count from the end when negative and are
     reported as absolute indices; a plan rule is reported as the plan resolves it (negative for
-    ``offset_from_end``, the convention of the banks that use it)."""
+    ``offset_from_end`` and ``all_from_end``, the convention of the banks that use them)."""
     n = len(tokens)
     if isinstance(rule, int | list):
         want = [rule] if isinstance(rule, int) else list(rule)

@@ -40,8 +40,6 @@ name) or a producer whose "tokens" are phrases or labels (the template lens, an 
 auto-interp labels) can register.
 """
 
-from __future__ import annotations
-
 import re
 import unicodedata
 from collections.abc import Callable, Mapping

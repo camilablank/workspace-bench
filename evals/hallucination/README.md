@@ -65,9 +65,9 @@ shared client and cache without changing the instrument.
   here** — a single-layer lens judged at its one layer is complete, as in the source.
 - **Judge:** `google/gemini-3.8-flash`, reasoning `{"effort": "minimal"}`,
   `PROMPT_VERSION = "v5c-chat"` — identical to the source pin, so `pinned_instrument` is true
-  under the default. Cost: a full multilayer arm is 1,123 x 5 = 5,615 span-judge calls plus the
-  same number of claim-verification calls (below); a token-lens arm adds one summary call per
-  cell.
+  under the default. Cost: a full multilayer arm over the five in-house layers 20/36/44/52/60
+  is 1,123 x 5 = 5,615 span-judge calls plus the same number of claim-verification calls
+  (below); a token-lens arm adds one summary call per cell.
 - **Claim verification (stage 2, `VERIFY_PROMPT_VERSION = "v5c-chat-verify-v1"`):** the span
   judge finds the FALSE claims but never counts the TRUE ones, so `hallucination_rate`'s
   denominator is a per-readout "says something concrete" flag, not a claim count. A second call
@@ -101,7 +101,7 @@ uv run wsbench judge family=hallucination readouts=examples/readouts/hallucinati
 # a token lens: the summarizer prompt is printed instead
 uv run wsbench judge family=hallucination readouts=examples/readouts/hallucination.tokens.jsonl out=/tmp/h dry_run=True
 # judge a full arm (span judge + claim verification; add opts=verify=0 to skip stage 2)
-OPENROUTER_API_KEY=sk-or-... uv run wsbench judge family=hallucination readouts=my_lens.jsonl layers=20,36,44,48,60 out=outputs/my_lens/hallucination
+OPENROUTER_API_KEY=sk-or-... uv run wsbench judge family=hallucination readouts=my_lens.jsonl layers=20,36,44,52,60 out=outputs/my_lens/hallucination
 ```
 
 `examples/readouts/hallucination.jsonl` (the source `examples/readouts_toy.jsonl`) and

@@ -3,31 +3,29 @@
 `wsbench` is a growing set of evals of whether an activation-reading lens (prose "O-lens" samples or
 top-k "J-lens" tokens) surfaces what a model computes but never writes. Every family plugs
 into the shared package in `src/wsbench/` (client, judge config, cache, readout contract,
-results schema, registry, runner, CLI). Design: `plans/0000-bench-v2-design.md`; phase plans
-`plans/000N-*.md`. Public docs: `README.md`, `NOTICE.md`, `CITATION.cff`.
+results schema, registry, runner, CLI, `readplan` = the producer-facing read plan, `capable/` =
+the porting gate, `produce/` = the optional HF-transformers producer behind the `gpu` extra).
+`plans/` is the 2026-09-15..17 design history of the nine-family restructure, not a current
+pointer (`plans/README.md`). Public docs: `README.md`, `NOTICE.md`, `CITATION.cff`.
 
 ## Readout contract (input to every family)
-One JSONL file per (family, arm), one row per cell; a file is all-prose or all-tokens:
-```
-{"id": "<item id>", "layer": 36, "pos": 33, "samples": ["...", "..."]}
-{"id": "<item id>", "layer": 36, "pos": 33, "tokens": ["Ġword", "..."], "scores": [10.8, 9.9]}
-```
-Optional `"token"` = the read-site token. `load_readouts` counts malformed lines (never fatal),
-keeps the first duplicate `(id, layer, pos)`, counts empty readouts (a result, not a missing
-cell). `wsbench convert-gen-dir gen_dir=GEN out=F.jsonl kind=prose|tokens` converts the in-house
+Stated once, in README §Quickstart (the contract block) and `docs/producing_readouts.md`; do not
+restate it here. Code facts only: `load_readouts` counts malformed lines (never fatal), keeps the
+first duplicate `(id, layer, pos)`, counts empty readouts (a result, not a missing cell).
+`wsbench convert-gen-dir gen_dir=GEN out=F.jsonl kind=prose|tokens` converts the in-house
 `<gen_dir>/<label>/L###.jsonl` layout (id = directory name, layer = filename).
 
 ## Judge layer (`llm.py`, `judge_config.py`)
 - Default judge `google/gemini-3.8-flash` via OpenRouter, reasoning `{"effort": "minimal"}`.
   Pins: agentic_misalignment + jailbreak_recognition -> `claude-sonnet-5` (reasons: README
   §Judges and the family READMEs). jlens runs all three stages on the default judge.
-- Override precedence: `judge_model=` flag > `WSBENCH_JUDGE_MODEL` env > family pin.
-  `pinned_instrument` is true only when the resolved model equals the pin; unpinned numbers
-  are never numbers of record. Aux models are not overridden.
+- Override precedence and what `pinned_instrument` means: README §Judges (the bullets under
+  the table); not restated here.
 - Routes by model id: `claude-*` -> Anthropic SDK (`ANTHROPIC_API_KEY`, structured output,
   refusal -> `None`); else OpenRouter via the OpenAI SDK (`OPENROUTER_API_KEY`, `sk-or-…`).
-  Shared: JSON-schema output, 12 jittered retries on 408/409/429/5xx/timeouts, process-wide
-  thread-safe RPM pacer (`rpm=`, default 240), `preflight` fail-fast, `Spend` tally. A failed
+  Shared: JSON-schema output, 11 jittered retries (`_ATTEMPTS = 12`) on 408/409/429/5xx/
+  timeouts, process-wide thread-safe RPM pacer (`rpm=`, default 240), `preflight` fail-fast,
+  `Spend` tally. A failed
   call returns `None` and never scores. `stream_json_async` is the primitive, `stream_json`
   wraps it (`temperature` dropped on the Anthropic route); `stream_text[_async]` is agentic's
   free-text Anthropic-only primitive.
@@ -59,9 +57,9 @@ cell). `wsbench convert-gen-dir gen_dir=GEN out=F.jsonl kind=prose|tokens` conve
   described / uniform) and `prompt_only`; `wsbench freeze` stamps entries with the family's
   `prompt_version`, and `report` shows a floor only while the stamp matches.
 - Per-family read regimes, pass rules and floors are documented in each `evals/<family>/README.md`
-  (the source of truth); do not restate them here. Camila's original families (agentic, jailbreak,
-  hallucination, jlens_concept_pr, moral, relational, role-bound, conjunctive, user_modeling) keep
-  their own `judge.py` + `score.py`.
+  (the source of truth); do not restate them here. Ten families keep their own `judge.py` +
+  `score.py`: Camila's nine originals (agentic, jailbreak, hallucination, jlens_concept_pr,
+  moral, relational, role-bound, conjunctive, user_modeling) and directed_modulation.
 - `opts=key=value,k2=v2` fills `JudgeArgs.extra`; `aux_models` comes from the family `JudgeConfig`.
   `EvalSpec.calls_per_arm` / `.sources` feed `wsbench list`; every non-empty `sources` must
   appear verbatim in README §Credits and NOTICE.md (`tests/test_readme.py`).
@@ -83,11 +81,8 @@ cell). `wsbench convert-gen-dir gen_dir=GEN out=F.jsonl kind=prose|tokens` conve
   unreadable results.
 
 ## Results contract (`results.py`)
-`results.json` = `{schema_version, family, complete, pinned_instrument, config, n_items,
-counts: {n_expected_cells, n_missing_cells, n_unjudged_cells, n_empty_cells, skipped_rows,
-spend_usd}, numbers: {metric, value, ci95, chance, chance_label, higher_is_better, extras},
-rows}`. `complete` = pinned judge, no subset, zero missing/unjudged cells, empty ≤ 5%. The
-macro averages only complete `pass_rate` families and lists every exclusion with its reason.
+README §Results contract is the single statement (schema, `complete`, the macro row); `results.py`
+implements it. Not restated here.
 
 ## Invariants
 - Every judge prompt lives in the family's `prompts.py` (`PROMPTS`; `{name}` placeholders
@@ -101,6 +96,9 @@ macro averages only complete `pass_rate` families and lists every exclusion with
   `- *What it is:*` / `- *Example:*` / `- *Judged by:*`, grouped Basic (single token) · Basic
   (multi-token) · Computational · Safety · Association · Bag of words · Precision · Logical processing. Credits live in README §Credits and NOTICE.md, one
   bullet per external source; in-house families get no credit line.
+- Style, enforced by review rather than a linter: module docstrings are 1–3 lines (rationale
+  goes in the README beside the code, not the file header); no `from __future__ import
+  annotations` (Python ≥ 3.11, write the modern syntax directly).
 
 ## Adding a family
 `src/wsbench/evals/<family>/{__init__,prompts,judge}.py` following the skeleton above (register an
@@ -113,16 +111,18 @@ and a credit if the items are external. Smoke `limit=3` live before any full run
 - CLI (pydra, `wsbench <command> key=value ...`): `wsbench list` | `wsbench judge family=F
   readouts=F.jsonl out=DIR` | `wsbench run all=True readouts_root=DIR out=DIR` |
   `wsbench report dir=DIR` | `wsbench baseline` / `wsbench freeze` |
-  `wsbench plan` (the producer interface: render, positions rule and layers per item,
-  `docs/producing_readouts.md`; `readplan.resolve` turns a rule into indices) |
+  `wsbench plan [families=a,b] [out=DIR]` (the producer interface: render, positions rule and
+  layers per item, `docs/producing_readouts.md`; `readplan.resolve` turns a rule into indices) |
+  `wsbench produce family=F method=M out=F.jsonl` or `text=... method=M positions=-1
+  layers=20,36,60` (methods logit_lens | jlens | rlens | olens | nla; needs the `gpu` extra) |
   `wsbench capable model=M` (re-run a bank's own gate on another model; porting notes and
   the pre-run sanity checks live in `AGENTS.md`) | `wsbench convert-gen-dir
-  gen_dir=GEN out=F.jsonl kind=prose|tokens` | `wsbench convert-read-json read=R out=F.jsonl`.
-  Shared judge keys: `judge_model=`, `layers=20,36`, `items=a,b`, `limit=N`, `allow_missing=True`,
-  `concurrency=64`, `rpm=240`, `dry_run=True`, `opts=k=v,k2=v2`; `--show` prints the resolved
-  config, `--help` a command's keys. Each command is a `pydra.Config` in `cli.py`: declare a
-  field in `__init__`, normalise it in `finalize()`; `runner.py` reads the same attribute names.
-- `uv sync --extra dev`; `uv run pytest -q`; `uv run ruff check .`; `uv run ruff format .`. Keys
+  gen_dir=GEN out=F.jsonl kind=prose|tokens` | `wsbench convert-read-json read=R out=F.jsonl`
+  (legacy). Shared judge keys: README §Quickstart (the output-layout paragraph). Each command is
+  a `pydra.Config` in `cli.py`: declare a field in `__init__`, normalise it in `finalize()`;
+  `runner.py` reads the same attribute names.
+- `uv sync --extra dev` (add `--extra gpu` for `produce`); `uv run pytest -q`; `uv run ruff
+  check .`; `uv run ruff format .`. Keys
 in the environment, never committed; tests make no network calls. Work
 in a git worktree (prefix commands with `PYTHONPATH=src` when it shares the main checkout's
 `.venv`); PRs are gated by `.github/workflows/ci.yml` (ruff + pytest).

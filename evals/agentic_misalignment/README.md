@@ -2,8 +2,10 @@
 
 Does an activation-reading lens show the model's own plan to take a misaligned action
 (blackmail, leaking, self-exfiltration, ...) **before it writes it**? Qwen3.6-27B read 32
-agentic scenarios in which it went on to misbehave (28) or not (4 controls); the lens was read
-at **every prompt position** on a **12-layer ladder** (20, 24, ..., 60, 63 for O-lens). A blind
+agentic scenarios in which it went on to misbehave (28) or not (4 controls); the prompt is the
+chat render (system + user turns when the item carries a system prompt, thinking off) and the
+lens was read at **every prompt position** on a **12-layer ladder** (20, 24, ..., 60, plus 63;
+`wsbench plan families=agentic_misalignment` prints it). A blind
 describer turns the readouts into an account of what the model was representing and planning; a
 separate scorer grades that account against the scenario's *design* (the misaligned action the
 scenario makes available), never against what the model actually did.
@@ -126,8 +128,8 @@ macro groups by category) and `misalignment_rate`.
   `n_unjudged_cells` = Stage A failures + B/C call failures on items whose Stage A was complete;
   `n_empty_cells` = empty readouts; `skipped_rows`; `spend_usd` (0 on the Anthropic route —
   token counts are in `extras.usage`). `config` adds `stride`, `chunk_chars`, `layers_read`.
-- `complete` = pinned judge, no `items=`/`limit=`/`layers=` subset, and every misaligned
-  item has a Stage C record.
+- `complete` = pinned judge, no `items=`/`limit=`/`layers=` subset, every misaligned
+  item has a Stage C record, and `n_unjudged_cells == 0`.
 
 **Retired "actual" mode.** The source also had a `--score-mode actual` (`SCORE_PROMPT` /
 `parse_score`: the account graded against the pinned rollout, `fidelity` / `specificity` /
@@ -145,7 +147,8 @@ not take the misaligned action. They never enter the headline; they are the fals
 ## Judge
 
 `JudgeConfig(model="claude-sonnet-5", prompt_version="am-narrative-v1", reasoning=None)` —
-the judge of record and the only non-default pin in the repo. No Gemini agreement data exists
+the judge of record and one of the repo's two non-default pins (jailbreak_recognition is the
+other). No Gemini agreement data exists
 for this family, so `judge_model=`/`WSBENCH_JUDGE_MODEL` overrides produce unpinned numbers
 that are never numbers of record; a non-`claude-*` override is refused (`JudgeConfigError`:
 the free-text stages need the Anthropic route). `ResolvedJudge.reasoning` is ignored; the

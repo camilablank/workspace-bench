@@ -10,10 +10,10 @@ of record) onto the shared client and cache. Three judged stages, one ``run_call
   with concepts; the ``foil`` pass grades the same concepts against a seeded within-family
   derangement partner's tokens (keys ``:F..``) and runs by default;
 * Stage P (per-concept precision, T = 0) on the judge: one call per 60-concept chunk with the
-  cell's full content-token set; ``pfoil`` (keys ``:Q..``) only with ``--opt stage_p_foil=1``.
+  cell's full content-token set; ``pfoil`` (keys ``:Q..``) only with ``opts=stage_p_foil=1``.
 
 A cell is (label, layer, eval position) — exactly one eval position per label per the manifest.
-An ABSENT cell is missing (fatal without ``--allow-missing``); a PRESENT-but-empty cell scores
+An ABSENT cell is missing (fatal without ``allow_missing=True``); a PRESENT-but-empty cell scores
 as zero concepts ("lens silent") and counts in ``n_empty_cells``. A parser ``ValueError`` on any
 stage is a reject: the result is cached as a failure and re-queued by the next run, never
 partially scored. Keys are ``f"{cell.key}:A"``, ``:B{ti:02d}`` / ``:F{ti:02d}``,

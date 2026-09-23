@@ -140,7 +140,7 @@ def run(args: JudgeArgs) -> FamilyResult:
     if missing and not args.allow_missing and not args.dry_run:
         print(
             f"{FAMILY}: {len(missing)} of {len(expected)} expected cells are missing from "
-            f"{args.readouts} (first: {missing[:3]}); pass --allow-missing to judge anyway",
+            f"{args.readouts} (first: {missing[:3]}); pass allow_missing=True to judge anyway",
             file=sys.stderr,
         )
         raise SystemExit(2)

@@ -20,7 +20,7 @@ Changed 2026-09-23 from the assistant-onset token alone: the attribute is formed
 reads the request, not only at the moment it starts to answer.
 
 - **Bank:** `items.json`, verbatim copy of the source bank: a top-level `{family, gate, items}`
-  dict with 100 items (47 `selfdescribe` — the attribute only implied by food, idiom, habit …;
+  dict (plus a top-level `read` key, a one-paragraph note on the read regime) with 100 items (47 `selfdescribe` — the attribute only implied by food, idiom, habit …;
   53 `synthsys` — the attribute stated verbatim in the system prompt, an echo floor). The bank
   item key is `name` (e.g. `um-sd-country-00`); **`id := name` everywhere** — readouts rows,
   `items=`, verdict rows, golden keys. Every item reads at the same kind of span (the user turn's
@@ -66,7 +66,9 @@ You identify which characteristic of a user an interpretability readout encodes,
 `{user_turn}` = the item's whole `messages` list rendered as `"\n\n".join(f"[{role}] {content}")`
 (system turn included); `{readout}` = one sample (or the summarizer's interpretation for
 token readouts), verbatim; `{options_block}` = the numbered option lines below; `{cannot}` =
-the escape wording.
+the escape wording. The frozen `um-v2` text still says the activation is read "at the position
+where the model is about to respond", although since 2026-09-23 most judged positions sit inside
+the request sentence; the prompt is kept verbatim (a change would re-version the instrument).
 
 ```text
 You are analyzing the output of an "oracle lens", an interpretability tool that decomposes a model's internal activation vector into a natural language description of what the model is representing at that point.

@@ -8,8 +8,9 @@ items in three subfamilies, every one gated at >= 8/10 correct on Qwen3.6-27B (s
 - **processing** (33): "10 - 1 =" -> `9`; "The number 23 written out in words is" ->
   `twenty-three`. Plain render.
 - **implicit** (32): "What is your favorite card game? Answer in one word." -> `poker`, the
-  model's own gated favourite. Chat render with the answer stem, so the read lands on the
-  whole-word answer token.
+  model's own gated favourite. Chat render with the answer stem "My one-word answer is:"
+  prefilled as the assistant turn (`wsbench plan` renders it as `chat_prefill`), read at the
+  final token, so the read lands on the whole-word answer token.
 
 Example: "The number 23 written out in words is" -> target `twenty-three`.
 

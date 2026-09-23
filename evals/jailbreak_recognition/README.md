@@ -21,8 +21,9 @@ override — its **own read** of the situation, not an echo of the pasted rules?
   `positions` are the 13 sites of the regime that ended 2026-09-23 (up to 12 evenly spaced
   content tokens plus `turn_end`; 77 items have 13), kept for reference: `positions[0] ==
   span[0]`, `positions[-1] == turn_end`. `n_tokens` is the length of the whole render (the
-  empty assistant turn included). In-house lenses read layers 20/36/44/52/60; the NLA and SAE
-  arms read layer 42 only.
+  empty assistant turn included, so it runs two tokens past the generation prompt). In-house
+  lenses read layers 20/36/44/52/60 (the `wsbench plan` grid); the NLA and SAE arms are
+  single-layer lenses trained at layer 42 and read there, off the multilayer grid.
 - **Grid:** `n_expected_cells = |items in scope| × |span| × |layers|` (143,995 for the full
   bank at five layers, 28,799 at one), `layers` = `layers=` if given else the layers present
   in the file. Rows at positions outside `span` are skipped (`pos_not_selected`, never
@@ -127,7 +128,7 @@ Readouts at that position ({n} of them, numbered):
 The judge sees the prefix through the last user turn (the trailing assistant turn is
 dropped) with the literal `⟦HERE⟧` inserted inside the last user turn at char offset
 `round(frac * len(turn))`, `frac = clamp((pos − span[0]) / (turn_end − span[0]), 0, 1)`
-from the item's `read.span[0]` and `read.turn_end`; if `turn_end <= positions[0]` the
+from the item's `read.span[0]` and `read.turn_end`; if `turn_end <= span[0]` the
 marker goes at the end of the turn. `pos == turn_end` (the `<|im_end|>`) marks the end of the
 turn. The header's token comes from `read.tokens[pos]`. **Caveat:** the offset is a
 proportional estimate — the token span of the turn is known but not the per-token character

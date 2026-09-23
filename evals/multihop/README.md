@@ -10,7 +10,8 @@ so their read position is unchanged. The reasoning: at the trailing space the mo
 finished reading the prompt, while the last word is where the bridge is formed. Eight prompts end
 in `is "` (an opening quote before a quoted answer): their last non-whitespace token is the quote,
 and that is their read. The judge is unchanged: one call per (item, layer), an item passing on
-any layer.
+any layer. The bank header's `eval_render_note` ("directed-modulation is the only
+chat-templated family") predates the chat-rendered families and is superseded by `wsbench plan`.
 
 Example: "Fact: The chemical symbol for the element with atomic number 26 is" -> target `iron` (the bridge; the surface answer `Fe` is not a target).
 

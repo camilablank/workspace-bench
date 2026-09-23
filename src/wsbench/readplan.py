@@ -14,12 +14,15 @@ from wsbench.registry import REPO_ROOT
 
 GRID = list(range(20, 61, 4))  # the benchmark's layer grid for Qwen3.6-27B (64 layers)
 SIX = [20, 28, 36, 44, 52, 60]  # the association families' coarser grid
+FIVE = [20, 36, 44, 52, 60]  # the in-house layers of the hallucination and jailbreak arms
+ANSWER_STEM = "My one-word answer is:"  # basic_readout implicit items: prefilled assistant turn
 SUMMARIZE_SUFFIX = "\n\nSummarize the preceding story in one sentence."
 
 RENDERS: dict[str, str] = {
     "plain": "the text verbatim, no chat template, no special tokens",
-    "chat": "Qwen chat template, enable_thinking=False (empty <think> block), no system prompt; "
-    "the text is the user turn; read positions index the full render",
+    "chat": "Qwen chat template, enable_thinking=False (empty <think> block); the text is the "
+    "user turn, `system` the system turn when the item carries one; read positions index the "
+    "full render",
     "chat_context": "Qwen chat template over the item's `messages` (system + user), "
     "enable_thinking=False; read positions index the full render",
     "chat_prefill": "Qwen chat template, enable_thinking=False; the text is the user turn and "
@@ -66,6 +69,8 @@ class ReadSpec:
 #                               negative index -k, the convention of the banks that use it
 #   last_n {n}                  the last n tokens
 #   all                         every token
+#   all_from_end                every token, reported as negative offsets -n..-1 (the
+#                               convention of the banks that count from the end)
 #   positions {list}            explicit indices into the render
 #   line_one_newline            the newline token that ends line one (the last newline)
 #   from_token {token}          from the first token whose text is `token` through the end
@@ -93,6 +98,8 @@ def resolve(rule: dict[str, Any], tokens: list[str]) -> list[int]:
         return list(range(max(0, n - int(rule["n"])), n))
     if kind == "all":
         return list(range(n))
+    if kind == "all_from_end":
+        return list(range(-n, 0))
     if kind == "positions":
         return [int(p) for p in rule["positions"] if 0 <= int(p) < n]
     if kind == "line_one_newline":
@@ -183,7 +190,20 @@ def _final_token_families(family: str, render: str) -> list[ReadSpec]:
             k = -int(spec["offsets"][0])
             rule = {"kind": "final_token"} if k == 1 else {"kind": "offset_from_end", "k": k}
         r = it.get("eval_render") or render
-        out.append(ReadSpec(family, it["id"], r, rule, GRID, text=it["prompt"]))
+        if r == "chat":  # basic_readout's implicit items: the model's own favourite after the stem
+            out.append(
+                ReadSpec(
+                    family,
+                    it["id"],
+                    "chat_prefill",
+                    rule,
+                    GRID,
+                    text=it["prompt"],
+                    prefill=ANSWER_STEM,
+                )
+            )
+        else:
+            out.append(ReadSpec(family, it["id"], r, rule, GRID, text=it["prompt"]))
     return out
 
 
@@ -302,7 +322,8 @@ def plan(family: str) -> list[ReadSpec]:
                 text=it["prompt"],
                 prefill="Answer:",
                 extra={"regions": it["regions"]},
-                note="24 pinned cells across the stir, start and question regions",
+                note="24 pinned cells: the three emission cells (the headline) plus the stir, "
+                "start and question regions",
             )
             for it in items
         ]
@@ -316,8 +337,8 @@ def plan(family: str) -> list[ReadSpec]:
                 {"kind": "from_token", "token": " What"},
                 GRID,
                 text=it["prompt"],
-                note="the question span through the end of the render (opts=cells=all); "
-                "the default judge reads the final token only",
+                note="the question span through the end of the render (opts=cells=all); the "
+                "default judge reads only the render's final token, the assistant onset",
             )
             for it in items
         ]
@@ -328,12 +349,13 @@ def plan(family: str) -> list[ReadSpec]:
                 family,
                 it["id"],
                 "chat",
-                {"kind": "offset_from_end", "k": -int(it["cell"]["pos"])},
-                [int(it["cell"]["layer"])],
+                {"kind": "all_from_end"},
+                [56, 60],
                 text=it["prompt"],
-                extra={"variant": it["variant"]},
-                note="one frozen cell per item; opts=cells=all judges every "
-                "(layer, position) instead",
+                extra={"variant": it["variant"], "frozen_cell": it["cell"]},
+                note="every position at layers 56 and 60 (opts=cells=all, the regime of record); "
+                "frozen_cell is the pre-registered (layer, negative offset) the default judge "
+                "reads",
             )
             for it in items
         ]
@@ -374,9 +396,10 @@ def plan(family: str) -> list[ReadSpec]:
                 r["id"],
                 "captured",
                 {"kind": "positions", "positions": r["read_positions"]},
-                GRID,
+                FIVE,
                 extra={"input_ids": r["input_ids"], "prompt_len": r["prompt_len"]},
-                note="punctuation and newline sites inside the model's own response",
+                note="punctuation and newline sites inside the model's own response, at the "
+                "five in-house layers",
             )
             for r in rows
         ]
@@ -390,7 +413,7 @@ def plan(family: str) -> list[ReadSpec]:
                 it["id"],
                 "chat_context",
                 {"kind": "positions", "positions": grid_positions(it["read"])},
-                SIX,
+                FIVE,
                 messages=prefix_to_last_user(it["messages"]),
                 extra={"n_tokens": it["read"]["n_tokens"]},
                 note="every token of the last user turn, first content token through its "
@@ -410,7 +433,8 @@ def plan(family: str) -> list[ReadSpec]:
                 [*GRID, 63],
                 text=it["text"],
                 system=it.get("system"),
-                note="every prompt position; prefill (the pinned rollout) is not read",
+                note="every prompt position of the chat render (system + user); the pinned "
+                "rollout is not read",
             )
             for it in items
         ]

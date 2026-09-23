@@ -71,8 +71,10 @@ anything from a correctly produced file. The judge is unchanged (`mcdm-2026-09-1
   controls' cells naming anything: the lexical-loading floor of this sentence),
   `partner_confusion_rate` (items whose readouts named the partner's concept), `per_stratum`.
 - **Floors.** No analytic floor for a multi-select. The measured floors are the lucky-guessing
-  baseline (an LLM shown only these candidate lists), the prompt-only baseline (stock
-  Qwen3.6-27B given the prompt text) and the controls' pick rate, the first two in later PRs.
+  baseline (an LLM shown only these candidate lists; frozen in `evals/baselines/`, blind 0.36 on
+  n=25) and the controls' pick rate. The prompt-only baseline is excluded by design
+  (`evals/baselines/README.md`): the prompt dictates the concepts, so the stock model names them
+  every time (measured 1.0) and the number says nothing about the lens.
 
 ## Readouts
 
