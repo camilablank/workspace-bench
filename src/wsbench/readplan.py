@@ -394,7 +394,8 @@ def plan(family: str) -> list[ReadSpec]:
                 messages=prefix_to_last_user(it["messages"]),
                 extra={"n_tokens": it["read"]["n_tokens"]},
                 note="every token of the last user turn, first content token through its "
-                "<|im_end|> (read.span)",
+                "<|im_end|> (read.span); the bank's n_tokens also closes an empty assistant "
+                "turn, two tokens past the generation prompt and past every read position",
             )
             for it in items
         ]
