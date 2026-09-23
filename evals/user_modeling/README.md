@@ -172,7 +172,7 @@ changed the options; this port deliberately does not.) `seed = 0`.
   — the escape is line 6 and is NOT in `options`.
 - Parity: `tests/golden/user_modeling_options.json` (`{name: {options, gold_position}}`) was
   produced by the source library's own `pick_options` / `build_options` over all 100 items
-  (`tests/golden/make_user_modeling.py`); `tests/test_user_modeling.py` asserts this port
+  (`make_user_modeling.py`, a retired golden maker; see `tests/golden/README.md`); `tests/test_user_modeling.py` asserts this port
   reproduces it item for item, and that a 1-item scope reproduces the golden options.
 
 Supplement pool (`UM_OPTION_SUPPLEMENT`, curated same-class values for strata the bank cannot

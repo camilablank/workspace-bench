@@ -149,7 +149,7 @@ Each MC has six lines: five options seeded-shuffled + `cannot tell from the read
 - Per-question shuffles: seeds `f"{DATASET_SEED}:{id}:q1"`, `…:q2`, `…:q3`; Q1 and Q3 are
   independent shuffles of the same people list. `DATASET_SEED = 20260810`.
 - Parity: `tests/golden/role_bound_association_options.json` holds the source script's own
-  `oa_question` block and golds for every item (`tests/golden/make_role_bound_association.py`);
+  `oa_question` block and golds for every item (`make_role_bound_association.py`, a retired golden maker; see `tests/golden/README.md`);
   `tests/test_role_bound_association.py` asserts this port reproduces it byte for byte.
 
 ### Verdict rows

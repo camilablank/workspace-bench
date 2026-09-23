@@ -93,7 +93,7 @@ Eleven lines: the item's frozen `mc_options` deduped order-preserving (gold asse
 seeded-shuffled with `seeded_shuffle(opts, f"{COMP_SEED}:{id}")`, then
 `cannot tell from the readout` last. `COMP_SEED = 20260805`. Parity:
 `tests/golden/conjunctive_association_options.json` was produced by the source script's own
-`build_question` (`tests/golden/make_conjunctive_association.py`);
+`build_question` (`make_conjunctive_association.py`, a retired golden maker; see `tests/golden/README.md`);
 `tests/test_conjunctive_association.py` asserts this port reproduces it.
 
 ### Verdict rows

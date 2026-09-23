@@ -124,7 +124,7 @@ Six lines: the gold reason + 4 cross-item distractors, seeded-shuffled, then the
   `seed_int(s) = int.from_bytes(sha256(s).digest()[:8], "big")`.
 - Order: `seeded_shuffle([gold, *distractors], f"{EC_SEED}:{id}:{side}:order")` + `CANNOT`.
 - Parity: `tests/golden/moral_rationale_options.json` was produced by the source script's own
-  `build_pools` / `build_mcs` over the whole bank (`tests/golden/make_moral_rationale.py`) and
+  `build_pools` / `build_mcs` over the whole bank (`make_moral_rationale.py`, a retired golden maker; see `tests/golden/README.md`) and
   `tests/test_moral_rationale.py` asserts this port reproduces it item for item.
 
 ### Verdict rows
