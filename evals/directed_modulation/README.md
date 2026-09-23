@@ -48,8 +48,8 @@ predates the chat-rendered families and is superseded by `wsbench plan`.
   comparable.
 - Chance: 1/6 per call over the shown options, which is not a floor for an any-row max; the
   measured floors are frozen in `evals/baselines/`: the lucky-guessing baseline (an LLM shown
-  only the same option lists; blind 0.162, `lucky-2026-09-16`) and the prompt-only baseline
-  (0.21, `dm-2026-09-16`).
+  only the same option lists; blind 0.162) and the prompt-only baseline (0.21), both under the
+  `dm-2026-09-16` instrument `report` gates on.
 
 ## Readouts
 

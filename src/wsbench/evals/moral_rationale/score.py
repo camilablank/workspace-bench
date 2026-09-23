@@ -56,7 +56,7 @@ def score(
     # 🚨 DO NOT QUOTE `any_of_grid_floor` FROM THIS FILE AS A FLOOR (2026-09-10). At the
     # last 5 positions over the 11-layer grid this is 55 sites per item, so the value below is
     # ~0.99 (committed) / ~0.99 (deliberative) and puts EVERY arm — and the no-activation
-    # baseline — "below chance". The formula assumes a guesser that re-randomises at all ~34
+    # baseline — "below chance". The formula assumes a guesser that re-randomises at all ~55
     # sites; the MEASURED guesser (lucky_guessing.json) has a spread of 0.005 over five draws
     # and a majority-vote rate equal to its mean, i.e. it picks the same option every time, so
     # its grid rate IS its per-call rate (0.191 here). It is kept because it is the correct

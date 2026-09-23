@@ -131,9 +131,9 @@ bank is authored, gated and then frozen into `evals/<family>/items.json`. What "
 so far, and what a new item has to satisfy:
 
 - **Multi-token targets.** A top-10 token bag can hold `iron` but not `Simula 67`, so the hard
-  tier moved to multi-token bridges. Their scorer of record is the regex contract (every
-  required unit's multi-token form in one sample at one layer); the forced choice among five
-  confusables is `opts=judge=mc`, a diagnostic.
+  tier moved to multi-token bridges. Their scorer of record is the regex contract (each
+  required unit hits some sample at the same layer; a form never spans samples); the forced
+  choice among five confusables is `opts=judge=mc`, a diagnostic.
 - **No leak.** The target must not appear in the prompt, in any script or spelling. The
   arithmetic and chain banks check that no intermediate appears as a numeral in the prompt.
 - **A real gate.** Greedy-correct, then at least 8 of 10 samples at temperature 0.7.

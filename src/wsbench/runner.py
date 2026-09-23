@@ -29,7 +29,7 @@ class FamilyOutcome:
 
 
 class Options(Protocol):
-    """The judge options ``wsbench judge`` / ``wsbench run`` pass down (``cli.JudgeOptions``)."""
+    """The judge options ``wsbench judge`` passes down (``cli.JudgeOptions``)."""
 
     judge_model: str | None
     layers: list[int] | None
@@ -39,8 +39,13 @@ class Options(Protocol):
     concurrency: int
     rpm: float
     dry_run: bool
-    family_workers: int
     opt: list[str]
+
+
+class RunOptions(Options, Protocol):
+    """``wsbench run``'s options: the judge options plus the thread count."""
+
+    family_workers: int
 
 
 def parse_opts(pairs: Sequence[str]) -> dict[str, str]:
@@ -128,7 +133,7 @@ def _seed_preflights(judges: Mapping[str, ResolvedJudge]) -> None:
 
 def run_families(
     specs: Sequence[EvalSpec],
-    args: Options,
+    args: RunOptions,
     *,
     readouts_root: Path,
     out: Path,

@@ -319,7 +319,7 @@ Five families (user_modeling and the four in-house MC families) were judged with
 `claude-opus-5` in their source scripts and moved to Gemini 3.8 Flash in this repo.
 `scripts/judge_swap.py` compares a re-judged reference arm against the stored Opus verdicts
 (per-cell agreement and Cohen's κ); that comparison has not been run yet, so no agreement
-numbers are recorded here. Its results will land under `outputs/judge_swap/`.
+numbers are recorded here. Run it with `--out outputs/judge_swap/...` when it is.
 
 ## Results contract
 

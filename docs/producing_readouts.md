@@ -122,9 +122,9 @@ max_new_tokens=256, k=1)`, the settings the in-house arms used.
 Two spellings, on purpose: the read-site `token` is `tokenizer.decode([id])`, exactly what the
 banks store (`"\n"`, `" öffnen"`, `"<|im_end|>"`); the ranked `tokens` of a token lens are the
 byte-level BPE strings with `Ġ`/`▁` shown as a space (`" led"`), what the regex scorers expect.
-`pos` is the index the plan resolves: absolute, except `offset_from_end` (arithmetic
-intermediates, some multihop items), which the banks and judges count from the end, so those rows
-carry the negative offset (`-8`). A single-layer lens reads at its trained layer whatever the
+`pos` is the index the plan resolves: absolute, except the two rules that count from the end
+because their banks and judges do — `offset_from_end` (some multihop items) and `all_from_end`
+(arithmetic intermediates) — whose rows carry the negative offset (`-8`). A single-layer lens reads at its trained layer whatever the
 plan lists: `nla` is layer 42 (not on the benchmark grid; the in-house L44 NLA numbers were
 off-layer and are superseded). `nla` also loads its own copy of the reader (a second 27B on the
 same device), so it wants an H200; the other methods fit one H100.
