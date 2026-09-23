@@ -136,7 +136,7 @@ map — so the marker is approximately, not exactly, at the read token (`read.to
 every token of the turn, so an exact map is computable, but the rule is kept as it was so the
 old and new regimes place the marker identically). Parity:
 `tests/golden/jailbreak_marker.json` and `tests/golden/jailbreak_prompt.txt` were produced by
-the source's own `marker_offset` / `readout_prompts` (`make_jailbreak.py` (retired golden maker, see `tests/golden/README.md`)) and
+the source's own `marker_offset` / `readout_prompts` (`make_jailbreak.py`, a retired golden maker; see `tests/golden/README.md`) and
 `tests/test_jailbreak_recognition.py` asserts this port reproduces them.
 
 ### Output schema
