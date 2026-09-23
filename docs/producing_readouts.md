@@ -61,8 +61,8 @@ One JSONL per family, one row per (item, layer, position), in the contract of th
 README:
 
 ```json
-{"id": "couplet-ahead-head", "layer": 36, "pos": 16, "token": "Ċ", "samples": ["led the way"]}
-{"id": "couplet-ahead-head", "layer": 36, "pos": 16, "token": "Ċ", "tokens": ["Ġled", "Ġsaid"], "scores": [9.1, 7.7]}
+{"id": "couplet-ahead-head", "layer": 36, "pos": 16, "token": "\n", "samples": ["led the way"]}
+{"id": "couplet-ahead-head", "layer": 36, "pos": 16, "token": "\n", "tokens": [" led", " said"], "scores": [9.1, 7.7]}
 ```
 
 `id` is the row's `id` from the plan, `pos` the index into your render, `token` that position's
@@ -84,7 +84,8 @@ uv run wsbench report dir=out/mylens
 ## Or let the repo produce them
 
 `wsbench.produce` is a small producer over Hugging Face transformers, for anyone who has a GPU
-and wants readouts without writing the plumbing. Install the `gpu` extra and:
+and wants readouts without writing the plumbing. Install the `gpu` extra (`pip install -e ".[gpu]"`
+or the uv equivalent) and:
 
 ```python
 from wsbench.produce import Producer
@@ -115,9 +116,15 @@ marker token. Methods are plain classes behind one `read(h, layer)` protocol, so
 few lines. Sampling for the verbalizers is `Sampling(temperature=1.0, top_p=0.95, top_k=64,
 max_new_tokens=256, k=1)`, the settings the in-house arms used.
 
-Token strings are spelled the way the in-house rows are: byte-level BPE with `Ġ`/`▁` shown as
-the space they encode (`" the"`), so the `token` field can be read as text. `nla` loads its own
-copy of the reader (a second 27B), so it wants an H200 or two GPUs; the other methods fit one H100.
+Two spellings, on purpose: the read-site `token` is `tokenizer.decode([id])`, exactly what the
+banks store (`"\n"`, `" öffnen"`, `"<|im_end|>"`); the ranked `tokens` of a token lens are the
+byte-level BPE strings with `Ġ`/`▁` shown as a space (`" led"`), what the regex scorers expect.
+`pos` is the index the plan resolves: absolute, except `offset_from_end` (arithmetic
+intermediates, some multihop items), which the banks and judges count from the end, so those rows
+carry the negative offset (`-8`). A method trained at one layer reads there unless told otherwise:
+`nla` is layer 42 (not on the benchmark grid; pass `layers=[44]` to read it where the in-house
+table did). `nla` also loads its own copy of the reader (a second 27B on the same device), so it
+wants an H200; the other methods fit one H100.
 
 What it is not: fast. It reads one prompt at a time on one GPU, which is right for a token
 position, a question or a family, and wrong for the whole benchmark at every token; the in-house

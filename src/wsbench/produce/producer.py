@@ -5,7 +5,7 @@ import json
 from collections.abc import Iterable, Iterator
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any
+from typing import Any, Self
 
 from wsbench import readplan
 from wsbench.readplan import GRID, ReadSpec
@@ -38,12 +38,18 @@ class Row:
 
 
 def _positions(rule: Positions, tokens: list[str]) -> list[int]:
-    if isinstance(rule, int):
-        return [rule % len(tokens)] if tokens else []
+    """Indices a positions rule selects. Plain ints count from the end when negative and are
+    reported as absolute indices; a plan rule is reported as the plan resolves it (negative for
+    ``offset_from_end``, the convention of the banks that use it)."""
+    n = len(tokens)
+    if isinstance(rule, int | list):
+        want = [rule] if isinstance(rule, int) else list(rule)
+        bad = [p for p in want if not -n <= p < n]
+        if bad:
+            raise ValueError(f"positions {bad} out of range for a {n}-token render")
+        return [p % n for p in want]
     if isinstance(rule, str):
-        return readplan.resolve({"kind": rule}, tokens)
-    if isinstance(rule, list):
-        return [p % len(tokens) for p in rule] if tokens else []
+        rule = {"kind": rule}
     return readplan.resolve(rule, tokens)
 
 
@@ -60,17 +66,17 @@ class Producer:
     def load(
         cls,
         model: str = DEFAULT_MODEL,
-        method_spec: "str | Method" = "logit_lens",
+        method_spec: str | Method = "logit_lens",
         *,
         device: str = "cuda",
         **method_kw: Any,
-    ) -> "Producer":
+    ) -> Self:
+        m = method(method_spec, **method_kw)  # before the model load, so a typo fails fast
         backend = Backend.load(model, device=device)
-        m = method(method_spec, **method_kw)
         m.bind(backend)
         return cls(backend=backend, method=m)
 
-    def use(self, method_spec: "str | Method", **method_kw: Any) -> "Producer":
+    def use(self, method_spec: str | Method, **method_kw: Any) -> Self:
         """Switch method on the loaded model (``p.use("jlens")``); returns self."""
         m = method(method_spec, **method_kw)
         m.bind(self.backend)
@@ -79,31 +85,37 @@ class Producer:
 
     # ---- the four entry points
 
-    def read(self, text: str, pos: int = -1, layer: int = 44, *, chat: bool = False) -> Row:
+    def read(
+        self, text: str, pos: int = -1, layer: int | None = None, *, chat: bool = False
+    ) -> Row:
         """One cell of one prompt: the readout at ``pos`` (negative counts from the end) after
-        block ``layer``."""
-        rows = self.read_prompt(text, positions=pos, layers=[layer], chat=chat)
-        return rows[0]
+        block ``layer`` (default: the method's own layer if it has one, else 44)."""
+        layers = [layer] if layer is not None else (self.method.layers or [44])
+        return self.read_prompt(text, positions=pos, layers=layers, chat=chat)[0]
 
     def read_prompt(
         self,
         text: str,
         *,
         positions: Positions = -1,
-        layers: Iterable[int] = GRID,
+        layers: Iterable[int] | None = None,
         chat: bool = False,
         system: str | None = None,
         item_id: str = "adhoc",
     ) -> list[Row]:
-        """A prompt outside any bank, over a positions rule and a layer list."""
+        """A prompt outside any bank, over a positions rule and a layer list (default: the
+        method's own layers, else the benchmark grid)."""
         rendered = render_text(text, self.backend.tokenizer, chat=chat, system=system)
-        return list(self._read_rendered(item_id, rendered, positions, list(layers)))
+        return list(self._read_rendered(item_id, rendered, positions, self._layers(layers, GRID)))
 
     def read_spec(self, spec: ReadSpec, *, layers: Iterable[int] | None = None) -> list[Row]:
-        """A read-plan row: its own render, positions rule and layers unless overridden."""
+        """A read-plan row: its own render and positions rule; its layers unless the method has
+        fixed ones or the caller overrides."""
         rendered = render(spec, self.backend.tokenizer)
         return list(
-            self._read_rendered(spec.id, rendered, spec.positions, list(layers or spec.layers))
+            self._read_rendered(
+                spec.id, rendered, spec.positions, self._layers(layers, spec.layers)
+            )
         )
 
     def run_family(
@@ -115,8 +127,8 @@ class Producer:
         layers: Iterable[int] | None = None,
         items: Iterable[str] | None = None,
     ) -> Path:
-        """Every item of a family into one readouts JSONL, resumable: rows already in ``out`` are
-        kept and their items skipped."""
+        """Every item of a family into one readouts JSONL, resumable: an item whose rows are
+        already in ``out`` is skipped; each item's rows are written in one call."""
         out = Path(out)
         specs = readplan.plan(family)
         if items is not None:
@@ -133,12 +145,17 @@ class Producer:
             for spec in specs:
                 if spec.id in done:
                     continue
-                for row in self.read_spec(spec, layers=layers):
-                    fh.write(json.dumps(row.contract(), ensure_ascii=False) + "\n")
+                rows = self.read_spec(spec, layers=layers)
+                fh.write("".join(json.dumps(r.contract(), ensure_ascii=False) + "\n" for r in rows))
                 fh.flush()
         return out
 
     # ---- internals
+
+    def _layers(self, given: Iterable[int] | None, default: Iterable[int]) -> list[int]:
+        if given is not None:
+            return list(given)
+        return list(self.method.layers or default)
 
     def _read_rendered(
         self, item_id: str, rendered: Rendered, positions: Positions, layers: list[int]
@@ -146,14 +163,16 @@ class Producer:
         pos = _positions(positions, rendered.tokens)
         if not pos:
             return
-        acts = self.backend.capture(rendered.ids, layers, pos)
+        idx = [p % len(rendered) for p in pos]  # a plan may report negative offsets
+        acts = self.backend.capture(rendered.ids, layers, idx)
         for layer in layers:
             h_all = acts[layer]
-            for i, p in enumerate(pos):
-                yield Row(item_id, layer, p, rendered.tokens[p], self.method.read(h_all[i], layer))
+            for i, (p, j) in enumerate(zip(pos, idx, strict=True)):
+                yield Row(item_id, layer, p, rendered.decoded[j], self.method.read(h_all[i], layer))
 
 
 def write(rows: Iterable[Row], path: Path | str) -> Path:
+    """Rows to a readouts JSONL (one contract row per line)."""
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("w", encoding="utf-8") as fh:

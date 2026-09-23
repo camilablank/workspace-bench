@@ -29,6 +29,7 @@ class Readout:
 
 class Method(Protocol):
     name: str
+    layers: list[int] | None  # fixed read layers (a lens trained at one layer), else None
 
     def bind(self, backend: Backend) -> None: ...  # load artifacts onto the backend's device
     def read(self, h: Any, layer: int) -> Readout: ...  # h: [d] fp32 CPU residual vector
@@ -39,36 +40,35 @@ class Method(Protocol):
 
 @dataclass
 class LogitLens:
-    """``W_U · norm(h)``: the model's own unembedding after its final RMSNorm (gain ``1 + w`` on
-    Qwen3.6). No artifact."""
+    """``W_U · norm(h)``: the model's own unembedding after its own final norm module. No
+    artifact."""
 
     name: str = "logit_lens"
+    layers: list[int] | None = None
     k: int = TOP_K
     _b: Backend | None = field(default=None, repr=False)
+    _w_u: Any = field(default=None, repr=False)
 
     def bind(self, backend: Backend) -> None:
         self._b = backend
+        self._w_u = backend.unembed.float()
 
     def read(self, h: Any, layer: int) -> Readout:
         import torch
 
         b = self._b
         assert b is not None
-        x = h.to(b.device)
-        w = b.final_norm.weight.float()
-        gain = 1.0 + w if "Qwen3" in b.model_id or "Qwen3.6" in b.model_id else w
-        x = x * torch.rsqrt(x.pow(2).mean(-1, keepdim=True) + 1e-6) * gain
-        scores = x @ b.unembed.float().T
-        vals, ids = torch.topk(scores, self.k)
+        x = b.final_norm(h.to(b.device))  # the model's own norm module, fp32 in, fp32 out
+        vals, ids = torch.topk(x @ self._w_u.T, self.k)
         return Readout(
             tokens=display_tokens(b.tokenizer, ids.tolist()),
             scores=[round(v, 4) for v in vals.tolist()],
         )
 
 
-def _load_jacobians(repo: str, filename: str, device: str) -> tuple[Any, int]:
-    """``(J[layer, d, d] fp32, n_source_layers)`` from a J-lens ``.pt`` (dict with ``J`` and
-    optional ``source_layers``, or the official ``JacobianLens`` layout with ``jacobians``)."""
+def _load_jacobians(repo: str, filename: str, device: str) -> Any:
+    """``J[layer, d, d]`` fp32 from a J-lens ``.pt`` (the official ``JacobianLens`` layout with
+    ``J`` keyed by layer, or a plain ``jacobians`` stack)."""
     import torch
     from huggingface_hub import hf_hub_download
 
@@ -82,7 +82,7 @@ def _load_jacobians(repo: str, filename: str, device: str) -> tuple[Any, int]:
         layers = list(range(stacked.shape[0]))
     if layers != list(range(len(layers))):
         raise ValueError(f"{filename}: source_layers not contiguous from 0: {layers}")
-    return stacked.to(device), len(layers)
+    return stacked.to(device)
 
 
 @dataclass
@@ -92,16 +92,19 @@ class JLens:
     wikitext lens for Qwen3.6-27B."""
 
     name: str = "jlens"
+    layers: list[int] | None = None
     repo: str = "neuronpedia/jacobian-lens"
     filename: str = "qwen3.6-27b/jlens/Salesforce-wikitext/Qwen3.6-27B_jacobian_lens_n1000.pt"
     k: int = TOP_K
     _b: Backend | None = field(default=None, repr=False)
     _jac: Any = field(default=None, repr=False)
+    _w_u: Any = field(default=None, repr=False)
     _denom: dict[int, Any] = field(default_factory=dict, repr=False)
 
     def bind(self, backend: Backend) -> None:
         self._b = backend
-        self._jac, _n = _load_jacobians(self.repo, self.filename, backend.device)
+        self._jac = _load_jacobians(self.repo, self.filename, backend.device)
+        self._w_u = backend.unembed.float()
 
     def read(self, h: Any, layer: int) -> Readout:
         import torch
@@ -110,7 +113,7 @@ class JLens:
         assert b is not None and self._jac is not None
         if layer >= self._jac.shape[0]:
             raise ValueError(f"layer {layer} beyond the lens's {self._jac.shape[0]} source layers")
-        w_u = b.unembed.float()
+        w_u = self._w_u
         if layer not in self._denom:
             self._denom[layer] = (w_u @ self._jac[layer]).norm(dim=1).clamp_min(1e-9)
         scores = ((h.to(b.device) @ self._jac[layer].T) @ w_u.T) / self._denom[layer]
@@ -127,25 +130,26 @@ class RLens:
     ``W_U · norm(J·h)``. Default artifact: ``camilablank/workspace-lenses``."""
 
     name: str = "rlens"
+    layers: list[int] | None = None
     repo: str = "camilablank/workspace-lenses"
     filename: str = "qwen3.6-27b/r-lens/lens.pt"
     k: int = TOP_K
     _b: Backend | None = field(default=None, repr=False)
     _jac: Any = field(default=None, repr=False)
+    _w_u: Any = field(default=None, repr=False)
 
     def bind(self, backend: Backend) -> None:
         self._b = backend
-        self._jac, _n = _load_jacobians(self.repo, self.filename, backend.device)
+        self._jac = _load_jacobians(self.repo, self.filename, backend.device)
+        self._w_u = backend.unembed.float()
 
     def read(self, h: Any, layer: int) -> Readout:
         import torch
 
         b = self._b
         assert b is not None and self._jac is not None
-        x = h.to(b.device) @ self._jac[layer].T
-        gain = 1.0 + b.final_norm.weight.float()
-        x = x * torch.rsqrt(x.pow(2).mean(-1, keepdim=True) + 1e-6) * gain
-        vals, ids = torch.topk(x @ b.unembed.float().T, self.k)
+        x = b.final_norm(h.to(b.device) @ self._jac[layer].T)
+        vals, ids = torch.topk(x @ self._w_u.T, self.k)
         return Readout(
             tokens=display_tokens(b.tokenizer, ids.tolist()),
             scores=[round(v, 4) for v in vals.tolist()],
@@ -172,6 +176,7 @@ class OLens:
     while generating, so one model serves both roles."""
 
     name: str = "olens"
+    layers: list[int] | None = None
     lora: str = "agu18dec/local-workspace:ckpts/ao/rl/s3d.ddp600.s0/iter_000600"
     alpha: float = 16000.0
     prompt: str = (
@@ -194,6 +199,8 @@ class OLens:
             else snapshot_download(repo)
         )
         adir = f"{local}/{sub}" if sub else local
+        if isinstance(backend.model, PeftModel):  # a previous verbalizer's adapter
+            backend.model = backend.model.unload()
         backend.model = PeftModel.from_pretrained(backend.model, adir)
         backend.model.eval()
         self._b = backend
@@ -203,7 +210,8 @@ class OLens:
         survives as one token inside the full chat render (as the in-house renderer does)."""
         if layer in self._slots:
             return self._slots[layer]
-        tok = self._b.tokenizer  # type: ignore[union-attr]
+        assert self._b is not None
+        tok = self._b.tokenizer
         for code in range(0x3200, 0x3400):
             char = chr(code)
             ids = tok(char, add_special_tokens=False)["input_ids"]
@@ -253,12 +261,14 @@ class OLens:
 class NLA:
     """Karvonen's natural-language autoencoder: a separate reader (``av_base`` + a PEFT adapter)
     that receives the vector as a norm-matched ADD at the output of its decoder block 1, at the
-    marker token of its own prompt. Trained at one layer; read it there."""
+    marker token of its own prompt. Trained on layer-42 activations of Qwen3.6-27B, so it reads
+    at 42 unless the caller says otherwise; the vector's layer is not part of its prompt."""
 
     name: str = "nla"
+    layers: list[int] | None = field(default_factory=lambda: [42])
     repo: str = "ceselder/qwen3.6-27b-nla-rl"
     adapter: str = "av_rl_adapters/iter_000400"
-    sampling: Sampling = field(default_factory=lambda: Sampling(max_new_tokens=256))
+    sampling: Sampling = field(default_factory=Sampling)
     _b: Backend | None = field(default=None, repr=False)
     _reader: Any = field(default=None, repr=False)
     _tok: Any = field(default=None, repr=False)
@@ -351,7 +361,7 @@ METHODS: dict[str, type] = {
 }
 
 
-def method(spec: "str | Method", **kw: Any) -> Any:
+def method(spec: str | Method, **kw: Any) -> Any:
     """A method instance from its name (``"jlens"``) or an instance passed through."""
     if isinstance(spec, str):
         if spec not in METHODS:

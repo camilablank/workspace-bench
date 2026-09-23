@@ -1,4 +1,4 @@
-"""Turn a read-plan row into token ids: the nine renders of ``wsbench.readplan.RENDERS``."""
+"""Turn a read-plan row into token ids: the renders of ``wsbench.readplan.RENDERS``."""
 
 from dataclasses import dataclass
 from typing import Any
@@ -11,7 +11,8 @@ class Rendered:
     """One rendered prompt: its token ids, their display strings, and how it was built."""
 
     ids: list[int]
-    tokens: list[str]
+    tokens: list[str]  # display spelling (``" the"``, ``Ċ``), what the positions rules match
+    decoded: list[str]  # ``tokenizer.decode([id])`` per token, what the banks store as `token`
     render: str
 
     def __len__(self) -> int:
@@ -60,12 +61,15 @@ def render(spec: ReadSpec, tokenizer: Any) -> Rendered:
         ids = _chat(
             tokenizer, [{"role": "user", "content": (spec.text or "") + (spec.suffix or "")}]
         )
-    elif r == "transcript":
-        text = "\n".join(f"[{m['role']}]: {m['content']}" for m in (spec.messages or []))
-        ids = tokenizer(text, add_special_tokens=False)["input_ids"]
     else:
         raise ValueError(f"unknown render {r!r}")
-    return Rendered(ids=list(ids), tokens=display_tokens(tokenizer, list(ids)), render=r)
+    ids = list(ids)
+    return Rendered(
+        ids=ids,
+        tokens=display_tokens(tokenizer, ids),
+        decoded=[tokenizer.decode([i]) for i in ids],
+        render=r,
+    )
 
 
 def render_text(

@@ -9,7 +9,7 @@ dependencies = ["openai>=1.40", "anthropic>=1.0", "numpy>=1.26", "pydra-config>=
 
 [project.optional-dependencies]
 dev = ["pytest>=8", "ruff>=0.6"]
-gpu = ["torch>=2.4", "transformers>=5", "peft>=0.14", "safetensors", "huggingface_hub", "accelerate", "pyyaml"]
+gpu = ["torch>=2.4", "transformers>=5", "peft>=0.14", "huggingface_hub", "accelerate", "pyyaml"]
 
 [project.scripts]
 wsbench = "wsbench.cli:main"

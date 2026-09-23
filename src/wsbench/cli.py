@@ -557,7 +557,15 @@ class Produce(Command):
         self.family = str(self.family or "")
         self.text = str(self.text or "")
         self.chat = _bool(self.chat)
-        self.positions = str(self.positions)
+        p = self.positions
+        if isinstance(p, list | tuple):
+            self.positions = [int(x) for x in p]
+        elif str(p).lstrip("-").isdigit():
+            self.positions = int(p)
+        elif "," in str(p):
+            self.positions = [int(x) for x in str(p).split(",")]
+        else:
+            self.positions = str(p)  # a rule kind such as all / final_token
         self.layers = _ints(self.layers)
         self.out = _path(self.out) if self.out else None
         self.limit = _int(self.limit)
@@ -565,10 +573,16 @@ class Produce(Command):
         self.device = str(self.device)
 
     def execute(self) -> int:
-        from wsbench.produce import Producer, write
+        from wsbench.produce import METHODS, Producer, write
 
         if bool(self.family) == bool(self.text):
             print("give exactly one of family= or text=", file=sys.stderr)
+            return EXIT_USAGE
+        if self.method not in METHODS:
+            print(f"unknown method {self.method!r}; known {sorted(METHODS)}", file=sys.stderr)
+            return EXIT_USAGE
+        if self.family and self.family not in readplan.families():
+            print(f"unknown family {self.family!r}", file=sys.stderr)
             return EXIT_USAGE
         producer = Producer.load(self.model, self.method, device=self.device)
         if self.family:
@@ -578,15 +592,8 @@ class Produce(Command):
             )
             print(f"wrote {path}")
             return 0
-        pos: object
-        if self.positions.lstrip("-").isdigit():
-            pos = int(self.positions)
-        elif "," in self.positions:
-            pos = [int(x) for x in self.positions.split(",")]
-        else:
-            pos = self.positions
         rows = producer.read_prompt(
-            self.text, positions=pos, layers=self.layers or readplan.GRID, chat=self.chat
+            self.text, positions=self.positions, layers=self.layers, chat=self.chat
         )
         if self.out:
             print(f"wrote {write(rows, self.out)} ({len(rows)} rows)")

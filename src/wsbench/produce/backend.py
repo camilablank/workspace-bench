@@ -4,7 +4,7 @@ that block), the convention every bank was captured with."""
 
 from contextlib import nullcontext
 from dataclasses import dataclass
-from typing import Any
+from typing import Any, Self
 
 DEFAULT_MODEL = "Qwen/Qwen3.6-27B"
 
@@ -22,7 +22,7 @@ class Backend:
     @classmethod
     def load(
         cls, model_id: str = DEFAULT_MODEL, *, device: str = "cuda", dtype: str = "bfloat16"
-    ) -> "Backend":
+    ) -> Self:
         import torch
         from transformers import AutoModelForCausalLM, AutoTokenizer
 
@@ -99,7 +99,11 @@ class Backend:
         )
         try:
             with torch.no_grad(), plain:
-                self.model(torch.tensor([ids], device=self.device))
+                x = torch.tensor([ids], device=self.device)
+                try:
+                    self.model(x, logits_to_keep=1)  # the hooks want the residual, not the head
+                except TypeError:
+                    self.model(x)
         finally:
             for h in handles:
                 h.remove()
