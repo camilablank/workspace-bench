@@ -53,6 +53,12 @@ Every entry is stamped with the family's judge `prompt_version` (`instrument`); 
 draws a floor only while it matches the family's current instrument, so a changed judge drops
 its floor until re-measured.
 
+The six multi-token families (`basic_readout_mt`, `multihop_mt`, `multilingual_mt`, `typo_mt`,
+`multilingual_multihop`, `multilingual_typo`) are scored by the deterministic regex contract since
+2026-09-23 (`mt-regex-2026-09-23`). Their lucky-guessing entries are MC-specific — a guesser over
+option lists the regex scorer never sees — so they no longer apply and are no longer drawn (the
+stamp `mc-2026-09-16` no longer matches); they stay in the file for `opts=judge=mc` diagnostics.
+
 ```
 wsbench baseline variant=uniform                       # no API key; every family
 wsbench baseline families=typo_mt variant=blind limit=3  # pilot
@@ -89,6 +95,14 @@ families that report it (seven do not; for those the run's nominal layer is the 
 | the 13 frozen 2026-09-16 (basics, directed_modulation, the multi-token six) | 20 | the layer their generation replicated |
 | the nine frozen 2026-09-18 | 44 | the nominal layer of that generation |
 | `buggy_code`, `arithmetic_intermediates` | 56 | their activations were captured at layers 56/60 only |
+
+The six multi-token entries were re-scored on 2026-09-23 with the regex scorer from the SAME
+prompt-only summaries (`gen-prompt-only-hard-mt`, layer 20, `judge_model` `regex`, instrument
+`mt-regex-2026-09-23`): `basic_readout_mt` 0.40 -> 0.59, `multihop_mt` 0.52 -> 0.69, `multilingual_mt`
+0.37 -> 0.42, `typo_mt` 0.46 -> 0.67, `multilingual_multihop` 0.36 -> 0.45, `multilingual_typo` 0.48 ->
+0.66. The stock model's summary usually states the bridge or the correction the prompt makes
+recoverable, so these are high, not item-blind floors, and several lens arms sit below them
+(`multihop_mt`: s3d-rl600 0.32 against 0.69); read them as the text-leakage caveat above says.
 
 The `poetry` and `user_modeling` entries were measured at the read sites those families used
 until 2026-09-23 (the final prompt token / the assistant-onset token); both families now read

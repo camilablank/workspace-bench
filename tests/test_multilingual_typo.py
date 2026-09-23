@@ -1,4 +1,5 @@
-"""multilingual_typo: option sets, judged roles, and a toy run on the shared multi-token judge."""
+"""multilingual_typo: option sets and judged roles of the optional MC judge (``opts=judge=mc``);
+the regex scorer of record is tested in ``test_mt_regex.py``."""
 
 import json
 from pathlib import Path
@@ -39,4 +40,8 @@ def test_registered():
     from wsbench.evals.multilingual_typo import SPEC
 
     registry.FAMILIES.setdefault(SPEC.name, SPEC)
-    assert SPEC.group == "basic_mt" and SPEC.judge.prompt_version == "mc-2026-09-16"
+    assert SPEC.group == "basic_mt" and SPEC.scorer == "regex"
+    assert (
+        SPEC.judge.prompt_version == "mt-regex-2026-09-23"
+    )  # the regex contract is the instrument
+    assert "0 (regex)" in SPEC.calls_per_arm and "opts=judge=mc" in SPEC.calls_per_arm

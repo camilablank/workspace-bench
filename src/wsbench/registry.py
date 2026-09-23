@@ -45,6 +45,9 @@ class EvalSpec:
     run: Callable[[JudgeArgs], FamilyResult]  # returns a FamilyResult; writes nothing
     calls_per_arm: str = ""  # human string for `wsbench list`, e.g. "≈ 7k" (judge calls per arm)
     sources: str = ""  # credit substring that appears verbatim in README §Credits and NOTICE.md
+    # a deterministic scorer of record ("regex"): `wsbench list` shows it as the judge and `run`
+    # skips its preflight unless opts=judge=mc asks for the family's optional LLM judge
+    scorer: str = ""
 
 
 def register(spec: EvalSpec) -> EvalSpec:
