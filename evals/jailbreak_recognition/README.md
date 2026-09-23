@@ -69,10 +69,13 @@ override — its **own read** of the situation, not an echo of the pasted rules?
   `positions[0]` and `turn_end` already were) and the cached verdicts of the 13 old sites
   (same cell keys, same fingerprints).
 - **Cost.** One Sonnet 5 call per cell over the whole conversation prefix: ≈ 27× the 13-site
-  grid, i.e. of the order of $1k–2k per five-layer arm at 2026-09 list prices (measure on a
-  `limit=2` smoke before a full run and extrapolate: input tokens × $2/M + output tokens ×
-  $10/M per cell). `layers=` and `items=` restrict the grid, but the number so produced is a
-  subset (`complete=False`).
+  grid. Measured 2026-09-23 on a `limit=2` smoke (1,486 cells of the O-lens arm, k = 4): 1,755
+  input + 542 output tokens per cell (the judge runs with the model's default adaptive
+  thinking), $0.0089 per cell at 2026-09 list prices ($2/M in, $10/M out) — ≈ $1,285 per
+  five-layer arm, ≈ $257 per L42 arm, ≈ $11k for eleven arms; 860 cells/min at concurrency
+  256, the account's output-token cap (2M/min) is the binding limit. Smoke before a full run
+  and extrapolate the same way. `layers=` and `items=` restrict the grid, but the number so
+  produced is a subset (`complete=False`).
 
 ## Judge prompts
 
