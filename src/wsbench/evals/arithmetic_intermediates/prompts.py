@@ -4,7 +4,7 @@ expression; printed verbatim in the family README."""
 
 from wsbench.llm import schema_block
 
-PROMPT_VERSION = "arith-free-2026-09-16"
+PROMPT_VERSION = "arith-free-2026-09-23"
 MAX_VALUES = 3  # the prompt caps the ranked list at three; the schema cannot (no maxItems)
 
 SYSTEM = """You are reading the output of a "lens" that tries to verbalize what a language model is

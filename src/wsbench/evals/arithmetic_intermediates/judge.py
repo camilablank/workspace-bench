@@ -131,7 +131,7 @@ def verdict(
     }
 
 
-BANDS = ("exact", "rel2pct", "rel5pct")  # the accuracy bands reported beside the variant's own
+BANDS = ("exact", "rel5pct")  # the accuracy bands reported beside the variant's own tolerance
 
 
 def cell_grid(args: JudgeArgs) -> str:
@@ -337,7 +337,7 @@ def run(args: JudgeArgs) -> FamilyResult:
             else None,
             "top1_rate": rate(bool(r.get("top1_hit")) for r in decided),
             "committed_rate": rate(bool(c["values"]) for c in judged_cells),
-            # accuracy at fixed bands, any cell: exact, within 2%, within 5% of the intermediate
+            # accuracy at fixed bands, any cell: exact and within 5% of the intermediate
             "bands": {b: rate(r["bands"][b] for r in decided) for b in BANDS},
             "cell_hit_rate": rate(bool(c["hit"]) for c in judged_cells),
             "per_layer_hit_rate": {
