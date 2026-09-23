@@ -10,7 +10,7 @@ from pathlib import Path
 
 import pydra
 
-from wsbench import registry, runner
+from wsbench import readplan, registry, runner
 from wsbench.baselines import lucky_guessing, prompt_only
 from wsbench.capable import questions as capable_questions
 from wsbench.capable import run as capable_run
@@ -500,6 +500,39 @@ class Capable(Command):
         return 0
 
 
+class Plan(Command):
+    """Write the read plan: for every item, what to render and how, which positions to read
+    and at which layers (`docs/producing_readouts.md`). One JSONL per family under `out`."""
+
+    def __init__(self) -> None:
+        super().__init__()
+        self.families = "all"
+        self.out = "outputs/plan"
+        self.limit = 0
+
+    def finalize(self) -> None:
+        self.families = _strs(self.families) or ["all"]
+        self.out = _path(self.out)
+        self.limit = _int(self.limit)
+
+    def execute(self) -> int:
+        names = readplan.families() if self.families == ["all"] else self.families
+        unknown = [f for f in names if f not in readplan.families()]
+        if unknown:
+            print(f"unknown families {unknown}; known {readplan.families()}", file=sys.stderr)
+            return EXIT_USAGE
+        for name in names:
+            specs = readplan.plan(name)[: self.limit or None]
+            n = readplan.write(specs, self.out / f"{name}.jsonl")
+            layers = sorted({L for s in specs for L in s.layers})
+            kinds = sorted({s.positions["kind"] for s in specs})
+            print(
+                f"{name}: {n} items, render {sorted({s.render for s in specs})}, "
+                f"positions {kinds}, layers {layers}"
+            )
+        return 0
+
+
 class Freeze(Command):
     """Fold a finished baseline run into the tracked ``evals/baselines/<kind>.json``.
     ``kind=lucky_guessing``: ``src`` holds ``<family>/<variant>.json`` from ``wsbench baseline``.
@@ -549,6 +582,7 @@ COMMANDS: dict[str, type[Command]] = {
     "report": ReportRuns,
     "baseline": Baseline,
     "capable": Capable,
+    "plan": Plan,
     "freeze": Freeze,
     "convert-gen-dir": ConvertGenDir,
     "convert-read-json": ConvertReadJson,
