@@ -81,6 +81,45 @@ uv run wsbench run all=True readouts_root=readouts/mylens out=out/mylens
 uv run wsbench report dir=out/mylens
 ```
 
+## Or let the repo produce them
+
+`wsbench.produce` is a small producer over Hugging Face transformers, for anyone who has a GPU
+and wants readouts without writing the plumbing. Install the `gpu` extra and:
+
+```python
+from wsbench.produce import Producer
+
+p = Producer.load("Qwen/Qwen3.6-27B", "jlens")     # logit_lens | jlens | rlens | olens | nla
+p.read("The athlete Muhammad Ali plays the sport of", pos=-1, layer=36).readout.tokens
+p.read_prompt("Sechs geteilt durch zwei ist", positions="all", layers=[20, 36, 60])
+p.run_family("poetry", "readouts/mine/poetry.jsonl", limit=10)   # resumable; the plan picks the cells
+```
+
+The same from the shell:
+
+```
+wsbench produce family=poetry method=logit_lens out=readouts/mine/poetry.jsonl
+wsbench produce text="The athlete Muhammad Ali plays the sport of" method=jlens positions=-1 layers=20,36,60
+```
+
+What it does: renders the prompt the way the plan says (its chat template, thinking off),
+captures the residual stream after each requested decoder block in one forward pass, and hands
+each (layer, position) vector to the method. The vector lenses (`logit_lens`, `jlens`, `rlens`)
+return the top-10 tokens with scores; `olens` verbalizes through its LoRA with the vector placed
+in the carrier prompt's `<activation>` slot as `alpha · unit(h)`, the adapter off while capturing
+and on while generating; `nla` runs Karvonen's reader with the vector added norm-matched at its
+marker token. Methods are plain classes behind one `read(h, layer)` protocol, so a new lens is a
+few lines. Sampling for the verbalizers is `Sampling(temperature=1.0, top_p=0.95, top_k=64,
+max_new_tokens=256, k=1)`, the settings the in-house arms used.
+
+Token strings are spelled the way the in-house rows are: byte-level BPE with `Ġ`/`▁` shown as
+the space they encode (`" the"`), so the `token` field can be read as text. `nla` loads its own
+copy of the reader (a second 27B), so it wants an H200 or two GPUs; the other methods fit one H100.
+
+What it is not: fast. It reads one prompt at a time on one GPU, which is right for a token
+position, a question or a family, and wrong for the whole benchmark at every token; the in-house
+runs fan that out over Modal.
+
 ## What the plan does not carry
 
 - **Model-dependence.** The banks were gated on Qwen3.6-27B; `wsbench capable` re-runs that gate on

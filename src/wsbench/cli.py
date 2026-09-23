@@ -533,6 +533,69 @@ class Plan(Command):
         return 0
 
 
+class Produce(Command):
+    """Produce readouts with the built-in producer (needs the `gpu` extra): a family into one
+    readouts JSONL, or one prompt with `text=` over `positions=` and `layers=`."""
+
+    def __init__(self) -> None:
+        super().__init__()
+        self.method = "logit_lens"
+        self.model = "Qwen/Qwen3.6-27B"
+        self.family = ""
+        self.text = ""
+        self.chat = False
+        self.positions = "-1"  # an int, a comma list, or a rule kind such as all / final_token
+        self.layers = None
+        self.out = ""
+        self.limit = 0
+        self.items = None
+        self.device = "cuda"
+
+    def finalize(self) -> None:
+        self.method = str(self.method)
+        self.model = str(self.model)
+        self.family = str(self.family or "")
+        self.text = str(self.text or "")
+        self.chat = _bool(self.chat)
+        self.positions = str(self.positions)
+        self.layers = _ints(self.layers)
+        self.out = _path(self.out) if self.out else None
+        self.limit = _int(self.limit)
+        self.items = _strs(self.items)
+        self.device = str(self.device)
+
+    def execute(self) -> int:
+        from wsbench.produce import Producer, write
+
+        if bool(self.family) == bool(self.text):
+            print("give exactly one of family= or text=", file=sys.stderr)
+            return EXIT_USAGE
+        producer = Producer.load(self.model, self.method, device=self.device)
+        if self.family:
+            out = self.out or Path("outputs/readouts") / self.method / f"{self.family}.jsonl"
+            path = producer.run_family(
+                self.family, out, limit=self.limit, layers=self.layers, items=self.items
+            )
+            print(f"wrote {path}")
+            return 0
+        pos: object
+        if self.positions.lstrip("-").isdigit():
+            pos = int(self.positions)
+        elif "," in self.positions:
+            pos = [int(x) for x in self.positions.split(",")]
+        else:
+            pos = self.positions
+        rows = producer.read_prompt(
+            self.text, positions=pos, layers=self.layers or readplan.GRID, chat=self.chat
+        )
+        if self.out:
+            print(f"wrote {write(rows, self.out)} ({len(rows)} rows)")
+        else:
+            for r in rows:
+                print(json.dumps(r.contract(), ensure_ascii=False))
+        return 0
+
+
 class Freeze(Command):
     """Fold a finished baseline run into the tracked ``evals/baselines/<kind>.json``.
     ``kind=lucky_guessing``: ``src`` holds ``<family>/<variant>.json`` from ``wsbench baseline``.
@@ -583,6 +646,7 @@ COMMANDS: dict[str, type[Command]] = {
     "baseline": Baseline,
     "capable": Capable,
     "plan": Plan,
+    "produce": Produce,
     "freeze": Freeze,
     "convert-gen-dir": ConvertGenDir,
     "convert-read-json": ConvertReadJson,
