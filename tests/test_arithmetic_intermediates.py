@@ -2,6 +2,7 @@
 permutation null, a scripted run and a dry run."""
 
 import json
+import re
 from pathlib import Path
 
 import pytest
@@ -10,7 +11,12 @@ from wsbench import registry
 from wsbench.banks import load_bank
 from wsbench.cli import main
 from wsbench.evals.arithmetic_intermediates import judge
-from wsbench.evals.arithmetic_intermediates.prompts import PROMPT_VERSION, SYSTEM
+from wsbench.evals.arithmetic_intermediates.prompts import (
+    PROMPT_VERSION,
+    PROMPT_VERSION_BATCH,
+    SYSTEM,
+    SYSTEM_BATCH,
+)
 from wsbench.judge_config import JudgeConfig, resolve
 from wsbench.registry import JudgeArgs
 from wsbench.results import read_results
@@ -237,7 +243,8 @@ def test_registered_readme_and_dry_run(tmp_path, capsys, monkeypatch):
     from wsbench.evals.arithmetic_intermediates import SPEC
 
     assert SPEC.group == "computational" and SPEC.judge.prompt_version == PROMPT_VERSION
-    assert SYSTEM in (REPO / "evals/arithmetic_intermediates/README.md").read_text(encoding="utf-8")
+    readme = (REPO / "evals/arithmetic_intermediates/README.md").read_text(encoding="utf-8")
+    assert SYSTEM in readme and SYSTEM_BATCH in readme and PROMPT_VERSION_BATCH in readme
     monkeypatch.delenv("WSBENCH_JUDGE_MODEL", raising=False)
     out = tmp_path / "out"
     argv = ["judge", f"family={SPEC.name}", f"readouts={EXAMPLE}", f"out={out}", "dry_run=True"]
@@ -247,29 +254,51 @@ def test_registered_readme_and_dry_run(tmp_path, capsys, monkeypatch):
     assert "Lens output:" in capsys.readouterr().out
 
 
+_ENTRY = re.compile(r'^\[(\d+)\] pos=(-?\d+) token=("(?:\\.|[^"\\])*"): ', re.M)
+
+
+def batch_entries_of(user: str) -> list[tuple[int, int, str]]:
+    """(k, pos, text) of every entry in a batched user message, as the test judge reads it."""
+    heads = list(_ENTRY.finditer(user))
+    tail = user.rindex("\n\nFor each entry")
+    out = []
+    for n, m in enumerate(heads):
+        stop = heads[n + 1].start() if n + 1 < len(heads) else tail
+        out.append((int(m.group(1)), int(m.group(2)), user[m.end() : stop].strip()))
+    return out
+
+
 def test_all_cells_mode_uses_every_row_and_reports_bands(tmp_path, monkeypatch):
-    """``opts=cells=all``: every (layer, pos) row is a cell, an item passes on any cell, and
-    the accuracy bands are computed over the same kept values."""
+    """``opts=cells=all``: every (layer, pos) row is a cell, ONE call per (item, layer) lists
+    them as numbered entries, an item passes on any cell, and the accuracy bands are computed
+    over the same kept values."""
     _h, items = load_bank(BANK)
     it = next(x for x in items if x["tolerance"] == "exact")
     target = float(it["intermediates"][0])
-    off = target * 1.03  # inside 5%, not exact
+    off = target * 1.03  # inside 5%, outside exact
     rows = [
-        {"id": it["id"], "layer": 20, "pos": 0, "samples": ["nothing here"]},
-        {"id": it["id"], "layer": 20, "pos": 1, "samples": [f"maybe {off:g}"]},
+        {"id": it["id"], "layer": 20, "pos": 0, "token": "a", "samples": ["nothing here"]},
+        {"id": it["id"], "layer": 20, "pos": 1, "token": "\n", "samples": [f"maybe {off:g}"]},
         {"id": it["id"], "layer": 60, "pos": 1, "samples": [f"the value is {target:g}"]},
     ]
+    seen: list[dict] = []
 
     def fake_run_calls(calls, **kw):
+        seen.append(kw)
         out = {}
         for c in calls:
-            text = c.user
-            if f"{target:g}" in text:
-                out[c.key] = {"values": [target], "quote": f"{target:g}", "basis": "t"}
-            elif f"{off:g}" in text:
-                out[c.key] = {"values": [off], "quote": f"{off:g}", "basis": "t"}
-            else:
-                out[c.key] = {"values": [], "quote": "", "basis": "none"}
+            entries = batch_entries_of(c.user)
+            assert [k for k, _p, _t in entries] == list(range(1, len(entries) + 1))
+            assert [p for _k, p, _t in entries] == c.meta["positions"]
+            reply = []
+            for k, _pos, text in entries:
+                if f"{target:g}" in text:
+                    reply.append({"k": k, "values": [target], "quote": f"{target:g}", "basis": "t"})
+                elif f"{off:g}" in text:
+                    reply.append({"k": k, "values": [off], "quote": f"{off:g}", "basis": "t"})
+                else:
+                    reply.append({"k": k, "values": [], "quote": "", "basis": "none"})
+            out[c.key] = {"entries": reply}
         return out
 
     monkeypatch.setattr(judge, "run_calls", fake_run_calls)
@@ -292,16 +321,109 @@ def test_all_cells_mode_uses_every_row_and_reports_bands(tmp_path, monkeypatch):
     row = r.rows[0]
     assert row["n_cells"] == 3 and row["pass"] is True and row["hits_at"] == [(60, 1)]
     assert row["bands"] == {"exact": True, "rel5pct": True}
-    assert r.extras["n_rows_off_cell"] == 0 and r.extras["n_calls"] == 3
+    assert r.extras["n_rows_off_cell"] == 0 and r.extras["n_calls"] == 2  # (item, layer) pairs
+    assert r.extras["n_calls_failed"] == 0 and r.counts["n_unjudged_cells"] == 0
     assert r.extras["cell_hit_rate"] == pytest.approx(1 / 3)
     assert r.extras["per_layer_hit_rate"] == {"20": 0.0, "60": 1.0}
     assert r.config["cells"] == "all" and r.config["layers_judged"] == [20, 60]
+    assert r.config["prompt_version"] == PROMPT_VERSION_BATCH
+    assert seen[0]["prompt_version"] == PROMPT_VERSION_BATCH and seen[0]["validate"] is not None
     # without the exact cell, only the 5% band is reached
     path.write_text("".join(json.dumps(x) + "\n" for x in rows[:2]))
     r2 = judge.run(JudgeArgs(**{**args.__dict__, "out": tmp_path / "out2"}))
-    assert r2.rows[0]["pass"] is False
+    assert r2.rows[0]["pass"] is False and r2.extras["n_calls"] == 1
     assert r2.rows[0]["bands"] == {"exact": False, "rel5pct": True}
     assert r2.extras["bands"]["rel5pct"] == 1.0 and r2.extras["bands"]["exact"] == 0.0
+
+
+def test_batched_replies_are_read_per_entry(tmp_path, monkeypatch):
+    """A batched reply is mapped back to cells by ``k``: the first well-formed entry per k
+    wins, malformed and missing entries leave their cells unjudged, a failed call leaves every
+    cell of its (item, layer) unjudged, a reply without any usable entry is invalid."""
+    good = {"k": 2, "values": [1.0], "basis": "t", "quote": ""}
+    res = {
+        "entries": [
+            good,
+            {"k": 2, "values": [2.0]},  # duplicate k: ignored
+            {"k": "x", "values": []},  # non-integer k
+            {"k": 5, "values": []},  # out of range
+            {"k": 1.0, "values": [3.0]},  # an integral float is fine
+            {"k": 3, "values": "no"},  # values not a list
+            {"k": True, "values": []},
+        ]
+    }
+    parsed = judge.batch_entries(res, 4)
+    assert set(parsed) == {1, 2} and parsed[2] is good and parsed[1]["values"] == [3.0]
+    assert judge.batch_entries(None, 3) == {} and judge.batch_entries({"entries": "x"}, 3) == {}
+    call = judge.Call(key="k", system="", user="", meta={"n_entries": 4})
+    assert judge.valid_batch(call, res) and not judge.valid_batch(call, {"entries": []})
+
+    _h, items = load_bank(BANK)
+    it = next(x for x in items if x["tolerance"] == "exact")
+    target = float(it["intermediates"][0])
+    rows = [
+        {"id": it["id"], "layer": 56, "pos": -3, "samples": [f"it comes to {target + 1:g}"]},
+        {"id": it["id"], "layer": 56, "pos": -2, "samples": [f"so {target:g}"]},
+        {"id": it["id"], "layer": 56, "pos": -1, "samples": ["nothing"]},
+        {"id": it["id"], "layer": 60, "pos": -1, "samples": ["nothing"]},
+    ]
+    path = tmp_path / "r.jsonl"
+    path.write_text("".join(json.dumps(x) + "\n" for x in rows))
+    base = {
+        "readouts": path,
+        "out": tmp_path / "out",
+        "judge": resolve(JudgeConfig(prompt_version=PROMPT_VERSION)),
+        "layers": None,
+        "items": [it["id"]],
+        "limit": 0,
+        "allow_missing": False,
+        "concurrency": 1,
+        "rpm": 1.0,
+        "dry_run": False,
+        "extra": {"cells": "all"},
+    }
+    # the layer-56 reply skips entry 2 (the hit), the layer-60 call fails
+    monkeypatch.setattr(
+        judge,
+        "run_calls",
+        lambda calls, **kw: {
+            c.key: (
+                None
+                if c.meta["layer"] == 60
+                else {
+                    "entries": [
+                        {"k": 1, "values": [target + 1], "basis": "t", "quote": ""},
+                        {"k": 3, "values": [], "basis": "none", "quote": ""},
+                    ]
+                }
+            )
+            for c in calls
+        },
+    )
+    r = judge.run(JudgeArgs(**base))
+    row = r.rows[0]
+    assert row["pass"] is None and row["n_cells"] == 4 and row["n_unjudged"] == 2
+    assert r.counts["n_unjudged_cells"] == 2 and r.extras["n_calls_failed"] == 1
+    assert r.extras["n_calls"] == 2 and r.complete is False
+    assert row["unjudged_at"] == [(56, -2), (60, -1)]
+    # a hit in one entry decides the item even with unjudged cells beside it
+    monkeypatch.setattr(
+        judge,
+        "run_calls",
+        lambda calls, **kw: {
+            c.key: {
+                "entries": [
+                    {"k": 2, "values": [target], "basis": "t", "quote": ""},
+                ]
+            }
+            if c.meta["layer"] == 56
+            else None
+            for c in calls
+        },
+    )
+    r = judge.run(JudgeArgs(**{**base, "out": tmp_path / "out2"}))
+    assert r.rows[0]["pass"] is True and r.rows[0]["hits_at"] == [(56, -2)]
+    assert r.rows[0]["n_unjudged"] == 3 and r.value == 1.0
 
 
 def test_example_file_carries_the_every_position_regime(tmp_path, monkeypatch):
