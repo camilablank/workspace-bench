@@ -248,7 +248,7 @@ version.
 | family | judge model | prompt version |
 |---|---|---|
 | agentic_misalignment | claude-sonnet-5 | am-narrative-v1 |
-| arithmetic_intermediates | google/gemini-3.8-flash | arith-free-2026-09-16 |
+| arithmetic_intermediates | google/gemini-3.8-flash | arith-free-2026-09-23 |
 | association | google/gemini-3.8-flash | bank-2026-09-16 |
 | basic_readout | google/gemini-3.8-flash | bank-2026-09-16 |
 | basic_readout_mt | google/gemini-3.8-flash | mc-2026-09-16 |

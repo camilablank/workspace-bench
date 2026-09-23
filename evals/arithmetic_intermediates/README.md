@@ -13,20 +13,20 @@ the prompt). Bare render.
 
 | variant | shape | items | tolerance | cell | role |
 |---|---|---|---|---|---|
-| `absval` | `abs(a - b) * c` | 25 | rel2pct | L56, -7 | structural |
-| `addmul` | `(a + b) * c` | 43 | rel2pct | L60, -8 | comparison |
+| `absval` | `abs(a - b) * c` | 25 | rel5pct | L56, -7 | structural |
+| `addmul` | `(a + b) * c` | 43 | rel5pct | L60, -8 | comparison |
 | `floordiv` | `floor(a / b) + c` | 21 | exact | L60, -7 | structural |
-| `frac` | `(p / q) * (p*q*k)` | 116 | rel2pct | L60, -8 | structural |
-| `fracadd` | `(a / b) + (c / b),  b odd, b \| (a+c)` | 63 | rel2pct | L56, -8 | structural |
-| `fraccomp` | `((a + b) / c) * (c*e)` | 44 | rel2pct | L56, -8 | structural |
-| `fracint` | `(a / b) + (c / b),  b \| a, b \| c` | 32 | rel2pct | L56, -8 | comparison |
-| `fracsmall` | `(a / b) + (c / b),  a,c single-digit, b \| (a+c)` | 16 | rel2pct | L56, -8 | comparison |
-| `muladd` | `(a * b) + c` | 35 | rel2pct | L60, -8 | structural |
-| `mulmid` | `(a * b) + (c * d),  products 60-100` | 33 | rel2pct | L56, -8 | comparison |
+| `frac` | `(p / q) * (p*q*k)` | 116 | rel5pct | L60, -8 | structural |
+| `fracadd` | `(a / b) + (c / b),  b odd, b \| (a+c)` | 63 | rel5pct | L56, -8 | structural |
+| `fraccomp` | `((a + b) / c) * (c*e)` | 44 | rel5pct | L56, -8 | structural |
+| `fracint` | `(a / b) + (c / b),  b \| a, b \| c` | 32 | rel5pct | L56, -8 | comparison |
+| `fracsmall` | `(a / b) + (c / b),  a,c single-digit, b \| (a+c)` | 16 | rel5pct | L56, -8 | comparison |
+| `muladd` | `(a * b) + c` | 35 | rel5pct | L60, -8 | structural |
+| `mulmid` | `(a * b) + (c * d),  products 60-100` | 33 | rel5pct | L56, -8 | comparison |
 | `sign` | `(a - b) * c` | 25 | exact | L56, -8 | comparison |
-| `signpair` | `(a - b) * c` | 23 | rel2pct | L56, -8 | structural |
-| `subsub` | `(a - b) - c` | 60 | rel2pct | L56, -8 | comparison |
-| `subsubx` | `a - (b - c)` | 60 | rel2pct | L56, -8 | comparison |
+| `signpair` | `(a - b) * c` | 23 | rel5pct | L56, -8 | structural |
+| `subsub` | `(a - b) - c` | 60 | rel5pct | L56, -8 | comparison |
+| `subsubx` | `a - (b - c)` | 60 | rel5pct | L56, -8 | comparison |
 
 `role` is the source's reading: a *structural* variant has no single-token route to the
 intermediate and can support a claim against token lenses; a *comparison* variant is
@@ -45,11 +45,12 @@ Example: `(271 - 322) * 14` → intermediate -51, answer -714.
   numeral is credited that way). No regex or numeric matcher scores
   anything: the numerals are read only to verify what the judge named.
 - **Pass** (`value` in the source's terms): some kept value lies within the variant's tolerance
-  of the headline intermediate (`exact`, or a relative 2%; the source's `tolerance_ok`, sign-
+  of the headline intermediate (`exact`, or a relative 5%; the source's `tolerance_ok`, sign-
   aware). `extras.top1_rate` is the stricter top-ranked-value rate.
 - **Floors.** No analytic floor. `cross` is the permutation null: the same rule against the
   intermediates of the item's `null_set` (the other items of its variant whose intermediates the
-  source kept apart by about four tolerances; two muladd pairs sit closer, harmless at 2%),
+  source kept apart by about four 2% tolerances; the 13 pairs that sit within the 5% used since
+  2026-09-23 were dropped from the null sets),
   averaged over that set; `net = value −
   cross`. `extras.per_variant` gives n / value / cross / net / tolerance / role per variant,
   `extras.per_role` the structural vs comparison split; `extras.committed_rate` the calls that
@@ -58,8 +59,8 @@ Example: `(271 - 322) * 14` → intermediate -51, answer -714.
 - **Every-position read (`opts=cells=all`).** The same judge over every (layer, position) row
   in the file; an item passes when ANY cell names a value within its tolerance, and the
   permutation null is taken the same way, so `net` stays comparable. `extras.bands` reports the
-  any-cell accuracy at fixed bands beside the variant's own tolerance: `exact`, within 2%
-  (`rel2pct`) and within 5% (`rel5pct`) of the intermediate. `extras.cell_hit_rate` and
+  any-cell accuracy at two fixed bands beside the variant's own tolerance: `exact` and within
+  5% (`rel5pct`) of the intermediate. `extras.cell_hit_rate` and
   `extras.per_layer_hit_rate` are the per-cell numbers, and each row lists `hits_at`. An
   any-of-grid rule over hundreds of cells inflates the pass rate for that reason alone: read it
   against `cross`, never alone.
@@ -82,7 +83,7 @@ wsbench judge family=arithmetic_intermediates readouts=<arm>.jsonl out=outputs/<
 
 ## Judge prompts
 
-`prompt_version`: `arith-free-2026-09-16`. Judge: the repo default (`google/gemini-3.8-flash`),
+`prompt_version`: `arith-free-2026-09-23`. Judge: the repo default (`google/gemini-3.8-flash`),
 temperature 0. Output schema: `{"states_value": bool, "values": [number, ...], "basis":
 "arithmetic" | "stated_result" | "numeral_bag" | "none", "quote": str}`.
 

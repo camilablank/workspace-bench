@@ -251,7 +251,7 @@ def test_all_cells_mode_uses_every_row_and_reports_bands(tmp_path, monkeypatch):
     _h, items = load_bank(BANK)
     it = next(x for x in items if x["tolerance"] == "exact")
     target = float(it["intermediates"][0])
-    off = target * 1.03  # inside 5%, outside 2% and exact
+    off = target * 1.03  # inside 5%, not exact
     rows = [
         {"id": it["id"], "layer": 20, "pos": 0, "samples": ["nothing here"]},
         {"id": it["id"], "layer": 20, "pos": 1, "samples": [f"maybe {off:g}"]},
@@ -289,7 +289,7 @@ def test_all_cells_mode_uses_every_row_and_reports_bands(tmp_path, monkeypatch):
     r = judge.run(args)
     row = r.rows[0]
     assert row["n_cells"] == 3 and row["pass"] is True and row["hits_at"] == [(60, 1)]
-    assert row["bands"] == {"exact": True, "rel2pct": True, "rel5pct": True}
+    assert row["bands"] == {"exact": True, "rel5pct": True}
     assert r.extras["n_rows_off_cell"] == 0 and r.extras["n_calls"] == 3
     assert r.extras["cell_hit_rate"] == pytest.approx(1 / 3)
     assert r.extras["per_layer_hit_rate"] == {"20": 0.0, "60": 1.0}
@@ -298,5 +298,5 @@ def test_all_cells_mode_uses_every_row_and_reports_bands(tmp_path, monkeypatch):
     path.write_text("".join(json.dumps(x) + "\n" for x in rows[:2]))
     r2 = judge.run(JudgeArgs(**{**args.__dict__, "out": tmp_path / "out2"}))
     assert r2.rows[0]["pass"] is False
-    assert r2.rows[0]["bands"] == {"exact": False, "rel2pct": False, "rel5pct": True}
+    assert r2.rows[0]["bands"] == {"exact": False, "rel5pct": True}
     assert r2.extras["bands"]["rel5pct"] == 1.0 and r2.extras["bands"]["exact"] == 0.0

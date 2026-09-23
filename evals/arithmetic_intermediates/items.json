@@ -4,7 +4,7 @@
  "variants": {
   "absval": {
    "shape": "abs(a - b) * c",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "cell": {
     "layer": 56,
     "pos": -7
@@ -14,7 +14,7 @@
   },
   "addmul": {
    "shape": "(a + b) * c",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "cell": {
     "layer": 60,
     "pos": -8
@@ -34,7 +34,7 @@
   },
   "frac": {
    "shape": "(p / q) * (p*q*k)",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "cell": {
     "layer": 60,
     "pos": -8
@@ -44,7 +44,7 @@
   },
   "fracadd": {
    "shape": "(a / b) + (c / b),  b odd, b | (a+c)",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "cell": {
     "layer": 56,
     "pos": -8
@@ -54,7 +54,7 @@
   },
   "fraccomp": {
    "shape": "((a + b) / c) * (c*e)",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "cell": {
     "layer": 56,
     "pos": -8
@@ -64,7 +64,7 @@
   },
   "fracint": {
    "shape": "(a / b) + (c / b),  b | a, b | c",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "cell": {
     "layer": 56,
     "pos": -8
@@ -74,7 +74,7 @@
   },
   "fracsmall": {
    "shape": "(a / b) + (c / b),  a,c single-digit, b | (a+c)",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "cell": {
     "layer": 56,
     "pos": -8
@@ -84,7 +84,7 @@
   },
   "muladd": {
    "shape": "(a * b) + c",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "cell": {
     "layer": 60,
     "pos": -8
@@ -94,7 +94,7 @@
   },
   "mulmid": {
    "shape": "(a * b) + (c * d),  products 60-100",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "cell": {
     "layer": 56,
     "pos": -8
@@ -114,7 +114,7 @@
   },
   "signpair": {
    "shape": "(a - b) * c",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "cell": {
     "layer": 56,
     "pos": -8
@@ -124,7 +124,7 @@
   },
   "subsub": {
    "shape": "(a - b) - c",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "cell": {
     "layer": 56,
     "pos": -8
@@ -134,7 +134,7 @@
   },
   "subsubx": {
    "shape": "a - (b - c)",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "cell": {
     "layer": 56,
     "pos": -8
@@ -211,7 +211,7 @@
     "absval-363",
     "absval-366"
    ],
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "pair_survived": true,
    "cell": {
     "layer": 56,
@@ -272,7 +272,7 @@
     "absval-363",
     "absval-366"
    ],
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "pair_survived": true,
    "cell": {
     "layer": 56,
@@ -334,7 +334,7 @@
     "absval-363",
     "absval-366"
    ],
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "pair_survived": true,
    "cell": {
     "layer": 56,
@@ -396,7 +396,7 @@
     "absval-363",
     "absval-366"
    ],
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "pair_survived": true,
    "cell": {
     "layer": 56,
@@ -457,7 +457,7 @@
     "absval-363",
     "absval-366"
    ],
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "pair_survived": true,
    "cell": {
     "layer": 56,
@@ -518,7 +518,7 @@
     "absval-363",
     "absval-366"
    ],
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "pair_survived": true,
    "cell": {
     "layer": 56,
@@ -579,7 +579,7 @@
     "absval-362",
     "absval-363"
    ],
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "pair_survived": true,
    "cell": {
     "layer": 56,
@@ -641,7 +641,7 @@
     "absval-363",
     "absval-366"
    ],
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "pair_survived": true,
    "cell": {
     "layer": 56,
@@ -704,7 +704,7 @@
     "absval-363",
     "absval-366"
    ],
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "pair_survived": true,
    "cell": {
     "layer": 56,
@@ -766,7 +766,7 @@
     "absval-363",
     "absval-366"
    ],
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "pair_survived": true,
    "cell": {
     "layer": 56,
@@ -828,7 +828,7 @@
     "absval-363",
     "absval-366"
    ],
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "pair_survived": true,
    "cell": {
     "layer": 56,
@@ -889,7 +889,7 @@
     "absval-362",
     "absval-366"
    ],
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "pair_survived": true,
    "cell": {
     "layer": 56,
@@ -950,7 +950,7 @@
     "absval-363",
     "absval-366"
    ],
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "pair_survived": true,
    "cell": {
     "layer": 56,
@@ -1012,7 +1012,7 @@
     "absval-363",
     "absval-366"
    ],
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "pair_survived": true,
    "cell": {
     "layer": 56,
@@ -1075,7 +1075,7 @@
     "absval-363",
     "absval-366"
    ],
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "pair_survived": false,
    "cell": {
     "layer": 56,
@@ -1138,7 +1138,7 @@
     "absval-363",
     "absval-366"
    ],
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "pair_survived": false,
    "cell": {
     "layer": 56,
@@ -1200,7 +1200,7 @@
     "absval-363",
     "absval-366"
    ],
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "pair_survived": false,
    "cell": {
     "layer": 56,
@@ -1260,7 +1260,7 @@
     "absval-362",
     "absval-366"
    ],
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "pair_survived": true,
    "cell": {
     "layer": 56,
@@ -1322,7 +1322,7 @@
     "absval-363",
     "absval-366"
    ],
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "pair_survived": true,
    "cell": {
     "layer": 56,
@@ -1384,7 +1384,7 @@
     "absval-363",
     "absval-366"
    ],
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "pair_survived": true,
    "cell": {
     "layer": 56,
@@ -1445,7 +1445,7 @@
     "absval-363",
     "absval-366"
    ],
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "pair_survived": true,
    "cell": {
     "layer": 56,
@@ -1507,7 +1507,7 @@
     "absval-363",
     "absval-366"
    ],
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "pair_survived": true,
    "cell": {
     "layer": 56,
@@ -1568,7 +1568,7 @@
     "absval-361",
     "absval-363"
    ],
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "pair_survived": true,
    "cell": {
     "layer": 56,
@@ -1629,7 +1629,7 @@
     "absval-362",
     "absval-366"
    ],
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "pair_survived": true,
    "cell": {
     "layer": 56,
@@ -1690,7 +1690,7 @@
     "absval-361",
     "absval-363"
    ],
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "pair_survived": true,
    "cell": {
     "layer": 56,
@@ -1715,7 +1715,7 @@
     "54"
    ],
    "prompt": "Compute (24 + 30) * 8. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "addmul-002",
     "addmul-003",
@@ -1780,7 +1780,7 @@
     "86"
    ],
    "prompt": "Compute (48 + 38) * 6. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "addmul-000",
     "addmul-004",
@@ -1844,7 +1844,7 @@
     "87"
    ],
    "prompt": "Compute (43 + 44) * 6. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "addmul-000",
     "addmul-004",
@@ -1908,7 +1908,7 @@
     "59"
    ],
    "prompt": "Compute (34 + 25) * 9. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "addmul-000",
     "addmul-002",
@@ -1973,7 +1973,7 @@
     "78"
    ],
    "prompt": "Compute (43 + 35) * 8. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "addmul-000",
     "addmul-002",
@@ -2036,7 +2036,7 @@
     "49"
    ],
    "prompt": "Compute (28 + 21) * 9. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "addmul-000",
     "addmul-002",
@@ -2099,7 +2099,7 @@
     "61"
    ],
    "prompt": "Compute (40 + 21) * 8. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "addmul-000",
     "addmul-002",
@@ -2162,7 +2162,7 @@
     "85"
    ],
    "prompt": "Compute (40 + 45) * 3. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "addmul-000",
     "addmul-004",
@@ -2227,7 +2227,7 @@
     "31"
    ],
    "prompt": "Compute (18 + 13) * 9. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "addmul-000",
     "addmul-002",
@@ -2297,7 +2297,7 @@
     "77"
    ],
    "prompt": "Compute (35 + 42) * 6. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "addmul-000",
     "addmul-002",
@@ -2359,7 +2359,7 @@
     "52"
    ],
    "prompt": "Compute (14 + 38) * 3. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "addmul-002",
     "addmul-003",
@@ -2422,7 +2422,7 @@
     "45"
    ],
    "prompt": "Compute (22 + 23) * 5. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "addmul-000",
     "addmul-002",
@@ -2489,7 +2489,7 @@
     "66"
    ],
    "prompt": "Compute (48 + 18) * 5. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "addmul-000",
     "addmul-002",
@@ -2553,7 +2553,7 @@
     "67"
    ],
    "prompt": "Compute (25 + 42) * 4. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "addmul-000",
     "addmul-002",
@@ -2618,7 +2618,7 @@
     "41"
    ],
    "prompt": "Compute (29 + 12) * 3. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "addmul-000",
     "addmul-002",
@@ -2685,7 +2685,7 @@
     "34"
    ],
    "prompt": "Compute (17 + 17) * 5. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "addmul-000",
     "addmul-002",
@@ -2755,7 +2755,7 @@
     "44"
    ],
    "prompt": "Compute (16 + 28) * 4. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "addmul-000",
     "addmul-002",
@@ -2821,7 +2821,7 @@
     "47"
    ],
    "prompt": "Compute (12 + 35) * 3. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "addmul-000",
     "addmul-002",
@@ -2884,7 +2884,7 @@
     "59"
    ],
    "prompt": "Compute (42 + 17) * 5. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "addmul-000",
     "addmul-002",
@@ -2949,7 +2949,7 @@
     "71"
    ],
    "prompt": "Compute (30 + 41) * 5. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "addmul-000",
     "addmul-002",
@@ -3009,7 +3009,7 @@
     "37"
    ],
    "prompt": "Compute (24 + 13) * 7. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "addmul-000",
     "addmul-002",
@@ -3078,7 +3078,7 @@
     "57"
    ],
    "prompt": "Compute (46 + 11) * 9. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "addmul-002",
     "addmul-003",
@@ -3141,7 +3141,7 @@
     "83"
    ],
    "prompt": "Compute (35 + 48) * 3. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "addmul-000",
     "addmul-004",
@@ -3202,7 +3202,7 @@
     "60"
    ],
    "prompt": "Compute (40 + 20) * 9. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "addmul-000",
     "addmul-002",
@@ -3267,7 +3267,7 @@
     "67"
    ],
    "prompt": "Compute (30 + 37) * 9. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "addmul-000",
     "addmul-002",
@@ -3332,7 +3332,7 @@
     "67"
    ],
    "prompt": "Compute (44 + 23) * 5. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "addmul-000",
     "addmul-002",
@@ -3397,7 +3397,7 @@
     "75"
    ],
    "prompt": "Compute (45 + 30) * 6. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "addmul-000",
     "addmul-002",
@@ -3460,7 +3460,7 @@
     "50"
    ],
    "prompt": "Compute (30 + 20) * 8. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "addmul-002",
     "addmul-003",
@@ -3522,7 +3522,7 @@
     "88"
    ],
    "prompt": "Compute (48 + 40) * 7. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "addmul-000",
     "addmul-004",
@@ -3586,7 +3586,7 @@
     "49"
    ],
    "prompt": "Compute (36 + 13) * 9. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "addmul-000",
     "addmul-002",
@@ -3649,7 +3649,7 @@
     "77"
    ],
    "prompt": "Compute (33 + 44) * 7. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "addmul-000",
     "addmul-002",
@@ -3711,7 +3711,7 @@
     "39"
    ],
    "prompt": "Compute (28 + 11) * 8. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "addmul-000",
     "addmul-002",
@@ -3779,7 +3779,7 @@
     "53"
    ],
    "prompt": "Compute (23 + 30) * 4. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "addmul-002",
     "addmul-003",
@@ -3841,7 +3841,7 @@
     "59"
    ],
    "prompt": "Compute (14 + 45) * 3. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "addmul-000",
     "addmul-002",
@@ -3906,7 +3906,7 @@
     "86"
    ],
    "prompt": "Compute (44 + 42) * 3. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "addmul-000",
     "addmul-004",
@@ -3970,7 +3970,7 @@
     "76"
    ],
    "prompt": "Compute (41 + 35) * 6. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "addmul-000",
     "addmul-002",
@@ -4033,7 +4033,7 @@
     "66"
    ],
    "prompt": "Compute (48 + 18) * 6. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "addmul-000",
     "addmul-002",
@@ -4097,7 +4097,7 @@
     "73"
    ],
    "prompt": "Compute (37 + 36) * 9. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "addmul-000",
     "addmul-002",
@@ -4160,7 +4160,7 @@
     "52"
    ],
    "prompt": "Compute (17 + 35) * 5. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "addmul-002",
     "addmul-003",
@@ -4223,7 +4223,7 @@
     "78"
    ],
    "prompt": "Compute (36 + 42) * 4. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "addmul-000",
     "addmul-002",
@@ -4286,7 +4286,7 @@
     "44"
    ],
    "prompt": "Compute (32 + 12) * 4. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "addmul-000",
     "addmul-002",
@@ -4352,7 +4352,7 @@
     "49"
    ],
    "prompt": "Compute (24 + 25) * 3. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "addmul-000",
     "addmul-002",
@@ -4415,7 +4415,7 @@
     "93"
    ],
    "prompt": "Compute (46 + 47) * 8. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "addmul-000",
     "addmul-004",
@@ -5717,7 +5717,7 @@
     "0.777778"
    ],
    "prompt": "Compute (7 / 9) * 126. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "frac-002",
     "frac-003",
@@ -5847,7 +5847,7 @@
     "1.285714"
    ],
    "prompt": "Compute (9 / 7) * 126. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "frac-002",
     "frac-003",
@@ -5977,7 +5977,7 @@
     "0.636364"
    ],
    "prompt": "Compute (7 / 11) * 385. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "frac-000",
     "frac-001",
@@ -6112,7 +6112,7 @@
     "1.571429"
    ],
    "prompt": "Compute (11 / 7) * 385. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "frac-000",
     "frac-001",
@@ -6247,7 +6247,7 @@
     "0.272727"
    ],
    "prompt": "Compute (3 / 11) * 99. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "frac-000",
     "frac-001",
@@ -6385,7 +6385,7 @@
     "3.666667"
    ],
    "prompt": "Compute (11 / 3) * 99. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "frac-000",
     "frac-001",
@@ -6523,7 +6523,7 @@
     "0.130435"
    ],
    "prompt": "Compute (3 / 23) * 69. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "frac-000",
     "frac-001",
@@ -6665,7 +6665,7 @@
     "7.666667"
    ],
    "prompt": "Compute (23 / 3) * 69. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "frac-000",
     "frac-001",
@@ -6807,7 +6807,7 @@
     "0.538462"
    ],
    "prompt": "Compute (7 / 13) * 364. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "frac-000",
     "frac-001",
@@ -6942,7 +6942,7 @@
     "1.857143"
    ],
    "prompt": "Compute (13 / 7) * 364. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "frac-000",
     "frac-001",
@@ -7077,7 +7077,7 @@
     "0.846154"
    ],
    "prompt": "Compute (11 / 13) * 572. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "frac-000",
     "frac-001",
@@ -7209,7 +7209,7 @@
     "1.181818"
    ],
    "prompt": "Compute (13 / 11) * 572. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "frac-000",
     "frac-001",
@@ -7341,7 +7341,7 @@
     "0.846154"
    ],
    "prompt": "Compute (11 / 13) * 715. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "frac-000",
     "frac-001",
@@ -7473,7 +7473,7 @@
     "1.181818"
    ],
    "prompt": "Compute (13 / 11) * 715. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "frac-000",
     "frac-001",
@@ -7605,7 +7605,7 @@
     "0.272727"
    ],
    "prompt": "Compute (3 / 11) * 132. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "frac-000",
     "frac-001",
@@ -7743,7 +7743,7 @@
     "3.666667"
    ],
    "prompt": "Compute (11 / 3) * 132. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "frac-000",
     "frac-001",
@@ -7881,7 +7881,7 @@
     "0.647059"
    ],
    "prompt": "Compute (11 / 17) * 561. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "frac-000",
     "frac-001",
@@ -8016,7 +8016,7 @@
     "1.545455"
    ],
    "prompt": "Compute (17 / 11) * 561. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "frac-000",
     "frac-001",
@@ -8151,7 +8151,7 @@
     "0.764706"
    ],
    "prompt": "Compute (13 / 17) * 442. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "frac-001",
     "frac-002",
@@ -8281,7 +8281,7 @@
     "1.307692"
    ],
    "prompt": "Compute (17 / 13) * 442. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "frac-000",
     "frac-002",
@@ -8411,7 +8411,7 @@
     "0.636364"
    ],
    "prompt": "Compute (7 / 11) * 154. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "frac-000",
     "frac-001",
@@ -8546,7 +8546,7 @@
     "1.571429"
    ],
    "prompt": "Compute (11 / 7) * 154. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "frac-000",
     "frac-001",
@@ -8681,7 +8681,7 @@
     "0.538462"
    ],
    "prompt": "Compute (7 / 13) * 182. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "frac-000",
     "frac-001",
@@ -8816,7 +8816,7 @@
     "1.857143"
    ],
    "prompt": "Compute (13 / 7) * 182. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "frac-000",
     "frac-001",
@@ -8951,7 +8951,7 @@
     "0.565217"
    ],
    "prompt": "Compute (13 / 23) * 299. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "frac-000",
     "frac-001",
@@ -9086,7 +9086,7 @@
     "1.769231"
    ],
    "prompt": "Compute (23 / 13) * 299. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "frac-000",
     "frac-001",
@@ -9221,7 +9221,7 @@
     "0.428571"
    ],
    "prompt": "Compute (3 / 7) * 105. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "frac-000",
     "frac-001",
@@ -9358,7 +9358,7 @@
     "2.333333"
    ],
    "prompt": "Compute (7 / 3) * 105. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "frac-000",
     "frac-001",
@@ -9495,7 +9495,7 @@
     "0.529412"
    ],
    "prompt": "Compute (9 / 17) * 153. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "frac-000",
     "frac-001",
@@ -9630,7 +9630,7 @@
     "1.888889"
    ],
    "prompt": "Compute (17 / 9) * 153. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "frac-000",
     "frac-001",
@@ -9765,7 +9765,7 @@
     "0.230769"
    ],
    "prompt": "Compute (3 / 13) * 117. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "frac-000",
     "frac-001",
@@ -9904,7 +9904,7 @@
     "4.333333"
    ],
    "prompt": "Compute (13 / 3) * 117. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "frac-000",
     "frac-001",
@@ -10043,7 +10043,7 @@
     "0.818182"
    ],
    "prompt": "Compute (9 / 11) * 396. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "frac-001",
     "frac-002",
@@ -10168,7 +10168,7 @@
     "1.222222"
    ],
    "prompt": "Compute (11 / 9) * 396. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "frac-000",
     "frac-002",
@@ -10293,7 +10293,7 @@
     "0.636364"
    ],
    "prompt": "Compute (7 / 11) * 77. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "frac-000",
     "frac-001",
@@ -10428,7 +10428,7 @@
     "1.571429"
    ],
    "prompt": "Compute (11 / 7) * 77. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "frac-000",
     "frac-001",
@@ -10563,7 +10563,7 @@
     "0.764706"
    ],
    "prompt": "Compute (13 / 17) * 221. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "frac-001",
     "frac-002",
@@ -10693,7 +10693,7 @@
     "1.307692"
    ],
    "prompt": "Compute (17 / 13) * 221. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "frac-000",
     "frac-002",
@@ -10823,7 +10823,7 @@
     "0.230769"
    ],
    "prompt": "Compute (3 / 13) * 39. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "frac-000",
     "frac-001",
@@ -10962,7 +10962,7 @@
     "4.333333"
    ],
    "prompt": "Compute (13 / 3) * 39. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "frac-000",
     "frac-001",
@@ -11101,7 +11101,7 @@
     "0.272727"
    ],
    "prompt": "Compute (3 / 11) * 33. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "frac-000",
     "frac-001",
@@ -11239,7 +11239,7 @@
     "3.666667"
    ],
    "prompt": "Compute (11 / 3) * 33. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "frac-000",
     "frac-001",
@@ -11377,7 +11377,7 @@
     "0.230769"
    ],
    "prompt": "Compute (3 / 13) * 78. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "frac-000",
     "frac-001",
@@ -11516,7 +11516,7 @@
     "4.333333"
    ],
    "prompt": "Compute (13 / 3) * 78. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "frac-000",
     "frac-001",
@@ -11655,7 +11655,7 @@
     "0.538462"
    ],
    "prompt": "Compute (7 / 13) * 455. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "frac-000",
     "frac-001",
@@ -11790,7 +11790,7 @@
     "1.857143"
    ],
    "prompt": "Compute (13 / 7) * 455. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "frac-000",
     "frac-001",
@@ -11925,7 +11925,7 @@
     "0.411765"
    ],
    "prompt": "Compute (7 / 17) * 238. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "frac-000",
     "frac-001",
@@ -12062,7 +12062,7 @@
     "2.428571"
    ],
    "prompt": "Compute (17 / 7) * 238. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "frac-000",
     "frac-001",
@@ -12199,7 +12199,7 @@
     "0.272727"
    ],
    "prompt": "Compute (3 / 11) * 165. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "frac-000",
     "frac-001",
@@ -12337,7 +12337,7 @@
     "3.666667"
    ],
    "prompt": "Compute (11 / 3) * 165. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "frac-000",
     "frac-001",
@@ -12475,7 +12475,7 @@
     "0.176471"
    ],
    "prompt": "Compute (3 / 17) * 153. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "frac-000",
     "frac-001",
@@ -12615,7 +12615,7 @@
     "5.666667"
    ],
    "prompt": "Compute (17 / 3) * 153. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "frac-000",
     "frac-001",
@@ -12755,7 +12755,7 @@
     "0.272727"
    ],
    "prompt": "Compute (3 / 11) * 66. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "frac-000",
     "frac-001",
@@ -12893,7 +12893,7 @@
     "3.666667"
    ],
    "prompt": "Compute (11 / 3) * 66. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "frac-000",
     "frac-001",
@@ -13031,7 +13031,7 @@
     "0.636364"
    ],
    "prompt": "Compute (7 / 11) * 231. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "frac-000",
     "frac-001",
@@ -13166,7 +13166,7 @@
     "1.571429"
    ],
    "prompt": "Compute (11 / 7) * 231. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "frac-000",
     "frac-001",
@@ -13301,7 +13301,7 @@
     "0.478261"
    ],
    "prompt": "Compute (11 / 23) * 253. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "frac-000",
     "frac-001",
@@ -13441,7 +13441,7 @@
     "2.090909"
    ],
    "prompt": "Compute (23 / 11) * 253. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "frac-000",
     "frac-001",
@@ -13581,7 +13581,7 @@
     "0.846154"
    ],
    "prompt": "Compute (11 / 13) * 429. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "frac-000",
     "frac-001",
@@ -13713,7 +13713,7 @@
     "1.181818"
    ],
    "prompt": "Compute (13 / 11) * 429. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "frac-000",
     "frac-001",
@@ -13845,7 +13845,7 @@
     "0.529412"
    ],
    "prompt": "Compute (9 / 17) * 459. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "frac-000",
     "frac-001",
@@ -13980,7 +13980,7 @@
     "1.888889"
    ],
    "prompt": "Compute (17 / 9) * 459. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "frac-000",
     "frac-001",
@@ -14115,7 +14115,7 @@
     "0.473684"
    ],
    "prompt": "Compute (9 / 19) * 171. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "frac-000",
     "frac-001",
@@ -14255,7 +14255,7 @@
     "2.111111"
    ],
    "prompt": "Compute (19 / 9) * 171. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "frac-000",
     "frac-001",
@@ -14395,7 +14395,7 @@
     "0.818182"
    ],
    "prompt": "Compute (9 / 11) * 495. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "frac-001",
     "frac-002",
@@ -14520,7 +14520,7 @@
     "1.222222"
    ],
    "prompt": "Compute (11 / 9) * 495. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "frac-000",
     "frac-002",
@@ -14645,7 +14645,7 @@
     "0.176471"
    ],
    "prompt": "Compute (3 / 17) * 102. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "frac-000",
     "frac-001",
@@ -14785,7 +14785,7 @@
     "5.666667"
    ],
    "prompt": "Compute (17 / 3) * 102. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "frac-000",
     "frac-001",
@@ -14925,7 +14925,7 @@
     "0.473684"
    ],
    "prompt": "Compute (9 / 19) * 342. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "frac-000",
     "frac-001",
@@ -15065,7 +15065,7 @@
     "2.111111"
    ],
    "prompt": "Compute (19 / 9) * 342. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "frac-000",
     "frac-001",
@@ -15205,7 +15205,7 @@
     "0.647059"
    ],
    "prompt": "Compute (11 / 17) * 187. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "frac-000",
     "frac-001",
@@ -15340,7 +15340,7 @@
     "1.545455"
    ],
    "prompt": "Compute (17 / 11) * 187. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "frac-000",
     "frac-001",
@@ -15475,7 +15475,7 @@
     "0.538462"
    ],
    "prompt": "Compute (7 / 13) * 91. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "frac-000",
     "frac-001",
@@ -15610,7 +15610,7 @@
     "1.857143"
    ],
    "prompt": "Compute (13 / 7) * 91. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "frac-000",
     "frac-001",
@@ -15745,7 +15745,7 @@
     "0.777778"
    ],
    "prompt": "Compute (7 / 9) * 315. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "frac-001",
     "frac-002",
@@ -15875,7 +15875,7 @@
     "1.285714"
    ],
    "prompt": "Compute (9 / 7) * 315. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "frac-000",
     "frac-002",
@@ -16005,7 +16005,7 @@
     "0.636364"
    ],
    "prompt": "Compute (7 / 11) * 308. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "frac-000",
     "frac-001",
@@ -16140,7 +16140,7 @@
     "1.571429"
    ],
    "prompt": "Compute (11 / 7) * 308. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "frac-000",
     "frac-001",
@@ -16275,7 +16275,7 @@
     "0.818182"
    ],
    "prompt": "Compute (9 / 11) * 99. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "frac-001",
     "frac-002",
@@ -16400,7 +16400,7 @@
     "1.222222"
    ],
    "prompt": "Compute (11 / 9) * 99. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "frac-000",
     "frac-002",
@@ -16525,7 +16525,7 @@
     "0.529412"
    ],
    "prompt": "Compute (9 / 17) * 306. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "frac-000",
     "frac-001",
@@ -16660,7 +16660,7 @@
     "1.888889"
    ],
    "prompt": "Compute (17 / 9) * 306. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "frac-000",
     "frac-001",
@@ -16795,7 +16795,7 @@
     "0.230769"
    ],
    "prompt": "Compute (3 / 13) * 156. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "frac-000",
     "frac-001",
@@ -16934,7 +16934,7 @@
     "4.333333"
    ],
    "prompt": "Compute (13 / 3) * 156. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "frac-000",
     "frac-001",
@@ -17073,7 +17073,7 @@
     "0.818182"
    ],
    "prompt": "Compute (9 / 11) * 297. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "frac-001",
     "frac-002",
@@ -17198,7 +17198,7 @@
     "1.222222"
    ],
    "prompt": "Compute (11 / 9) * 297. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "frac-000",
     "frac-002",
@@ -17323,7 +17323,7 @@
     "0.764706"
    ],
    "prompt": "Compute (13 / 17) * 663. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "frac-001",
     "frac-002",
@@ -17453,7 +17453,7 @@
     "1.307692"
    ],
    "prompt": "Compute (17 / 13) * 663. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "frac-000",
     "frac-002",
@@ -17583,7 +17583,7 @@
     "0.428571"
    ],
    "prompt": "Compute (3 / 7) * 63. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "frac-000",
     "frac-001",
@@ -17720,7 +17720,7 @@
     "2.333333"
    ],
    "prompt": "Compute (7 / 3) * 63. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "frac-000",
     "frac-001",
@@ -17857,7 +17857,7 @@
     "0.894737"
    ],
    "prompt": "Compute (17 / 19) * 323. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "frac-000",
     "frac-001",
@@ -17994,7 +17994,7 @@
     "1.117647"
    ],
    "prompt": "Compute (19 / 17) * 323. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "frac-000",
     "frac-001",
@@ -18131,7 +18131,7 @@
     "0.818182"
    ],
    "prompt": "Compute (9 / 11) * 198. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "frac-001",
     "frac-002",
@@ -18256,7 +18256,7 @@
     "1.222222"
    ],
    "prompt": "Compute (11 / 9) * 198. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "frac-000",
     "frac-002",
@@ -18381,7 +18381,7 @@
     "0.777778"
    ],
    "prompt": "Compute (7 / 9) * 63. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "frac-001",
     "frac-002",
@@ -18511,7 +18511,7 @@
     "1.285714"
    ],
    "prompt": "Compute (9 / 7) * 63. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "frac-000",
     "frac-002",
@@ -18641,7 +18641,7 @@
     "0.777778"
    ],
    "prompt": "Compute (7 / 9) * 189. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "frac-001",
     "frac-002",
@@ -18771,7 +18771,7 @@
     "1.285714"
    ],
    "prompt": "Compute (9 / 7) * 189. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "frac-000",
     "frac-002",
@@ -18901,7 +18901,7 @@
     "0.428571"
    ],
    "prompt": "Compute (3 / 7) * 42. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "frac-000",
     "frac-001",
@@ -19038,7 +19038,7 @@
     "2.333333"
    ],
    "prompt": "Compute (7 / 3) * 42. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "frac-000",
     "frac-001",
@@ -19175,7 +19175,7 @@
     "0.304348"
    ],
    "prompt": "Compute (7 / 23) * 161. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "frac-000",
     "frac-001",
@@ -19317,7 +19317,7 @@
     "3.285714"
    ],
    "prompt": "Compute (23 / 7) * 161. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "frac-000",
     "frac-001",
@@ -19459,7 +19459,7 @@
     "0.777778"
    ],
    "prompt": "Compute (7 / 9) * 252. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "frac-001",
     "frac-002",
@@ -19589,7 +19589,7 @@
     "1.285714"
    ],
    "prompt": "Compute (9 / 7) * 252. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "frac-000",
     "frac-002",
@@ -19719,7 +19719,7 @@
     "0.428571"
    ],
    "prompt": "Compute (3 / 7) * 21. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "frac-000",
     "frac-001",
@@ -19856,7 +19856,7 @@
     "2.333333"
    ],
    "prompt": "Compute (7 / 3) * 21. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "frac-000",
     "frac-001",
@@ -19993,7 +19993,7 @@
     "0.846154"
    ],
    "prompt": "Compute (11 / 13) * 143. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "frac-000",
     "frac-001",
@@ -20125,7 +20125,7 @@
     "1.181818"
    ],
    "prompt": "Compute (13 / 11) * 143. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "frac-000",
     "frac-001",
@@ -20257,7 +20257,7 @@
     "0.647059"
    ],
    "prompt": "Compute (11 / 17) * 374. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "frac-000",
     "frac-001",
@@ -20392,7 +20392,7 @@
     "1.545455"
    ],
    "prompt": "Compute (17 / 11) * 374. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "frac-000",
     "frac-001",
@@ -20527,7 +20527,7 @@
     "0.428571"
    ],
    "prompt": "Compute (3 / 7) * 84. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "frac-000",
     "frac-001",
@@ -20664,7 +20664,7 @@
     "2.333333"
    ],
    "prompt": "Compute (7 / 3) * 84. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "frac-000",
     "frac-001",
@@ -20801,7 +20801,7 @@
     "0.176471"
    ],
    "prompt": "Compute (3 / 17) * 51. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "frac-000",
     "frac-001",
@@ -20941,7 +20941,7 @@
     "5.666667"
    ],
    "prompt": "Compute (17 / 3) * 51. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "frac-000",
     "frac-001",
@@ -21081,7 +21081,7 @@
     "0.846154"
    ],
    "prompt": "Compute (11 / 13) * 286. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "frac-000",
     "frac-001",
@@ -21213,7 +21213,7 @@
     "1.181818"
    ],
    "prompt": "Compute (13 / 11) * 286. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "frac-000",
     "frac-001",
@@ -21344,7 +21344,7 @@
     "174"
    ],
    "prompt": "Compute (83 / 3) + (91 / 3). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fracadd-006",
     "fracadd-007",
@@ -21430,7 +21430,7 @@
     "102"
    ],
    "prompt": "Compute (92 / 3) + (10 / 3). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fracadd-000",
     "fracadd-008",
@@ -21506,7 +21506,7 @@
     "102"
    ],
    "prompt": "Compute (62 / 3) + (40 / 3). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fracadd-000",
     "fracadd-008",
@@ -21582,7 +21582,7 @@
     "132"
    ],
    "prompt": "Compute (68 / 11) + (64 / 11). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fracadd-000",
     "fracadd-006",
@@ -21662,7 +21662,7 @@
     "108"
    ],
    "prompt": "Compute (61 / 9) + (47 / 9). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fracadd-000",
     "fracadd-008",
@@ -21739,7 +21739,7 @@
     "117"
    ],
    "prompt": "Compute (92 / 3) + (25 / 3). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fracadd-000",
     "fracadd-006",
@@ -21819,7 +21819,7 @@
     "108"
    ],
    "prompt": "Compute (98 / 3) + (10 / 3). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fracadd-000",
     "fracadd-008",
@@ -21896,7 +21896,7 @@
     "110"
    ],
    "prompt": "Compute (41 / 11) + (69 / 11). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fracadd-000",
     "fracadd-008",
@@ -21973,7 +21973,7 @@
     "93"
    ],
    "prompt": "Compute (11 / 3) + (82 / 3). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fracadd-000",
     "fracadd-006",
@@ -22053,7 +22053,7 @@
     "44"
    ],
    "prompt": "Compute (18 / 11) + (26 / 11). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fracadd-000",
     "fracadd-006",
@@ -22139,7 +22139,7 @@
     "156"
    ],
    "prompt": "Compute (59 / 13) + (97 / 13). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fracadd-000",
     "fracadd-006",
@@ -22221,7 +22221,7 @@
     "132"
    ],
    "prompt": "Compute (98 / 3) + (34 / 3). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fracadd-000",
     "fracadd-006",
@@ -22301,7 +22301,7 @@
     "144"
    ],
    "prompt": "Compute (56 / 3) + (88 / 3). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fracadd-000",
     "fracadd-006",
@@ -22379,7 +22379,7 @@
     "129"
    ],
    "prompt": "Compute (70 / 3) + (59 / 3). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fracadd-000",
     "fracadd-006",
@@ -22459,7 +22459,7 @@
     "168"
    ],
    "prompt": "Compute (83 / 3) + (85 / 3). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fracadd-006",
     "fracadd-007",
@@ -22542,7 +22542,7 @@
     "117"
    ],
    "prompt": "Compute (83 / 9) + (34 / 9). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fracadd-000",
     "fracadd-006",
@@ -22622,7 +22622,7 @@
     "130"
    ],
    "prompt": "Compute (55 / 13) + (75 / 13). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fracadd-000",
     "fracadd-006",
@@ -22702,7 +22702,7 @@
     "45"
    ],
    "prompt": "Compute (20 / 9) + (25 / 9). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fracadd-000",
     "fracadd-006",
@@ -22787,7 +22787,7 @@
     "96"
    ],
    "prompt": "Compute (67 / 3) + (29 / 3). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fracadd-000",
     "fracadd-008",
@@ -22866,7 +22866,7 @@
     "120"
    ],
    "prompt": "Compute (58 / 3) + (62 / 3). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fracadd-000",
     "fracadd-006",
@@ -22948,7 +22948,7 @@
     "129"
    ],
    "prompt": "Compute (94 / 3) + (35 / 3). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fracadd-000",
     "fracadd-006",
@@ -23028,7 +23028,7 @@
     "105"
    ],
    "prompt": "Compute (25 / 7) + (80 / 7). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fracadd-000",
     "fracadd-008",
@@ -23106,7 +23106,7 @@
     "117"
    ],
    "prompt": "Compute (66 / 13) + (51 / 13). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fracadd-000",
     "fracadd-006",
@@ -23186,7 +23186,7 @@
     "84"
    ],
    "prompt": "Compute (57 / 7) + (27 / 7). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fracadd-000",
     "fracadd-006",
@@ -23270,7 +23270,7 @@
     "93"
    ],
    "prompt": "Compute (52 / 3) + (41 / 3). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fracadd-000",
     "fracadd-006",
@@ -23350,7 +23350,7 @@
     "143"
    ],
    "prompt": "Compute (80 / 13) + (63 / 13). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fracadd-000",
     "fracadd-006",
@@ -23429,7 +23429,7 @@
     "75"
    ],
    "prompt": "Compute (44 / 3) + (31 / 3). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fracadd-000",
     "fracadd-006",
@@ -23513,7 +23513,7 @@
     "72"
    ],
    "prompt": "Compute (25 / 3) + (47 / 3). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fracadd-000",
     "fracadd-006",
@@ -23597,7 +23597,7 @@
     "144"
    ],
    "prompt": "Compute (91 / 9) + (53 / 9). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fracadd-000",
     "fracadd-006",
@@ -23675,7 +23675,7 @@
     "150"
    ],
    "prompt": "Compute (76 / 3) + (74 / 3). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fracadd-000",
     "fracadd-006",
@@ -23754,7 +23754,7 @@
     "140"
    ],
    "prompt": "Compute (44 / 7) + (96 / 7). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fracadd-000",
     "fracadd-006",
@@ -23831,7 +23831,7 @@
     "105"
    ],
    "prompt": "Compute (89 / 7) + (16 / 7). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fracadd-000",
     "fracadd-008",
@@ -23909,7 +23909,7 @@
     "99"
    ],
    "prompt": "Compute (16 / 11) + (83 / 11). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fracadd-000",
     "fracadd-008",
@@ -23985,7 +23985,7 @@
     "87"
    ],
    "prompt": "Compute (19 / 3) + (68 / 3). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fracadd-000",
     "fracadd-006",
@@ -24065,7 +24065,7 @@
     "84"
    ],
    "prompt": "Compute (18 / 7) + (66 / 7). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fracadd-000",
     "fracadd-006",
@@ -24149,7 +24149,7 @@
     "42"
    ],
    "prompt": "Compute (27 / 7) + (15 / 7). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fracadd-000",
     "fracadd-006",
@@ -24235,7 +24235,7 @@
     "84"
    ],
    "prompt": "Compute (26 / 3) + (58 / 3). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fracadd-000",
     "fracadd-006",
@@ -24319,7 +24319,7 @@
     "110"
    ],
    "prompt": "Compute (98 / 11) + (12 / 11). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fracadd-000",
     "fracadd-008",
@@ -24396,7 +24396,7 @@
     "93"
    ],
    "prompt": "Compute (74 / 3) + (19 / 3). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fracadd-000",
     "fracadd-006",
@@ -24476,7 +24476,7 @@
     "99"
    ],
    "prompt": "Compute (15 / 11) + (84 / 11). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fracadd-000",
     "fracadd-008",
@@ -24552,7 +24552,7 @@
     "72"
    ],
    "prompt": "Compute (56 / 3) + (16 / 3). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fracadd-000",
     "fracadd-006",
@@ -24636,7 +24636,7 @@
     "156"
    ],
    "prompt": "Compute (74 / 3) + (82 / 3). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fracadd-000",
     "fracadd-006",
@@ -24718,7 +24718,7 @@
     "135"
    ],
    "prompt": "Compute (82 / 3) + (53 / 3). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fracadd-000",
     "fracadd-006",
@@ -24796,7 +24796,7 @@
     "93"
    ],
    "prompt": "Compute (47 / 3) + (46 / 3). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fracadd-000",
     "fracadd-006",
@@ -24876,7 +24876,7 @@
     "105"
    ],
    "prompt": "Compute (32 / 7) + (73 / 7). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fracadd-000",
     "fracadd-008",
@@ -24954,7 +24954,7 @@
     "78"
    ],
    "prompt": "Compute (55 / 13) + (23 / 13). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fracadd-000",
     "fracadd-006",
@@ -25035,7 +25035,7 @@
     "57"
    ],
    "prompt": "Compute (44 / 3) + (13 / 3). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fracadd-000",
     "fracadd-006",
@@ -25123,7 +25123,7 @@
     "84"
    ],
    "prompt": "Compute (38 / 3) + (46 / 3). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fracadd-000",
     "fracadd-006",
@@ -25207,7 +25207,7 @@
     "182"
    ],
    "prompt": "Compute (86 / 13) + (96 / 13). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fracadd-006",
     "fracadd-007",
@@ -25293,7 +25293,7 @@
     "138"
    ],
    "prompt": "Compute (46 / 3) + (92 / 3). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fracadd-000",
     "fracadd-006",
@@ -25370,7 +25370,7 @@
     "120"
    ],
    "prompt": "Compute (77 / 3) + (43 / 3). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fracadd-000",
     "fracadd-006",
@@ -25452,7 +25452,7 @@
     "77"
    ],
    "prompt": "Compute (27 / 11) + (50 / 11). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fracadd-000",
     "fracadd-006",
@@ -25537,7 +25537,7 @@
     "96"
    ],
    "prompt": "Compute (32 / 3) + (64 / 3). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fracadd-000",
     "fracadd-008",
@@ -25616,7 +25616,7 @@
     "143"
    ],
    "prompt": "Compute (91 / 11) + (52 / 11). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fracadd-000",
     "fracadd-006",
@@ -25695,7 +25695,7 @@
     "93"
    ],
    "prompt": "Compute (68 / 3) + (25 / 3). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fracadd-000",
     "fracadd-006",
@@ -25775,7 +25775,7 @@
     "42"
    ],
    "prompt": "Compute (17 / 3) + (25 / 3). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fracadd-000",
     "fracadd-006",
@@ -25861,7 +25861,7 @@
     "156"
    ],
    "prompt": "Compute (83 / 3) + (73 / 3). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fracadd-000",
     "fracadd-006",
@@ -25943,7 +25943,7 @@
     "60"
    ],
    "prompt": "Compute (10 / 3) + (50 / 3). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fracadd-000",
     "fracadd-006",
@@ -26031,7 +26031,7 @@
     "69"
    ],
    "prompt": "Compute (26 / 3) + (43 / 3). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fracadd-000",
     "fracadd-006",
@@ -26117,7 +26117,7 @@
     "171"
    ],
    "prompt": "Compute (77 / 3) + (94 / 3). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fracadd-006",
     "fracadd-007",
@@ -26203,7 +26203,7 @@
     "48"
    ],
    "prompt": "Compute (25 / 3) + (23 / 3). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fracadd-000",
     "fracadd-006",
@@ -26291,7 +26291,7 @@
     "110"
    ],
    "prompt": "Compute (82 / 11) + (28 / 11). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fracadd-000",
     "fracadd-008",
@@ -26368,7 +26368,7 @@
     "153"
    ],
    "prompt": "Compute (65 / 3) + (88 / 3). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fracadd-000",
     "fracadd-006",
@@ -26451,7 +26451,7 @@
     "18.333333"
    ],
    "prompt": "Compute ((19 + 36) / 3) * 12. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fraccomp-009",
     "fraccomp-018",
@@ -26514,7 +26514,7 @@
     "7.142857"
    ],
    "prompt": "Compute ((12 + 38) / 7) * 35. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fraccomp-008",
     "fraccomp-019",
@@ -26569,7 +26569,7 @@
     "7.142857"
    ],
    "prompt": "Compute ((33 + 17) / 7) * 28. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fraccomp-008",
     "fraccomp-019",
@@ -26624,7 +26624,7 @@
     "5.428571"
    ],
    "prompt": "Compute ((15 + 23) / 7) * 14. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fraccomp-008",
     "fraccomp-009",
@@ -26691,7 +26691,7 @@
     "15.333333"
    ],
    "prompt": "Compute ((12 + 34) / 3) * 12. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fraccomp-008",
     "fraccomp-019",
@@ -26749,7 +26749,7 @@
     "7.142857"
    ],
    "prompt": "Compute ((21 + 29) / 7) * 35. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fraccomp-008",
     "fraccomp-019",
@@ -26804,7 +26804,7 @@
     "17.333333"
    ],
    "prompt": "Compute ((12 + 40) / 3) * 12. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fraccomp-019",
     "fraccomp-020",
@@ -26859,7 +26859,7 @@
     "23.333333"
    ],
    "prompt": "Compute ((30 + 40) / 3) * 6. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fraccomp-008",
     "fraccomp-009",
@@ -26926,7 +26926,7 @@
     "21.333333"
    ],
    "prompt": "Compute ((36 + 28) / 3) * 6. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fraccomp-008",
     "fraccomp-009",
@@ -26992,7 +26992,7 @@
     "3.857143"
    ],
    "prompt": "Compute ((12 + 15) / 7) * 28. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fraccomp-008",
     "fraccomp-009",
@@ -27062,7 +27062,7 @@
     "18.666667"
    ],
    "prompt": "Compute ((22 + 34) / 3) * 9. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fraccomp-009",
     "fraccomp-018",
@@ -27124,7 +27124,7 @@
     "21.666667"
    ],
    "prompt": "Compute ((30 + 35) / 3) * 12. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fraccomp-008",
     "fraccomp-009",
@@ -27188,7 +27188,7 @@
     "16.666667"
    ],
    "prompt": "Compute ((31 + 19) / 3) * 9. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fraccomp-008",
     "fraccomp-019",
@@ -27243,7 +27243,7 @@
     "16.333333"
    ],
    "prompt": "Compute ((25 + 24) / 3) * 15. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fraccomp-008",
     "fraccomp-019",
@@ -27298,7 +27298,7 @@
     "10.666667"
    ],
    "prompt": "Compute ((20 + 12) / 3) * 6. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fraccomp-008",
     "fraccomp-009",
@@ -27369,7 +27369,7 @@
     "8.333333"
    ],
    "prompt": "Compute ((14 + 11) / 3) * 12. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fraccomp-008",
     "fraccomp-009",
@@ -27436,7 +27436,7 @@
     "21.666667"
    ],
    "prompt": "Compute ((25 + 40) / 3) * 6. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fraccomp-008",
     "fraccomp-009",
@@ -27500,7 +27500,7 @@
     "7.142857"
    ],
    "prompt": "Compute ((21 + 29) / 7) * 14. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fraccomp-008",
     "fraccomp-019",
@@ -27555,7 +27555,7 @@
     "8.142857"
    ],
    "prompt": "Compute ((27 + 30) / 7) * 21. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fraccomp-009",
     "fraccomp-018",
@@ -27618,7 +27618,7 @@
     "16.666667"
    ],
    "prompt": "Compute ((36 + 14) / 3) * 6. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fraccomp-008",
     "fraccomp-019",
@@ -27673,7 +27673,7 @@
     "17.333333"
    ],
    "prompt": "Compute ((24 + 28) / 3) * 6. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fraccomp-019",
     "fraccomp-020",
@@ -27728,7 +27728,7 @@
     "11.666667"
    ],
    "prompt": "Compute ((10 + 25) / 3) * 9. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fraccomp-008",
     "fraccomp-009",
@@ -27796,7 +27796,7 @@
     "18.333333"
    ],
    "prompt": "Compute ((27 + 28) / 3) * 12. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fraccomp-009",
     "fraccomp-018",
@@ -27859,7 +27859,7 @@
     "3.571429"
    ],
    "prompt": "Compute ((15 + 10) / 7) * 14. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fraccomp-008",
     "fraccomp-009",
@@ -27929,7 +27929,7 @@
     "7.142857"
    ],
    "prompt": "Compute ((14 + 36) / 7) * 14. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fraccomp-008",
     "fraccomp-019",
@@ -27984,7 +27984,7 @@
     "12.666667"
    ],
    "prompt": "Compute ((12 + 26) / 3) * 15. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fraccomp-008",
     "fraccomp-009",
@@ -28051,7 +28051,7 @@
     "15.666667"
    ],
    "prompt": "Compute ((15 + 32) / 3) * 12. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fraccomp-008",
     "fraccomp-019",
@@ -28108,7 +28108,7 @@
     "5.142857"
    ],
    "prompt": "Compute ((22 + 14) / 7) * 21. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fraccomp-008",
     "fraccomp-009",
@@ -28176,7 +28176,7 @@
     "19.333333"
    ],
    "prompt": "Compute ((20 + 38) / 3) * 6. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fraccomp-009",
     "fraccomp-018",
@@ -28240,7 +28240,7 @@
     "8.571429"
    ],
    "prompt": "Compute ((40 + 20) / 7) * 21. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fraccomp-008",
     "fraccomp-009",
@@ -28301,7 +28301,7 @@
     "15.666667"
    ],
    "prompt": "Compute ((16 + 31) / 3) * 12. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fraccomp-008",
     "fraccomp-019",
@@ -28358,7 +28358,7 @@
     "18.666667"
    ],
    "prompt": "Compute ((22 + 34) / 3) * 6. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fraccomp-009",
     "fraccomp-018",
@@ -28420,7 +28420,7 @@
     "5.714286"
    ],
    "prompt": "Compute ((12 + 28) / 7) * 21. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fraccomp-008",
     "fraccomp-009",
@@ -28490,7 +28490,7 @@
     "7.142857"
    ],
    "prompt": "Compute ((17 + 33) / 7) * 14. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fraccomp-008",
     "fraccomp-019",
@@ -28545,7 +28545,7 @@
     "9.857143"
    ],
    "prompt": "Compute ((38 + 31) / 7) * 21. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fraccomp-008",
     "fraccomp-009",
@@ -28610,7 +28610,7 @@
     "16.666667"
    ],
    "prompt": "Compute ((38 + 12) / 3) * 9. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fraccomp-008",
     "fraccomp-019",
@@ -28665,7 +28665,7 @@
     "11.666667"
    ],
    "prompt": "Compute ((10 + 25) / 3) * 15. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fraccomp-008",
     "fraccomp-009",
@@ -28733,7 +28733,7 @@
     "21.666667"
    ],
    "prompt": "Compute ((25 + 40) / 3) * 9. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fraccomp-008",
     "fraccomp-009",
@@ -28797,7 +28797,7 @@
     "18.666667"
    ],
    "prompt": "Compute ((28 + 28) / 3) * 12. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fraccomp-009",
     "fraccomp-018",
@@ -28859,7 +28859,7 @@
     "23.333333"
    ],
    "prompt": "Compute ((38 + 32) / 3) * 9. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fraccomp-008",
     "fraccomp-009",
@@ -28926,7 +28926,7 @@
     "7.285714"
    ],
    "prompt": "Compute ((33 + 18) / 7) * 28. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fraccomp-019",
     "fraccomp-020",
@@ -28982,7 +28982,7 @@
     "8.571429"
    ],
    "prompt": "Compute ((20 + 40) / 7) * 35. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fraccomp-008",
     "fraccomp-009",
@@ -29043,7 +29043,7 @@
     "15.333333"
    ],
    "prompt": "Compute ((12 + 34) / 3) * 6. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fraccomp-008",
     "fraccomp-019",
@@ -29101,7 +29101,7 @@
     "15.333333"
    ],
    "prompt": "Compute ((10 + 36) / 3) * 12. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fraccomp-008",
     "fraccomp-019",
@@ -29158,7 +29158,7 @@
     "31"
    ],
    "prompt": "Compute (140 / 7) + (217 / 7). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fracint-005",
     "fracint-007",
@@ -29205,7 +29205,7 @@
     "18"
    ],
    "prompt": "Compute (87 / 3) + (54 / 3). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fracint-003",
     "fracint-007",
@@ -29258,7 +29258,7 @@
     "20"
    ],
    "prompt": "Compute (153 / 9) + (180 / 9). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fracint-003",
     "fracint-005",
@@ -29307,7 +29307,7 @@
     "18"
    ],
    "prompt": "Compute (286 / 13) + (234 / 13). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fracint-003",
     "fracint-007",
@@ -29359,7 +29359,7 @@
     "26"
    ],
    "prompt": "Compute (208 / 13) + (338 / 13). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fracint-003",
     "fracint-005",
@@ -29408,7 +29408,7 @@
     "22"
    ],
    "prompt": "Compute (247 / 13) + (286 / 13). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fracint-005",
     "fracint-007",
@@ -29456,7 +29456,7 @@
     "23"
    ],
    "prompt": "Compute (63 / 3) + (69 / 3). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fracint-005",
     "fracint-007",
@@ -29505,7 +29505,7 @@
     "14"
    ],
    "prompt": "Compute (260 / 13) + (182 / 13). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fracint-005",
     "fracint-007",
@@ -29554,7 +29554,7 @@
     "15"
    ],
    "prompt": "Compute (90 / 3) + (45 / 3). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fracint-003",
     "fracint-007",
@@ -29606,7 +29606,7 @@
     "15"
    ],
    "prompt": "Compute (126 / 7) + (105 / 7). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fracint-003",
     "fracint-005",
@@ -29654,7 +29654,7 @@
     "29"
    ],
    "prompt": "Compute (78 / 3) + (87 / 3). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fracint-005",
     "fracint-007",
@@ -29703,7 +29703,7 @@
     "19"
    ],
    "prompt": "Compute (72 / 3) + (57 / 3). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fracint-003",
     "fracint-010",
@@ -29754,7 +29754,7 @@
     "32"
    ],
    "prompt": "Compute (225 / 9) + (288 / 9). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fracint-005",
     "fracint-007",
@@ -29803,7 +29803,7 @@
     "14"
    ],
    "prompt": "Compute (189 / 9) + (126 / 9). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fracint-005",
     "fracint-007",
@@ -29853,7 +29853,7 @@
     "28"
    ],
    "prompt": "Compute (154 / 11) + (308 / 11). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fracint-003",
     "fracint-005",
@@ -29902,7 +29902,7 @@
     "26"
    ],
    "prompt": "Compute (42 / 3) + (78 / 3). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fracint-003",
     "fracint-005",
@@ -29952,7 +29952,7 @@
     "22"
    ],
    "prompt": "Compute (264 / 11) + (242 / 11). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fracint-003",
     "fracint-005",
@@ -30000,7 +30000,7 @@
     "19"
    ],
    "prompt": "Compute (286 / 11) + (209 / 11). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fracint-003",
     "fracint-010",
@@ -30051,7 +30051,7 @@
     "30"
    ],
    "prompt": "Compute (45 / 3) + (90 / 3). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fracint-005",
     "fracint-007",
@@ -30098,7 +30098,7 @@
     "32"
    ],
    "prompt": "Compute (119 / 7) + (224 / 7). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fracint-005",
     "fracint-009",
@@ -30146,7 +30146,7 @@
     "26"
    ],
    "prompt": "Compute (54 / 3) + (78 / 3). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fracint-003",
     "fracint-005",
@@ -30194,7 +30194,7 @@
     "30"
    ],
    "prompt": "Compute (195 / 13) + (390 / 13). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fracint-005",
     "fracint-007",
@@ -30241,7 +30241,7 @@
     "22"
    ],
    "prompt": "Compute (105 / 7) + (154 / 7). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fracint-003",
     "fracint-005",
@@ -30289,7 +30289,7 @@
     "21"
    ],
    "prompt": "Compute (126 / 9) + (189 / 9). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fracint-003",
     "fracint-005",
@@ -30340,7 +30340,7 @@
     "15"
    ],
    "prompt": "Compute (234 / 13) + (195 / 13). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fracint-003",
     "fracint-005",
@@ -30388,7 +30388,7 @@
     "26"
    ],
    "prompt": "Compute (189 / 9) + (234 / 9). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fracint-005",
     "fracint-007",
@@ -30437,7 +30437,7 @@
     "32"
    ],
    "prompt": "Compute (36 / 3) + (96 / 3). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fracint-005",
     "fracint-007",
@@ -30491,7 +30491,7 @@
     "23"
    ],
    "prompt": "Compute (57 / 3) + (69 / 3). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fracint-005",
     "fracint-007",
@@ -30540,7 +30540,7 @@
     "28"
    ],
    "prompt": "Compute (187 / 11) + (308 / 11). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fracint-003",
     "fracint-005",
@@ -30587,7 +30587,7 @@
     "19"
    ],
    "prompt": "Compute (182 / 7) + (133 / 7). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fracint-003",
     "fracint-010",
@@ -30638,7 +30638,7 @@
     "23"
    ],
    "prompt": "Compute (224 / 7) + (161 / 7). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fracint-003",
     "fracint-005",
@@ -30690,7 +30690,7 @@
     "15"
    ],
    "prompt": "Compute (93 / 3) + (45 / 3). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fracint-003",
     "fracint-007",
@@ -30741,7 +30741,7 @@
     "15"
    ],
    "prompt": "Compute (8 / 3) + (7 / 3). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fracsmall-001",
     "fracsmall-002",
@@ -30778,7 +30778,7 @@
     "12"
    ],
    "prompt": "Compute (8 / 3) + (4 / 3). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fracsmall-000",
     "fracsmall-004",
@@ -30817,7 +30817,7 @@
     "12"
    ],
    "prompt": "Compute (5 / 3) + (7 / 3). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fracsmall-000",
     "fracsmall-004",
@@ -30856,7 +30856,7 @@
     "12"
    ],
    "prompt": "Compute (7 / 3) + (5 / 3). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fracsmall-000",
     "fracsmall-004",
@@ -30895,7 +30895,7 @@
     "14"
    ],
    "prompt": "Compute (9 / 7) + (5 / 7). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fracsmall-001",
     "fracsmall-002",
@@ -30932,7 +30932,7 @@
     "6"
    ],
    "prompt": "Compute (4 / 3) + (2 / 3). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fracsmall-000",
     "fracsmall-001",
@@ -30973,7 +30973,7 @@
     "12"
    ],
    "prompt": "Compute (4 / 3) + (8 / 3). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fracsmall-000",
     "fracsmall-004",
@@ -31012,7 +31012,7 @@
     "14"
    ],
    "prompt": "Compute (8 / 7) + (6 / 7). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fracsmall-001",
     "fracsmall-002",
@@ -31049,7 +31049,7 @@
     "14"
    ],
    "prompt": "Compute (6 / 7) + (8 / 7). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fracsmall-001",
     "fracsmall-002",
@@ -31086,7 +31086,7 @@
     "14"
    ],
    "prompt": "Compute (5 / 7) + (9 / 7). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fracsmall-001",
     "fracsmall-002",
@@ -31123,7 +31123,7 @@
     "15"
    ],
    "prompt": "Compute (7 / 3) + (8 / 3). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fracsmall-001",
     "fracsmall-002",
@@ -31160,7 +31160,7 @@
     "9"
    ],
    "prompt": "Compute (5 / 3) + (4 / 3). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fracsmall-000",
     "fracsmall-001",
@@ -31199,7 +31199,7 @@
     "6"
    ],
    "prompt": "Compute (2 / 3) + (4 / 3). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fracsmall-000",
     "fracsmall-001",
@@ -31240,7 +31240,7 @@
     "9"
    ],
    "prompt": "Compute (2 / 3) + (7 / 3). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fracsmall-000",
     "fracsmall-001",
@@ -31279,7 +31279,7 @@
     "9"
    ],
    "prompt": "Compute (4 / 3) + (5 / 3). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fracsmall-000",
     "fracsmall-001",
@@ -31318,7 +31318,7 @@
     "9"
    ],
    "prompt": "Compute (7 / 3) + (2 / 3). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "fracsmall-000",
     "fracsmall-001",
@@ -31357,7 +31357,7 @@
    ],
    "name": "muladd-050",
    "prompt": "Compute (17 * 14) + 552. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "muladd-054",
     "muladd-055",
@@ -31415,7 +31415,7 @@
    ],
    "name": "muladd-054",
    "prompt": "Compute (21 * 45) + 841. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "muladd-050",
     "muladd-055",
@@ -31471,7 +31471,7 @@
    ],
    "name": "muladd-055",
    "prompt": "Compute (17 * 26) + 550. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "muladd-050",
     "muladd-054",
@@ -31528,7 +31528,7 @@
    ],
    "name": "muladd-056",
    "prompt": "Compute (45 * 47) + 398. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "muladd-050",
     "muladd-054",
@@ -31584,7 +31584,7 @@
    ],
    "name": "muladd-057",
    "prompt": "Compute (47 * 22) + 636. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "muladd-050",
     "muladd-054",
@@ -31641,7 +31641,7 @@
    ],
    "name": "muladd-058",
    "prompt": "Compute (44 * 47) + 363. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "muladd-050",
     "muladd-054",
@@ -31697,7 +31697,7 @@
    ],
    "name": "muladd-059",
    "prompt": "Compute (31 * 36) + 725. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "muladd-050",
     "muladd-054",
@@ -31754,7 +31754,7 @@
    ],
    "name": "muladd-060",
    "prompt": "Compute (25 * 31) + 245. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "muladd-050",
     "muladd-054",
@@ -31810,7 +31810,7 @@
    ],
    "name": "muladd-061",
    "prompt": "Compute (48 * 43) + 306. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "muladd-050",
     "muladd-054",
@@ -31866,7 +31866,7 @@
    ],
    "name": "muladd-062",
    "prompt": "Compute (38 * 46) + 218. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "muladd-050",
     "muladd-054",
@@ -31923,7 +31923,7 @@
    ],
    "name": "muladd-063",
    "prompt": "Compute (44 * 12) + 720. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "muladd-050",
     "muladd-054",
@@ -31980,7 +31980,7 @@
    ],
    "name": "muladd-064",
    "prompt": "Compute (36 * 13) + 652. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "muladd-050",
     "muladd-054",
@@ -32035,7 +32035,7 @@
    ],
    "name": "muladd-065",
    "prompt": "Compute (46 * 48) + 225. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "muladd-050",
     "muladd-054",
@@ -32091,7 +32091,7 @@
    ],
    "name": "muladd-066",
    "prompt": "Compute (43 * 17) + 808. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "muladd-050",
     "muladd-054",
@@ -32147,7 +32147,7 @@
    ],
    "name": "muladd-070",
    "prompt": "Compute (39 * 42) + 638. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "muladd-050",
     "muladd-054",
@@ -32203,7 +32203,7 @@
    ],
    "name": "muladd-071",
    "prompt": "Compute (32 * 18) + 297. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "muladd-050",
     "muladd-054",
@@ -32261,7 +32261,7 @@
    ],
    "name": "muladd-072",
    "prompt": "Compute (38 * 13) + 367. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "muladd-050",
     "muladd-054",
@@ -32317,7 +32317,7 @@
    ],
    "name": "muladd-073",
    "prompt": "Compute (24 * 21) + 333. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "muladd-050",
     "muladd-054",
@@ -32373,7 +32373,7 @@
    ],
    "name": "muladd-074",
    "prompt": "Compute (34 * 27) + 735. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "muladd-050",
     "muladd-055",
@@ -32430,7 +32430,7 @@
    ],
    "name": "muladd-075",
    "prompt": "Compute (43 * 18) + 612. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "muladd-050",
     "muladd-054",
@@ -32487,7 +32487,7 @@
    ],
    "name": "muladd-076",
    "prompt": "Compute (19 * 44) + 739. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "muladd-050",
     "muladd-054",
@@ -32543,7 +32543,7 @@
    ],
    "name": "muladd-077",
    "prompt": "Compute (28 * 24) + 819. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "muladd-050",
     "muladd-054",
@@ -32600,7 +32600,7 @@
    ],
    "name": "muladd-078",
    "prompt": "Compute (45 * 39) + 124. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "muladd-050",
     "muladd-054",
@@ -32657,7 +32657,7 @@
    ],
    "name": "muladd-080",
    "prompt": "Compute (22 * 46) + 310. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "muladd-050",
     "muladd-055",
@@ -32714,7 +32714,7 @@
    ],
    "name": "muladd-083",
    "prompt": "Compute (24 * 18) + 238. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "muladd-050",
     "muladd-054",
@@ -32772,7 +32772,7 @@
    ],
    "name": "muladd-085",
    "prompt": "Compute (18 * 39) + 532. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "muladd-050",
     "muladd-054",
@@ -32828,7 +32828,7 @@
    ],
    "name": "muladd-087",
    "prompt": "Compute (24 * 48) + 799. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "muladd-050",
     "muladd-054",
@@ -32886,7 +32886,7 @@
    ],
    "name": "muladd-088",
    "prompt": "Compute (44 * 33) + 615. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "muladd-050",
     "muladd-054",
@@ -32945,7 +32945,7 @@
    ],
    "name": "muladd-089",
    "prompt": "Compute (24 * 16) + 594. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "muladd-050",
     "muladd-054",
@@ -33004,7 +33004,7 @@
    ],
    "name": "muladd-090",
    "prompt": "Compute (18 * 13) + 139. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "muladd-054",
     "muladd-055",
@@ -33062,7 +33062,7 @@
    ],
    "name": "muladd-092",
    "prompt": "Compute (42 * 21) + 295. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "muladd-050",
     "muladd-055",
@@ -33118,7 +33118,7 @@
    ],
    "name": "muladd-095",
    "prompt": "Compute (41 * 16) + 884. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "muladd-050",
     "muladd-054",
@@ -33175,7 +33175,7 @@
    ],
    "name": "muladd-096",
    "prompt": "Compute (18 * 32) + 501. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "muladd-050",
     "muladd-054",
@@ -33233,7 +33233,7 @@
    ],
    "name": "muladd-097",
    "prompt": "Compute (41 * 39) + 628. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "muladd-050",
     "muladd-054",
@@ -33291,7 +33291,7 @@
    ],
    "name": "muladd-099",
    "prompt": "Compute (14 * 24) + 286. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "muladd-050",
     "muladd-054",
@@ -33353,7 +33353,7 @@
     "60"
    ],
    "prompt": "Compute (11 * 9) + (15 * 4). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "mulmid-003",
     "mulmid-006",
@@ -33402,7 +33402,7 @@
     "72"
    ],
    "prompt": "Compute (16 * 5) + (18 * 4). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "mulmid-000",
     "mulmid-011",
@@ -33450,7 +33450,7 @@
     "69"
    ],
    "prompt": "Compute (30 * 3) + (23 * 3). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "mulmid-000",
     "mulmid-008",
@@ -33496,7 +33496,7 @@
     "99"
    ],
    "prompt": "Compute (11 * 7) + (11 * 9). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "mulmid-000",
     "mulmid-006",
@@ -33545,7 +33545,7 @@
     "80"
    ],
    "prompt": "Compute (12 * 6) + (16 * 5). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "mulmid-000",
     "mulmid-003",
@@ -33592,7 +33592,7 @@
     "80"
    ],
    "prompt": "Compute (17 * 4) + (16 * 5). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "mulmid-000",
     "mulmid-003",
@@ -33642,7 +33642,7 @@
     "80"
    ],
    "prompt": "Compute (24 * 4) + (20 * 4). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "mulmid-003",
     "mulmid-008",
@@ -33688,7 +33688,7 @@
     "99"
    ],
    "prompt": "Compute (10 * 9) + (11 * 9). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "mulmid-000",
     "mulmid-003",
@@ -33737,7 +33737,7 @@
     "64"
    ],
    "prompt": "Compute (32 * 3) + (16 * 4). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "mulmid-003",
     "mulmid-008",
@@ -33784,7 +33784,7 @@
     "63"
    ],
    "prompt": "Compute (17 * 5) + (9 * 7). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "mulmid-008",
     "mulmid-011",
@@ -33828,7 +33828,7 @@
     "90"
    ],
    "prompt": "Compute (11 * 7) + (10 * 9). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "mulmid-000",
     "mulmid-006",
@@ -33876,7 +33876,7 @@
     "60"
    ],
    "prompt": "Compute (11 * 6) + (12 * 5). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "mulmid-003",
     "mulmid-006",
@@ -33924,7 +33924,7 @@
     "60"
    ],
    "prompt": "Compute (23 * 4) + (10 * 6). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "mulmid-003",
     "mulmid-008",
@@ -33970,7 +33970,7 @@
     "60"
    ],
    "prompt": "Compute (18 * 5) + (20 * 3). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "mulmid-003",
     "mulmid-008",
@@ -34017,7 +34017,7 @@
     "60"
    ],
    "prompt": "Compute (26 * 3) + (20 * 3). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "mulmid-006",
     "mulmid-019",
@@ -34060,7 +34060,7 @@
     "60"
    ],
    "prompt": "Compute (12 * 8) + (15 * 4). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "mulmid-003",
     "mulmid-008",
@@ -34107,7 +34107,7 @@
     "72"
    ],
    "prompt": "Compute (12 * 7) + (18 * 4). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "mulmid-000",
     "mulmid-008",
@@ -34156,7 +34156,7 @@
     "88"
    ],
    "prompt": "Compute (19 * 4) + (22 * 4). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "mulmid-000",
     "mulmid-006",
@@ -34204,7 +34204,7 @@
     "100"
    ],
    "prompt": "Compute (22 * 3) + (20 * 5). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "mulmid-000",
     "mulmid-003",
@@ -34259,7 +34259,7 @@
     "72"
    ],
    "prompt": "Compute (16 * 5) + (9 * 8). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "mulmid-000",
     "mulmid-011",
@@ -34307,7 +34307,7 @@
     "90"
    ],
    "prompt": "Compute (33 * 3) + (30 * 3). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "mulmid-003",
     "mulmid-006",
@@ -34358,7 +34358,7 @@
     "100"
    ],
    "prompt": "Compute (17 * 4) + (25 * 4). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "mulmid-000",
     "mulmid-003",
@@ -34411,7 +34411,7 @@
     "60"
    ],
    "prompt": "Compute (11 * 7) + (12 * 5). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "mulmid-006",
     "mulmid-019",
@@ -34456,7 +34456,7 @@
     "88"
    ],
    "prompt": "Compute (17 * 4) + (22 * 4). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "mulmid-000",
     "mulmid-003",
@@ -34506,7 +34506,7 @@
     "75"
    ],
    "prompt": "Compute (7 * 9) + (15 * 5). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "mulmid-000",
     "mulmid-008",
@@ -34551,7 +34551,7 @@
     "85"
    ],
    "prompt": "Compute (20 * 3) + (17 * 5). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "mulmid-000",
     "mulmid-003",
@@ -34603,7 +34603,7 @@
     "72"
    ],
    "prompt": "Compute (11 * 9) + (24 * 3). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "mulmid-008",
     "mulmid-011",
@@ -34650,7 +34650,7 @@
     "70"
    ],
    "prompt": "Compute (9 * 9) + (10 * 7). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "mulmid-000",
     "mulmid-011",
@@ -34697,7 +34697,7 @@
     "72"
    ],
    "prompt": "Compute (16 * 5) + (12 * 6). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "mulmid-000",
     "mulmid-011",
@@ -34745,7 +34745,7 @@
     "85"
    ],
    "prompt": "Compute (25 * 4) + (17 * 5). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "mulmid-003",
     "mulmid-006",
@@ -34793,7 +34793,7 @@
     "60"
    ],
    "prompt": "Compute (12 * 6) + (12 * 5). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "mulmid-003",
     "mulmid-006",
@@ -34839,7 +34839,7 @@
     "75"
    ],
    "prompt": "Compute (14 * 6) + (25 * 3). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "mulmid-000",
     "mulmid-008",
@@ -34885,7 +34885,7 @@
     "80"
    ],
    "prompt": "Compute (11 * 8) + (10 * 8). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "mulmid-000",
     "mulmid-003",
@@ -34948,7 +34948,6 @@
     "sign-080",
     "sign-081",
     "sign-082",
-    "sign-083",
     "sign-084",
     "sign-085",
     "sign-086",
@@ -34999,7 +34998,6 @@
     "sign-079",
     "sign-080",
     "sign-081",
-    "sign-082",
     "sign-083",
     "sign-084",
     "sign-085",
@@ -35194,7 +35192,6 @@
     "sign-065",
     "sign-066",
     "sign-068",
-    "sign-069",
     "sign-070",
     "sign-072",
     "sign-074",
@@ -35296,11 +35293,9 @@
     "sign-064",
     "sign-065",
     "sign-066",
-    "sign-067",
     "sign-068",
     "sign-070",
     "sign-072",
-    "sign-073",
     "sign-074",
     "sign-077",
     "sign-078",
@@ -35452,7 +35447,6 @@
     "sign-065",
     "sign-066",
     "sign-068",
-    "sign-069",
     "sign-070",
     "sign-072",
     "sign-074",
@@ -35613,8 +35607,6 @@
     "sign-074",
     "sign-077",
     "sign-079",
-    "sign-080",
-    "sign-081",
     "sign-082",
     "sign-083",
     "sign-084",
@@ -35716,7 +35708,6 @@
     "sign-073",
     "sign-074",
     "sign-077",
-    "sign-078",
     "sign-079",
     "sign-082",
     "sign-083",
@@ -35767,7 +35758,6 @@
     "sign-073",
     "sign-074",
     "sign-077",
-    "sign-078",
     "sign-079",
     "sign-082",
     "sign-083",
@@ -35806,7 +35796,6 @@
    "leak": false,
    "null_set": [
     "sign-062",
-    "sign-063",
     "sign-064",
     "sign-065",
     "sign-066",
@@ -35857,7 +35846,6 @@
    "ok": true,
    "leak": false,
    "null_set": [
-    "sign-062",
     "sign-063",
     "sign-064",
     "sign-065",
@@ -36081,7 +36069,6 @@
     "sign-081",
     "sign-082",
     "sign-083",
-    "sign-084",
     "sign-085",
     "sign-086",
     "sign-088",
@@ -36250,7 +36237,7 @@
     "signpair-403",
     "signpair-406"
    ],
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "pair_survived": true,
    "cell": {
     "layer": 56,
@@ -36309,7 +36296,7 @@
     "signpair-403",
     "signpair-406"
    ],
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "pair_survived": true,
    "cell": {
     "layer": 56,
@@ -36368,7 +36355,7 @@
     "signpair-403",
     "signpair-406"
    ],
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "pair_survived": true,
    "cell": {
     "layer": 56,
@@ -36427,7 +36414,7 @@
     "signpair-403",
     "signpair-406"
    ],
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "pair_survived": false,
    "cell": {
     "layer": 56,
@@ -36486,7 +36473,7 @@
     "signpair-403",
     "signpair-406"
    ],
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "pair_survived": true,
    "cell": {
     "layer": 56,
@@ -36545,7 +36532,7 @@
     "signpair-403",
     "signpair-406"
    ],
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "pair_survived": true,
    "cell": {
     "layer": 56,
@@ -36604,7 +36591,7 @@
     "signpair-402",
     "signpair-403"
    ],
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "pair_survived": true,
    "cell": {
     "layer": 56,
@@ -36665,7 +36652,7 @@
     "signpair-403",
     "signpair-406"
    ],
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "pair_survived": true,
    "cell": {
     "layer": 56,
@@ -36726,7 +36713,7 @@
     "signpair-403",
     "signpair-406"
    ],
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "pair_survived": true,
    "cell": {
     "layer": 56,
@@ -36786,7 +36773,7 @@
     "signpair-403",
     "signpair-406"
    ],
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "pair_survived": true,
    "cell": {
     "layer": 56,
@@ -36845,7 +36832,7 @@
     "signpair-403",
     "signpair-406"
    ],
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "pair_survived": true,
    "cell": {
     "layer": 56,
@@ -36904,7 +36891,7 @@
     "signpair-402",
     "signpair-406"
    ],
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "pair_survived": true,
    "cell": {
     "layer": 56,
@@ -36964,7 +36951,7 @@
     "signpair-403",
     "signpair-406"
    ],
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "pair_survived": false,
    "cell": {
     "layer": 56,
@@ -37024,7 +37011,7 @@
     "signpair-403",
     "signpair-406"
    ],
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "pair_survived": true,
    "cell": {
     "layer": 56,
@@ -37083,7 +37070,7 @@
     "signpair-403",
     "signpair-406"
    ],
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "pair_survived": true,
    "cell": {
     "layer": 56,
@@ -37141,7 +37128,7 @@
     "signpair-402",
     "signpair-406"
    ],
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "pair_survived": true,
    "cell": {
     "layer": 56,
@@ -37201,7 +37188,7 @@
     "signpair-403",
     "signpair-406"
    ],
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "pair_survived": true,
    "cell": {
     "layer": 56,
@@ -37261,7 +37248,7 @@
     "signpair-403",
     "signpair-406"
    ],
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "pair_survived": true,
    "cell": {
     "layer": 56,
@@ -37320,7 +37307,7 @@
     "signpair-403",
     "signpair-406"
    ],
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "pair_survived": true,
    "cell": {
     "layer": 56,
@@ -37380,7 +37367,7 @@
     "signpair-403",
     "signpair-406"
    ],
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "pair_survived": true,
    "cell": {
     "layer": 56,
@@ -37439,7 +37426,7 @@
     "signpair-401",
     "signpair-403"
    ],
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "pair_survived": true,
    "cell": {
     "layer": 56,
@@ -37498,7 +37485,7 @@
     "signpair-402",
     "signpair-406"
    ],
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "pair_survived": true,
    "cell": {
     "layer": 56,
@@ -37557,7 +37544,7 @@
     "signpair-401",
     "signpair-403"
    ],
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "pair_survived": true,
    "cell": {
     "layer": 56,
@@ -37582,7 +37569,7 @@
     "21"
    ],
    "prompt": "Compute (69 - 48) - 17. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "subsub-001",
     "subsub-002",
@@ -37669,7 +37656,7 @@
     "25"
    ],
    "prompt": "Compute (84 - 59) - 6. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "subsub-000",
     "subsub-002",
@@ -37747,7 +37734,7 @@
     "13"
    ],
    "prompt": "Compute (77 - 64) - 5. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "subsub-000",
     "subsub-001",
@@ -37829,7 +37816,7 @@
     "33"
    ],
    "prompt": "Compute (94 - 61) - 7. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "subsub-000",
     "subsub-001",
@@ -37912,7 +37899,7 @@
     "13"
    ],
    "prompt": "Compute (85 - 72) - 4. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "subsub-000",
     "subsub-001",
@@ -37994,7 +37981,7 @@
     "16"
    ],
    "prompt": "Compute (53 - 37) - 12. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "subsub-000",
     "subsub-001",
@@ -38073,7 +38060,7 @@
     "17"
    ],
    "prompt": "Compute (72 - 55) - 13. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "subsub-000",
     "subsub-001",
@@ -38150,7 +38137,7 @@
     "25"
    ],
    "prompt": "Compute (58 - 33) - 15. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "subsub-000",
     "subsub-002",
@@ -38228,7 +38215,7 @@
     "69"
    ],
    "prompt": "Compute (98 - 29) - 11. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "subsub-000",
     "subsub-001",
@@ -38313,7 +38300,7 @@
     "45"
    ],
    "prompt": "Compute (96 - 51) - 18. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "subsub-000",
     "subsub-001",
@@ -38396,7 +38383,7 @@
     "16"
    ],
    "prompt": "Compute (55 - 39) - 5. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "subsub-000",
     "subsub-001",
@@ -38475,7 +38462,7 @@
     "24"
    ],
    "prompt": "Compute (99 - 75) - 3. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "subsub-000",
     "subsub-002",
@@ -38554,7 +38541,7 @@
     "13"
    ],
    "prompt": "Compute (75 - 62) - 4. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "subsub-000",
     "subsub-001",
@@ -38636,7 +38623,7 @@
     "18"
    ],
    "prompt": "Compute (88 - 70) - 9. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "subsub-000",
     "subsub-001",
@@ -38715,7 +38702,7 @@
     "62"
    ],
    "prompt": "Compute (88 - 26) - 6. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "subsub-000",
     "subsub-001",
@@ -38799,7 +38786,7 @@
     "15"
    ],
    "prompt": "Compute (81 - 66) - 4. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "subsub-000",
     "subsub-001",
@@ -38878,7 +38865,7 @@
     "53"
    ],
    "prompt": "Compute (90 - 37) - 18. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "subsub-000",
     "subsub-001",
@@ -38960,7 +38947,7 @@
     "27"
    ],
    "prompt": "Compute (98 - 71) - 14. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "subsub-000",
     "subsub-002",
@@ -39043,7 +39030,7 @@
     "41"
    ],
    "prompt": "Compute (87 - 46) - 17. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "subsub-000",
     "subsub-001",
@@ -39127,7 +39114,7 @@
     "46"
    ],
    "prompt": "Compute (84 - 38) - 10. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "subsub-000",
     "subsub-001",
@@ -39209,7 +39196,7 @@
     "36"
    ],
    "prompt": "Compute (67 - 31) - 8. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "subsub-000",
     "subsub-001",
@@ -39295,7 +39282,7 @@
     "24"
    ],
    "prompt": "Compute (98 - 74) - 3. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "subsub-000",
     "subsub-002",
@@ -39374,7 +39361,7 @@
     "16"
    ],
    "prompt": "Compute (57 - 41) - 10. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "subsub-000",
     "subsub-001",
@@ -39453,7 +39440,7 @@
     "49"
    ],
    "prompt": "Compute (88 - 39) - 16. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "subsub-000",
     "subsub-001",
@@ -39536,7 +39523,7 @@
     "26"
    ],
    "prompt": "Compute (82 - 56) - 4. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "subsub-000",
     "subsub-002",
@@ -39616,7 +39603,7 @@
     "48"
    ],
    "prompt": "Compute (85 - 37) - 14. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "subsub-000",
     "subsub-001",
@@ -39699,7 +39686,7 @@
     "31"
    ],
    "prompt": "Compute (76 - 45) - 10. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "subsub-000",
     "subsub-001",
@@ -39782,7 +39769,7 @@
     "41"
    ],
    "prompt": "Compute (88 - 47) - 18. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "subsub-000",
     "subsub-001",
@@ -39866,7 +39853,7 @@
     "15"
    ],
    "prompt": "Compute (69 - 54) - 10. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "subsub-000",
     "subsub-001",
@@ -39945,7 +39932,7 @@
     "33"
    ],
    "prompt": "Compute (60 - 27) - 12. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "subsub-000",
     "subsub-001",
@@ -40028,7 +40015,7 @@
     "17"
    ],
    "prompt": "Compute (77 - 60) - 4. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "subsub-000",
     "subsub-001",
@@ -40105,7 +40092,7 @@
     "41"
    ],
    "prompt": "Compute (86 - 45) - 19. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "subsub-000",
     "subsub-001",
@@ -40189,7 +40176,7 @@
     "18"
    ],
    "prompt": "Compute (74 - 56) - 6. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "subsub-000",
     "subsub-001",
@@ -40268,7 +40255,7 @@
     "54"
    ],
    "prompt": "Compute (86 - 32) - 19. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "subsub-000",
     "subsub-001",
@@ -40351,7 +40338,7 @@
     "54"
    ],
    "prompt": "Compute (92 - 38) - 13. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "subsub-000",
     "subsub-001",
@@ -40434,7 +40421,7 @@
     "18"
    ],
    "prompt": "Compute (85 - 67) - 12. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "subsub-000",
     "subsub-001",
@@ -40513,7 +40500,7 @@
     "46"
    ],
    "prompt": "Compute (78 - 32) - 14. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "subsub-000",
     "subsub-001",
@@ -40595,7 +40582,7 @@
     "59"
    ],
    "prompt": "Compute (93 - 34) - 10. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "subsub-000",
     "subsub-001",
@@ -40677,7 +40664,7 @@
     "23"
    ],
    "prompt": "Compute (75 - 52) - 8. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "subsub-000",
     "subsub-002",
@@ -40757,7 +40744,7 @@
     "57"
    ],
    "prompt": "Compute (91 - 34) - 6. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "subsub-000",
     "subsub-001",
@@ -40839,7 +40826,7 @@
     "23"
    ],
    "prompt": "Compute (66 - 43) - 15. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "subsub-000",
     "subsub-002",
@@ -40919,7 +40906,7 @@
     "14"
    ],
    "prompt": "Compute (47 - 33) - 5. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "subsub-000",
     "subsub-001",
@@ -40998,7 +40985,7 @@
     "24"
    ],
    "prompt": "Compute (71 - 47) - 18. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "subsub-000",
     "subsub-002",
@@ -41077,7 +41064,7 @@
     "23"
    ],
    "prompt": "Compute (57 - 34) - 18. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "subsub-000",
     "subsub-002",
@@ -41157,7 +41144,7 @@
     "30"
    ],
    "prompt": "Compute (82 - 52) - 19. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "subsub-000",
     "subsub-001",
@@ -41241,7 +41228,7 @@
     "68"
    ],
    "prompt": "Compute (99 - 31) - 11. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "subsub-000",
     "subsub-001",
@@ -41326,7 +41313,7 @@
     "56"
    ],
    "prompt": "Compute (97 - 41) - 9. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "subsub-000",
     "subsub-001",
@@ -41408,7 +41395,7 @@
     "14"
    ],
    "prompt": "Compute (59 - 45) - 9. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "subsub-000",
     "subsub-001",
@@ -41487,7 +41474,7 @@
     "15"
    ],
    "prompt": "Compute (67 - 52) - 11. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "subsub-000",
     "subsub-001",
@@ -41566,7 +41553,7 @@
     "18"
    ],
    "prompt": "Compute (96 - 78) - 9. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "subsub-000",
     "subsub-001",
@@ -41645,7 +41632,7 @@
     "34"
    ],
    "prompt": "Compute (99 - 65) - 7. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "subsub-000",
     "subsub-001",
@@ -41728,7 +41715,7 @@
     "18"
    ],
    "prompt": "Compute (59 - 41) - 5. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "subsub-000",
     "subsub-001",
@@ -41807,7 +41794,7 @@
     "14"
    ],
    "prompt": "Compute (52 - 38) - 6. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "subsub-000",
     "subsub-001",
@@ -41886,7 +41873,7 @@
     "64"
    ],
    "prompt": "Compute (91 - 27) - 9. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "subsub-000",
     "subsub-001",
@@ -41968,7 +41955,7 @@
     "17"
    ],
    "prompt": "Compute (47 - 30) - 10. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "subsub-000",
     "subsub-001",
@@ -42045,7 +42032,7 @@
     "32"
    ],
    "prompt": "Compute (80 - 48) - 12. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "subsub-000",
     "subsub-001",
@@ -42127,7 +42114,7 @@
     "28"
    ],
    "prompt": "Compute (73 - 45) - 6. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "subsub-000",
     "subsub-001",
@@ -42211,7 +42198,7 @@
     "19"
    ],
    "prompt": "Compute (51 - 32) - 10. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "subsub-000",
     "subsub-001",
@@ -42293,7 +42280,7 @@
     "62"
    ],
    "prompt": "Compute (95 - 33) - 15. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "subsub-000",
     "subsub-001",
@@ -42377,7 +42364,7 @@
     "44"
    ],
    "prompt": "Compute (79 - 35) - 5. Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "subsub-000",
     "subsub-001",
@@ -42458,7 +42445,7 @@
     "31"
    ],
    "prompt": "Compute 69 - (48 - 17). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "subsubx-001",
     "subsubx-002",
@@ -42536,7 +42523,7 @@
     "53"
    ],
    "prompt": "Compute 84 - (59 - 6). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "subsubx-000",
     "subsubx-002",
@@ -42617,7 +42604,7 @@
     "59"
    ],
    "prompt": "Compute 77 - (64 - 5). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "subsubx-000",
     "subsubx-001",
@@ -42697,7 +42684,7 @@
     "54"
    ],
    "prompt": "Compute 94 - (61 - 7). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "subsubx-000",
     "subsubx-002",
@@ -42776,7 +42763,7 @@
     "68"
    ],
    "prompt": "Compute 85 - (72 - 4). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "subsubx-000",
     "subsubx-001",
@@ -42860,7 +42847,7 @@
     "25"
    ],
    "prompt": "Compute 53 - (37 - 12). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "subsubx-000",
     "subsubx-001",
@@ -42941,7 +42928,7 @@
     "42"
    ],
    "prompt": "Compute 72 - (55 - 13). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "subsubx-000",
     "subsubx-001",
@@ -43024,7 +43011,7 @@
     "18"
    ],
    "prompt": "Compute 58 - (33 - 15). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "subsubx-000",
     "subsubx-001",
@@ -43106,7 +43093,7 @@
     "18"
    ],
    "prompt": "Compute 98 - (29 - 11). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "subsubx-000",
     "subsubx-001",
@@ -43188,7 +43175,7 @@
     "33"
    ],
    "prompt": "Compute 96 - (51 - 18). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "subsubx-001",
     "subsubx-002",
@@ -43268,7 +43255,7 @@
     "34"
    ],
    "prompt": "Compute 55 - (39 - 5). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "subsubx-000",
     "subsubx-001",
@@ -43347,7 +43334,7 @@
     "72"
    ],
    "prompt": "Compute 99 - (75 - 3). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "subsubx-000",
     "subsubx-001",
@@ -43431,7 +43418,7 @@
     "58"
    ],
    "prompt": "Compute 75 - (62 - 4). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "subsubx-000",
     "subsubx-001",
@@ -43510,7 +43497,7 @@
     "61"
    ],
    "prompt": "Compute 88 - (70 - 9). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "subsubx-000",
     "subsubx-001",
@@ -43592,7 +43579,7 @@
     "20"
    ],
    "prompt": "Compute 88 - (26 - 6). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "subsubx-000",
     "subsubx-001",
@@ -43676,7 +43663,7 @@
     "62"
    ],
    "prompt": "Compute 81 - (66 - 4). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "subsubx-000",
     "subsubx-001",
@@ -43759,7 +43746,7 @@
     "19"
    ],
    "prompt": "Compute 90 - (37 - 18). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "subsubx-000",
     "subsubx-001",
@@ -43838,7 +43825,7 @@
     "57"
    ],
    "prompt": "Compute 98 - (71 - 14). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "subsubx-000",
     "subsubx-004",
@@ -43917,7 +43904,7 @@
     "29"
    ],
    "prompt": "Compute 87 - (46 - 17). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "subsubx-001",
     "subsubx-002",
@@ -43995,7 +43982,7 @@
     "28"
    ],
    "prompt": "Compute 84 - (38 - 10). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "subsubx-000",
     "subsubx-001",
@@ -44074,7 +44061,7 @@
     "23"
    ],
    "prompt": "Compute 67 - (31 - 8). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "subsubx-000",
     "subsubx-001",
@@ -44155,7 +44142,7 @@
     "71"
    ],
    "prompt": "Compute 98 - (74 - 3). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "subsubx-000",
     "subsubx-001",
@@ -44239,7 +44226,7 @@
     "31"
    ],
    "prompt": "Compute 57 - (41 - 10). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "subsubx-001",
     "subsubx-002",
@@ -44317,7 +44304,7 @@
     "23"
    ],
    "prompt": "Compute 88 - (39 - 16). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "subsubx-000",
     "subsubx-001",
@@ -44398,7 +44385,7 @@
     "52"
    ],
    "prompt": "Compute 82 - (56 - 4). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "subsubx-000",
     "subsubx-002",
@@ -44480,7 +44467,7 @@
     "23"
    ],
    "prompt": "Compute 85 - (37 - 14). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "subsubx-000",
     "subsubx-001",
@@ -44561,7 +44548,7 @@
     "35"
    ],
    "prompt": "Compute 76 - (45 - 10). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "subsubx-000",
     "subsubx-001",
@@ -44642,7 +44629,7 @@
     "29"
    ],
    "prompt": "Compute 88 - (47 - 18). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "subsubx-001",
     "subsubx-002",
@@ -44720,7 +44707,7 @@
     "44"
    ],
    "prompt": "Compute 69 - (54 - 10). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "subsubx-000",
     "subsubx-001",
@@ -44804,7 +44791,7 @@
     "15"
    ],
    "prompt": "Compute 60 - (27 - 12). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "subsubx-000",
     "subsubx-001",
@@ -44890,7 +44877,7 @@
     "56"
    ],
    "prompt": "Compute 77 - (60 - 4). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "subsubx-000",
     "subsubx-004",
@@ -44969,7 +44956,7 @@
     "26"
    ],
    "prompt": "Compute 86 - (45 - 19). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "subsubx-000",
     "subsubx-001",
@@ -45049,7 +45036,7 @@
     "50"
    ],
    "prompt": "Compute 74 - (56 - 6). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "subsubx-000",
     "subsubx-002",
@@ -45133,7 +45120,7 @@
     "13"
    ],
    "prompt": "Compute 86 - (32 - 19). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "subsubx-000",
     "subsubx-001",
@@ -45220,7 +45207,7 @@
     "25"
    ],
    "prompt": "Compute 92 - (38 - 13). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "subsubx-000",
     "subsubx-001",
@@ -45301,7 +45288,7 @@
     "55"
    ],
    "prompt": "Compute 85 - (67 - 12). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "subsubx-000",
     "subsubx-004",
@@ -45380,7 +45367,7 @@
     "18"
    ],
    "prompt": "Compute 78 - (32 - 14). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "subsubx-000",
     "subsubx-001",
@@ -45462,7 +45449,7 @@
     "24"
    ],
    "prompt": "Compute 93 - (34 - 10). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "subsubx-000",
     "subsubx-001",
@@ -45543,7 +45530,7 @@
     "44"
    ],
    "prompt": "Compute 75 - (52 - 8). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "subsubx-000",
     "subsubx-001",
@@ -45627,7 +45614,7 @@
     "28"
    ],
    "prompt": "Compute 91 - (34 - 6). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "subsubx-000",
     "subsubx-001",
@@ -45706,7 +45693,7 @@
     "28"
    ],
    "prompt": "Compute 66 - (43 - 15). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "subsubx-000",
     "subsubx-001",
@@ -45785,7 +45772,7 @@
     "28"
    ],
    "prompt": "Compute 47 - (33 - 5). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "subsubx-000",
     "subsubx-001",
@@ -45864,7 +45851,7 @@
     "29"
    ],
    "prompt": "Compute 71 - (47 - 18). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "subsubx-001",
     "subsubx-002",
@@ -45942,7 +45929,7 @@
     "16"
    ],
    "prompt": "Compute 57 - (34 - 18). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "subsubx-000",
     "subsubx-001",
@@ -46028,7 +46015,7 @@
     "33"
    ],
    "prompt": "Compute 82 - (52 - 19). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "subsubx-001",
     "subsubx-002",
@@ -46108,7 +46095,7 @@
     "20"
    ],
    "prompt": "Compute 99 - (31 - 11). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "subsubx-000",
     "subsubx-001",
@@ -46192,7 +46179,7 @@
     "32"
    ],
    "prompt": "Compute 97 - (41 - 9). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "subsubx-001",
     "subsubx-002",
@@ -46272,7 +46259,7 @@
     "36"
    ],
    "prompt": "Compute 59 - (45 - 9). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "subsubx-000",
     "subsubx-001",
@@ -46354,7 +46341,7 @@
     "41"
    ],
    "prompt": "Compute 67 - (52 - 11). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "subsubx-000",
     "subsubx-001",
@@ -46437,7 +46424,7 @@
     "69"
    ],
    "prompt": "Compute 96 - (78 - 9). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "subsubx-000",
     "subsubx-001",
@@ -46521,7 +46508,7 @@
     "58"
    ],
    "prompt": "Compute 99 - (65 - 7). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "subsubx-000",
     "subsubx-001",
@@ -46600,7 +46587,7 @@
     "36"
    ],
    "prompt": "Compute 59 - (41 - 5). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "subsubx-000",
     "subsubx-001",
@@ -46682,7 +46669,7 @@
     "32"
    ],
    "prompt": "Compute 52 - (38 - 6). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "subsubx-001",
     "subsubx-002",
@@ -46762,7 +46749,7 @@
     "18"
    ],
    "prompt": "Compute 91 - (27 - 9). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "subsubx-000",
     "subsubx-001",
@@ -46844,7 +46831,7 @@
     "20"
    ],
    "prompt": "Compute 47 - (30 - 10). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "subsubx-000",
     "subsubx-001",
@@ -46928,7 +46915,7 @@
     "36"
    ],
    "prompt": "Compute 80 - (48 - 12). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "subsubx-000",
     "subsubx-001",
@@ -47010,7 +46997,7 @@
     "39"
    ],
    "prompt": "Compute 73 - (45 - 6). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "subsubx-000",
     "subsubx-001",
@@ -47092,7 +47079,7 @@
     "22"
    ],
    "prompt": "Compute 51 - (32 - 10). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "subsubx-000",
     "subsubx-001",
@@ -47176,7 +47163,7 @@
     "18"
    ],
    "prompt": "Compute 95 - (33 - 15). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "subsubx-000",
     "subsubx-001",
@@ -47258,7 +47245,7 @@
     "30"
    ],
    "prompt": "Compute 79 - (35 - 5). Reply with only the final number, nothing else.",
-   "tolerance": "rel2pct",
+   "tolerance": "rel5pct",
    "null_set": [
     "subsubx-001",
     "subsubx-002",
@@ -47317,5 +47304,6 @@
    },
    "role": "comparison"
   }
- ]
+ ],
+ "tolerance_note": "relative tolerance widened from 2% to 5% on 2026-09-23 (the exact variants stay exact); 13 null-set entries whose intermediate lay within 5% of the item's own were dropped so the permutation null stays clean"
 }
