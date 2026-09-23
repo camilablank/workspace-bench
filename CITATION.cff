@@ -8,6 +8,7 @@ authors:
 version: 0.1.0
 date-released: 2026-09-16
 repository-code: https://github.com/camilablank/workspace-bench
+url: https://www.lesswrong.com/posts/Zeg2JztbdhguL48uH/workspacebench-evaluating-interpretability-methods-for-the
 license: MIT
 preferred-citation:
   type: software
@@ -17,4 +18,5 @@ preferred-citation:
       given-names: Camila
   year: 2026
   repository-code: https://github.com/camilablank/workspace-bench
+  url: https://www.lesswrong.com/posts/Zeg2JztbdhguL48uH/workspacebench-evaluating-interpretability-methods-for-the
   license: MIT

@@ -10,6 +10,9 @@ is the contract: a lens producer hands over one JSONL readout file per (family, 
 `wsbench` scores it. The optional `wsbench produce` (the `gpu` extra) can generate those
 readouts for you.
 
+Write-up: [WorkspaceBench: Evaluating Interpretability Methods for the Global Workspace](https://www.lesswrong.com/posts/Zeg2JztbdhguL48uH/workspacebench-evaluating-interpretability-methods-for-the)
+(LessWrong, 2026) — what the evals measure, the arms judged so far and where each lens fails.
+
 **Terms.** *O-lens*: the oracle lens, a LoRA verbalizer that turns one activation into
 sentences. *J-lens*: the Jacobian lens, a token readout (top-10 tokens with scores). *R-Lens*:
 the RelP Jacobian lens, same output shape. *NLA*: natural-language autoencoder, a separate
@@ -377,8 +380,22 @@ verdicts in `<out>/<family>/cells.jsonl`, so a re-run only pays for what is miss
 ## License
 
 Code and the in-house items are MIT (see [`LICENSE`](LICENSE)). Third-party data and code carry
-their own terms, restated in [`NOTICE.md`](NOTICE.md). Cite the repo with
-[`CITATION.cff`](CITATION.cff).
+their own terms, restated in [`NOTICE.md`](NOTICE.md).
+
+## Cite as
+
+If you use workspace-bench, please cite the repo and the write-up
+([`CITATION.cff`](CITATION.cff) carries the same metadata for GitHub's citation widget):
+
+```bibtex
+@misc{blank2026workspacebench,
+  author       = {Blank, Camila},
+  title        = {WorkspaceBench: Evaluating Interpretability Methods for the Global Workspace},
+  year         = {2026},
+  howpublished = {\url{https://www.lesswrong.com/posts/Zeg2JztbdhguL48uH/workspacebench-evaluating-interpretability-methods-for-the}},
+  note         = {Code and item banks: \url{https://github.com/camilablank/workspace-bench}}
+}
+```
 
 ## Open work
 
