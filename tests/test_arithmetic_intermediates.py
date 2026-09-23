@@ -167,6 +167,8 @@ def test_scripted_run(tmp_path, monkeypatch):
     other = by_id[by_id[b]["null_set"][0]]["intermediates"][0]
     rows = [json.loads(x) for x in EXAMPLE.read_text().splitlines() if x.strip()]
     for row in rows:
+        if row["id"] == a:  # the real rows do not write -51; a scripted hit must verify
+            row["samples"] = [f"- 271 - 322 = {by_id[a]['intermediates'][0]}, then times 14"]
         if row["id"] == b:
             row["samples"] = [f"- the sum comes to {other}"]
     path = tmp_path / "r.jsonl"
@@ -300,3 +302,36 @@ def test_all_cells_mode_uses_every_row_and_reports_bands(tmp_path, monkeypatch):
     assert r2.rows[0]["pass"] is False
     assert r2.rows[0]["bands"] == {"exact": False, "rel5pct": True}
     assert r2.extras["bands"]["rel5pct"] == 1.0 and r2.extras["bands"]["exact"] == 0.0
+
+
+def test_example_file_carries_the_every_position_regime(tmp_path, monkeypatch):
+    """Since 2026-09-23 the readouts of record hold every position at layers 56/60, judged
+    ``opts=cells=all``: the toy file shows several positions of both layers per item, each item's
+    frozen cell among them, ``pos`` a negative offset from the end of the render."""
+    header, items = load_bank(BANK)
+    assert "every position" in header["read"] and "cells=all" in header["read"]
+    by_id = {it["id"]: it for it in items}
+    rows = [json.loads(x) for x in EXAMPLE.read_text(encoding="utf-8").splitlines() if x.strip()]
+    assert {r["layer"] for r in rows} == {56, 60} and all(r["pos"] < 0 for r in rows)
+    for i in {r["id"] for r in rows}:
+        cells = {(r["layer"], r["pos"]) for r in rows if r["id"] == i}
+        assert len(cells) >= 3 and len({p for _l, p in cells}) >= 2
+        assert (by_id[i]["cell"]["layer"], by_id[i]["cell"]["pos"]) in cells
+    assert any(not r["samples"] for r in rows)  # one real empty cell: a negative, not a gap
+    monkeypatch.delenv("WSBENCH_JUDGE_MODEL", raising=False)
+    out = tmp_path / "out"
+    argv = [
+        "judge",
+        "family=arithmetic_intermediates",
+        f"readouts={EXAMPLE}",
+        f"out={out}",
+        "dry_run=True",
+        "opts=cells=all",
+    ]
+    assert main(argv) == 0
+    r = read_results(out)
+    assert r.config["cells"] == "all" and r.config["layers_judged"] == [56, 60]
+    # a dry run reports the 592 items without readouts as missing rather than failing
+    assert r.counts["n_expected_cells"] - r.counts["n_missing_cells"] == len(rows)
+    assert r.counts["n_empty_cells"] == 1
+    assert r.extras["n_rows_off_cell"] == 0

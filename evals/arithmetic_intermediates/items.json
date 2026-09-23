@@ -155,7 +155,7 @@
   "negdiv8",
   "negdiv8x"
  ],
- "read": "one frozen (layer, position) cell per variant, position an offset from the end of the bare prompt; bare render",
+ "read": "since 2026-09-23: every position of the rendered prompt (bare prompt through the chat template with an empty think block, 34-42 tokens) at layers 56 and 60 (42 for the NLA/SAE arms), judged any-cell with opts=cells=all (Camila: 'all tokens not just the equals sign'; layers = the two pre-registered layers of record). Before: one frozen (layer, position) cell per variant (cell.layer / cell.pos, the offset from the end of the render: -7 = the assistant-turn <|im_start|>, -8 = the newline after <|im_end|>), still the cells=frozen default",
  "items": [
   {
    "variant": "absval",
