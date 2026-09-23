@@ -1,5 +1,5 @@
 """jailbreak_recognition: one recognition / echo / topic / noise call per (item, layer, pos) cell
-over the bank's read sites, all K samples classified at once."""
+over every token of the last user turn (``read.span``), all K samples classified at once."""
 
 import sys
 from typing import Any
@@ -25,7 +25,7 @@ from . import prompts, score
 from .prompts import MARKER, PROMPT_VERSION, READOUT_CLASSES, READOUT_SCHEMA, READOUT_SYSTEM, norm
 
 FAMILY = "jailbreak_recognition"
-N_SLOTS = 12  # rel_slot 0..11 = content sites rescaled, 12 = the <|im_end|>
+N_SLOTS = 12  # rel_slot 0..11 = twelfths of the turn's content tokens, 12 = the <|im_end|>
 
 
 def prefix_to_last_user(messages: list[dict]) -> list[dict]:
@@ -34,23 +34,31 @@ def prefix_to_last_user(messages: list[dict]) -> list[dict]:
     return messages[: last + 1]
 
 
+def grid_positions(read: dict) -> list[int]:
+    """The item's read grid (2026-09-23): every token of the last user turn, ``read.span[0]``
+    (its first content token) through ``read.span[1]`` (its ``<|im_end|>``, = ``turn_end``)."""
+    a, b = (int(x) for x in read["span"])
+    return list(range(a, b + 1))
+
+
 def rel_slot(read: dict, pos: int) -> int:
-    """Position bucket for the profile: 12 = the ``<|im_end|>``; otherwise the read site's
-    index rescaled onto 0..11 (a short turn has fewer than 12 content sites, so absolute
-    indices would not be comparable across items); -1 = not a listed site."""
-    if pos == int(read["turn_end"]):
+    """Position bucket for the profile: 12 = the ``<|im_end|>``; otherwise the content token's
+    relative position in the turn rescaled onto 0..11 — twelfths of the turn (turns run from 1
+    to ~1,600 tokens, so absolute indices would not be comparable across items); -1 = outside
+    the span."""
+    a, b = (int(x) for x in read["span"])
+    if pos == b:
         return N_SLOTS
-    sites = [int(q) for q in read["positions"] if int(q) != int(read["turn_end"])]
-    if pos not in sites:
+    if not a <= pos < b:
         return -1
-    return round(11 * sites.index(pos) / max(1, len(sites) - 1))
+    return round(11 * (pos - a) / max(1, b - 1 - a))
 
 
 def marker_offset(read: dict, pos: int, turn: str) -> int:
     """Approximate char offset of token ``pos`` inside the user turn (token span known):
     ``round(frac * len(turn))`` with ``frac`` the token's fraction of the way from
-    ``positions[0]`` to ``turn_end``, clamped to [0, 1]."""
-    p0, p1 = int(read["positions"][0]), int(read["turn_end"])
+    ``span[0]`` (the first content token) to ``turn_end``, clamped to [0, 1]."""
+    p0, p1 = int(read["span"][0]), int(read["turn_end"])
     if p1 <= p0:
         return len(turn)
     frac = min(1.0, max(0.0, (pos - p0) / (p1 - p0)))
@@ -122,7 +130,7 @@ def run(args: JudgeArgs) -> FamilyResult:
     bank = load_bank(FAMILY)["items"]
     scope = item_scope(bank, args)
     by_id = {it["id"]: it for it in scope}
-    positions = {it["id"]: [int(p) for p in it["read"]["positions"]] for it in scope}
+    positions = {it["id"]: grid_positions(it["read"]) for it in scope}
     cells, rep = load_readouts(
         args.readouts, ids=list(by_id), layers=args.layers, positions=positions
     )

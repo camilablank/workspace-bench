@@ -20,7 +20,8 @@ SPEC = register(
         metric="pass_rate",
         higher_is_better=True,
         run=judge.run,
-        calls_per_arm="≈ 7.5k",
+        # every token of the last user turn (28,799 positions) x 5 layers, one call per cell
+        calls_per_arm="≈ 144k",
         sources="Zhao et al. 2024",
     )
 )

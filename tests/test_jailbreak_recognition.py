@@ -9,6 +9,7 @@ from conftest import write_jsonl
 from wsbench.evals.jailbreak_recognition import judge, prompts
 from wsbench.evals.jailbreak_recognition.judge import (
     build_user,
+    grid_positions,
     marker_offset,
     postprocess_readout,
     prefix_to_last_user,
@@ -34,22 +35,32 @@ def _items() -> list[dict]:
 
 def test_public_bank_shape():
     bank = load_bank("jailbreak_recognition")
-    assert set(bank) == {"family", "n_items", "items"}
+    assert set(bank) == {"family", "n_items", "read", "items"}
     assert bank["family"] == "jailbreak_recognition" and bank["n_items"] == 86
+    assert "every token of the last user turn" in bank["read"] and "2026-09-23" in bank["read"]
     items = bank["items"]
     assert len(items) == 86 and len({it["id"] for it in items}) == 86
+    n_span = 0
     for it in items:
         assert set(it) == FIVE, it["id"]
-        assert set(it["read"]) == {"positions", "turn_end", "n_tokens", "tokens"}
+        rd = it["read"]
+        assert set(rd) == {"positions", "turn_end", "n_tokens", "span", "tokens"}
         assert it["source"] == "wildchat" and isinstance(it["source_id"], str)
         assert it["messages"][-1]["role"] == "assistant"  # trailing WildChat turn kept
-        ps = it["read"]["positions"]
-        assert ps and ps[-1] == it["read"]["turn_end"] and ps == sorted(ps)
-        for p in ps:
-            assert isinstance(it["read"]["tokens"][str(p)], str)
-        assert it["read"]["tokens"][str(it["read"]["turn_end"])] == "<|im_end|>"
+        a, b = rd["span"]
+        assert 0 < a < b == rd["turn_end"] < rd["n_tokens"], it["id"]
+        grid = grid_positions(rd)  # every token of the last user turn, <|im_end|> included
+        assert grid == list(range(a, b + 1)) and set(rd["tokens"]) == {str(p) for p in grid}
+        toks = [rd["tokens"][str(p)] for p in grid]
+        assert all(isinstance(t, str) for t in toks)
+        assert toks[-1] == "<|im_end|>" and "<|im_end|>" not in toks[:-1], it["id"]
+        ps = rd["positions"]  # the 13 sites of the regime that ended 2026-09-23: a subset
+        assert ps and ps[0] == a and ps[-1] == b and ps == sorted(ps) and set(ps) <= set(grid)
+        n_span += len(grid)
+    assert n_span == 28799
     assert items[0]["id"] == I1 and items[1]["id"] == I2
     assert sum(len(it["read"]["positions"]) == 13 for it in items) == 77
+    assert items[0]["read"]["span"] == [3, 745] and items[0]["read"]["tokens"]["4"] == "ü"
 
 
 def test_source_repo_never_imported():
@@ -69,18 +80,21 @@ def test_marker_offsets_match_golden():
         assert marker_offset(read, pos, turn) == GOLDEN_MARKER["offsets"][str(pos)], pos
     assert marker_offset(read, read["turn_end"], turn) == len(turn)
     assert marker_offset(read, ps[0], turn) == 0
-    assert marker_offset({"positions": [5, 7], "turn_end": 5}, 5, "abc") == 3  # guard
-    assert marker_offset({"positions": [0], "turn_end": 10}, 20, "abcd") == 4  # clamped
-    assert marker_offset({"positions": [10], "turn_end": 20}, 15, "abcd") == 2
+    assert marker_offset({"span": [5, 5], "turn_end": 5}, 5, "abc") == 3  # guard
+    assert marker_offset({"span": [0, 10], "turn_end": 10}, 20, "abcd") == 4  # clamped
+    assert marker_offset({"span": [10, 20], "turn_end": 20}, 15, "abcd") == 2
 
 
 def test_rel_slot():
-    read = {"positions": [3, 70, 138, 205, 272, 340, 407, 475, 542, 609, 677, 744, 745]}
-    read["turn_end"] = 745
+    read = {"span": [3, 745], "turn_end": 745}
     assert rel_slot(read, 745) == 12 and rel_slot(read, 3) == 0 and rel_slot(read, 744) == 11
-    assert rel_slot(read, 407) == 6 and rel_slot(read, 999) == -1
-    short = {"positions": [3, 9, 15], "turn_end": 15}
-    assert [rel_slot(short, p) for p in (3, 9, 15)] == [0, 11, 12]
+    # twelfths of the turn: 407 is 404/741 of the way -> 6, 372 -> 5, 4 -> 0
+    assert rel_slot(read, 407) == 6 and rel_slot(read, 372) == 5 and rel_slot(read, 4) == 0
+    assert rel_slot(read, 999) == -1 and rel_slot(read, 2) == -1  # outside the span
+    short = {"span": [3, 15], "turn_end": 15}
+    assert [rel_slot(short, p) for p in (3, 9, 14, 15)] == [0, 6, 11, 12]
+    assert rel_slot({"span": [7, 8], "turn_end": 8}, 7) == 0  # a one-token turn
+    assert grid_positions(short) == list(range(3, 16))
 
 
 def test_rendered_prompt_matches_golden():
@@ -191,7 +205,7 @@ def _scripted(tmp_path):
             r = {**r, "samples": [f"R:{'a' if r['layer'] == 20 else 'b'} persona paste", ""]}
         out.append(r)
     out.append({"id": "not-in-bank", "layer": 20, "pos": 3, "samples": ["x"]})
-    out.append({"id": I1, "layer": 20, "pos": 4, "samples": ["x"]})  # pos not selected
+    out.append({"id": I1, "layer": 20, "pos": 1, "samples": ["x"]})  # "user" header: not in span
     out.append({"id": I1, "layer": 20, "pos": 3, "samples": ["dup"]})  # duplicate
     assert bank[I2]["read"]["tokens"]["3"] == "Chat"
     return write_jsonl(tmp_path / "r.jsonl", out)
@@ -208,14 +222,15 @@ def test_run_verdicts_and_numbers(tmp_path, fake_llm, mk_args):
         res.chance is None and res.chance_label == "free-label recognition judge; no analytic floor"
     )
     c = res.counts
-    n_sites = sum(len(it["read"]["positions"]) for it in _items())
-    assert c["n_expected_cells"] == n_sites * 2  # layers present in the file: 20, 44
-    assert c["n_missing_cells"] == c["n_expected_cells"] - 12
+    n_span = sum(len(grid_positions(it["read"])) for it in _items())
+    assert n_span == 28799
+    assert c["n_expected_cells"] == n_span * 2  # every token of the turn x layers in file: 20, 44
+    assert c["n_missing_cells"] == c["n_expected_cells"] - 14
     assert c["n_unjudged_cells"] == 1 and c["n_empty_cells"] == 0 and c["skipped_rows"] == 3
     assert c["spend_usd"] > 0
-    assert len(script.calls) == 12  # one call per cell, all K samples at once
+    assert len(script.calls) == 14  # one call per cell, all K samples at once
     by_key = {r["key"]: r for r in res.rows}
-    assert len(by_key) == 11 and f"{I2}__L044__p3" not in by_key
+    assert len(by_key) == 13 and f"{I2}__L044__p3" not in by_key
     r = by_key[f"{I1}__L020__p407"]
     assert set(r) == {
         "key", "id", "layer", "pos", "rel_slot", "n_samples", "labels", "quotes",
@@ -225,6 +240,10 @@ def test_run_verdicts_and_numbers(tmp_path, fake_llm, mk_args):
     assert r["rel_slot"] == 6 and r["n_samples"] == 2 and r["flags"] == []
     assert r["any_recognition"] is True and r["n_recognition"] == 1 and r["rationale"] == "r"
     assert by_key[f"{I1}__L020__p3"]["rel_slot"] == 0
+    assert by_key[f"{I1}__L020__p4"]["rel_slot"] == 0 and by_key[f"{I1}__L020__p5"]["labels"] == [
+        "recognition",
+        "topic",
+    ]  # adjacent tokens are cells of their own
     assert by_key[f"{I1}__L044__p745"]["rel_slot"] == 12
     a = by_key[f"{I2}__L020__p3"]
     assert a["labels"] == ["recognition"] and a["flags"] == ["quote_unverified:1"]
@@ -235,17 +254,17 @@ def test_run_verdicts_and_numbers(tmp_path, fake_llm, mk_args):
     assert by_key[f"{I2}__L044__p403"]["labels"] == ["noise"]
     assert by_key[f"{I2}__L044__p738"]["labels"] == ["topic"]
     e = res.extras
-    assert e["cell_recognition_rate"] == pytest.approx(7 / 11) and e["n_api_failed"] == 1
+    assert e["cell_recognition_rate"] == pytest.approx(9 / 13) and e["n_api_failed"] == 1
     assert e["by_layer"] == {
-        "20": {"cells": 6, "recognition_cells": 4, "items_pass": 2},
+        "20": {"cells": 8, "recognition_cells": 6, "items_pass": 2},
         "44": {"cells": 5, "recognition_cells": 3, "items_pass": 1},
     }
-    assert set(e["by_pos_idx"]) == {str(i) for i in range(13)}
-    assert e["by_pos_idx"]["0"] == {"cells": 3, "recognition_cells": 3, "items_pass": 2}
+    assert set(e["by_pos_idx"]) == {str(i) for i in range(13)}  # twelfths of the turn + <|im_end|>
+    assert e["by_pos_idx"]["0"] == {"cells": 5, "recognition_cells": 5, "items_pass": 2}
     assert e["by_pos_idx"]["6"] == {"cells": 4, "recognition_cells": 2, "items_pass": 1}
     assert e["by_pos_idx"]["12"] == {"cells": 4, "recognition_cells": 2, "items_pass": 1}
     assert e["by_pos_idx"]["5"] == {"cells": 0, "recognition_cells": 0, "items_pass": 0}
-    assert e["label_mix"] == {"recognition": 7, "echo": 1, "topic": 7, "noise": 2}
+    assert e["label_mix"] == {"recognition": 9, "echo": 1, "topic": 9, "noise": 2}
     assert e["flags"] == {"quote_unverified": 1, "bad_label": 1}
     assert res.complete is False and res.pinned_instrument is True
     assert res.config["prompt_version"] == "jb-v1" and res.config["allow_missing"] is True
@@ -274,10 +293,10 @@ def test_pass_any_and_item_scope(tmp_path, fake_llm, mk_args):
 
     fake_llm(one_cell)
     res = judge.run(mk_args(_scripted(tmp_path), allow_missing=True, items=[I1], layers=[20]))
-    assert res.n_items == 1 and res.value == 1.0 and len(res.rows) == 3
-    assert res.counts["n_expected_cells"] == 13 and res.counts["n_missing_cells"] == 10
-    assert res.extras["by_layer"] == {"20": {"cells": 3, "recognition_cells": 1, "items_pass": 1}}
-    assert res.extras["label_mix"] == {"recognition": 1, "echo": 3, "topic": 2, "noise": 0}
+    assert res.n_items == 1 and res.value == 1.0 and len(res.rows) == 5
+    assert res.counts["n_expected_cells"] == 743 and res.counts["n_missing_cells"] == 738
+    assert res.extras["by_layer"] == {"20": {"cells": 5, "recognition_cells": 1, "items_pass": 1}}
+    assert res.extras["label_mix"] == {"recognition": 1, "echo": 5, "topic": 4, "noise": 0}
     assert res.config["layers"] == [20]
 
 
@@ -289,11 +308,14 @@ def test_missing_cells_fatal_unless_allowed(tmp_path, fake_llm, mk_args, capsys)
     assert "missing" in capsys.readouterr().err
     full = [
         {"id": I1, "layer": 20, "pos": p, "samples": ["   "]}
-        for p in _items()[0]["read"]["positions"]
+        for p in grid_positions(_items()[0]["read"])
     ]
     res = judge.run(mk_args(write_jsonl(tmp_path / "f.jsonl", full), items=[I1]))
-    assert res.counts["n_missing_cells"] == 0 and res.counts["n_empty_cells"] == 13
-    assert res.counts["n_expected_cells"] == 13 and res.value == 0.0 and res.rows == []
+    assert res.counts["n_missing_cells"] == 0 and res.counts["n_empty_cells"] == 743
+    assert res.counts["n_expected_cells"] == 743 and res.value == 0.0 and res.rows == []
+    # the 13 old sites alone are no longer a complete grid
+    with pytest.raises(SystemExit):
+        judge.run(mk_args(write_jsonl(tmp_path / "s.jsonl", full[:1] + full[-1:]), items=[I1]))
 
 
 def test_token_mismatch_raises(tmp_path, fake_llm, mk_args):
