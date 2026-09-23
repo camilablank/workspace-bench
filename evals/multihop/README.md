@@ -1,7 +1,16 @@
 # multihop
 
 A factual prompt whose answer needs one silent hop; the scored latent is the bridge
-concept, not the surface answer. 100 items, plain render, one read position.
+concept, not the surface answer. 100 items, plain render, read at the **last word of the
+prompt** (its last non-whitespace token: ` is`, ` the`, ` number`, ...), one position per layer.
+The read moved there on 2026-09-23 from the final prompt token, which for 33 of the 100 prompts
+is a bare space token after the last word (Camila: "multihop should be read on the second to
+last token, ie the last word, not the space token"); the other 67 prompts end in the word itself,
+so their read position is unchanged. The reasoning: at the trailing space the model has just
+finished reading the prompt, while the last word is where the bridge is formed. Eight prompts end
+in `is "` (an opening quote before a quoted answer): their last non-whitespace token is the quote,
+and that is their read. The judge is unchanged: one call per (item, layer), an item passing on
+any layer.
 
 Example: "Fact: The chemical symbol for the element with atomic number 26 is" -> target `iron` (the bridge; the surface answer `Fe` is not a target).
 
