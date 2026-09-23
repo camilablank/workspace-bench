@@ -39,6 +39,7 @@ Positions rules, all handled by `resolve`:
 | `offset_from_end {k}` | the token `k` from the end (`k=1` is the last) |
 | `last_n {n}` | the last `n` tokens |
 | `all` | every token |
+| `all_from_end` | every token, reported as negative offsets `-n..-1` (arithmetic intermediates: the bank and judge count from the end) |
 | `positions {positions}` | explicit indices (brew, hallucination, jailbreak, J-lens precision) |
 | `line_one_newline` | the newline token that ends line one (poetry) |
 | `from_token {token}` | from the first token with that text through the end (chain's question span) |

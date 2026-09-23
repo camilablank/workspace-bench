@@ -69,6 +69,8 @@ class ReadSpec:
 #                               negative index -k, the convention of the banks that use it
 #   last_n {n}                  the last n tokens
 #   all                         every token
+#   all_from_end                every token, reported as negative offsets -n..-1 (the
+#                               convention of the banks that count from the end)
 #   positions {list}            explicit indices into the render
 #   line_one_newline            the newline token that ends line one (the last newline)
 #   from_token {token}          from the first token whose text is `token` through the end
@@ -96,6 +98,8 @@ def resolve(rule: dict[str, Any], tokens: list[str]) -> list[int]:
         return list(range(max(0, n - int(rule["n"])), n))
     if kind == "all":
         return list(range(n))
+    if kind == "all_from_end":
+        return list(range(-n, 0))
     if kind == "positions":
         return [int(p) for p in rule["positions"] if 0 <= int(p) < n]
     if kind == "line_one_newline":
@@ -345,7 +349,7 @@ def plan(family: str) -> list[ReadSpec]:
                 family,
                 it["id"],
                 "chat",
-                {"kind": "all"},
+                {"kind": "all_from_end"},
                 [56, 60],
                 text=it["prompt"],
                 extra={"variant": it["variant"], "frozen_cell": it["cell"]},
