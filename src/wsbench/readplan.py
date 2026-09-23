@@ -29,8 +29,6 @@ RENDERS: dict[str, str] = {
     "chat_summarize": "Qwen chat template, enable_thinking=False, no system prompt; the user turn "
     "is the stimulus followed by `suffix`",
     "bare": "the text verbatim with nothing asked (a program, a scene), no chat template",
-    "transcript": "the conversation rendered as `[role]: content` turns (the CHIVE contract); "
-    "positions index the producer's capture of that render",
     "captured": "the exact captured token ids (`input_ids`) shipped with the bank; positions "
     "index them directly",
 }
@@ -64,7 +62,8 @@ class ReadSpec:
 #
 # kinds:
 #   final_token                 the last token of the render
-#   offset_from_end {k}         the token k from the end (k=1 is the last)
+#   offset_from_end {k}         the token k from the end (k=1 is the last), reported as the
+#                               negative index -k, the convention of the banks that use it
 #   last_n {n}                  the last n tokens
 #   all                         every token
 #   positions {list}            explicit indices into the render
@@ -89,7 +88,7 @@ def resolve(rule: dict[str, Any], tokens: list[str]) -> list[int]:
         return [n - 1] if n else []
     if kind == "offset_from_end":
         k = int(rule["k"])
-        return [n - k] if 0 < k <= n else []
+        return [-k] if 0 < k <= n else []
     if kind == "last_n":
         return list(range(max(0, n - int(rule["n"])), n))
     if kind == "all":
@@ -382,20 +381,21 @@ def plan(family: str) -> list[ReadSpec]:
             for r in rows
         ]
     if family == "jailbreak_recognition":
-        from wsbench.evals.jailbreak_recognition.judge import grid_positions
+        from wsbench.evals.jailbreak_recognition.judge import grid_positions, prefix_to_last_user
 
         _h, items = _bank(family)
         return [
             ReadSpec(
                 family,
                 it["id"],
-                "transcript",
+                "chat_context",
                 {"kind": "positions", "positions": grid_positions(it["read"])},
                 SIX,
-                messages=it["messages"],
+                messages=prefix_to_last_user(it["messages"]),
                 extra={"n_tokens": it["read"]["n_tokens"]},
                 note="every token of the last user turn, first content token through its "
-                "<|im_end|> (read.span)",
+                "<|im_end|> (read.span); the bank's n_tokens also closes an empty assistant "
+                "turn, two tokens past the generation prompt and past every read position",
             )
             for it in items
         ]

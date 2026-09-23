@@ -61,8 +61,8 @@ One JSONL per family, one row per (item, layer, position), in the contract of th
 README:
 
 ```json
-{"id": "couplet-ahead-head", "layer": 36, "pos": 16, "token": "Ċ", "samples": ["led the way"]}
-{"id": "couplet-ahead-head", "layer": 36, "pos": 16, "token": "Ċ", "tokens": ["Ġled", "Ġsaid"], "scores": [9.1, 7.7]}
+{"id": "couplet-ahead-head", "layer": 36, "pos": 16, "token": "\n", "samples": ["led the way"]}
+{"id": "couplet-ahead-head", "layer": 36, "pos": 16, "token": "\n", "tokens": [" led", " said"], "scores": [9.1, 7.7]}
 ```
 
 `id` is the row's `id` from the plan, `pos` the index into your render, `token` that position's
@@ -80,6 +80,55 @@ uv run wsbench judge family=poetry readouts=readouts/mylens/poetry.jsonl out=out
 uv run wsbench run all=True readouts_root=readouts/mylens out=out/mylens
 uv run wsbench report dir=out/mylens
 ```
+
+## Or let the repo produce them
+
+`wsbench.produce` is a small producer over Hugging Face transformers, for anyone who has a GPU
+and wants readouts without writing the plumbing. Install the `gpu` extra (`pip install -e ".[gpu]"`
+or the uv equivalent) and:
+
+```python
+from wsbench.produce import Producer
+
+# methods: logit_lens | jlens | rlens | olens | nla
+p = Producer.load("Qwen/Qwen3.6-27B", "jlens")
+p.read("The athlete Muhammad Ali plays the sport of", pos=-1, layer=36).readout.tokens
+p.read_prompt("Sechs geteilt durch zwei ist", positions="all", layers=[20, 36, 60])
+# a whole eval set, resumable; the plan picks the cells
+p.run_family("poetry", "readouts/mine/poetry.jsonl", limit=10)
+p.use("olens")  # swap method, keep the loaded model
+```
+
+The same from the shell:
+
+```
+wsbench produce family=poetry method=logit_lens out=readouts/mine/poetry.jsonl
+wsbench produce text="The athlete Muhammad Ali plays the sport of" method=jlens positions=-1 layers=20,36,60
+```
+
+What it does: renders the prompt the way the plan says (its chat template, thinking off),
+captures the residual stream after each requested decoder block in one forward pass, and hands
+each (layer, position) vector to the method. The vector lenses (`logit_lens`, `jlens`, `rlens`)
+return the top-10 tokens with scores; `olens` verbalizes through its LoRA with the vector placed
+in the carrier prompt's `<activation>` slot as `alpha · unit(h)`, the adapter off while capturing
+and on while generating; `nla` runs Karvonen's reader with the vector added norm-matched at its
+marker token. Methods are plain classes behind one `read(h, layer)` protocol, so a new lens is a
+few lines. Sampling for the verbalizers is `Sampling(temperature=1.0, top_p=0.95, top_k=64,
+max_new_tokens=256, k=1)`, the settings the in-house arms used.
+
+Two spellings, on purpose: the read-site `token` is `tokenizer.decode([id])`, exactly what the
+banks store (`"\n"`, `" öffnen"`, `"<|im_end|>"`); the ranked `tokens` of a token lens are the
+byte-level BPE strings with `Ġ`/`▁` shown as a space (`" led"`), what the regex scorers expect.
+`pos` is the index the plan resolves: absolute, except `offset_from_end` (arithmetic
+intermediates, some multihop items), which the banks and judges count from the end, so those rows
+carry the negative offset (`-8`). A method trained at one layer reads there unless told otherwise:
+`nla` is layer 42 (not on the benchmark grid; pass `layers=[44]` to read it where the in-house
+table did). `nla` also loads its own copy of the reader (a second 27B on the same device), so it
+wants an H200; the other methods fit one H100.
+
+What it is not: fast. It reads one prompt at a time on one GPU, which is right for a token
+position, a question or a family, and wrong for the whole benchmark at every token; the in-house
+runs fan that out over Modal.
 
 ## What the plan does not carry
 

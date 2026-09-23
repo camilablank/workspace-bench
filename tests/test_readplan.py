@@ -72,13 +72,14 @@ def test_plans_match_the_bank_specs():
     assert poetry.positions == {"kind": "line_one_newline"} and poetry.layers == readplan.GRID
     jb = readplan.plan("jailbreak_recognition")[0]
     span = jb.positions["positions"]
+    assert jb.render == "chat_context" and jb.messages[-1]["role"] == "user"
     assert span[0] == 3 and span[-1] == 745 and len(span) == 743  # every token of the last turn
 
 
 def test_resolve_each_rule():
     r = readplan.resolve
     assert r({"kind": "final_token"}, POEM) == [14]
-    assert r({"kind": "offset_from_end", "k": 2}, POEM) == [13]
+    assert r({"kind": "offset_from_end", "k": 2}, POEM) == [-2]
     assert r({"kind": "last_n", "n": 3}, POEM) == [12, 13, 14]
     assert r({"kind": "all"}, POEM) == list(range(15))
     assert r({"kind": "positions", "positions": [1, 3, 99]}, POEM) == [1, 3]
