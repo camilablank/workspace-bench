@@ -17,7 +17,10 @@ intermediates [11, 5], answer 2.
 ## Scoring
 
 - **Headline: pass rate, free recall.** One prompt-blind call per (item, layer) on the readout
-  at the LAST prompt token. The judge names the number(s) the readout presents as a computed
+  at the LAST token of the render (`cells=last`, the default): the assistant onset `\n\n` after
+  the empty think block, not the user turn's last token. `wsbench plan` reads the chat render
+  from the " What" token through the end of the render; `cells=last` judges the render's final
+  token of those. The judge names the number(s) the readout presents as a computed
   value, ranked, at most three, or none. An item passes when the top-named value is one of its
   intermediates at any layer. The top value is credited only when it appears in the readout as a
   whole number (5 does not match 15) or the judge's quote is verbatim in it (a Chinese numeral is
@@ -45,8 +48,9 @@ intermediates [11, 5], answer 2.
 
 ## Readouts
 
-`{"id": "<item name>", "layer": L, "pos": P, "samples": [...]}` rows at the last prompt token
-(prompt positions only; the max-pos row per (item, layer) is taken as the last token. The source
+`{"id": "<item name>", "layer": L, "pos": P, "samples": [...]}` rows over the plan's positions
+(" What" through the end of the render, prompt positions only; the max-pos row per (item, layer)
+is taken as the last token — the render's final `\n\n`, not the user turn's last token. The source
 gen dirs label the seed-last prompts `<name>-last`; strip the suffix when converting,
 `sed 's/-last"/"/'`). `examples/readouts/chain_intermediates.jsonl` is a toy file.
 

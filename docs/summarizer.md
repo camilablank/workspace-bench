@@ -1,14 +1,16 @@
 # The J-lens summarizer
 
-Every family accepts two readout kinds (see `CLAUDE.md` › Readout contract). Prose
+Every family accepts two readout kinds (the contract block in README §Quickstart). Prose
 ("O-lens") samples are judged as they are. Top-k token ("J-lens") readouts first go through
 **one shared blind-interpretation step** — `wsbench/summarizer.py` — that turns a token bag into
 one or two sentences of prose; the judge then sees that interpretation text in place of the
 readout. The interpreter sees only the tokens: no stimulus, no options, no gold.
 
 - `SUMMARIZER_PROMPT_VERSION = "interp-v1"` — bump on any edit.
-- Model: `aux_models["summarizer"]` of the family's `JudgeConfig` if set, else the judge model
-  (all four MC families leave it at the default).
+- Model: `aux_models["summarizer"]` of the family's `JudgeConfig` if set, else the judge model.
+  Eight families use it: conjunctive_association, hallucination, jailbreak_recognition,
+  moral_rationale, multi_concept_directed_modulation, relational_multihop,
+  role_bound_association, user_modeling; all leave the model at the default.
 - Cache key `summ:<cell key>`, fingerprint `(SUMMARIZER_PROMPT_VERSION, model, bundle_text)`
   in the family's `<out>/cells.jsonl`. A failed summary leaves the cell unjudged
   (`n_unjudged_cells`); an empty interpretation counts as a failure — an empty string is never

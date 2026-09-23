@@ -2,7 +2,9 @@
 
 A non-English prompt with a one-word answer; the scored latent is the English concept
 (`intermediates`), and a readout in any language that names it counts. 100 items,
-plain render, one read position.
+plain render, one read position, layers 20..60 step 4. The bank header's `eval_render_note`
+("directed-modulation is the only chat-templated family") predates the chat-rendered families
+and is superseded by `wsbench plan`.
 
 Example: "Sechs geteilt durch zwei ist "" -> target `three` (the German answer `drei` is the surface form; `three` is the scored concept).
 

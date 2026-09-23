@@ -81,4 +81,5 @@ indexing the render above, `token` the site's token, e.g.
 {"id": "q01_a", "layer": 52, "pos": 68, "token": "\n\n", "samples": ["- After a long day, Laura packed boxes in the kitchen, meticulously clearing the house before…"]}
 ```
 
-(The toy files under `examples/readouts/` are test fixtures and do not follow this regime.)
+(The files under `examples/readouts/` are dry-run fixtures; `wsbench plan` is the read site of
+record.)

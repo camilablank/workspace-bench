@@ -5,8 +5,11 @@ token; does the lens surface the consideration the model itself weighs — the c
 or (for deliberative items) both the YES-side and the NO-side reason?
 
 - **Bank:** `items.json`, 200 items (166 committed, 34 deliberative), verbatim copy of the source
-  repo's `evals/workspace-bench/hillclimbing_evals/moral_rationale/items.json`. Every item reads
-  at `end_of_stimulus`; the bank carries no position list.
+  repo's `evals/workspace-bench/hillclimbing_evals/moral_rationale/items.json`. The bank's
+  `read_position: end_of_stimulus` is a bank field, not the plan: `wsbench plan` reads the chat
+  render (thinking off) at the last 5 positions of the render — the assistant-header tail — on
+  layers 20..60 step 4 (11 layers, 55 sites per item, ≈ 12.9k calls per arm). The bank carries
+  no position list.
 - **Cells:** rows of the readouts file; per (item, layer) the **last 5 positions** (sorted by
   `pos`) — the decision region. 5 is the instrument and is not exposed as a flag. Call unit =
   (item, layer, pos, side): committed items make one call, deliberative items two (yes / no).

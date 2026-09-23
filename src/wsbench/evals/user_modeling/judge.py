@@ -85,7 +85,7 @@ def decode_choice(choice: Any, options: list[str], gold_position: int) -> tuple[
 
 
 def item_scope(bank: list[dict], args: JudgeArgs) -> list[dict]:
-    """bank ∩ ``--items`` (bank order) on the bank key ``name``, then ``--limit``."""
+    """bank ∩ ``items=`` (bank order) on the bank key ``name``, then ``limit=``."""
     items = bank
     if args.items is not None:
         want = set(args.items)

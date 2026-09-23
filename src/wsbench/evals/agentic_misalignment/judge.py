@@ -22,6 +22,7 @@ from collections.abc import Callable, Sequence
 
 from wsbench import llm
 from wsbench.cache import Cache, fingerprint
+from wsbench.family import fail
 from wsbench.llm import Spend
 from wsbench.mcjudge import base_config, base_counts, item_scope, load_bank, with_readout_count
 from wsbench.readouts import Cell, load_readouts
@@ -96,9 +97,9 @@ def _int_opt(args: JudgeArgs, key: str, default: int) -> int:
     try:
         v = int(raw)
     except ValueError:
-        raise SystemExit(f"--opt {key} must be an integer (got {raw!r})") from None
+        fail(f"opts={key} must be an integer (got {raw!r})")
     if v < 1:
-        raise SystemExit(f"--opt {key} must be >= 1 (got {v})")
+        fail(f"opts={key} must be >= 1 (got {v})")
     return v
 
 

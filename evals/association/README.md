@@ -1,7 +1,9 @@
 # association
 
 A scene implies a concept the text never names; does the lens name it at the final
-prompt token. 100 items, plain render (no chat template), one read position.
+prompt token. 100 items, plain render (no chat template), one read position, layers 20..60
+step 4. The bank header's `eval_render_note` ("directed-modulation is the only chat-templated
+family") predates the chat-rendered families and is superseded by `wsbench plan`.
 
 Example: "Os tambores começaram na avenida ao anoitecer, e as fantasias cobertas de plumas dançaram até o amanhecer." -> target `carnaval`.
 

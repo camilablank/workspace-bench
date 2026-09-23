@@ -1,9 +1,10 @@
 # Producing readouts
 
-This repository holds **data and judging only**: the item banks, the judges, the baselines and
-the results contract. It contains no model loading, no activation capture and no lens
-implementation. To score a lens you run those yourself, anywhere, and hand this repo one
-readouts file per family. This page is the interface between the two halves.
+Judging is the contract; producing is optional. The item banks, the judges, the baselines and
+the results contract are the benchmark; to score a lens you run it on the cells the plan names,
+anywhere, and hand this repo one readouts file per family. `wsbench produce` (below) is a
+bundled producer for anyone who would rather not write that plumbing. This page is the
+interface between the two halves.
 
 ## 1. Get the read plan
 
@@ -24,7 +25,7 @@ render it, which token positions to read, and at which layers:
 
 | key | meaning |
 |---|---|
-| `render` | how to turn the row into a token sequence; the vocabulary is `wsbench.readplan.RENDERS` (`plain`, `chat`, `chat_context`, `chat_prefill`, `chat_dm`, `chat_summarize`, `bare`, `transcript`, `captured`) |
+| `render` | how to turn the row into a token sequence; the vocabulary is `wsbench.readplan.RENDERS` (`plain`, `chat`, `chat_context`, `chat_prefill`, `chat_dm`, `chat_summarize`, `bare`, `captured`) |
 | `text` / `messages` / `system` / `prefill` / `suffix` / `assistant` | the pieces the render composes; `captured` rows ship `extra.input_ids` instead |
 | `positions` | a rule over the rendered tokens (below); `wsbench.readplan.resolve(rule, tokens)` turns it into indices once you have tokenized the render |
 | `layers` | the decoder layers to read (residual stream after that layer) |
@@ -76,16 +77,16 @@ in-house producer layouts; anything else needs a few lines of your own.
 ## 4. Judge
 
 ```
-uv run wsbench judge family=poetry readouts=readouts/mylens/poetry.jsonl out=out/mylens/poetry dry_run=True
-uv run wsbench run all=True readouts_root=readouts/mylens out=out/mylens
-uv run wsbench report dir=out/mylens
+uv run wsbench judge family=poetry readouts=outputs/readouts/mylens/poetry.jsonl out=outputs/judged/mylens/poetry dry_run=True
+uv run wsbench run all=True readouts_root=outputs/readouts/mylens out=outputs/judged/mylens
+uv run wsbench report dir=outputs/judged/mylens
 ```
 
 ## Or let the repo produce them
 
 `wsbench.produce` is a small producer over Hugging Face transformers, for anyone who has a GPU
-and wants readouts without writing the plumbing. Install the `gpu` extra (`pip install -e ".[gpu]"`
-or the uv equivalent) and:
+and wants readouts without writing the plumbing. Install the `gpu` extra (`uv sync --extra gpu`)
+and:
 
 ```python
 from wsbench.produce import Producer
@@ -95,14 +96,15 @@ p = Producer.load("Qwen/Qwen3.6-27B", "jlens")
 p.read("The athlete Muhammad Ali plays the sport of", pos=-1, layer=36).readout.tokens
 p.read_prompt("Sechs geteilt durch zwei ist", positions="all", layers=[20, 36, 60])
 # a whole eval set, resumable; the plan picks the cells
-p.run_family("poetry", "readouts/mine/poetry.jsonl", limit=10)
-p.use("olens")  # swap method, keep the loaded model
+p.run_family("poetry", "outputs/readouts/mine/poetry.jsonl", limit=10)
+# swap method, keep the loaded model
+p.use("olens")
 ```
 
 The same from the shell:
 
 ```
-wsbench produce family=poetry method=logit_lens out=readouts/mine/poetry.jsonl
+wsbench produce family=poetry method=logit_lens out=outputs/readouts/mine/poetry.jsonl
 wsbench produce text="The athlete Muhammad Ali plays the sport of" method=jlens positions=-1 layers=20,36,60
 ```
 
@@ -121,10 +123,10 @@ banks store (`"\n"`, `" öffnen"`, `"<|im_end|>"`); the ranked `tokens` of a tok
 byte-level BPE strings with `Ġ`/`▁` shown as a space (`" led"`), what the regex scorers expect.
 `pos` is the index the plan resolves: absolute, except `offset_from_end` (arithmetic
 intermediates, some multihop items), which the banks and judges count from the end, so those rows
-carry the negative offset (`-8`). A method trained at one layer reads there unless told otherwise:
-`nla` is layer 42 (not on the benchmark grid; pass `layers=[44]` to read it where the in-house
-table did). `nla` also loads its own copy of the reader (a second 27B on the same device), so it
-wants an H200; the other methods fit one H100.
+carry the negative offset (`-8`). A single-layer lens reads at its trained layer whatever the
+plan lists: `nla` is layer 42 (not on the benchmark grid; the in-house L44 NLA numbers were
+off-layer and are superseded). `nla` also loads its own copy of the reader (a second 27B on the
+same device), so it wants an H200; the other methods fit one H100.
 
 What it is not: fast. It reads one prompt at a time on one GPU, which is right for a token
 position, a question or a family, and wrong for the whole benchmark at every token; the in-house

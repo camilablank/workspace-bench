@@ -1,8 +1,13 @@
 # NOTICE — third-party data and code
 
-The code in this repository and the in-house item banks (`conjunctive_association`,
+The code in this repository and every in-house item bank are released under the MIT licence in
+`LICENSE`. In-house means every bank not listed below as third-party: `association`,
+`basic_readout`, `basic_readout_mt`, `multihop`, `multihop_mt`, `multilingual`,
+`multilingual_mt`, `multilingual_multihop`, `multilingual_typo`, `poetry`, `typo`, `typo_mt`,
+`directed_modulation`, `multi_concept_directed_modulation`, `chain_intermediates`,
+`brew_intermediates`, `arithmetic_intermediates`, `buggy_code`, `conjunctive_association`,
 `role_bound_association`, `relational_multihop`, `moral_rationale`, and the 14 in-house
-`agentic_misalignment` scenarios) are released under the MIT licence in `LICENSE`. The items
+`agentic_misalignment` scenarios. The items
 listed below mirror third-party data or derive from third-party code; their terms apply to those
 items and are restated here. Item files that mirror external data keep `source` / `source_id`
 fields where the bank carries them (jailbreak and hallucination); the jlens seeds are

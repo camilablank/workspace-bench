@@ -11,8 +11,9 @@ UTC, "for user modeling and arithmetic let's just batch it — feed it everythin
 the layers at 56/60 rather than
 widening to the ladder is the orchestrator's decision (Camila specified the tokens, not the
 layers). Until then one frozen cell per variant was read and judged (`cells=frozen`, still the
-default and the pre-registered comparison point). Can a lens assert the intermediate anywhere in
-the prompt?
+judge default and the pre-registered comparison point). `wsbench plan` emits the regime of
+record: chat render, every position, layers 56 and 60, with each item's frozen cell kept in
+`extra`. Can a lens assert the intermediate anywhere in the prompt?
 
 596 items across 14 variants (the source bank's `<variant>.json` files, items unchanged, each
 carrying its variant's cell and role; 10 variants were dropped by Agam on 2026-09-16: addmulx,
@@ -72,7 +73,8 @@ Example: `(271 - 322) * 14` → intermediate -51, answer -714.
   cross`. `extras.per_variant` gives n / value / cross / net / tolerance / role per variant,
   `extras.per_role` the structural vs comparison split; `extras.committed_rate` the calls that
   named anything. The prompt-only baseline is not item-blind here (the stock model computes the
-  expression).
+  expression); its frozen entry is stamped `arith-free-2026-09-16`, stale against the current
+  prompt version, so `report` does not draw it until it is re-measured.
 - **Every-position read (`opts=cells=all`, the run of record since 2026-09-23).** The same
   judge over every (layer, position) row in the file, packaged as one call per (item, layer)
   (`arith-free-batched-2026-09-23`, below); an item passes when ANY cell names a value within

@@ -98,8 +98,8 @@ class JudgeOptions(Command):
         self.concurrency = 64
         self.rpm = 240.0
         self.dry_run = False
-        self.opts = None  # comma list of KEY=VALUE family options (values without commas)
-        self.opt: list[str] = []
+        self.opts = None  # comma list of KEY=VALUE family options; a value cannot hold a comma
+        self.opt: list[str] = []  # the parsed pairs; filled by finalize
 
     def finalize(self) -> None:
         self.judge_model = str(self.judge_model or "") or None
@@ -330,11 +330,10 @@ def floor_columns() -> dict[str, dict[str, str]]:
 
 
 class Baseline(Command):
-    """Measure a floor. ``kind=lucky_guessing``: a model shown only each family's option lists."""
+    """Measure the lucky-guessing floor: a model shown only each family's option lists."""
 
     def __init__(self) -> None:
         super().__init__()
-        self.kind = "lucky_guessing"
         self.families = "all"
         self.variant = "blind,described,uniform"
         self.draws = lucky_guessing.DEFAULT_DRAWS
@@ -347,7 +346,6 @@ class Baseline(Command):
         self.out = "outputs/baselines/lucky_guessing"
 
     def finalize(self) -> None:
-        self.kind = str(self.kind)
         self.families = _strs(self.families) or ["all"]
         self.variant = _strs(self.variant) or []
         self.draws = _int(self.draws)
@@ -360,9 +358,6 @@ class Baseline(Command):
         self.out = _path(self.out)
 
     def execute(self) -> int:
-        if self.kind != "lucky_guessing":
-            print(f"unknown baseline kind {self.kind!r}; known: lucky_guessing", file=sys.stderr)
-            return EXIT_USAGE
         names = list(lucky_guessing.BUILDERS) if self.families == ["all"] else self.families
         unknown = [f for f in names if f not in lucky_guessing.BUILDERS]
         bad = [v for v in self.variant if v not in lucky_guessing.VARIANTS]

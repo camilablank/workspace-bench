@@ -9,7 +9,8 @@ Avery's ___") — read at its blank; does the lens hold the composed relation in
   (outer), `hop2` (inner).
 - **Cells:** per (item, layer) the **max-pos row** is the blank. If that row carries a `token`
   it must be the possessive `'s` (`BLANK_TOKEN`); any other token raises with the item id. A
-  row without a `token` is accepted and rendered as `[position p<pos>]`.
+  row without a `token` is accepted and rendered as `[position p<pos>]`. `wsbench plan`: bare
+  render, the final (blank) token, layers 20..60 step 4 (11 layers → 2,200 calls per arm).
 - **Calls:** two per cell over the same readout and the same option list — X (outer) and Y
   (inner), keyed `<cell>:X` / `<cell>:Y`. Cell pass = both correct (a direction flip picks the
   other hop and fails). Item pass = any layer.

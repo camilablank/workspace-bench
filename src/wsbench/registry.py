@@ -29,7 +29,7 @@ class JudgeArgs:
     rpm: float
     dry_run: bool
     aux_models: Mapping[str, str] = field(default_factory=dict)  # e.g. {"summarizer": model}
-    extra: dict[str, str] = field(default_factory=dict)  # family options from --opt key=value
+    extra: dict[str, str] = field(default_factory=dict)  # family options from opts=key=value
 
 
 @dataclass(frozen=True)
@@ -37,8 +37,8 @@ class EvalSpec:
     name: str  # family key, e.g. "moral_rationale"
     title: str  # README name, e.g. "Moral rationale"
     group: str  # "basic" | "basic_mt" | "safety" | "association" | "bag_of_words" | "precision"
-    #            | "logic"
-    bank: Path  # evals/<family>/items.json, relative to REPO_ROOT
+    #            | "logic" | "computational"
+    bank: Path  # the bank file, relative to REPO_ROOT (items.json; jlens_concept_pr: manifest.json)
     judge: JudgeConfig
     metric: str
     higher_is_better: bool

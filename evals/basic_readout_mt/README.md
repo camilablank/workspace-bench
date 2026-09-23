@@ -4,7 +4,7 @@ The model's obvious next concept when it is a multi-token phrase (a dynasty, a c
 
 100 items (source bank `lens-eval-basic-readout-hard.json`, parent `basic-readout-mt`,
 frozen 2026-09-10). Plain render, one read position: the final prompt token, immediately
-before the answer word. Every item and every bridge was gated on Qwen3.6-27B (greedy-verified,
+before the answer word. Every item was gated on Qwen3.6-27B (greedy-verified,
 then >= 8/10 at temperature 0.7).
 
 Example: a factual prompt completing to the Aghlabid dynasty → the lens must write `Aghlabid dynasty` (or `Aghlabids` / `Banu al-Aghlab`, the unit's alias list) in one sample.

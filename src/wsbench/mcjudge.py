@@ -104,7 +104,7 @@ def run_calls(
 
 
 # Process-global "already preflighted" set, shared by every family's Preflighter and seeded by
-# ``runner.run_families`` so ``run --all`` preflights each judge model once, not once per family.
+# ``runner.run_families`` so ``run all=True`` preflights each judge model once, not once per family.
 _PREFLIGHT_LOCK = threading.Lock()
 _PREFLIGHTED: set[str] = set()
 
@@ -143,7 +143,7 @@ def load_bank(family: str) -> list[dict]:
 
 
 def item_scope(bank: list[dict], args: JudgeArgs) -> list[dict]:
-    """bank ∩ ``--items`` (bank order), then ``--limit``."""
+    """bank ∩ ``items=`` (bank order), then ``limit=``."""
     items = bank
     if args.items is not None:
         want = set(args.items)

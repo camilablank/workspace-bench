@@ -18,7 +18,7 @@ SPEC = register(
         metric="pass_rate",
         higher_is_better=True,
         run=judge.run,
-        calls_per_arm="< 2k",
+        calls_per_arm="≈ 2.2k",
         sources="",
     )
 )

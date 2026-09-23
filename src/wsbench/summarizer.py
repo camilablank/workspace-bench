@@ -1,10 +1,6 @@
-"""The one token-bag -> prose step for J-lens (``kind == "tokens"``) readouts.
-
-Every MC family hands the summarizer one bundle text per cell and judges the returned
-interpretation in place of the readout. The prompt is the blind-interpretation protocol of the
-source repo's ``oa_eb_readout_judge.py`` / ``judge_relational_multihop.py``; it is printed
-verbatim in ``docs/summarizer.md`` (a test asserts equality).
-"""
+"""The one token-bag -> prose step for J-lens (``kind == "tokens"``) readouts: the families that
+judge token bags hand the summarizer one bundle text per cell and judge the returned
+interpretation in place of the readout. Prompt and provenance: ``docs/summarizer.md``."""
 
 import dataclasses
 from collections.abc import Callable, Mapping, Sequence

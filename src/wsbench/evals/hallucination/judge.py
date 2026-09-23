@@ -13,7 +13,7 @@ separately the spans that are JUNK; every label is derived here:
 
 Cells = every row of the readouts file on a bank read site (``items[].sites[].pos``); the
 expected grid is every site of every in-scope item x the selected layers, and a missing cell is
-fatal (exit 2) unless ``--allow-missing`` (a dry run only reports it). A prose cell is judged on
+fatal (exit 2) unless ``allow_missing=True`` (a dry run only reports it). A prose cell is judged on
 its first :data:`HAL_K` non-empty readouts; a ``tokens`` cell is decoded (:func:`decode_token`),
 summarised by the shared summarizer and judged as one readout (k = 1). A verdict in which any
 readout parses to ``unjudged`` fails validation and is re-queued by the next run.

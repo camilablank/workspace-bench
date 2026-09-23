@@ -4,6 +4,7 @@ import re
 from collections import defaultdict
 
 from wsbench.cache import Cache
+from wsbench.family import fail
 from wsbench.llm import Spend
 from wsbench.mc import CANNOT, classify, seeded_shuffle
 from wsbench.mcjudge import (
@@ -78,11 +79,9 @@ def run(args: JudgeArgs) -> FamilyResult:
     try:
         char_cap = int(args.extra.get("char_cap", DEFAULT_CHAR_CAP))
     except ValueError:
-        raise SystemExit(
-            f"--opt char_cap must be an integer (got {args.extra['char_cap']!r})"
-        ) from None
+        fail(f"opts=char_cap must be an integer (got {args.extra['char_cap']!r})")
     if char_cap < 1:
-        raise SystemExit(f"--opt char_cap must be >= 1 (got {char_cap})")
+        fail(f"opts=char_cap must be >= 1 (got {char_cap})")
     bank = load_bank(FAMILY)
     scope = item_scope(bank, args)
     cells, rep = load_readouts(args.readouts, ids=[it["id"] for it in scope], layers=args.layers)

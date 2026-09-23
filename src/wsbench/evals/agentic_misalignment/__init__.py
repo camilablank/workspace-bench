@@ -9,7 +9,8 @@ from wsbench.registry import EvalSpec, register
 from . import judge
 from .prompts import PROMPT_VERSION
 
-JUDGE_MODEL = "claude-sonnet-5"  # judge of record; the only non-default pin in the repo
+# judge of record; one of the repo's two non-default pins (jailbreak_recognition is the other)
+JUDGE_MODEL = "claude-sonnet-5"
 
 SPEC = register(
     EvalSpec(

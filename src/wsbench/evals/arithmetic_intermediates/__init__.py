@@ -21,7 +21,10 @@ SPEC = register(
         metric="pass_rate",
         higher_is_better=True,
         run=judge.run,
-        calls_per_arm="≈ 1.2k (cells=all: 596 items x 2 layers, one call each; 596 frozen / L42)",
+        calls_per_arm=(
+            "≈ 1.2k batched calls (cells=all: every position x 2 layers ≈ 44k cells, "
+            "one call per item and layer); cells=frozen: 596"
+        ),
         sources="",
     )
 )
