@@ -1,14 +1,14 @@
-"""Buggy code: a consequence-ladder judge per program (buggy and clean twins alike) at one read
-cell; headline ``net_S2`` = P(consequence read | buggy) - P(consequence read | clean). Rubric,
-strata and the quote gate are explained in the family README."""
+"""Buggy code: a blind reader infers what the readouts claim about the program, then an informed
+grader scores that inference 1-10 against the ground truth (the bug, or the fact that there is
+none). Headline ``score`` = the mean 1-10 score over buggy programs and clean twins alike.
+Stages, scores for silent readouts and strata are explained in the family README."""
 
-import random
 from collections import defaultdict
 from typing import Any
 
 from wsbench.banks import load_bank
 from wsbench.cache import Cache
-from wsbench.family import cell_text, fail, quote_in, rate, require_cells
+from wsbench.family import cell_text, fail, mean, rate, require_cells
 from wsbench.llm import Spend
 from wsbench.mcjudge import (
     Call,
@@ -22,52 +22,51 @@ from wsbench.mcjudge import (
 )
 from wsbench.readouts import Cell, load_readouts
 from wsbench.registry import REPO_ROOT, JudgeArgs
-from wsbench.results import FamilyResult, completeness
+from wsbench.results import FamilyResult, bootstrap_ci, completeness
 
-from .prompts import CONSEQUENCE, PROMPT_VERSION, RUNGS, SCHEMA, SYSTEM, render_user
+from .prompts import (
+    CLAIMS,
+    GRADE_SCHEMA,
+    GRADE_SYSTEM,
+    INFER_SCHEMA,
+    INFER_SYSTEM,
+    PROMPT_VERSION,
+    SILENT_SCORE,
+    render_grade,
+    render_infer,
+)
 
 NAME = "buggy_code"
 BANK = REPO_ROOT / "evals" / NAME / "items.json"
 CHANCE_LABEL = (
-    "difference of two rates; 0 = the lens reads bug consequences into clean programs as often "
-    "as into buggy ones. The clean twins are the false-alarm control"
+    "a lens that claims nothing about any program (score 1 on every buggy program, 5 on every "
+    "clean twin), see extras.silent_floor"
 )
 
 
-def verdict(res: dict[str, Any] | None, samples: list[str]) -> dict[str, Any]:
-    """One judge answer. An S2+ rung counts as a consequence read only with a verbatim quote from
-    a sample; without one it is recorded as ``unverified`` and scored below S2."""
-    if res is None or res.get("rung") not in RUNGS:
-        return {"judged": False, "rung": None, "consequence": False}
-    rung = str(res["rung"])
-    quote = str(res.get("quote", "")).strip()
-    quote_ok = any(quote_in(quote, s) for s in samples)  # ONE sample
-    consequence = rung in CONSEQUENCE and quote_ok
+def inference(res: dict[str, Any] | None) -> dict[str, Any]:
+    """Stage A answer: the claim, the inferred behaviour and the supporting snippet (kept as
+    evidence, not enforced)."""
+    if res is None:
+        return {"judged": False, "claim": None, "inferred": "", "quote": ""}
+    claim = str(res.get("claim", "none"))
+    if claim not in CLAIMS:
+        claim = "none"
     return {
         "judged": True,
-        "rung": rung,
-        "consequence": consequence,
-        "unverified": rung in CONSEQUENCE and not quote_ok,
-        "anti": bool(res.get("anti", False)),
-        "quote": quote,
-        "quote_ok": quote_ok,
-        "why": str(res.get("why", "")),
+        "claim": claim,
+        "inferred": str(res.get("inferred", "")).strip(),
+        "quote": str(res.get("quote", "")).strip(),
     }
 
 
-def net_ci(
-    buggy: list[bool], clean: list[bool], *, n: int = 1000, seed: int = 0
-) -> tuple[float, float] | None:
-    """Bootstrap CI of the rate difference, resampling the buggy and clean sets separately."""
-    if not buggy or not clean:
+def grade(res: dict[str, Any] | None) -> int | None:
+    if res is None:
         return None
-    rng = random.Random(seed)
-    diffs = sorted(
-        sum(rng.choice(buggy) for _ in buggy) / len(buggy)
-        - sum(rng.choice(clean) for _ in clean) / len(clean)
-        for _ in range(n)
-    )
-    return diffs[round(0.025 * (n - 1))], diffs[round(0.975 * (n - 1))]
+    score = res.get("score")
+    if isinstance(score, bool) or not isinstance(score, int | float):
+        return None
+    return max(1, min(10, round(score)))
 
 
 def run(args: JudgeArgs) -> FamilyResult:
@@ -95,8 +94,6 @@ def run(args: JudgeArgs) -> FamilyResult:
     samples: dict[str, list[str]] = {}
     empty: set[str] = set()
     for i, c in chosen.items():
-        # the judge reads each prose sample separately (the one-sample quote rule); a token
-        # lens is one scored bag
         ss = (
             [cell_text(c)[0]]
             if c.tokens is not None
@@ -108,44 +105,82 @@ def run(args: JudgeArgs) -> FamilyResult:
             empty.add(i)
 
     spend = Spend()
+    pre = Preflighter(args.dry_run)
+    inferred: dict[str, dict[str, Any]] = {}
+    scores: dict[str, int | None] = {}
     with Cache(args.out / "cells.jsonl") as cache:
-        calls = [
+        # stage A, blind: what do the readouts claim?
+        infer_calls = [
             Call(
-                key=f"{i}|L{layer_of[i]:03d}",
-                system=SYSTEM,
-                user=render_user(by_id[i], samples[i]),
-                meta={"item": i, "layer": layer_of[i], "src": by_id[i]["src"]},
+                key=f"{i}|L{layer_of[i]:03d}|infer",
+                system=INFER_SYSTEM,
+                user=render_infer(samples[i]),
+                meta={"item": i, "layer": layer_of[i], "src": by_id[i]["src"], "stage": "infer"},
             )
             for i in ids
             if i in samples
         ]
-        results = run_calls(
-            calls,
-            schema=SCHEMA,
-            judge=args.judge,
-            prompt_version=PROMPT_VERSION,
-            cache=cache,
-            spend=spend,
-            concurrency=args.concurrency,
-            rpm=args.rpm,
-            dry_run=args.dry_run,
-            preflight=Preflighter(args.dry_run).for_judge(args.judge),
-            temperature=0.0,
-        )
+        shared: dict[str, Any] = {
+            "judge": args.judge,
+            "prompt_version": PROMPT_VERSION,
+            "cache": cache,
+            "spend": spend,
+            "concurrency": args.concurrency,
+            "rpm": args.rpm,
+            "dry_run": args.dry_run,
+            "preflight": pre.for_judge(args.judge),
+            "temperature": 0.0,
+        }
+        infer_results = run_calls(infer_calls, schema=INFER_SCHEMA, **shared)
+        for i in ids:
+            if i in samples:
+                inferred[i] = inference(infer_results.get(f"{i}|L{layer_of[i]:03d}|infer"))
+        # stage B, informed: how close is the inference to the truth? Silent readouts get the
+        # fixed score for their source and make no call.
+        grade_calls = [
+            Call(
+                key=f"{i}|L{layer_of[i]:03d}|grade",
+                system=GRADE_SYSTEM,
+                user=render_grade(by_id[i], inferred[i]["claim"], inferred[i]["inferred"]),
+                meta={"item": i, "layer": layer_of[i], "src": by_id[i]["src"], "stage": "grade"},
+            )
+            for i in ids
+            if i in inferred and inferred[i]["judged"] and inferred[i]["claim"] != "none"
+        ]
+        grade_results = run_calls(grade_calls, schema=GRADE_SCHEMA, **shared) if grade_calls else {}
+        for c in grade_calls:
+            scores[c.meta["item"]] = grade(grade_results.get(c.key))
 
     rows = []
     for i in ids:
         it = by_id[i]
+        src = str(it["src"])
         if i in empty:
-            v: dict[str, Any] = {"judged": True, "rung": "S0", "consequence": False, "empty": True}
-        elif i in samples:
-            v = verdict(results.get(f"{i}|L{layer_of[i]:03d}"), samples[i])
+            v: dict[str, Any] = {
+                "judged": True,
+                "claim": "none",
+                "inferred": "",
+                "quote": "",
+                "score": SILENT_SCORE[src],
+                "empty": True,
+            }
+        elif i in inferred and inferred[i]["judged"]:
+            inf = inferred[i]
+            score = SILENT_SCORE[src] if inf["claim"] == "none" else scores.get(i)
+            v = {**inf, "score": score, "judged": score is not None}
         else:
-            v = {"judged": False, "rung": None, "consequence": False, "missing": True}
+            v = {
+                "judged": False,
+                "claim": None,
+                "inferred": "",
+                "quote": "",
+                "score": None,
+                "missing": i in missing,
+            }
         rows.append(
             {
                 "id": i,
-                "src": it["src"],
+                "src": src,
                 "lang_group": it["lang_group"],
                 "consequence_class": it.get("consequence_class"),
                 "layer": layer_of[i],
@@ -153,41 +188,41 @@ def run(args: JudgeArgs) -> FamilyResult:
             }
         )
     judged = [r for r in rows if r["judged"]]
-    buggy = [r["consequence"] for r in judged if r["src"] == "buggy"]
-    clean = [r["consequence"] for r in judged if r["src"] == "clean"]
-    b_rate, c_rate = rate(buggy), rate(clean)
-    value = (b_rate - c_rate) if b_rate is not None and c_rate is not None else None
+    values = [float(r["score"]) for r in judged]
+    value = mean(values)
     n_unjudged = sum(1 for r in rows if not r["judged"] and not r.get("missing"))
-    rungs: dict[str, dict[str, int]] = {"buggy": defaultdict(int), "clean": defaultdict(int)}
-    for r in judged:
-        rungs[r["src"]][str(r["rung"])] += 1
+    by_src = {s: [r for r in judged if r["src"] == s] for s in ("buggy", "clean")}
+    silent_floor = mean(float(SILENT_SCORE[str(it["src"])]) for it in scope)
     strata = sorted(
         {(r["consequence_class"] or "none", r["lang_group"]) for r in judged if r["src"] == "buggy"}
     )
-    per_stratum = {}
-    for cls, lg in strata:
-        b = [
-            r["consequence"]
-            for r in judged
-            if r["src"] == "buggy"
-            and (r["consequence_class"] or "none") == cls
-            and r["lang_group"] == lg
-        ]
-        c = [r["consequence"] for r in judged if r["src"] == "clean" and r["lang_group"] == lg]
-        per_stratum[f"{cls}/{lg}"] = {
-            "n_buggy": len(b),
-            "buggy_S2": rate(b),
-            "clean_S2": rate(c),
-            "net_S2": (rate(b) - rate(c)) if b and c else None,
+    per_stratum = {
+        f"{cls}/{lg}": {
+            "n": sum(
+                1
+                for r in by_src["buggy"]
+                if (r["consequence_class"] or "none") == cls and r["lang_group"] == lg
+            ),
+            "score": mean(
+                float(r["score"])
+                for r in by_src["buggy"]
+                if (r["consequence_class"] or "none") == cls and r["lang_group"] == lg
+            ),
         }
+        for cls, lg in strata
+    }
+    hist = {
+        s: {str(k): sum(1 for r in rs if r["score"] == k) for k in range(1, 11)}
+        for s, rs in by_src.items()
+    }
     result = FamilyResult(
         family=NAME,
-        metric="net_S2",
+        metric="score",
         value=value,
-        ci95=net_ci(buggy, clean),
+        ci95=bootstrap_ci(values) if values else None,
         n_items=len(ids),
         higher_is_better=True,
-        chance=0.0,
+        chance=silent_floor,
         chance_label=CHANCE_LABEL,
         complete=bool(cells)
         and completeness(
@@ -205,7 +240,8 @@ def run(args: JudgeArgs) -> FamilyResult:
             kind=rep.kind or "prose",
             layers_judged=sorted(set(layer_of.values())),
         ),
-        # a cell is one item at its read layer; one call per non-empty cell
+        # a cell is one item at its read layer; one blind call per non-empty cell plus one
+        # graded call per cell that claimed something
         counts=base_counts(
             n_expected=len(ids),
             n_missing=len(missing),
@@ -214,21 +250,32 @@ def run(args: JudgeArgs) -> FamilyResult:
             skipped_rows=sum(rep.skipped.values()) + n_extra,
             spend=spend,
         ),
-        extras={
-            "n_calls": len(calls),
-            "n_rows_not_at_read_cell": n_extra,
-            "buggy_S2_rate": b_rate,
-            "clean_S2_rate": c_rate,
-            "n_buggy_judged": len(buggy),
-            "n_clean_judged": len(clean),
-            "anti_rate_buggy": rate(bool(r.get("anti")) for r in judged if r["src"] == "buggy"),
-            "corrective_rate_buggy": rate(
-                r["rung"] == "corrective" for r in judged if r["src"] == "buggy"
-            ),
-            "unverified_S2_rate": rate(bool(r.get("unverified")) for r in judged),
-            "rungs": {k: dict(v) for k, v in rungs.items()},
-            "per_stratum": per_stratum,
-        },
         rows=rows,
+        extras={
+            "n_calls": len(infer_calls) + len(grade_calls),
+            "n_rows_not_at_read_cell": n_extra,
+            "silent_floor": silent_floor,
+            "score_buggy": mean(float(r["score"]) for r in by_src["buggy"]),
+            "score_clean": mean(float(r["score"]) for r in by_src["clean"]),
+            "n_buggy_judged": len(by_src["buggy"]),
+            "n_clean_judged": len(by_src["clean"]),
+            "claims": {
+                s: {c: rate(r["claim"] == c for r in rs) for c in CLAIMS}
+                for s, rs in by_src.items()
+            },
+            "false_alarm_rate_clean": rate(r["claim"] == "bug" for r in by_src["clean"]),
+            "score_hist": hist,
+            "per_stratum": per_stratum,
+            "rows_claims": [
+                {
+                    "id": r["id"],
+                    "src": r["src"],
+                    "claim": r["claim"],
+                    "score": r["score"],
+                    "inferred": r["inferred"][:300],
+                }
+                for r in judged
+            ],
+        },
     )
     return with_readout_count(result, scope, cells)
