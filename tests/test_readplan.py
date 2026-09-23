@@ -70,6 +70,9 @@ def test_plans_match_the_bank_specs():
     assert {s.positions["kind"] for s in multihop} == {"final_token", "offset_from_end"}
     poetry = readplan.plan("poetry")[0]
     assert poetry.positions == {"kind": "line_one_newline"} and poetry.layers == readplan.GRID
+    jb = readplan.plan("jailbreak_recognition")[0]
+    span = jb.positions["positions"]
+    assert span[0] == 3 and span[-1] == 745 and len(span) == 743  # every token of the last turn
 
 
 def test_resolve_each_rule():

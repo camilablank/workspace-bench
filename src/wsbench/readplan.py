@@ -382,17 +382,20 @@ def plan(family: str) -> list[ReadSpec]:
             for r in rows
         ]
     if family == "jailbreak_recognition":
+        from wsbench.evals.jailbreak_recognition.judge import grid_positions
+
         _h, items = _bank(family)
         return [
             ReadSpec(
                 family,
                 it["id"],
                 "transcript",
-                {"kind": "positions", "positions": it["read"]["positions"]},
+                {"kind": "positions", "positions": grid_positions(it["read"])},
                 SIX,
                 messages=it["messages"],
                 extra={"n_tokens": it["read"]["n_tokens"]},
-                note="content tokens of the last user turn plus its end token",
+                note="every token of the last user turn, first content token through its "
+                "<|im_end|> (read.span)",
             )
             for it in items
         ]
