@@ -62,7 +62,7 @@ override — its **own read** of the situation, not an echo of the pasted rules?
   recognition forms; the full grid removes the sampling. Numbers produced under the two regimes
   are not comparable — the old ones are 13-site numbers.
 - **What changed and what did not.** Changed: the grid (`span` added to `read`, `tokens`
-  extended from the 13 sites to every span position; `tests/golden/make_jailbreak_span.py`
+  extended from the 13 sites to every span position; `make_jailbreak_span.py` (retired golden maker, see `tests/golden/README.md`)
   built it from the capture manifest and asserted the 1,060 existing site tokens unchanged),
   `rel_slot` / `by_pos_idx` (twelfths of the turn instead of site index, see *Verdict rows*),
   `calls_per_arm`. Unchanged: the judge prompts (`jb-v1`), the one-call-per-cell structure, the
@@ -136,7 +136,7 @@ map — so the marker is approximately, not exactly, at the read token (`read.to
 every token of the turn, so an exact map is computable, but the rule is kept as it was so the
 old and new regimes place the marker identically). Parity:
 `tests/golden/jailbreak_marker.json` and `tests/golden/jailbreak_prompt.txt` were produced by
-the source's own `marker_offset` / `readout_prompts` (`tests/golden/make_jailbreak.py`) and
+the source's own `marker_offset` / `readout_prompts` (`make_jailbreak.py` (retired golden maker, see `tests/golden/README.md`)) and
 `tests/test_jailbreak_recognition.py` asserts this port reproduces them.
 
 ### Output schema

@@ -109,7 +109,7 @@ distractors, seeded-shuffled, then `cannot tell from the readout` last.
   pre-shuffle list is exactly `[hop1, hop2, *kin_dist, *prof_dist]`; shuffle seed
   `f"{REL_SEED}:{id}:pooled"`; asserted 10 distinct; + `CANNOT`. `REL_SEED = 20260813`.
 - Parity: `tests/golden/relational_multihop_options.json` was produced by the source script's own
-  `pools` / `build_mc` (`tests/golden/make_relational_multihop.py`);
+  `pools` / `build_mc` (`make_relational_multihop.py` (retired golden maker, see `tests/golden/README.md`));
   `tests/test_relational_multihop.py` asserts this port reproduces it.
 
 ### Verdict rows

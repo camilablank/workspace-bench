@@ -1,5 +1,5 @@
-"""The multi-token regex scorer: the port is pinned to the SOURCE repo's verdicts (goldens made by
-``tests/golden/make_mt_regex.py``), and ``run_regex`` applies the contract cell by cell."""
+"""The multi-token regex scorer: the port is pinned to the SOURCE repo's verdicts (the goldens in
+``tests/golden/mt_regex_*.json``), and ``run_regex`` applies the contract cell by cell."""
 
 import json
 from pathlib import Path

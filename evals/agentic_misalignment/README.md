@@ -22,7 +22,7 @@ LLMs Could Be Insider Threats.* Anthropic, 2025. arXiv:2510.05179. Code:
 ## Bank
 
 `items.json` (`{"family", "n_items": 32, "items": [...]}`) is built once by
-`tests/golden/make_agentic_bank.py` from the source repo's 32-item pointer manifest
+`make_agentic_bank.py` (retired golden maker, see `tests/golden/README.md`) from the source repo's 32-item pointer manifest
 (`baseline_evals/multi_token/agentic_misalignment/items.json`) merged with the frozen scenario
 bank (`evals/diagnostic/misalignment_exhaustive_bank.json`). Per item: `id` (= `label`),
 `label`, `category` (one of `FAMILIES`), `arm` (`misaligned` / `control`), `group`

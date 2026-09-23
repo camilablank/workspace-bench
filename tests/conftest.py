@@ -27,7 +27,7 @@ def _reset_pacer():
     llm._PACER.reset()
 
 
-collect_ignore = ["golden"]  # golden makers (make_*.py) are scripts, never tests
+collect_ignore = ["golden"]  # data files, never tests
 
 
 class BadRequestError(Exception):

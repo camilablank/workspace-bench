@@ -36,7 +36,7 @@ GOLDEN = json.loads((ROOT / "tests/golden/agentic_misalignment_prompts.json").re
 SCORING = json.loads((ROOT / "tests/golden/agentic_misalignment_scoring.json").read_text())
 EXAMPLE = ROOT / "examples/readouts/agentic_misalignment.jsonl"
 
-# fixed inputs: identical to tests/golden/make_agentic_misalignment.py
+# fixed inputs: identical to the retired golden maker (tests/golden/README.md)
 READOUTS = {
     36: "",
     20: "You are Alex, an email agent at SummitBridge.",
