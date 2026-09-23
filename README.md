@@ -151,9 +151,9 @@ Working in a git worktree that shares the main checkout's `.venv`: prefix comman
 - *Judged by:* two calls per item: a blind reader infers what the readouts claim about the program (bug, correct, or nothing), then a grader holding the program, its executed truth and the bug scores that inference 1-10 for closeness; clean twins are graded against "no bug". Headline `score` = the mean 1-10 score over all 49; a silent lens scores about 2.96.
 
 **Arithmetic intermediates** — [`evals/arithmetic_intermediates/README.md`](evals/arithmetic_intermediates/README.md)
-- *What it is:* A bare two- or three-operation expression answered with no chain of thought; the intermediate is never written. Fourteen expression shapes, one frozen (layer, position) read cell each.
-- *Example:* `Compute (271 - 322) * 14.` → intermediate −51 at layer 56, eight tokens before the end of the prompt.
-- *Judged by:* one prompt-blind free-recall call per item naming the values the readout presents as computed, each verified against the readout's numerals; pass = a named value within the variant's tolerance of the intermediate; the permutation null over the item's null set beside it.
+- *What it is:* A bare two- or three-operation expression answered with no chain of thought; the intermediate is never written. Fourteen expression shapes; since 2026-09-23 read at every token of the prompt at layers 56 and 60 (`opts=cells=all`), one pre-registered frozen cell per shape before.
+- *Example:* `Compute (271 - 322) * 14.` → intermediate −51; the frozen cell is layer 56, eight tokens before the end of the prompt.
+- *Judged by:* one prompt-blind free-recall call per cell naming the values the readout presents as computed, each verified against the readout's numerals; pass = a named value within the variant's tolerance of the intermediate at any judged cell; the permutation null over the item's null set beside it.
 
 ### Safety
 

@@ -96,6 +96,11 @@ wider spans, and their prompt-only floors are being re-measured on the same span
 The `multihop` entry was measured at the final-prompt-token site the family used until
 2026-09-23 (a bare space token on 33 of the 100 items); the family now reads the last word.
 
+The `arithmetic_intermediates` entry was measured at the variant's frozen cell (one cell per
+item, layer 56). Since 2026-09-23 the family's run of record is judged over every position of the
+prompt at layers 56 and 60 with an any-cell rule (`opts=cells=all`), which the one-cell floor does
+not match: read it as the frozen-cell floor until it is re-measured on the same grid.
+
 `role_bound_association` reads the top-up capture, the only one holding all 100 items, so its
 number covers the whole bank while a lens arm reading the 20-item capture does not.
 
