@@ -131,34 +131,53 @@ def verdict(
     }
 
 
+BANDS = ("exact", "rel2pct", "rel5pct")  # the accuracy bands reported beside the variant's own
+
+
+def cell_grid(args: JudgeArgs) -> str:
+    """``opts=cells=frozen`` (default) reads the variant's one pre-registered cell;
+    ``opts=cells=all`` reads every (layer, position) row in the file, any-cell rule."""
+    mode = args.extra.get("cells", "frozen")
+    if mode not in ("frozen", "all"):
+        fail(f"{NAME}: opts=cells must be frozen or all, not {mode!r}")
+    return mode
+
+
 def run(args: JudgeArgs) -> FamilyResult:
     header, items = load_bank(BANK)
     scope = item_scope(items, args)
     ids = [it["id"] for it in scope]
     by_id = {it["id"]: it for it in scope}
     by_name = {it["name"]: it for it in items}
-    if args.layers and len(args.layers) > 1:
+    mode = cell_grid(args)
+    if mode == "frozen" and args.layers and len(args.layers) > 1:
         fail(f"{NAME}: one frozen cell per item; pass a single layer or none, not {args.layers}")
-    layer_of = {i: (args.layers[0] if args.layers else int(by_id[i]["cell"]["layer"])) for i in ids}
-    pos_of = {i: int(by_id[i]["cell"]["pos"]) for i in ids}
+    frozen_layer = {
+        i: (args.layers[0] if mode == "frozen" and args.layers else int(by_id[i]["cell"]["layer"]))
+        for i in ids
+    }
+    frozen_pos = {i: int(by_id[i]["cell"]["pos"]) for i in ids}
     cells, rep = load_readouts(args.readouts, ids=ids, layers=args.layers)
-    # the read cell is the item's frozen (layer, pos); every other row is off-cell
-    have: dict[str, Cell] = {}
+    cells_of: dict[str, list[Cell]] = defaultdict(list)
     n_off_cell = 0
     for c in cells:
-        if c.layer == layer_of[c.id] and c.pos == pos_of[c.id]:
-            have[c.id] = c
+        if mode == "all" or (c.layer == frozen_layer[c.id] and c.pos == frozen_pos[c.id]):
+            cells_of[c.id].append(c)
         else:
             n_off_cell += 1
-    missing = [i for i in ids if i not in have]
+    missing = [i for i in ids if not cells_of[i]]
     require_cells(NAME, missing, len(ids), args)
-    texts, plain, empty = {}, {}, set()
-    for i, c in have.items():
-        judge_text, bare = cell_text(c)
-        if judge_text.strip():
-            texts[i], plain[i] = judge_text, bare
-        else:
-            empty.add(i)
+    texts: dict[tuple[str, int, int], str] = {}
+    plain: dict[tuple[str, int, int], str] = {}
+    empty: set[tuple[str, int, int]] = set()
+    for i, cs in cells_of.items():
+        for c in cs:
+            judge_text, bare = cell_text(c)
+            key = (i, c.layer, c.pos)
+            if judge_text.strip():
+                texts[key], plain[key] = judge_text, bare
+            else:
+                empty.add(key)
     target = {i: float(by_id[i]["intermediates"][0]) for i in ids}
     tol = {i: str(by_id[i]["tolerance"]) for i in ids}
     nulls = {
@@ -170,13 +189,12 @@ def run(args: JudgeArgs) -> FamilyResult:
     with Cache(args.out / "cells.jsonl") as cache:
         calls = [
             Call(
-                key=f"{i}|L{layer_of[i]:03d}|p{pos_of[i]}",
+                key=f"{i}|L{layer:03d}|p{pos}",
                 system=SYSTEM,
-                user=render_user(texts[i]),
-                meta={"item": i, "layer": layer_of[i], "pos": pos_of[i]},
+                user=render_user(texts[(i, layer, pos)]),
+                meta={"item": i, "layer": layer, "pos": pos},
             )
-            for i in ids
-            if i in texts
+            for (i, layer, pos) in sorted(texts)
         ]
         results = run_calls(
             calls,
@@ -193,26 +211,57 @@ def run(args: JudgeArgs) -> FamilyResult:
         )
 
     rows = []
+    cell_rows = []
     for i in ids:
         it = by_id[i]
-        if i in empty:
-            v: dict[str, Any] = {
-                "judged": True,
-                "kind": "empty",
-                "values": [],
-                "hit": False,
-                "cross": 0.0 if nulls[i] else None,
-            }
-        elif i in texts:
-            v = verdict(
-                results.get(f"{i}|L{layer_of[i]:03d}|p{pos_of[i]}"),
-                target[i],
-                tol[i],
-                nulls[i],
-                plain[i],
+        verdicts = []
+        for c in cells_of[i]:
+            key = (i, c.layer, c.pos)
+            if key in empty:
+                v: dict[str, Any] = {
+                    "judged": True,
+                    "kind": "empty",
+                    "values": [],
+                    "kept": [],
+                    "hit": False,
+                    "cross": 0.0 if nulls[i] else None,
+                }
+            else:
+                v = verdict(
+                    results.get(f"{i}|L{c.layer:03d}|p{c.pos}"),
+                    target[i],
+                    tol[i],
+                    nulls[i],
+                    plain[key],
+                )
+            verdicts.append({"layer": c.layer, "pos": c.pos, **v})
+            cell_rows.append({"id": i, **verdicts[-1]})
+        judged = [v for v in verdicts if v["judged"]]
+        unjudged = len(verdicts) - len(judged)
+        kept = [x for v in judged for x in v.get("kept", [])]
+        hit = any(v["hit"] for v in judged)
+        # every band over the same kept values: the variant's own tolerance is the headline
+        bands = {b: any(tolerance_ok(x, target[i], b) for x in kept) for b in BANDS}
+        cross = (
+            sum(any(tolerance_ok(x, n, tol[i]) for x in kept) for n in nulls[i]) / len(nulls[i])
+            if nulls[i] and judged
+            else None
+        )
+        hits_at = sorted((v["layer"], v["pos"]) for v in judged if v["hit"])
+        kind = (
+            (
+                "hit"
+                if hit
+                else "empty"
+                if all(v["kind"] == "empty" for v in judged)
+                else "none"
+                if not kept
+                else "other"
             )
-        else:
-            v = {"judged": False, "kind": "missing", "values": [], "hit": False, "cross": None}
+            if judged
+            else "missing"
+        )
+        # an item with no hit and an unjudged cell is undecided (a hit could still be there)
         rows.append(
             {
                 "id": i,
@@ -221,10 +270,21 @@ def run(args: JudgeArgs) -> FamilyResult:
                 "expr": it["expr"],
                 "intermediate": target[i],
                 "tolerance": tol[i],
-                "layer": layer_of[i],
-                "pos": pos_of[i],
-                "pass": tri_state(v["hit"], not v["judged"]),
-                **v,
+                "layer": frozen_layer[i],
+                "pos": frozen_pos[i],
+                "n_cells": len(verdicts),
+                "n_unjudged": unjudged,
+                "pass": tri_state(hit, unjudged > 0 or not verdicts),
+                "kind": kind,
+                "judged": bool(judged),
+                "values": [x for v in judged for x in v.get("values", [])][: MAX_VALUES * 3],
+                "kept": kept[: MAX_VALUES * 3],
+                "hit": hit,
+                "top1_hit": any(v.get("top1_hit") for v in judged),
+                "cross": cross,
+                "bands": bands,
+                "hits_at": hits_at,
+                "earliest_layer": min((L for L, _p in hits_at), default=None),
             }
         )
     decided = [r for r in rows if r["pass"] is not None]
@@ -247,7 +307,10 @@ def run(args: JudgeArgs) -> FamilyResult:
             "net": (val - crs) if val is not None and crs is not None else None,
             "tolerance": header["variants"][v]["tolerance"],
             "role": header["variants"][v]["role"],
+            "bands": {b: rate(r["bands"][b] for r in vs) for b in BANDS},
         }
+    judged_cells = [c for c in cell_rows if c["judged"]]
+    layers_seen = sorted({c["layer"] for c in cell_rows})
     result = pass_rate_result(
         name=NAME,
         args=args,
@@ -255,24 +318,32 @@ def run(args: JudgeArgs) -> FamilyResult:
         rows=rows,
         cells=cells,
         rep=rep,
-        # a cell is one item at its frozen (layer, pos); one call per non-empty cell
-        n_expected=len(ids),
+        # a cell is one (item, layer, pos) read; one call per non-empty cell
+        n_expected=sum(len(v) for v in cells_of.values()) + len(missing),
         n_missing=len(missing),
-        n_unjudged=sum(1 for r in rows if not r["judged"] and r["kind"] != "missing"),
+        n_unjudged=sum(r["n_unjudged"] for r in rows),
         n_empty=len(empty),
         spend=spend,
         chance_label=CHANCE_LABEL,
         skipped_extra=n_off_cell,
-        config_extra={"layers_judged": sorted(set(layer_of.values()))},
+        config_extra={"cells": mode, "layers_judged": layers_seen},
         extras={
             "n_calls": len(calls),
             "n_rows_off_cell": n_off_cell,
+            "cells_per_item": mean(float(r["n_cells"]) for r in rows),
             "cross": cross_rate,
             "net": (value_rate - cross_rate)
             if value_rate is not None and cross_rate is not None
             else None,
             "top1_rate": rate(bool(r.get("top1_hit")) for r in decided),
-            "committed_rate": rate(bool(r["values"]) for r in rows if r["judged"]),
+            "committed_rate": rate(bool(c["values"]) for c in judged_cells),
+            # accuracy at fixed bands, any cell: exact, within 2%, within 5% of the intermediate
+            "bands": {b: rate(r["bands"][b] for r in decided) for b in BANDS},
+            "cell_hit_rate": rate(bool(c["hit"]) for c in judged_cells),
+            "per_layer_hit_rate": {
+                str(L): rate(bool(c["hit"]) for c in judged_cells if c["layer"] == L)
+                for L in layers_seen
+            },
             "kinds": dict(kinds),
             "per_variant": per_variant,
             "per_role": {

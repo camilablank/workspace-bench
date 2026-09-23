@@ -243,3 +243,60 @@ def test_registered_readme_and_dry_run(tmp_path, capsys, monkeypatch):
     r = read_results(out)
     assert r.value is None and r.extras["n_items_without_readouts"] == 592
     assert "Lens output:" in capsys.readouterr().out
+
+
+def test_all_cells_mode_uses_every_row_and_reports_bands(tmp_path, monkeypatch):
+    """``opts=cells=all``: every (layer, pos) row is a cell, an item passes on any cell, and
+    the accuracy bands are computed over the same kept values."""
+    _h, items = load_bank(BANK)
+    it = next(x for x in items if x["tolerance"] == "exact")
+    target = float(it["intermediates"][0])
+    off = target * 1.03  # inside 5%, outside 2% and exact
+    rows = [
+        {"id": it["id"], "layer": 20, "pos": 0, "samples": ["nothing here"]},
+        {"id": it["id"], "layer": 20, "pos": 1, "samples": [f"maybe {off:g}"]},
+        {"id": it["id"], "layer": 60, "pos": 1, "samples": [f"the value is {target:g}"]},
+    ]
+
+    def fake_run_calls(calls, **kw):
+        out = {}
+        for c in calls:
+            text = c.user
+            if f"{target:g}" in text:
+                out[c.key] = {"values": [target], "quote": f"{target:g}", "basis": "t"}
+            elif f"{off:g}" in text:
+                out[c.key] = {"values": [off], "quote": f"{off:g}", "basis": "t"}
+            else:
+                out[c.key] = {"values": [], "quote": "", "basis": "none"}
+        return out
+
+    monkeypatch.setattr(judge, "run_calls", fake_run_calls)
+    path = tmp_path / "r.jsonl"
+    path.write_text("".join(json.dumps(x) + "\n" for x in rows))
+    args = JudgeArgs(
+        readouts=path,
+        out=tmp_path / "out",
+        judge=resolve(JudgeConfig(prompt_version=PROMPT_VERSION)),
+        layers=None,
+        items=[it["id"]],
+        limit=0,
+        allow_missing=False,
+        concurrency=1,
+        rpm=1.0,
+        dry_run=False,
+        extra={"cells": "all"},
+    )
+    r = judge.run(args)
+    row = r.rows[0]
+    assert row["n_cells"] == 3 and row["pass"] is True and row["hits_at"] == [(60, 1)]
+    assert row["bands"] == {"exact": True, "rel2pct": True, "rel5pct": True}
+    assert r.extras["n_rows_off_cell"] == 0 and r.extras["n_calls"] == 3
+    assert r.extras["cell_hit_rate"] == pytest.approx(1 / 3)
+    assert r.extras["per_layer_hit_rate"] == {"20": 0.0, "60": 1.0}
+    assert r.config["cells"] == "all" and r.config["layers_judged"] == [20, 60]
+    # without the exact cell, only the 5% band is reached
+    path.write_text("".join(json.dumps(x) + "\n" for x in rows[:2]))
+    r2 = judge.run(JudgeArgs(**{**args.__dict__, "out": tmp_path / "out2"}))
+    assert r2.rows[0]["pass"] is False
+    assert r2.rows[0]["bands"] == {"exact": False, "rel2pct": False, "rel5pct": True}
+    assert r2.extras["bands"]["rel5pct"] == 1.0 and r2.extras["bands"]["exact"] == 0.0

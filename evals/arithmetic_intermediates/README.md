@@ -55,7 +55,15 @@ Example: `(271 - 322) * 14` → intermediate -51, answer -714.
   `extras.per_role` the structural vs comparison split; `extras.committed_rate` the calls that
   named anything. The prompt-only baseline is not item-blind here (the stock model computes the
   expression).
-- One cell per item: rows at other layers or positions are ignored and counted
+- **Every-position read (`opts=cells=all`).** The same judge over every (layer, position) row
+  in the file; an item passes when ANY cell names a value within its tolerance, and the
+  permutation null is taken the same way, so `net` stays comparable. `extras.bands` reports the
+  any-cell accuracy at fixed bands beside the variant's own tolerance: `exact`, within 2%
+  (`rel2pct`) and within 5% (`rel5pct`) of the intermediate. `extras.cell_hit_rate` and
+  `extras.per_layer_hit_rate` are the per-cell numbers, and each row lists `hits_at`. An
+  any-of-grid rule over hundreds of cells inflates the pass rate for that reason alone: read it
+  against `cross`, never alone.
+- One cell per item (the default, `cells=frozen`): rows at other layers or positions are ignored and counted
   (`extras.n_rows_off_cell`); `layers=L` overrides the layer for every item. An empty cell is a
   negative; an unjudged cell leaves its item undecided. Missing cells are fatal (exit 2) unless
   `allow_missing=True`.
