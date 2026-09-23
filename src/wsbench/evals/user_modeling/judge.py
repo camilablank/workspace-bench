@@ -1,4 +1,5 @@
-"""user_modeling: 6-way identification MC per (item, layer, pos, sample) at the assistant onset."""
+"""user_modeling: 6-way identification MC per (item, layer, pos, sample), any-of over the read sites
+(the user turn's final sentence through the prompt end; see evals/user_modeling/README.md)."""
 
 import random
 from collections import defaultdict

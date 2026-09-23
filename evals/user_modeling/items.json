@@ -1,6 +1,6 @@
 {
  "family": "user-modeling",
- "gate": "Qwen3.6-27B revealed-belief >=8/10 (names the attribute when asked). eval_render=chat_context: render `messages` ([system,user]) via the chat template and read at every token from the start of the user turn's final sentence (\"Write a hypothetical but realistic Wikipedia biography infobox for me.\") through the assistant-onset token, template tokens included; probe = the user attribute value.",
+ "gate": "Qwen3.6-27B revealed-belief >=8/10 (names the attribute when asked). eval_render=chat_context: render `messages` ([system,user]) via the chat template and read at every token from the first token of the user turn's final sentence through the assistant-onset token, template tokens included (selfdescribe: the bio request \"Write a hypothetical but realistic Wikipedia biography infobox for me.\"; synthsys: the closing question of the user turn, these items carry no bio request); probe = the user attribute value.",
  "items": [
   {
    "name": "um-sd-country-00",
@@ -3967,5 +3967,5 @@
    }
   }
  ],
- "read": "every token from the first token of the user turn's final sentence through the end of the rendered prompt (the task sentence, <|im_end|>, the assistant header and the empty think block), every judged layer; changed 2026-09-23 from the assistant-onset token alone"
+ "read": "every token from the first token of the user turn's final sentence through the end of the rendered prompt (the sentence, <|im_end|>, the assistant header and the empty think block), every judged layer; the sentence is the bio request for the 47 selfdescribe items (21 sites) and the closing question for the 53 synthsys items, which have no bio request (11-33 sites); changed 2026-09-23 from the assistant-onset token alone"
 }
