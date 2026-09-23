@@ -10,6 +10,7 @@ from wsbench.banks import load_bank
 from wsbench.cache import Cache
 from wsbench.family import (
     cell_text,
+    fail,
     last_pos_rows,
     mean,
     pass_rate_result,
@@ -106,9 +107,17 @@ def run(args: JudgeArgs) -> FamilyResult:
     by_id = {it["id"]: it for it in scope}
     cells, rep = load_readouts(args.readouts, ids=ids, layers=args.layers)
     layers = args.layers if args.layers is not None else rep.layers
-    # the read cell is the last prompt token: the max-pos row per (item, layer)
-    chosen, n_extra_rows = last_pos_rows(cells)
-    missing = [(i, layer) for i in ids for layer in layers if (i, layer) not in chosen]
+    mode = args.extra.get("cells", "last")
+    if mode not in ("last", "all"):
+        fail(f"{NAME}: opts=cells must be last or all, not {mode!r}")
+    if mode == "last":
+        # the read cell is the last prompt token: the max-pos row per (item, layer)
+        chosen, n_extra_rows = last_pos_rows(cells)
+    else:
+        # every row in the file is a cell; the producer chose the span (an any-cell rule)
+        chosen, n_extra_rows = {(c.id, c.layer, c.pos): c for c in cells}, 0
+    seen = {(k[0], k[1]) for k in chosen}
+    missing = [(i, layer) for i in ids for layer in layers if (i, layer) not in seen]
     require_cells(NAME, missing, len(ids) * len(layers), args)
     texts, plain, empty = {}, {}, set()
     for k, c in chosen.items():
@@ -126,12 +135,12 @@ def run(args: JudgeArgs) -> FamilyResult:
     with Cache(args.out / "cells.jsonl") as cache:
         calls = [
             Call(
-                key=f"{i}|L{layer:03d}",
+                key=f"{k[0]}|L{k[1]:03d}" + (f"|p{k[2]}" if len(k) == 3 else ""),
                 system=SYSTEM,
                 user=render_user(text),
-                meta={"item": i, "layer": layer},
+                meta={"item": k[0], "layer": k[1], "pos": k[2] if len(k) == 3 else None},
             )
-            for (i, layer), text in sorted(texts.items())
+            for k, text in sorted(texts.items())
         ]
         results = run_calls(
             calls,
@@ -149,12 +158,21 @@ def run(args: JudgeArgs) -> FamilyResult:
 
     verdicts = [
         {
-            "item": i,
-            "layer": layer,
-            **verdict(results.get(c.key), gold[i], near[i], plain[(i, layer)]),
+            "item": c.meta["item"],
+            "layer": c.meta["layer"],
+            "pos": c.meta["pos"],
+            **verdict(
+                results.get(c.key),
+                gold[c.meta["item"]],
+                near[c.meta["item"]],
+                plain[
+                    (c.meta["item"], c.meta["layer"])
+                    if c.meta["pos"] is None
+                    else (c.meta["item"], c.meta["layer"], c.meta["pos"])
+                ],
+            ),
         }
         for c in calls
-        for i, layer in [(c.meta["item"], c.meta["layer"])]
     ]
     rows = [_item_row(by_id[i], gold[i], near[i], verdicts, missing, empty) for i in ids]
     decided = [r for r in rows if r["pass"] is not None]
@@ -173,15 +191,19 @@ def run(args: JudgeArgs) -> FamilyResult:
         rep=rep,
         n_expected=len(ids) * len(layers),
         n_missing=len(missing),
-        n_unjudged=len({(v["item"], v["layer"]) for v in verdicts if not v["judged"]}),
+        n_unjudged=len({(v["item"], v["layer"], v["pos"]) for v in verdicts if not v["judged"]}),
         n_empty=len(empty),
         spend=spend,
         chance_label=CHANCE_LABEL,
         skipped_extra=n_extra_rows,
-        config_extra={"layers_judged": layers},
+        config_extra={"layers_judged": layers, "cells": mode},
         extras={
             "n_calls": len(calls),
             "n_rows_not_last_token": n_extra_rows,
+            "cells_per_item": len(chosen) / max(1, len(ids)),
+            "per_layer_hit_rate": {
+                str(L): rate(bool(v["hit"]) for v in judged if v["layer"] == L) for L in layers
+            },
             # mean over decided items (the source averaged every item with a null)
             "null_top1_near": mean(
                 r["null_top1_near"] for r in decided if r["null_top1_near"] is not None
@@ -214,9 +236,9 @@ def _item_row(
     item_id = item["id"]
     mine = sorted((v for v in verdicts if v["item"] == item_id), key=lambda v: v["layer"])
     hits = [v["layer"] for v in mine if v["hit"]]
-    incomplete = any(not v["judged"] for v in mine) or any(i == item_id for i, _l in missing)
+    incomplete = any(not v["judged"] for v in mine) or any(k[0] == item_id for k in missing)
     judged = [v for v in mine if v["judged"]]
-    n_judged = len(judged) + sum(1 for i, _l in empty if i == item_id)
+    n_judged = len(judged) + sum(1 for k in empty if k[0] == item_id)
     near_hits = sum(1 for v in judged if v["kind"] == "near")
     return {
         "id": item_id,
@@ -226,12 +248,15 @@ def _item_row(
         "start": item.get("start"),
         "pass": tri_state(bool(hits), incomplete),
         "earliest_layer": min(hits) if hits else None,
-        "hitting_layers": hits,
+        "hitting_layers": sorted(set(hits)),
+        "hits_at": sorted(
+            (v["layer"], v["pos"]) for v in mine if v["hit"] and v.get("pos") is not None
+        ),
         "any_of_3": any(v.get("any_of_3") for v in mine),
         "null_top1_near": (near_hits * len(gold) / len(near) / n_judged)
         if n_judged and near
         else None,
-        "named_by_layer": {str(v["layer"]): v["values"] for v in mine},
-        "kind_by_layer": {str(v["layer"]): v["kind"] for v in mine},
-        "basis_by_layer": {str(v["layer"]): v.get("basis") for v in mine},
+        "named_by_layer": {str(v["layer"]): v["values"] for v in mine if v.get("pos") is None},
+        "kind_by_layer": {str(v["layer"]): v["kind"] for v in mine if v.get("pos") is None},
+        "basis_by_layer": {str(v["layer"]): v.get("basis") for v in mine if v.get("pos") is None},
     }

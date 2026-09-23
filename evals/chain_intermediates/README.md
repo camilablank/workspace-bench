@@ -22,6 +22,13 @@ intermediates [11, 5], answer 2.
   intermediates at any layer. The top value is credited only when it appears in the readout as a
   whole number (5 does not match 15) or the judge's quote is verbatim in it (a Chinese numeral is
   credited through the quote); a token bag is verified against its tokens, never its scores.
+- **Every-cell read (`opts=cells=all`).** The same judge over every (layer, position) row the
+  producer put in the file — the intended use is the question span, "What is the final number?
+  Reply with only the final number, nothing else." plus the chat-template tokens after it, where
+  the model has both intermediates and is about to answer. An item passes when ANY cell's top
+  value is an intermediate; each row lists `hits_at`, and `extras.per_layer_hit_rate` and
+  `extras.cells_per_item` size the grid. An any-of-grid rule over many cells inflates the pass
+  rate on its own: read it against `null_top1_near`, taken over the same cells.
 - **Token lenses** are judged as their top-k bag (the prompt's "bag of loose numerals" rule);
   no summarizer.
 - **Floors.** No analytic floor for free recall. `extras.null_top1_near` is the magnitude-matched

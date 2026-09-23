@@ -212,3 +212,55 @@ def test_registered_readme_and_dry_run(tmp_path, capsys, monkeypatch):
     r = read_results(out)
     assert r.value is None and r.extras["n_items_without_readouts"] == 117
     assert "Lens output:" in capsys.readouterr().out
+
+
+def test_all_cells_mode_scores_every_row(tmp_path, monkeypatch):
+    """``opts=cells=all``: every (layer, pos) row is a cell; an item passes on any cell, and the
+    per-cell hits are listed."""
+    _h, items = load_bank(BANK)
+    it = items[0]
+    gold = it["intermediates"][0]
+    rows = [
+        {"id": it["id"], "layer": 20, "pos": 5, "samples": ["nothing"]},
+        {"id": it["id"], "layer": 20, "pos": 6, "samples": [f"the value is {gold}"]},
+        {"id": it["id"], "layer": 44, "pos": 5, "samples": ["nothing"]},
+        {"id": it["id"], "layer": 44, "pos": 6, "samples": ["nothing"]},
+    ]
+
+    def fake_run_calls(calls, **kw):
+        out = {}
+        for c in calls:
+            if str(gold) in c.user:
+                out[c.key] = {
+                    "states_value": True,
+                    "values": [gold],
+                    "basis": "a",
+                    "quote": str(gold),
+                }
+            else:
+                out[c.key] = {"states_value": False, "values": [], "basis": "none", "quote": ""}
+        return out
+
+    monkeypatch.setattr(judge, "run_calls", fake_run_calls)
+    path = tmp_path / "r.jsonl"
+    path.write_text("".join(json.dumps(x) + "\n" for x in rows))
+    args = JudgeArgs(
+        readouts=path,
+        out=tmp_path / "out",
+        judge=resolve(JudgeConfig(prompt_version=PROMPT_VERSION)),
+        layers=None,
+        items=[it["id"]],
+        limit=0,
+        allow_missing=False,
+        concurrency=1,
+        rpm=1.0,
+        dry_run=False,
+        extra={"cells": "all"},
+    )
+    r = judge.run(args)
+    row = r.rows[0]
+    assert row["pass"] is True and row["hits_at"] == [(20, 6)] and row["earliest_layer"] == 20
+    assert r.extras["n_calls"] == 4 and r.extras["n_rows_not_last_token"] == 0
+    assert r.extras["cells_per_item"] == 4.0
+    assert r.extras["per_layer_hit_rate"] == {"20": 0.5, "44": 0.0}
+    assert r.config["cells"] == "all"
