@@ -46,7 +46,8 @@ Three buckets, then the detail.
 **Usable as they are, once `capable` says the model does the task** (no bank edits): association,
 basic_readout (minus its implicit third), multihop, multilingual, typo, the six multi-token
 families, chain_intermediates, brew_intermediates, arithmetic_intermediates, user_modeling,
-conjunctive_association, relational_multihop, role_bound_association, buggy_code.
+conjunctive_association, relational_multihop, role_bound_association, buggy_code,
+multi_concept_directed_modulation (the sentence is prefilled since 2026-09-23).
 
 **The bank itself has to be edited for the new model:** poetry (the rhyme target is whatever word
 that model commits to), moral_rationale (each item's YES/NO reasons are written for the side the
@@ -54,7 +55,7 @@ model takes), and basic_readout's 32 implicit items (the gold is the model's own
 
 **Nothing to port until you re-run something on the new model:** hallucination (its bank IS the
 model's own responses), agentic_misalignment (the rollouts), jlens_concept_pr (the activations and
-the J-lens reference), directed_modulation and multi_concept_directed_modulation (the compliance
+the J-lens reference), directed_modulation (the compliance
 screen), and jailbreak_recognition, whose items carry over but whose read positions are token
 indices and need re-capturing.
 
@@ -74,7 +75,7 @@ indices and need re-capturing.
 | user_modeling | names the attribute when asked (at least 8/10) | check with `capable` |
 | conjunctive_association, relational_multihop, role_bound_association | states the composed answer to the bank's own question | check with `capable`; conjunctive is graded against the bank's prose label, not its per-axis credit lists, so read its number loosely |
 | directed_modulation | compliance: the carrier sentence is copied and the held concept never surfaces | no `capable` question. Re-run the compliance screen on the new model |
-| multi_concept_directed_modulation | compliance: the dictated sentence is written | no `capable` question. The scorer already drops off-task windows, so what needs re-checking is that the new model writes the sentence at all |
+| multi_concept_directed_modulation | none since 2026-09-23: the dictated sentence is prefilled as the assistant's text, so the read cells are the sentence by construction | portable once the prefill render is reproduced with the new model's chat template; the off-task screen stays as a producer check |
 | hallucination | none: the bank IS the model's own responses | **re-generate.** The responses must come from the model under test, or the judge checks a readout against another model's text |
 | jailbreak_recognition | none: verbatim WildChat conversations | portable, but the read sites are token positions — re-capture with the new tokenizer |
 | agentic_misalignment | the rollout itself (the model did misbehave) | **re-run the scenarios.** A model that does not take the misaligned action has nothing to read |

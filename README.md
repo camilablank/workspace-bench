@@ -129,7 +129,7 @@ Working in a git worktree that shares the main checkout's `.venv`: prefix comman
 - *Judged by:* one prompt-blind five-way call per (item, layer, unit) with a cannot-tell escape and a verbatim-quote gate; a layer passes only when every judged unit is picked correctly; item passes at any layer.
 
 **Multi-concept directed modulation** — [`evals/multi_concept_directed_modulation/README.md`](evals/multi_concept_directed_modulation/README.md)
-- *What it is:* The model holds one to three unrelated concepts in mind while writing a dictated sentence; the lens reads the writing positions. Do the held concepts come back, how many, and does the binding ("Adam being angry at Betty" vs the reverse) survive?
+- *What it is:* The model holds one to three unrelated concepts in mind while writing a dictated sentence, prefilled as its own reply (chat render, since 2026-09-23); the lens reads every token of that sentence. Do the held concepts come back, how many, and does the binding ("Adam being angry at Betty" vs the reverse) survive?
 - *Example:* "Think about the plumber's blue ladder leaning against the mango tree. Now write this sentence: ..." → a write-cell readout naming `plumber`, `blue ladder` or `mango tree` among six candidates.
 - *Judged by:* one prompt-blind multi-select call per in-sentence write cell with a verbatim-quote gate; item passes when any cell names a dictated concept; controls and off-task items excluded.
 
