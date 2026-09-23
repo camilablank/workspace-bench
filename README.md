@@ -43,6 +43,11 @@ verdict, so a re-run only pays for what is missing); `out/<arm>/summary.md` (the
 `items=a,b`, `limit=N`, `allow_missing=True`, `dry_run=True`, `judge_model=`, `concurrency=`,
 `rpm=`, `opts=k=v`; `--help` prints a command's keys, `--show` the resolved config.
 
+**This repo is data and judging only.** There is no model loading, capture or lens code here.
+`wsbench plan` writes, per family, one JSONL row per item saying what to render and how, which
+token positions to read and at which layers; you run your lens on those cells and hand back a
+readouts file. [docs/producing_readouts.md](docs/producing_readouts.md) is the full interface.
+
 **Readout contract.** One row per cell, all-prose or all-tokens; `id` is the bank item id, `pos`
 the read position, `token` the read-site token when the producer has it:
 

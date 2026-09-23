@@ -162,6 +162,12 @@ You grade a model's ANSWER against the EXPECTED answer to the same question. Mar
 The per-family question text is pinned by `tests/golden/capable_questions.json`: editing it is an
 instrument change and the test will say so.
 
+## Getting the read sites without reading 27 READMEs
+
+`wsbench plan out=outputs/plan` writes one JSONL per family with every item's render, positions
+rule and layers, and `wsbench.readplan.resolve(rule, tokens)` turns a rule into indices for your
+tokenizer. `docs/producing_readouts.md` walks the whole producer side.
+
 ## What this repo will not do for you
 
 There is no capture code, no lens implementation and no model serving here. A readouts file is
