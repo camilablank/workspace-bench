@@ -5,6 +5,12 @@ title: "workspace-bench: evals of whether an activation-reading lens surfaces wh
 authors:
   - family-names: Blank
     given-names: Camila
+  - family-names: Bhatia
+    given-names: Agam
+  - family-names: Ong
+    given-names: Euan
+  - family-names: Nanda
+    given-names: Neel
 version: 0.1.0
 date-released: 2026-09-16
 repository-code: https://github.com/camilablank/workspace-bench
@@ -16,6 +22,12 @@ preferred-citation:
   authors:
     - family-names: Blank
       given-names: Camila
+    - family-names: Bhatia
+      given-names: Agam
+    - family-names: Ong
+      given-names: Euan
+    - family-names: Nanda
+      given-names: Neel
   year: 2026
   repository-code: https://github.com/camilablank/workspace-bench
   url: https://www.lesswrong.com/posts/Zeg2JztbdhguL48uH/workspacebench-evaluating-interpretability-methods-for-the

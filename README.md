@@ -389,11 +389,10 @@ If you use workspace-bench, please cite the repo and the write-up
 
 ```bibtex
 @misc{blank2026workspacebench,
-  author       = {Blank, Camila},
+  author       = {Blank, Camila and Bhatia, Agam and Ong, Euan and Nanda, Neel},
   title        = {WorkspaceBench: Evaluating Interpretability Methods for the Global Workspace},
   year         = {2026},
-  howpublished = {\url{https://www.lesswrong.com/posts/Zeg2JztbdhguL48uH/workspacebench-evaluating-interpretability-methods-for-the}},
-  note         = {Code and item banks: \url{https://github.com/camilablank/workspace-bench}}
+  howpublished = {\url{https://www.lesswrong.com/posts/Zeg2JztbdhguL48uH/workspacebench-evaluating-interpretability-methods-for-the}}
 }
 ```
 
