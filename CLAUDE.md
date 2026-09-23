@@ -50,7 +50,11 @@ first duplicate `(id, layer, pos)`, counts empty readouts (a result, not a missi
   contract `multitoken/regex.py` (a port of the source repo's `bank/matching.py` +
   `contract.py` + `conjunctive.py`; no call, `spend_usd` 0, `EvalSpec.scorer="regex"`, pinned by
   goldens `tests/golden/mt_regex_*.json` made by the source code); the forced-choice judge is
-  `opts=judge=mc` (never pinned). Their families are three-line packages under `evals/`. Option
+  `opts=judge=mc` (never pinned). Token bags are summarized first (`summarizer.summarize`, same
+  bundle text / cache key / fingerprint as the MC path, so its cached interpretations are reused),
+  then matched: a unit hits in the summary OR in a single token (`SUMMARIZED_SCORER_VERSION`; for
+  token arms `judge_model` = the summarizer model, pinned/spend/undecided follow it). Their
+  families are three-line packages under `evals/`. Option
   lists are pinned by goldens in `tests/golden/`. A spec with `scorer` set is not preflighted by
   `run` unless `opts=judge=mc`, and `wsbench list` shows the scorer in the judge column.
 - Baselines (`baselines/`): `lucky_guessing` (option lists from the judges' own builders, blind /
