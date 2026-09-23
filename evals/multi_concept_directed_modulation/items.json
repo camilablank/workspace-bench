@@ -4,8 +4,9 @@
  "head_template": "Think about %s. Now write this sentence: \"%s\"\n",
  "control_template": "Read carefully. Now write this sentence: \"%s\"\n",
  "target_sentence": "The committee will meet on Thursday to review the annual budget.",
- "render": "bare",
- "read_cells": "the last 20 tokens of the model's own completion, offsets -1 .. -20",
+ "render": "chat (Qwen chat template, enable_thinking=False, no system prompt): the item prompt is the user turn; the assistant turn opens with the empty <think>\n\n</think>\n\n block and the target sentence is PREFILLED as the assistant's text (bare sentence, no closing quote)",
+ "read_cells": "every token of the prefilled target sentence (12 tokens: The committee will meet on Thursday to review the annual budget .), offsets -12 .. -1 from the end of the render",
+ "read_cells_changed": "2026-09-23 (Camila: \"we aren't prefilling the sentence, we are just including it as part of the user message, so fix that and rerun all the methods on the written sentence tokens\"). Before: bare render of the prompt text followed by a greedy rollout, read cells = the last 20 tokens of the rollout (offsets -1 .. -20), which mixed the written sentence, the model's <think> block and its re-write of the prompt.",
  "layers": [
   44,
   52,

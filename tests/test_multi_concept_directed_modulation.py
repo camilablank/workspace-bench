@@ -17,6 +17,7 @@ from wsbench.evals.multi_concept_directed_modulation.prompts import (
     PROMPT_VERSION,
 )
 from wsbench.evals.multi_concept_directed_modulation.regions import (
+    TARGET_SENTENCE,
     Region,
     classify_regions,
     label_cells,
@@ -31,8 +32,8 @@ REPO = Path(__file__).resolve().parents[1]
 BANK = REPO / "evals/multi_concept_directed_modulation/items.json"
 EXAMPLE = REPO / "examples/readouts/multi_concept_directed_modulation.jsonl"
 
-# the shape every binding item's completion has: sentence, blank line, empty think block, then
-# the model re-writing the prompt
+# the shape every binding item's completion had under the pre-2026-09-23 rollout regime: sentence,
+# blank line, empty think block, then the model re-writing the prompt (the region rule is kept)
 WITH_THINK = [
     "review",
     " the",
@@ -175,16 +176,18 @@ def test_convert_read_json_round_trip(tmp_path):
 
 
 def test_toy_file_regions():
-    """The toy file is three items of the s3d read of record: d-plumber (novel), b-ange-mix-ab
-    (binding) and d-none (control), tokens intact so the regions are the real ones."""
+    """The toy file is three items of the s3d read of record (prefill regime, 2026-09-23): d-plumber
+    (novel), b-ange-mix-ab (binding) and d-none (control); the window is the 12 prefilled sentence
+    tokens, so every cell is in-sentence."""
     cells, rep = load_readouts(EXAMPLE)
     assert rep.kind == "prose" and rep.layers == [44, 52, 56, 60]
     assert all(c.token is not None for c in cells)
     for item in ("d-plumber", "b-ange-mix-ab", "d-none"):
         toks = {c.pos: c.token for c in cells if c.id == item}
-        assert sorted(toks) == list(range(-20, 0))
+        assert sorted(toks) == list(range(-12, 0))
+        assert "".join(toks[p] for p in sorted(toks)) == TARGET_SENTENCE
         labels, comp = label_cells([toks[p] for p in sorted(toks)])
-        assert comp.complied and Region.IN_SENTENCE in labels
+        assert comp.complied and labels == [Region.IN_SENTENCE] * 12
 
 
 def test_toy_run_with_a_scripted_judge(tmp_path, monkeypatch):
