@@ -158,7 +158,7 @@ Working in a git worktree that shares the main checkout's `.venv`: prefix comman
 **Arithmetic intermediates** — [`evals/arithmetic_intermediates/README.md`](evals/arithmetic_intermediates/README.md)
 - *What it is:* A bare two- or three-operation expression answered with no chain of thought; the intermediate is never written. Fourteen expression shapes; since 2026-09-23 read at every token of the prompt at layers 56 and 60 (`opts=cells=all`), one pre-registered frozen cell per shape before.
 - *Example:* `Compute (271 - 322) * 14.` → intermediate −51; the frozen cell is layer 56, eight tokens before the end of the prompt.
-- *Judged by:* one prompt-blind free-recall call per cell naming the values the readout presents as computed, each verified against the readout's numerals; pass = a named value within the variant's tolerance of the intermediate at any judged cell; the permutation null over the item's null set beside it.
+- *Judged by:* prompt-blind free recall — under `cells=all` one call per (item, layer) listing every position as a numbered entry and answered per entry, one call per cell at the frozen cell — naming the values each readout presents as computed, each verified against that readout's numerals; pass = a named value within the variant's tolerance of the intermediate at any judged cell; the permutation null over the item's null set beside it.
 
 ### Safety
 
@@ -255,7 +255,7 @@ please") — no judge call; their forced-choice judge of 2026-09-16 is `opts=jud
 | family | judge model | prompt version |
 |---|---|---|
 | agentic_misalignment | claude-sonnet-5 | am-narrative-v1 |
-| arithmetic_intermediates | google/gemini-3.8-flash | arith-free-2026-09-23 |
+| arithmetic_intermediates | google/gemini-3.8-flash | arith-free-2026-09-23 (frozen cell) / arith-free-batched-2026-09-23 (`cells=all`, one call per item and layer) |
 | association | google/gemini-3.8-flash | bank-2026-09-16 |
 | basic_readout | google/gemini-3.8-flash | bank-2026-09-16 |
 | basic_readout_mt | regex (deterministic) | mt-regex-2026-09-23 |

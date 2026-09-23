@@ -1,6 +1,9 @@
 """Arithmetic intermediates: a blind free-recall judge names the values a readout presents as
-computed at one frozen cell per variant; an item passes when a named value lands within its
-variant's tolerance of the never-written intermediate. Null and per-variant table: the README."""
+computed; an item passes when a named value lands within its variant's tolerance of the
+never-written intermediate. ``cells=frozen`` (default) judges the variant's one pre-registered
+cell per item, one call per cell; ``cells=all`` judges every (layer, position) row in the file
+with ONE call per (item, layer) that lists every position as a numbered entry and answers per
+entry (Camila, 2026-09-23). Null and per-variant table: the README."""
 
 import re
 from collections import defaultdict
@@ -24,7 +27,17 @@ from wsbench.readouts import Cell, load_readouts
 from wsbench.registry import REPO_ROOT, JudgeArgs
 from wsbench.results import FamilyResult
 
-from .prompts import MAX_VALUES, PROMPT_VERSION, SCHEMA, SYSTEM, render_user
+from .prompts import (
+    MAX_VALUES,
+    PROMPT_VERSION,
+    PROMPT_VERSION_BATCH,
+    SCHEMA,
+    SCHEMA_BATCH,
+    SYSTEM,
+    SYSTEM_BATCH,
+    render_batch_user,
+    render_user,
+)
 
 NAME = "arithmetic_intermediates"
 BANK = REPO_ROOT / "evals" / NAME / "items.json"
@@ -134,6 +147,30 @@ def verdict(
 BANDS = ("exact", "rel5pct")  # the accuracy bands reported beside the variant's own tolerance
 
 
+def batch_entries(res: dict[str, Any] | None, n: int) -> dict[int, dict[str, Any]]:
+    """A batched reply's entries by ``k`` (1..n). The first well-formed entry per k wins; an
+    entry with a missing, non-integer or out-of-range k, or without a values list, is dropped,
+    and every k without an entry is an unjudged cell."""
+    out: dict[int, dict[str, Any]] = {}
+    if not isinstance(res, dict) or not isinstance(res.get("entries"), list):
+        return out
+    for e in res["entries"]:
+        if not isinstance(e, dict):
+            continue
+        k = e.get("k")
+        if isinstance(k, bool) or not isinstance(k, int | float) or int(k) != k:
+            continue
+        k = int(k)
+        if 1 <= k <= n and k not in out and isinstance(e.get("values"), list):
+            out[k] = e
+    return out
+
+
+def valid_batch(call: Call, res: dict[str, Any]) -> bool:
+    """A batched reply with no usable entry at all is re-queued on the next run."""
+    return bool(batch_entries(res, int(call.meta["n_entries"])))
+
+
 def cell_grid(args: JudgeArgs) -> str:
     """``opts=cells=frozen`` (default) reads the variant's one pre-registered cell;
     ``opts=cells=all`` reads every (layer, position) row in the file, any-cell rule."""
@@ -169,13 +206,14 @@ def run(args: JudgeArgs) -> FamilyResult:
     require_cells(NAME, missing, len(ids), args)
     texts: dict[tuple[str, int, int], str] = {}
     plain: dict[tuple[str, int, int], str] = {}
+    tokens: dict[tuple[str, int, int], str | None] = {}
     empty: set[tuple[str, int, int]] = set()
     for i, cs in cells_of.items():
         for c in cs:
             judge_text, bare = cell_text(c)
             key = (i, c.layer, c.pos)
             if judge_text.strip():
-                texts[key], plain[key] = judge_text, bare
+                texts[key], plain[key], tokens[key] = judge_text, bare, c.token
             else:
                 empty.add(key)
     target = {i: float(by_id[i]["intermediates"][0]) for i in ids}
@@ -186,29 +224,62 @@ def run(args: JudgeArgs) -> FamilyResult:
     }
 
     spend = Spend()
+    prompt_version = PROMPT_VERSION_BATCH if mode == "all" else PROMPT_VERSION
+    # answer[(item, layer, pos)] -> the judge's per-cell dict (values / basis / quote) or None
+    answer: dict[tuple[str, int, int], dict[str, Any] | None] = {}
     with Cache(args.out / "cells.jsonl") as cache:
-        calls = [
-            Call(
-                key=f"{i}|L{layer:03d}|p{pos}",
-                system=SYSTEM,
-                user=render_user(texts[(i, layer, pos)]),
-                meta={"item": i, "layer": layer, "pos": pos},
-            )
-            for (i, layer, pos) in sorted(texts)
-        ]
-        results = run_calls(
-            calls,
-            schema=SCHEMA,
-            judge=args.judge,
-            prompt_version=PROMPT_VERSION,
-            cache=cache,
-            spend=spend,
-            concurrency=args.concurrency,
-            rpm=args.rpm,
-            dry_run=args.dry_run,
-            preflight=Preflighter(args.dry_run).for_judge(args.judge),
-            temperature=0.0,
-        )
+        common: dict[str, Any] = {
+            "judge": args.judge,
+            "prompt_version": prompt_version,
+            "cache": cache,
+            "spend": spend,
+            "concurrency": args.concurrency,
+            "rpm": args.rpm,
+            "dry_run": args.dry_run,
+            "preflight": Preflighter(args.dry_run).for_judge(args.judge),
+            "temperature": 0.0,
+        }
+        if mode == "all":
+            # one call per (item, layer): every non-empty position of that layer, in position
+            # order, as entries [1..n]; the reply is one result per entry
+            groups: dict[tuple[str, int], list[int]] = defaultdict(list)
+            for i, layer, pos in sorted(texts):
+                groups[(i, layer)].append(pos)
+            slot: dict[tuple[str, int, int], tuple[str, int]] = {}
+            calls = []
+            for (i, layer), poss in sorted(groups.items()):
+                key = f"{i}|L{layer:03d}|all"
+                entries = []
+                for k, pos in enumerate(poss, 1):
+                    slot[(i, layer, pos)] = (key, k)
+                    entries.append((k, pos, tokens[(i, layer, pos)], texts[(i, layer, pos)]))
+                calls.append(
+                    Call(
+                        key=key,
+                        system=SYSTEM_BATCH,
+                        user=render_batch_user(entries, bag=rep.kind == "tokens"),
+                        meta={"item": i, "layer": layer, "n_entries": len(poss), "positions": poss},
+                    )
+                )
+            results = run_calls(calls, schema=SCHEMA_BATCH, validate=valid_batch, **common)
+            parsed = {
+                c.key: batch_entries(results.get(c.key), int(c.meta["n_entries"])) for c in calls
+            }
+            for cell_key, (key, k) in slot.items():
+                answer[cell_key] = parsed[key].get(k)
+        else:
+            calls = [
+                Call(
+                    key=f"{i}|L{layer:03d}|p{pos}",
+                    system=SYSTEM,
+                    user=render_user(texts[(i, layer, pos)]),
+                    meta={"item": i, "layer": layer, "pos": pos},
+                )
+                for (i, layer, pos) in sorted(texts)
+            ]
+            results = run_calls(calls, schema=SCHEMA, **common)
+            for i, layer, pos in texts:
+                answer[(i, layer, pos)] = results.get(f"{i}|L{layer:03d}|p{pos}")
 
     rows = []
     cell_rows = []
@@ -227,13 +298,7 @@ def run(args: JudgeArgs) -> FamilyResult:
                     "cross": 0.0 if nulls[i] else None,
                 }
             else:
-                v = verdict(
-                    results.get(f"{i}|L{c.layer:03d}|p{c.pos}"),
-                    target[i],
-                    tol[i],
-                    nulls[i],
-                    plain[key],
-                )
+                v = verdict(answer.get(key), target[i], tol[i], nulls[i], plain[key])
             verdicts.append({"layer": c.layer, "pos": c.pos, **v})
             cell_rows.append({"id": i, **verdicts[-1]})
         judged = [v for v in verdicts if v["judged"]]
@@ -284,6 +349,7 @@ def run(args: JudgeArgs) -> FamilyResult:
                 "cross": cross,
                 "bands": bands,
                 "hits_at": hits_at,
+                "unjudged_at": sorted((v["layer"], v["pos"]) for v in verdicts if not v["judged"]),
                 "earliest_layer": min((L for L, _p in hits_at), default=None),
             }
         )
@@ -314,7 +380,7 @@ def run(args: JudgeArgs) -> FamilyResult:
     result = pass_rate_result(
         name=NAME,
         args=args,
-        prompt_version=PROMPT_VERSION,
+        prompt_version=prompt_version,
         rows=rows,
         cells=cells,
         rep=rep,
@@ -326,9 +392,14 @@ def run(args: JudgeArgs) -> FamilyResult:
         spend=spend,
         chance_label=CHANCE_LABEL,
         skipped_extra=n_off_cell,
-        config_extra={"cells": mode, "layers_judged": layers_seen},
+        config_extra={
+            "cells": mode,
+            "packaging": "one call per (item, layer)" if mode == "all" else "one call per cell",
+            "layers_judged": layers_seen,
+        },
         extras={
             "n_calls": len(calls),
+            "n_calls_failed": sum(1 for c in calls if results.get(c.key) is None) if calls else 0,
             "n_rows_off_cell": n_off_cell,
             "cells_per_item": mean(float(r["n_cells"]) for r in rows),
             "cross": cross_rate,

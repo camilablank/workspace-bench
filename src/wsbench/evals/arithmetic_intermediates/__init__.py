@@ -1,5 +1,7 @@
 """Arithmetic intermediates: a bare two- or three-operation expression answered with no chain of
-thought; does the lens assert the never-written intermediate at the variant's frozen cell?"""
+thought; does the lens assert the never-written intermediate — at the variant's frozen cell
+(``cells=frozen``) or anywhere in the prompt, one batched call per item and layer
+(``cells=all``)?"""
 
 from pathlib import Path
 
@@ -19,7 +21,7 @@ SPEC = register(
         metric="pass_rate",
         higher_is_better=True,
         run=judge.run,
-        calls_per_arm="596",
+        calls_per_arm="≈ 1.2k (cells=all: 596 items x 2 layers, one call each; 596 frozen / L42)",
         sources="",
     )
 )
