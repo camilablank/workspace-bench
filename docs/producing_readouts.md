@@ -89,10 +89,13 @@ and wants readouts without writing the plumbing. Install the `gpu` extra and:
 ```python
 from wsbench.produce import Producer
 
-p = Producer.load("Qwen/Qwen3.6-27B", "jlens")     # logit_lens | jlens | rlens | olens | nla
+# methods: logit_lens | jlens | rlens | olens | nla
+p = Producer.load("Qwen/Qwen3.6-27B", "jlens")
 p.read("The athlete Muhammad Ali plays the sport of", pos=-1, layer=36).readout.tokens
 p.read_prompt("Sechs geteilt durch zwei ist", positions="all", layers=[20, 36, 60])
-p.run_family("poetry", "readouts/mine/poetry.jsonl", limit=10)   # resumable; the plan picks the cells
+# a whole eval set, resumable; the plan picks the cells
+p.run_family("poetry", "readouts/mine/poetry.jsonl", limit=10)
+p.use("olens")  # swap method, keep the loaded model
 ```
 
 The same from the shell:
