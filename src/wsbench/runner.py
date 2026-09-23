@@ -145,9 +145,11 @@ def run_families(
             outcomes[s.name] = FamilyOutcome(s.name, "skipped", error=msg)
         else:
             runnable.append((s, readouts))
-    if runnable and not args.dry_run:
+    # a family with a deterministic scorer of record makes no call unless opts=judge=mc
+    needs_llm = [s for s, _r in runnable if not s.scorer or opts.get("judge") == "mc"]
+    if needs_llm and not args.dry_run:
         try:
-            _seed_preflights({s.name: judges[s.name] for s, _r in runnable})
+            _seed_preflights({s.name: judges[s.name] for s in needs_llm})
         except JudgeConfigError as e:
             print(f"judge config error: {e}", file=sys.stderr)
             return [], 3

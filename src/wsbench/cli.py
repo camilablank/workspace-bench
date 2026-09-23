@@ -125,7 +125,7 @@ class ListFamilies(Command):
                 s.group,
                 _n_items(s),
                 s.metric,
-                s.judge.model,
+                s.scorer or s.judge.model,
                 s.judge.prompt_version,
                 s.calls_per_arm or "?",
                 s.sources or "—",

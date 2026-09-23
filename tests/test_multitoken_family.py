@@ -1,4 +1,5 @@
-"""The shared multi-token judge: letter parsing, the quote gate, the per-item rule, a toy run."""
+"""The optional multi-token MC judge (``opts=judge=mc``): letter parsing, the quote gate, the
+per-item rule, a toy run. The regex scorer of record is tested in ``test_mt_regex.py``."""
 
 import importlib
 import json
@@ -167,6 +168,7 @@ def test_run_family_toy_run_with_a_scripted_judge(tmp_path, monkeypatch):
         concurrency=1,
         rpm=1.0,
         dry_run=False,
+        extra={"judge": "mc"},
     )
     r = fam.run_family(args, name="typo_mt")
     by_id = {row["id"]: row for row in r.rows}
@@ -178,7 +180,8 @@ def test_run_family_toy_run_with_a_scripted_judge(tmp_path, monkeypatch):
     assert r.counts["n_empty_cells"] == 2 and r.counts["n_unjudged_cells"] == 2
     assert r.extras["n_unjudged_units"] == 2 and r.extras["n_items_undecided"] == 1
     assert r.extras["kinds"] == {"correct": 1, "cannot": 3, "unavailable": 2}
-    assert not r.complete  # a subset run is never complete
+    assert not r.complete and not r.pinned_instrument  # a diagnostic, never the number of record
+    assert r.config["prompt_version"] == PROMPT_VERSION and r.config["instrument_of_record"]
 
 
 @pytest.mark.parametrize("name", MT)
@@ -189,7 +192,7 @@ def test_dry_run_on_the_toy_file(name, tmp_path, capsys, monkeypatch):
     out = tmp_path / "out"
     example = REPO / "examples/readouts" / f"{name}.jsonl"
     argv = ["judge", f"family={name}", f"readouts={example}", f"out={out}", "dry_run=True"]
-    assert main(argv) == 0
+    assert main([*argv, "opts=judge=mc"]) == 0
     r = read_results(out)
-    assert r.value is None and r.family == name
+    assert r.value is None and r.family == name and not r.pinned_instrument
     assert "[user]" in capsys.readouterr().out

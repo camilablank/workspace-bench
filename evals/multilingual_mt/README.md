@@ -1,44 +1,74 @@
 # multilingual_mt
 
-A non-English prompt whose answer is a multi-token concept; the judge must pick both the concept's English name and the passage's language, each from five options, in one layer.
+A non-English prompt whose answer is a multi-token concept; the lens must write the concept (its English or Chinese form) AND show the passage's language, both in one layer.
 
 100 items (source bank `lens-eval-multilingual-hard.json`, parent `multilingual-mt`,
 frozen 2026-09-10). Plain render, one read position: the final prompt token, immediately
 before the answer word. Every item and every bridge was gated on Qwen3.6-27B (greedy-verified,
 then >= 8/10 at temperature 0.7).
 
-Example: a Polish sentence about a concept → the concept's English name among four same-kind confusables, and Polish among Czech, Slovak, Ukrainian, Croatian, both in one layer.
+Example: a Polish sentence about a concept → the concept's `en`/`zh` form (`hourglass`, `sand timer`, `沙漏`) and the language (`Polish`, `波兰语`, or the answer in Polish) in one layer.
 
-Judged units: `concept` (frozen `mc` block) and `language` (the fixed confusable set for the prompt's language).
+Scored units: `concept` (required; `en` + `zh` forms) and `language` (required; the language's English or Chinese name, or the answer in the source language's own script).
 
-The bank file is a frozen copy of the source repo's hard-tier bank: its `family` header and `contract` block describe the source's regex contract and are not read by this judge.
+The bank file is a frozen copy of the source repo's hard-tier bank; its `contract` block, per-unit `forms` and `probe_token_lens` counts are exactly what the scorer reads.
 
 ## Scoring
 
-- **Headline: judged pass rate.** One forced-choice call per (item, layer, judged unit). The
-  judge never sees the prompt: it reads the cell's readout (the samples at the read position,
-  one per line) and five options, the unit's gold plus four confusables, with the escape
-  "cannot tell" last. It must abstain when the readout names none or several of the options, so
-  a hedged list of candidates fails. A pick counts only with a verbatim quote from the readout.
-- **Conjunctive:** a layer passes an item only when EVERY judged unit is picked correctly at
-  that layer; item pass = any layer. `extras.unit_any_layer` gives each unit's any-layer
-  accuracy on its own, `extras.abstain_rate` the escape rate, `extras.kinds` the pick counts.
-- **Options** are frozen per item (`tests/golden/multilingual_mt_options.json`): the bank's `mc` blocks
-  where they exist (concept, bridge and readout units: four same-kind confusables written by
-  the source repo's option pass), the source instrument's fixed confusable set per language, and
-  for typo corrections four other items' corrections drawn with a seeded rule. Option order is a
-  seeded shuffle keyed by item and unit, identical for every arm and subset.
-- Token readouts (a J-lens) are summarized first by the shared summarizer (`docs/summarizer.md`),
-  because a top-10 token bag cannot hold a multi-token form; a failed summary leaves its item
-  undecided.
-- An item with no passing layer and an unjudged unit, a failed summary, or a missing (item,
-  layer) cell is undecided and left out of the denominator (`extras.n_items_undecided`); a cell
-  whose samples are all blank is a negative. Exactly one read position per (item, layer) is
+- **Headline: regex pass rate** — `scorer_version` `mt-regex-2026-09-23`, deterministic, no judge
+  call, `spend_usd` 0, `judge_model` `regex`. The scorer is `wsbench.multitoken.regex`, a port of
+  the source repo's conjunctive bank scorer (`olens_suite/bank/matching.py`, `contract.py`,
+  `conjunctive.py`, `olens_sglang/score_targets.py`); goldens computed by the source code pin it
+  (`tests/golden/mt_regex_units.json`, `tests/golden/mt_regex_matching.json`).
+- **The contract, verbatim from the source:** (1) a cell's samples are its prose samples, or each
+  top-k token string of a token lens; chat scaffolding (`<|im_start|>`, `<|im_end|>`, `<think>`,
+  `</think>`, `<explanation>` tags) is stripped first. (2) The item's `units[]` are scored; under the
+  bank's `multi_token` contract only forms the bank stamped as strictly multi-token stay
+  (`probe_token_lens` > 1: the source's count is the minimum over case variants and bare /
+  leading-space encodings, so a form any single Qwen3.6-27B token could equal never earns
+  credit); units marked `multi_token: false` (the language units) keep every form. (3) A form hits
+  a sample when, after folding both sides (NFKD, combining marks dropped, curly apostrophe
+  straightened, casefold), a wordy form matches at word boundaries with `[\s-]+` between its words
+  (`Bohr magneton` = `Bohr-magneton`; `kentes` is not `kente`), a form containing CJK or Hangul or
+  non-word characters is a plain substring, and a purely numeric form must sit in answer position
+  (after `=`, `->`, `equals`, `answer/result/value/total/sum/product/quotient [is][:]`, their
+  Chinese counterparts, or alone at the start of the sample, never as a prefix of a longer number;
+  a CJK numeral there counts when it parses to the value). A form is matched against ONE sample at
+  a time — never a join of samples or of adjacent top-k tokens. (4) A unit hits at a layer when any
+  of its forms hits any sample at that layer, in any listed language. (5) A layer passes the item
+  when EVERY required unit hits there; the item passes at any layer.
+- **Scored units of this family:** `concept` (required; `en` + `zh` forms) and `language` (required; the language's English or Chinese name, or the answer in the source language's own script).
+- **Token lenses:** a strictly multi-token form can never equal one vocabulary token, so a top-k
+  token lens (J-lens, R-lens, logit, tuned) cannot satisfy a required multi-token unit by
+  construction — the source's stated asymmetry ("multi-token targets can only be hit by the oracle
+  lens"). A producer whose "tokens" are phrases or labels (the template lens, an SAE's auto-interp
+  labels) can. Token strings are matched as the producer wrote them (`Ġ`/`▁` as a space, byte-level
+  pieces of non-Latin tokens as they are), exactly as the source scorer saw them.
+- **Item rule:** an item whose every expected layer is scored and never passes fails; a cell whose
+  samples are all blank is a negative at that layer; an item with a MISSING (item, layer) cell and
+  no pass is undecided (`extras.n_items_undecided`). Exactly one read position per (item, layer) is
   expected; a file with more is refused. Missing cells are fatal (exit 2) unless
-  `allow_missing=True`.
-- No analytic floor for an any-layer conjunction (1/6 per unit call). The measured floors are
-  the lucky-guessing baseline (an LLM shown only these option lists) and the prompt-only
-  baseline (stock Qwen3.6-27B given the prompt text, no activation), both later PRs.
+  `allow_missing=True`; `layers=` restricts the grid and counts as a subset.
+- **Extras:** `any_hit_rate` (some unit hit somewhere — the parent-comparable number; Camila's
+  2026-09-23 substring preview corresponds to this, not to the conjunctive pass), `unit_any_layer`
+  per role, `language_of_readout` (which language each unit surfaced in first), and `mc` (the
+  forced-choice judge's number when `out/results.json` still holds one, so both instruments sit
+  side by side without a call).
+- **Floors:** the prompt-only baseline was re-measured under this scorer on 2026-09-23
+  (`evals/baselines/README.md`); the MC lucky-guessing floor has no meaning without option lists
+  and is no longer drawn.
+
+## Instrument history
+
+- Source repo (bank frozen 2026-09-10): this regex contract was the headline
+  (`score_targets.py --match word --exact`).
+- 2026-09-16 -> 2026-09-23 (PR #20): a forced-choice Gemini judge (`mc-2026-09-16`) replaced it —
+  one prompt-blind five-way call per (item, layer, unit) with a cannot-tell escape and a
+  verbatim-quote gate. Values of record then: s3d-rl600 0.93, s3d-sft251 0.91, nla-rl-L42 0.53, sae-l42 0.00.
+- 2026-09-23, Camila: "regex on the multitoken please" — the regex contract is the headline again;
+  on the same readouts: s3d-rl600 0.62, s3d-sft251 0.40, nla-rl-L42 0.44, sae-l42 0.02. The MC judge stays reachable with `opts=judge=mc`
+  (its result is never pinned, so never `complete` and never in the macro; its prompts are kept
+  verbatim below).
 
 ## Readouts
 
@@ -50,7 +80,10 @@ wsbench judge family=multilingual_mt readouts=examples/readouts/multilingual_mt.
 wsbench judge family=multilingual_mt readouts=<arm>.jsonl out=outputs/<arm>/multilingual_mt limit=3
 ```
 
-## Judge prompts
+## Judge prompts (the optional forced-choice judge, `opts=judge=mc`)
+
+Not the instrument of record since 2026-09-23 (see Instrument history); run with
+`opts=judge=mc` to obtain it beside the regex number.
 
 `prompt_version`: `mc-2026-09-16`. Judge: the repo default (`google/gemini-3.8-flash`),
 temperature 0. Output schema: `{"choice": "A".."F", "quote": str}`. The user message is the

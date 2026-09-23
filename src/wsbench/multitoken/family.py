@@ -1,7 +1,12 @@
-"""Multi-token basic families: one forced-choice judge call per (item, layer, unit); a layer
-passes when every unit is picked correctly with a verbatim quote, an item at any layer."""
+"""Multi-token basic families. Scorer of record (since 2026-09-23): the deterministic regex
+contract in ``wsbench.multitoken.regex`` — no judge call, a layer passes when every required
+unit's form is found in a sample at that layer, an item at any layer. The forced-choice Gemini
+judge that was the instrument from 2026-09-16 stays reachable with ``opts=judge=mc`` (one call
+per (item, layer, unit); its numbers are diagnostics, never pinned)."""
 
-from collections import defaultdict
+import dataclasses
+import json
+from collections import Counter, defaultdict
 from pathlib import Path
 from typing import Any
 
@@ -16,24 +21,32 @@ from wsbench.family import (
     require_cells,
     tri_state,
 )
-from wsbench.judge_config import JudgeConfig
+from wsbench.judge_config import JudgeConfig, ResolvedJudge
 from wsbench.llm import Spend
 from wsbench.mc import fold, letter_index  # fold is part of this module's public surface
 from wsbench.mcjudge import Call, Preflighter, item_scope, run_calls, with_readout_count
+from wsbench.multitoken import regex
 from wsbench.multitoken.options import judged_roles, option_sets
 from wsbench.multitoken.prompts import LETTERS, PROMPT_VERSION, SCHEMA, SYSTEM, render_user
+from wsbench.multitoken.regex import SCORER_VERSION
 from wsbench.readouts import Cell, load_readouts
 from wsbench.registry import REPO_ROOT, EvalSpec, JudgeArgs
 from wsbench.results import FamilyResult
 from wsbench.summarizer import SUMMARIZER_PROMPT_VERSION, aux_judge, render_bag, summarize
 
-__all__ = ["fold", "letter_index", "mt_family", "run_family", "verdict"]
+__all__ = ["fold", "letter_index", "mt_family", "run_family", "run_mc", "run_regex", "verdict"]
 
 GROUP = "basic_mt"
+SCORER = "regex"
 CHANCE_LABEL = (
+    "no analytic floor for an any-layer conjunction of exact-form matches; the measured floor is "
+    "the prompt-only baseline (the MC lucky-guessing floor does not apply to the regex scorer)"
+)
+MC_CHANCE_LABEL = (
     "no analytic floor for an any-layer conjunction (per call 1/6 per unit); the measured floors "
     "are the lucky-guessing and prompt-only baselines"
 )
+REGEX_JUDGE = ResolvedJudge(model=SCORER, reasoning=None, pinned=True, source="family")
 
 
 def mt_family(name: str, title: str, *, calls_per_arm: str) -> EvalSpec:
@@ -42,15 +55,190 @@ def mt_family(name: str, title: str, *, calls_per_arm: str) -> EvalSpec:
         title=title,
         group=GROUP,
         bank=Path("evals") / name / "items.json",
-        judge=JudgeConfig(prompt_version=PROMPT_VERSION),
+        # the instrument is the regex contract; the JudgeConfig model is what opts=judge=mc uses
+        judge=JudgeConfig(prompt_version=SCORER_VERSION),
         metric="pass_rate",
         higher_is_better=True,
         run=lambda args: run_family(args, name=name),
-        calls_per_arm=calls_per_arm,
+        calls_per_arm=f"0 (regex); {calls_per_arm} with opts=judge=mc",
         sources="",
+        scorer=SCORER,
     )
 
 
+def run_family(args: JudgeArgs, *, name: str) -> FamilyResult:
+    """``opts=judge=regex`` (default) or ``opts=judge=mc``."""
+    which = args.extra.get("judge", SCORER)
+    if which == SCORER:
+        return run_regex(args, name=name)
+    if which == "mc":
+        return run_mc(args, name=name)
+    fail(f"{name}: opts=judge must be 'regex' (default) or 'mc', not {which!r}")
+
+
+# ---------------------------------------------------------------------------------------------
+# the regex contract (scorer of record)
+# ---------------------------------------------------------------------------------------------
+def _cell_samples(cell: Cell) -> list[str]:
+    """One sample per prose sample, or one per top-k token string (as written by the
+    producer); scaffolding stripped; blanks dropped."""
+    raw = cell.tokens if cell.tokens is not None else (cell.samples or ())
+    out = [regex.extract_phrase(str(s)) for s in raw]
+    return [s for s in out if s]
+
+
+def _previous_mc(out: Path) -> dict[str, Any] | None:
+    """The MC judge's number when ``out/results.json`` still holds one (the regime before this
+    scorer, or an ``opts=judge=mc`` run) — carried into ``extras["mc"]`` so the two instruments
+    sit side by side without a judge call."""
+    path = out / "results.json"
+    if not path.exists():
+        return None
+    try:
+        d = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return None
+    cfg = d.get("config") or {}
+    if not str(cfg.get("prompt_version", "")).startswith("mc-"):
+        return None
+    return {
+        "value": (d.get("numbers") or {}).get("value"),
+        "prompt_version": cfg.get("prompt_version"),
+        "judge_model": cfg.get("judge_model"),
+        "n_items_decided": (d.get("numbers") or {}).get("extras", {}).get("n_items_decided"),
+    }
+
+
+def run_regex(args: JudgeArgs, *, name: str) -> FamilyResult:
+    header, items = load_bank(REPO_ROOT / "evals" / name / "items.json")
+    contract = regex.contract_for(header, str(header.get("family", name)))
+    scope = item_scope(items, args)
+    ids = [it["id"] for it in scope]
+    try:
+        units_of = {it["id"]: regex.scored_units(it, contract) for it in scope}
+    except ValueError as e:
+        fail(f"{name}: bank violates its own contract: {e}")
+    cells, rep = load_readouts(args.readouts, ids=ids, layers=args.layers)
+    layers = args.layers if args.layers is not None else rep.layers
+    positions: dict[tuple[str, int], list[Cell]] = defaultdict(list)
+    for c in cells:
+        positions[(c.id, c.layer)].append(c)
+    multi = sorted(k for k, cs in positions.items() if len({c.pos for c in cs}) > 1)
+    if multi:
+        fail(
+            f"{name}: {len(multi)} (item, layer) cells carry more than one read position "
+            f"(first: {multi[0]}); this family reads the final prompt token only"
+        )
+    missing = [(i, layer) for i in ids for layer in layers if (i, layer) not in positions]
+    require_cells(name, missing, len(ids) * len(layers), args)
+    previous_mc = _previous_mc(args.out)
+
+    if args.dry_run:
+        _print_dry_run(name, contract, scope, units_of, positions, layers, missing)
+
+    empty: set[tuple[str, int]] = set()
+    hits_by: dict[str, dict[int, dict[str, list[str]]]] = defaultdict(dict)
+    for (item_id, layer), cs in sorted(positions.items()):
+        samples = _cell_samples(cs[0])
+        if not samples:
+            empty.add((item_id, layer))
+        hits_by[item_id][layer] = (
+            regex.layer_unit_hits(samples, units_of[item_id]) if not args.dry_run else {}
+        )
+
+    rows: list[dict[str, Any]] = []
+    for item_id in ids:
+        units = units_of[item_id]
+        res = regex.item_result(hits_by.get(item_id, {}), units)
+        item_missing = [layer for i, layer in missing if i == item_id]
+        incomplete = bool(item_missing) or not hits_by.get(item_id) or args.dry_run
+        rows.append(
+            {
+                "id": item_id,
+                "roles": [u.role for u in units if u.required],
+                "optional_roles": [u.role for u in units if not u.required],
+                "pass": tri_state(res["pass"], incomplete),
+                "earliest_layer": res["earliest_layer"],
+                "passing_layers": res["passing_layers"],
+                "unit_hit": res["unit_hit"],
+                "unit_langs": res["unit_langs"],
+                "first_lang": res["first_lang"],
+                "any_hit": res["any_hit"],
+                "missing_layers": item_missing,
+                "layers": {
+                    str(layer): {"hits": h, "empty": (item_id, layer) in empty}
+                    for layer, h in sorted(hits_by.get(item_id, {}).items())
+                },
+            }
+        )
+    decided = [r for r in rows if r["pass"] is not None]
+    roles = sorted({r for row in rows for r in (*row["roles"], *row["optional_roles"])})
+    first_lang: dict[str, Counter[str]] = defaultdict(Counter)
+    for row in decided:
+        for role, lang in row["first_lang"].items():
+            if lang is not None:
+                first_lang[role][lang] += 1
+    result = pass_rate_result(
+        name=name,
+        args=dataclasses.replace(args, judge=REGEX_JUDGE),
+        prompt_version=SCORER_VERSION,
+        rows=rows,
+        cells=cells,
+        rep=rep,
+        n_expected=len(ids) * len(layers),
+        n_missing=len(missing),
+        n_unjudged=0,
+        n_empty=len(empty),
+        spend=Spend(),
+        chance_label=CHANCE_LABEL,
+        config_extra={
+            "layers_judged": layers,
+            "scorer": SCORER,
+            "scorer_version": SCORER_VERSION,
+            "contract": dataclasses.asdict(contract),
+        },
+        extras={
+            "n_calls": 0,
+            "any_hit_rate": rate(row["any_hit"] for row in decided),
+            "unit_any_layer": {
+                r: rate(row["unit_hit"][r] for row in decided if r in row["unit_hit"])
+                for r in roles
+            },
+            "language_of_readout": {r: dict(c) for r, c in sorted(first_lang.items())},
+            **({"mc": previous_mc} if previous_mc else {}),
+        },
+    )
+    return with_readout_count(result, scope, cells)
+
+
+def _print_dry_run(
+    name: str,
+    contract: regex.BankContract,
+    scope: list[dict[str, Any]],
+    units_of: dict[str, list[regex.ScoredUnit]],
+    positions: dict[tuple[str, int], list[Cell]],
+    layers: list[int],
+    missing: list[tuple[str, int]],
+) -> None:
+    print(
+        f"[regex] {name}: scorer {SCORER_VERSION}, contract {dataclasses.asdict(contract)}, "
+        f"{len(scope)} items x {len(layers)} layers, {len(missing)} missing cells"
+    )
+    if scope:
+        first = scope[0]["id"]
+        print(f"[regex] units of {first}:")
+        for u in units_of[first]:
+            print(f"  {u.role} (required={u.required}): {json.dumps(u.forms, ensure_ascii=False)}")
+        key = next((k for k in sorted(positions) if k[0] == first), None)
+        if key is not None:
+            samples = _cell_samples(positions[key][0])
+            print(f"[regex] first cell {key}: {len(samples)} samples, scored -> ", end="")
+            print(json.dumps(regex.layer_unit_hits(samples, units_of[first]), ensure_ascii=False))
+
+
+# ---------------------------------------------------------------------------------------------
+# the forced-choice judge (opts=judge=mc): the instrument from 2026-09-16 to 2026-09-23
+# ---------------------------------------------------------------------------------------------
 def verdict(
     res: dict[str, Any] | None, gold_idx: int, options: list[str], readout: str
 ) -> dict[str, Any]:
@@ -90,7 +278,9 @@ def verdict(
     }
 
 
-def run_family(args: JudgeArgs, *, name: str) -> FamilyResult:
+def run_mc(args: JudgeArgs, *, name: str) -> FamilyResult:
+    """The forced-choice judge, one call per (item, layer, unit). Not the instrument of record:
+    the result is never pinned, so it is never ``complete`` and never enters the macro."""
     _header, items = load_bank(REPO_ROOT / "evals" / name / "items.json")
     scope = item_scope(items, args)
     ids = [it["id"] for it in scope]
@@ -197,7 +387,8 @@ def run_family(args: JudgeArgs, *, name: str) -> FamilyResult:
     roles = sorted({r for i in ids for r in judged_roles(by_id[i])})
     result = pass_rate_result(
         name=name,
-        args=args,
+        # a diagnostic instrument: never pinned, so never complete and never in the macro
+        args=dataclasses.replace(args, judge=dataclasses.replace(args.judge, pinned=False)),
         prompt_version=PROMPT_VERSION,
         rows=rows,
         cells=cells,
@@ -208,10 +399,11 @@ def run_family(args: JudgeArgs, *, name: str) -> FamilyResult:
         n_unjudged=len(unjudged_cells),
         n_empty=len(empty),
         spend=spend,
-        chance_label=CHANCE_LABEL,
+        chance_label=MC_CHANCE_LABEL,
         config_extra={
             "layers_judged": layers,
             "summarizer": SUMMARIZER_PROMPT_VERSION if rep.kind == "tokens" else None,
+            "instrument_of_record": SCORER_VERSION,
         },
         extras={
             "n_calls": len(calls),

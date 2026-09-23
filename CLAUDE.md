@@ -48,8 +48,13 @@ cell). `wsbench convert-gen-dir gen_dir=GEN out=F.jsonl kind=prose|tokens` conve
   shuffles, `fold`, `letter_index` (a lone letter or a letter with its own option text).
   `summarizer.py`: token bag -> prose (prompt in `docs/summarizer.md`).
 - Shared judges: `basic/` (the bank judge, `bank_family(name, title)`) and `multitoken/`
-  (forced choice per unit, `mt_family(name, title, calls_per_arm=)`); their families are three-line
-  packages under `evals/`. Option lists are pinned by goldens in `tests/golden/`.
+  (`mt_family(name, title, calls_per_arm=)`): its scorer of record is the deterministic regex
+  contract `multitoken/regex.py` (a port of the source repo's `bank/matching.py` +
+  `contract.py` + `conjunctive.py`; no call, `spend_usd` 0, `EvalSpec.scorer="regex"`, pinned by
+  goldens `tests/golden/mt_regex_*.json` made by the source code); the forced-choice judge is
+  `opts=judge=mc` (never pinned). Their families are three-line packages under `evals/`. Option
+  lists are pinned by goldens in `tests/golden/`. A spec with `scorer` set is not preflighted by
+  `run` unless `opts=judge=mc`, and `wsbench list` shows the scorer in the judge column.
 - Baselines (`baselines/`): `lucky_guessing` (option lists from the judges' own builders, blind /
   described / uniform) and `prompt_only`; `wsbench freeze` stamps entries with the family's
   `prompt_version`, and `report` shows a floor only while the stamp matches.
