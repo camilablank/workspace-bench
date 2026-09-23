@@ -73,7 +73,7 @@ Working in a git worktree that shares the main checkout's `.venv`: prefix comman
 - *Judged by:* the shared bank judge, one call per (item, layer): pass = a target concept is NAMED with a verbatim quote verified against one sample; item passes at any layer.
 
 **Multihop** — [`evals/multihop/README.md`](evals/multihop/README.md)
-- *What it is:* A factual prompt whose answer needs one silent hop ("Fact: The chemical symbol for the element with atomic number 26 is" -> `Fe` via *iron*); does the lens name the bridge concept at the final prompt token.
+- *What it is:* A factual prompt whose answer needs one silent hop ("Fact: The chemical symbol for the element with atomic number 26 is" -> `Fe` via *iron*); does the lens name the bridge concept at the last word of the prompt.
 - *Example:* "Fact: The chemical symbol for the element with atomic number 26 is" → surface answer `Fe`; target (bridge) `iron`.
 - *Judged by:* the shared bank judge, one call per (item, layer): pass = a target concept is NAMED with a verbatim quote verified against one sample; item passes at any layer.
 

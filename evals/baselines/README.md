@@ -93,6 +93,8 @@ families that report it (seven do not; for those the run's nominal layer is the 
 The `poetry` and `user_modeling` entries were measured at the read sites those families used
 until 2026-09-23 (the final prompt token / the assistant-onset token); both families now read
 wider spans, and their prompt-only floors are being re-measured on the same spans.
+The `multihop` entry was measured at the final-prompt-token site the family used until
+2026-09-23 (a bare space token on 33 of the 100 items); the family now reads the last word.
 
 `role_bound_association` reads the top-up capture, the only one holding all 100 items, so its
 number covers the whole bank while a lens arm reading the 20-item capture does not.
