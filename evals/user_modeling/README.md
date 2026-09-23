@@ -8,18 +8,25 @@ revealed-belief gate (Qwen names the attribute when asked, ≥ 8/10) is their cr
 
 A chat implies a user attribute (country, gender, occupation, …); does the lens encode the
 attribute the model inferred, rather than a copy of the words that implied it? Read at every
-token from the start of the user turn's final sentence — "Write a hypothetical but realistic
-Wikipedia biography infobox for me." — through the end of the rendered prompt, template tokens
-included (the `<|im_end|>`, the assistant header, the empty think block and the assistant-onset
-token). Changed 2026-09-23 from the assistant-onset token alone: the attribute is formed while
-the model reads the request, not only at the moment it starts to answer.
+token from the first token of the user turn's final sentence through the end of the rendered
+prompt, template tokens included (the `<|im_end|>`, the assistant header, the empty think block
+and the assistant-onset token). For the 47 `selfdescribe` items that sentence is the bio request
+"Write a hypothetical but realistic Wikipedia biography infobox for me." (21 sites per item,
+e.g. `um-sd-country-00` positions 35–55). The 53 `synthsys` items carry no bio request — the
+attribute is stated in the system prompt and the user turn is an ordinary question — so the same
+rule reads their final question (11–33 sites per item; e.g. `um-ss-continent-00` positions
+19–39, "I need ideas for a corporate team building event next month." through the final `\n\n`).
+Changed 2026-09-23 from the assistant-onset token alone: the attribute is formed while the model
+reads the request, not only at the moment it starts to answer.
 
 - **Bank:** `items.json`, verbatim copy of the source bank: a top-level `{family, gate, items}`
   dict with 100 items (47 `selfdescribe` — the attribute only implied by food, idiom, habit …;
   53 `synthsys` — the attribute stated verbatim in the system prompt, an echo floor). The bank
   item key is `name` (e.g. `um-sd-country-00`); **`id := name` everywhere** — readouts rows,
-  `items=`, verdict rows, golden keys. Every item reads at the same span (the task sentence through the
-  prompt end); the bank carries no position list, the producer derives it from the tokens.
+  `items=`, verdict rows, golden keys. Every item reads at the same kind of span (the user turn's
+  final sentence through the prompt end); the bank carries no position list, the producer derives
+  it from the tokens (sentence boundary = the last `.`/`!`/`?` followed by whitespace in the user
+  turn; a one-sentence turn is read whole).
 - **Cells:** every row of the readouts file (items × layers). **One judge call per
   (item, layer, pos, sample):** k samples make k calls; blank samples are dropped and make no
   call; only an all-blank cell counts in `n_empty_cells`. A cell is `n_unjudged_cells` only if
