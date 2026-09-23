@@ -6,16 +6,20 @@ SelfDescribe set; the `synthsys` items use system prompts from their SynthSysPre
 revealed-belief gate (Qwen names the attribute when asked, ≥ 8/10) is their criterion. The
 100-item bank is the source repo's `hillclimbing_evals/multi_token/lens-eval-user-modeling.json`.
 
-A chat implies a user attribute (country, gender, occupation, …); does the lens at the
-assistant-onset token — the final prompt token, where the model is about to respond — encode
-the attribute the model inferred, rather than a copy of the words that implied it?
+A chat implies a user attribute (country, gender, occupation, …); does the lens encode the
+attribute the model inferred, rather than a copy of the words that implied it? Read at every
+token from the start of the user turn's final sentence — "Write a hypothetical but realistic
+Wikipedia biography infobox for me." — through the end of the rendered prompt, template tokens
+included (the `<|im_end|>`, the assistant header, the empty think block and the assistant-onset
+token). Changed 2026-09-23 from the assistant-onset token alone: the attribute is formed while
+the model reads the request, not only at the moment it starts to answer.
 
 - **Bank:** `items.json`, verbatim copy of the source bank: a top-level `{family, gate, items}`
   dict with 100 items (47 `selfdescribe` — the attribute only implied by food, idiom, habit …;
   53 `synthsys` — the attribute stated verbatim in the system prompt, an echo floor). The bank
   item key is `name` (e.g. `um-sd-country-00`); **`id := name` everywhere** — readouts rows,
-  `items=`, verdict rows, golden keys. Every item reads at one position (the final prompt
-  token); the bank carries no position list.
+  `items=`, verdict rows, golden keys. Every item reads at the same span (the task sentence through the
+  prompt end); the bank carries no position list, the producer derives it from the tokens.
 - **Cells:** every row of the readouts file (items × layers). **One judge call per
   (item, layer, pos, sample):** k samples make k calls; blank samples are dropped and make no
   call; only an all-blank cell counts in `n_empty_cells`. A cell is `n_unjudged_cells` only if

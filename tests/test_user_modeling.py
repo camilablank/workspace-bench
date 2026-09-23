@@ -22,7 +22,7 @@ def _items() -> list[dict]:
 
 def test_bank_loads():
     bank = load_bank("user_modeling")
-    assert set(bank) == {"family", "gate", "items"} and bank["family"] == "user-modeling"
+    assert set(bank) == {"family", "gate", "read", "items"} and bank["family"] == "user-modeling"
     items = bank["items"]
     assert len(items) == 100
     for it in items:
@@ -244,4 +244,4 @@ def test_dry_run_prints_and_makes_no_calls(tmp_path, mk_args, capsys, monkeypatc
     assert res.value is None and res.ci95 is None and res.rows == []
     assert res.config["dry_run"] is True and res.complete is False
     assert res.counts["spend_usd"] == 0.0 and res.n_items == 100
-    assert res.counts["n_expected_cells"] == 4 and res.counts["n_empty_cells"] == 0
+    assert res.counts["n_expected_cells"] == 8 and res.counts["n_empty_cells"] == 0

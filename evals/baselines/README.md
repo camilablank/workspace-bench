@@ -90,6 +90,10 @@ families that report it (seven do not; for those the run's nominal layer is the 
 | the nine frozen 2026-09-18 | 44 | the nominal layer of that generation |
 | `buggy_code`, `arithmetic_intermediates` | 56 | their activations were captured at layers 56/60 only |
 
+The `poetry` and `user_modeling` entries were measured at the read sites those families used
+until 2026-09-23 (the final prompt token / the assistant-onset token); both families now read
+wider spans, and their prompt-only floors are being re-measured on the same spans.
+
 `role_bound_association` reads the top-up capture, the only one holding all 100 items, so its
 number covers the whole bank while a lens arm reading the 20-item capture does not.
 
