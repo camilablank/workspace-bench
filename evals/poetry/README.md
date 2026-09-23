@@ -1,7 +1,11 @@
 # poetry
 
 A rhyming couplet cut before its final word; the scored latent is the committed rhyme
-word. 100 items, plain render, one read position.
+word. 100 items, plain render, read at the **newline that ends line one**, one position per
+layer. The read moved there on 2026-09-23 from the final prompt token, the space before the
+rhyme word: at the end of line one the model has committed to a rhyme and the O-lens already
+writes line two with it, while at the final token the readout echoes the line just read. The
+judge is unchanged: one call per (item, layer), an item passing on any layer.
 
 Example: "A rhyming couplet: The captain pointed at the route ahead, And told his crew to follow where he'd" -> target `led`.
 

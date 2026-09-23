@@ -83,7 +83,7 @@ Working in a git worktree that shares the main checkout's `.venv`: prefix comman
 - *Judged by:* the shared bank judge, one call per (item, layer): pass = a target concept is NAMED with a verbatim quote verified against one sample; item passes at any layer.
 
 **Poetry** — [`evals/poetry/README.md`](evals/poetry/README.md)
-- *What it is:* A rhyming couplet cut before its last word ("...follow where he'd"); does the lens name the rhyme word (`led`) at the final prompt token.
+- *What it is:* A rhyming couplet cut before its last word ("...follow where he'd"); does the lens name the rhyme word (`led`) at the newline ending line one.
 - *Example:* "A rhyming couplet: The captain pointed at the route ahead, And told his crew to follow where he'd" → target `led`.
 - *Judged by:* the shared bank judge, one call per (item, layer): pass = a target concept is NAMED with a verbatim quote verified against one sample; item passes at any layer.
 
@@ -170,7 +170,7 @@ Working in a git worktree that shares the main checkout's `.venv`: prefix comman
 ### Association
 
 **User modelling** — [`evals/user_modeling/README.md`](evals/user_modeling/README.md)
-- *What it is:* A chat implies a user attribute (country, gender, occupation…); does the lens at the assistant-onset token encode the inferred attribute.
+- *What it is:* A chat implies a user attribute (country, gender, occupation…); does the lens encode the inferred attribute anywhere from the task sentence ("Write a hypothetical … infobox for me.") through the assistant-onset token.
 - *Example:* "…sit with family over a table full of banchan… write a Wikipedia infobox for me" → target `south korea`.
 - *Judged by:* 6-way identification MC (gold + 4 same-class distractors + cannot tell), gold never disclosed; headline pass = gold picked with basis `inferred`, at any cell.
 
